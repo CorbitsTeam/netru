@@ -1,0 +1,87 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/constants/app_constants.dart';
+import 'package:netru_app/features/home/presentation/widgets/carousel_card.dart';
+import 'package:netru_app/features/home/presentation/widgets/home_up_bar.dart';
+import 'package:netru_app/features/home/presentation/widgets/latest_issues_card.dart';
+import 'package:netru_app/features/home/presentation/widgets/statistics_cards.dart';
+import 'package:netru_app/features/home/presentation/widgets/trending_Issues_card.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: 12.w),
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                HomeUpBar(),
+                SizedBox(height: 10.h),
+                Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "security".tr(),
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.bold,
+                        fontSize: 16.sp,
+                        color: AppColors
+                            .primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                CarouselCard(),
+                SizedBox(height: 15.h),
+                Text(
+                  "statistics".tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                StatisticsCards(),
+                SizedBox(height: 15.h),
+                Text(
+                  "latestIssues".tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                LatestIssuesCard(),
+                SizedBox(height: 15.h),
+                Text(
+                  "trendingIssues".tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                TrendingIssuesCard(),
+                SizedBox(height: 10.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

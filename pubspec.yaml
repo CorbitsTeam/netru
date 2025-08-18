@@ -1,0 +1,60 @@
+name: netru_app
+description: A new Flutter project with Clean Architecture
+# Flutter version on machine: 3.35.1
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  animate_do: ^4.2.0
+  animator: ^3.3.0
+  cached_network_image: ^3.4.1
+  cupertino_icons: ^1.0.8
+  dartz: ^0.10.1
+  dio: ^5.9.0
+  easy_localization: ^3.0.8
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  flutter_animate: ^4.5.2
+  flutter_bloc: null
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.2.0
+  freezed_annotation: ^3.1.0
+  get_it: ^8.2.0
+  google_fonts: ^6.3.0
+  intl: ^0.20.2
+  json_annotation: ^4.9.0
+  lottie: ^3.3.1
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  bloc_test: null
+  build_runner: null
+  flutter_lints: null
+  flutter_test:
+    sdk: flutter
+  freezed: null
+  json_serializable: null
+  mockito: null
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/lottie/
+    - assets/translations/
+
+  fonts:
+    - family: Almarai
+      fonts:
+        - asset: assets/fonts/Almarai-Regular.ttf
+        - asset: assets/fonts/Almarai-Bold.ttf
+        - asset: assets/fonts/Almarai-ExtraBold.ttf
+        - asset: assets/fonts/Almarai-Light.ttf
