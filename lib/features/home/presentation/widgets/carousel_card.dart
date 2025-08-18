@@ -1,0 +1,274 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/constants/app_constants.dart';
+
+class CarouselCard extends StatefulWidget {
+  const CarouselCard({super.key});
+
+  @override
+  State<CarouselCard> createState() =>
+      _CarouselCardState();
+}
+
+class _CarouselCardState
+    extends State<CarouselCard>
+    with TickerProviderStateMixin {
+  int _currentIndex = 0;
+  late AnimationController _slideController;
+  late AnimationController _dotController;
+  late Animation<Offset> _slideAnimation;
+
+  // بيانات الصور والنصوص
+  final List<Map<String, String>> _carouselData =
+      [
+    {
+      'image': AppAssets.newsImages,
+      'title':
+          'القبض على عنصر إرهابي شديد الخطورة',
+      'date': '15 يوليو 2024'
+    },
+    {
+      'image': AppAssets.newsImage2,
+      'title':
+          'الإستجابة لحالات التسول في الاسواق',
+      'date': '20 يوليو 2024'
+    },
+    {
+      'image': AppAssets.newsImage3,
+      'title':
+          'الداخلية تقبض على شبكة احتيال إلكتروني',
+      'date': '10 يوليو 2024'
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // إعداد animation controller للـ slide
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    // إعداد animation controller للنقط
+    _dotController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeInOut,
+    ));
+
+    // بدء الـ animation
+    _slideController.forward();
+    _dotController.forward();
+
+    // بدء التغيير التلقائي كل ثانيتين
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    Future.delayed(const Duration(seconds: 2),
+        () {
+      if (mounted) {
+        _changeSlide();
+        _startAutoSlide();
+      }
+    });
+  }
+
+  void _changeSlide() async {
+    // slide out للصورة الحالية
+    await _slideController.reverse();
+
+    setState(() {
+      _currentIndex = (_currentIndex + 1) %
+          _carouselData.length;
+    });
+
+    // slide in للصورة الجديدة
+    _slideController.forward();
+
+    // تحريك النقط
+    _dotController.reset();
+    _dotController.forward();
+  }
+
+  @override
+  void dispose() {
+    _slideController.dispose();
+    _dotController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 180.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Stack(
+          children: [
+            // الصورة الخلفية مع الـ slide animation
+            ...List.generate(_carouselData.length,
+                (index) {
+              return Positioned.fill(
+                child: AnimatedOpacity(
+                  opacity: index == _currentIndex
+                      ? 1.0
+                      : 0.0,
+                  duration: const Duration(
+                      milliseconds: 300),
+                  child: Image.asset(
+                    _carouselData[index]
+                        ['image']!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }),
+
+            // طبقة شفافة سوداء للنص
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black
+                          .withOpacity(0.7),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // المحتوى النصي والنقط
+            Positioned(
+              bottom: 16.h,
+              left: 16.w,
+              right: 16.w,
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // التاريخ مع النقط في نفس الصف
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .spaceBetween,
+                    children: [
+                      // التاريخ
+                      Text(
+                        _carouselData[
+                                _currentIndex]
+                            ['date']!,
+                        style: TextStyle(
+                          color: Colors.white
+                              .withOpacity(0.8),
+                          fontSize: 12.sp,
+                          fontWeight:
+                              FontWeight.w500,
+                        ),
+                        textDirection:
+                            TextDirection.rtl,
+                      ),
+
+                      // النقط المتحركة
+                      Row(
+                        children: List.generate(
+                          _carouselData.length,
+                          (index) =>
+                              AnimatedBuilder(
+                            animation:
+                                _dotController,
+                            builder:
+                                (context, child) {
+                              return Container(
+                                margin: EdgeInsets
+                                    .only(
+                                        left:
+                                            6.w),
+                                child:
+                                    AnimatedContainer(
+                                  duration:
+                                      Duration(
+                                    milliseconds:
+                                        index ==
+                                                _currentIndex
+                                            ? 300
+                                            : 150,
+                                  ),
+                                  width: index ==
+                                          _currentIndex
+                                      ? 16.w
+                                      : 6.w,
+                                  height: 6.h,
+                                  decoration:
+                                      BoxDecoration(
+                                    color: index ==
+                                            _currentIndex
+                                        ? Colors
+                                            .white
+                                        : Colors
+                                            .white
+                                            .withOpacity(
+                                                0.5),
+                                    borderRadius:
+                                        BorderRadius
+                                            .circular(
+                                                3.r),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 8.h),
+
+                  // العنوان
+                  Text(
+                    _carouselData[_currentIndex]
+                        ['title']!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                    textDirection:
+                        TextDirection.rtl,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "appName": "My App",
+  "welcome": "Welcome",
+  "login": "Login",
+  "signUp": "Sign Up",
+  "home": "Home",
+  "security": "Security services' efforts",
+  "statistics": "Statistics",
+  "latestIssues": "Latest Issues",
+  "trendingIssues": "Trending Issues",
+  "map": "Map",
+  "settings": "Settings",
+  "issues": "Issues"
+}
