@@ -2,7 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/constants/app_constants.dart';
-import 'package:netru_app/features/home/presentation/screens/home_screen.dart';
+import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
+import 'package:netru_app/features/reports/presentation/pages/reports_page.dart';
 
 class CustomBottomBar extends StatefulWidget {
   const CustomBottomBar({super.key});
@@ -20,7 +21,7 @@ class _CustomBottomBarState
     const HomeScreen(),
     const Center(child: Text("الخريطه")),
     const Center(child: Text("إضافة")),
-    const Center(child: Text("البلاغات")),
+    const ReportsPage(),
     const Center(child: Text("الإعدادات")),
   ];
 
@@ -68,8 +69,8 @@ class _CustomBottomBarState
               label: "",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.help_outline),
-              label: "issues".tr(),
+              icon: Icon(Icons.help_outlined),
+              label: "reports".tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),

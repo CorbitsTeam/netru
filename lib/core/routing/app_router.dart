@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:netru_app/features/home/presentation/screens/home_screen.dart';
+import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
+import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
 import '../routing/routes.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -14,6 +15,9 @@ class AppRouter {
       case Routes.customBottomBar:
         return _createRoute(
             const CustomBottomBar());
+      case Routes.reportDetailsPage:
+        return _createRoute(
+            const ReportDetailsPage());
 
       default:
         return null;
