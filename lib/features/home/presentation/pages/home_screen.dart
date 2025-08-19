@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/home/presentation/widgets/carousel_card.dart';
 import 'package:netru_app/features/home/presentation/widgets/home_up_bar.dart';
-import 'package:netru_app/features/home/presentation/widgets/latest_issues_card.dart';
+import 'package:netru_app/features/home/presentation/widgets/latest_cases_card.dart';
 import 'package:netru_app/features/home/presentation/widgets/statistics_cards.dart';
-import 'package:netru_app/features/home/presentation/widgets/trending_Issues_card.dart';
+import 'package:netru_app/features/home/presentation/widgets/trending_cases_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                 StatisticsCards(),
                 SizedBox(height: 15.h),
                 Text(
-                  "latestIssues".tr(),
+                  "latestCases".tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,
@@ -64,10 +64,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                LatestIssuesCard(),
+                LatestCasesCard(),
                 SizedBox(height: 15.h),
                 Text(
-                  "trendingIssues".tr(),
+                  "trendingCases".tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,
@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                TrendingIssuesCard(),
+                TrendingCasesCard(),
                 SizedBox(height: 10.h),
               ],
             ),

@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/constants/app_constants.dart';
 
-class LatestIssuesCard extends StatefulWidget {
-  const LatestIssuesCard({super.key});
+class LatestCasesCard extends StatefulWidget {
+  const LatestCasesCard({super.key});
 
   @override
-  State<LatestIssuesCard> createState() =>
-      _LatestIssuesCardState();
+  State<LatestCasesCard> createState() =>
+      _LatestCasesCardState();
 }
 
-class _LatestIssuesCardState
-    extends State<LatestIssuesCard>
+class _LatestCasesCardState
+    extends State<LatestCasesCard>
     with TickerProviderStateMixin {
   int _currentIndex = 0;
   late AnimationController _slideController;
