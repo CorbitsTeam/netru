@@ -26,5 +26,6 @@
   "location": "Location",
   "reportDate": "Report Date & Time",
   "procedures": "Procedures",
-  "media": "Media"
+  "media": "Media",
+  "heatMap": "Heat Map"
 }
