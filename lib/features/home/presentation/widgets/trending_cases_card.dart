@@ -280,6 +280,9 @@ class _TrendingCasesCardState
                       fontWeight: FontWeight.bold,
                       height: 1.2,
                     ),
+                    overflow:
+                        TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ],
               ),
