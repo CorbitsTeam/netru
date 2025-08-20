@@ -9,4 +9,6 @@ class Routes {
       '/customBottomBar';
   static const String reportDetailsPage =
       '/reportDetailsPage';
+  static const String crimeHeatMapPage =
+      '/crimeHeatMapPage';
 }

@@ -24,7 +24,7 @@ class ProceduresSection extends StatelessWidget {
           height: 10.h,
         ),
         Container(
-          width: 125.w,
+          width: 135.w,
           height: 25.h,
           decoration: BoxDecoration(
             color: AppColors.orange,

@@ -74,7 +74,7 @@ class ReportCard extends StatelessWidget {
                 ),
                 Container(
                   height: 25.h,
-                  width: 125.w,
+                  width: 135.w,
                   decoration: BoxDecoration(
                     color: reportData.statusColor,
                     borderRadius:
