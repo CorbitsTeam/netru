@@ -38,7 +38,7 @@ class HomeUpBar extends StatelessWidget {
               SizedBox(width: 8.w),
               Column(
                 crossAxisAlignment:
-                    CrossAxisAlignment.end,
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     "أحمد اسعد",
