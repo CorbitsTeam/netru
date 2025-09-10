@@ -11,4 +11,6 @@ class Routes {
       '/reportDetailsPage';
   static const String crimeHeatMapPage =
       '/crimeHeatMapPage';
+  static const String notificationsPage =
+      '/notificationsPage';
 }

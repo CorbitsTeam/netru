@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
+import 'package:netru_app/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
-import '../routing/routes.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../routing/routes.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -22,6 +23,9 @@ class AppRouter {
       case Routes.crimeHeatMapPage:
         return _createRoute(
             const CrimeHeatMapPage());
+      case Routes.notificationsPage:
+        return _createRoute(
+            const NotificationsPage());
       default:
         return null;
     }
