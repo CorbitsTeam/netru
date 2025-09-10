@@ -5,16 +5,16 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   animate_do: ^4.2.0
-  animator: ^3.3.0
+  animator:
   cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.0
-  easy_localization: ^3.0.8
+  easy_localization:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
@@ -30,7 +30,7 @@ dependencies:
   get_it: ^8.2.0
   google_fonts: ^6.3.0
   http: ^1.5.0
-  intl: ^0.20.2
+  intl:
   json_annotation: ^4.9.0
   latlong2: ^0.9.1
   location: ^8.0.1
