@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                       MainAxisAlignment.center,
                   children: [
                     Text(
-                      "security".tr(),
+                      "جهود الأجهزة الأمنية",
                       style: TextStyle(
                         fontWeight:
                             FontWeight.bold,

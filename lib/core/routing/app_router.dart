@@ -22,7 +22,6 @@ class AppRouter {
       case Routes.crimeHeatMapPage:
         return _createRoute(
             const CrimeHeatMapPage());
-
       default:
         return null;
     }
