@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:netru_app/features/newsdetails/presentation/cubit/news_cubit.dart';
 import 'core/constants/app_constants.dart';
 import 'core/cubit/locale/locale_cubit.dart';
 import 'core/cubit/theme/theme_cubit.dart';
@@ -47,11 +48,13 @@ void main() async {
               create: (_) => LocaleCubit()),
           BlocProvider(
               create: (_) => ThemeCubit()),
-
-          // إضافة PermissionCubit الجديد
           BlocProvider(
               create: (_) => PermissionCubit(
                   PermissionService())),
+          BlocProvider<NewsCubit>(
+            create: (context) =>
+                NewsCubit()..loadNews(),
+          ),
         ],
         child: MyApp(appRouter: AppRouter()),
       ),
