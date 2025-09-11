@@ -61,10 +61,7 @@ class PermissionRepositoryImpl implements PermissionRepository {
     } catch (e) {
       _logger.logError('Unexpected error in requestMultiplePermissions', e);
       return Left(
-        PermissionFailure(
-          message: 'Failed to request multiple permissions',
-          code: 500,
-        ),
+        PermissionFailure('Failed to request multiple permissions'),
       );
     }
   }
@@ -96,10 +93,7 @@ class PermissionRepositoryImpl implements PermissionRepository {
     } catch (e) {
       _logger.logError('Unexpected error in getAllPermissionsStatus', e);
       return Left(
-        PermissionFailure(
-          message: 'Failed to get all permissions status',
-          code: 500,
-        ),
+        PermissionFailure('Failed to get all permissions status'),
       );
     }
   }

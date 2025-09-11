@@ -92,7 +92,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return Right(identityDocument);
     } on Exception catch (e) {
       _logger.e('Saving identity document failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while saving document: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
@@ -112,7 +112,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return Right(documents);
     } on Exception catch (e) {
       _logger.e('Fetching user documents failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while fetching documents: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
@@ -132,7 +132,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return Right(document);
     } on Exception catch (e) {
       _logger.e('Fetching document by ID failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while fetching document: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
@@ -158,7 +158,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return Right(document);
     } on Exception catch (e) {
       _logger.e('Updating document status failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while updating status: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
@@ -176,7 +176,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return const Right(null);
     } on Exception catch (e) {
       _logger.e('Deleting document failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while deleting document: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
@@ -194,7 +194,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
       return Right(hasVerified);
     } on Exception catch (e) {
       _logger.e('Checking verification status failed: $e');
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     } catch (e) {
       _logger.e('Unexpected error while checking status: $e');
       return Left(GenericFailure(message: 'Unexpected error occurred'));
