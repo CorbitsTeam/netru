@@ -84,9 +84,9 @@ class _CrimeHeatMapPageState
         child: Column(
           children: [
             // شريط البحث
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: const MapSearchBar(),
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: MapSearchBar(),
             ),
             // الخريطة
             Expanded(

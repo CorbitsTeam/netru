@@ -22,7 +22,7 @@ class ReportsPage extends StatelessWidget {
           ),
         ),
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: 12),

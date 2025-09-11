@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 class CrimeLegendWidget extends StatelessWidget {
   const CrimeLegendWidget({super.key});
@@ -11,7 +12,7 @@ class CrimeLegendWidget extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(20.w),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Column(

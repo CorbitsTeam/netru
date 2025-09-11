@@ -20,8 +20,9 @@ class CrimeDataModel {
   /// تحديد مستوى الخطر بناءً على عدد الجرائم
   CrimeLevel get crimeLevel {
     if (crimeCount >= 30) return CrimeLevel.high;
-    if (crimeCount >= 15)
+    if (crimeCount >= 15) {
       return CrimeLevel.medium;
+    }
     return CrimeLevel.low;
   }
 
