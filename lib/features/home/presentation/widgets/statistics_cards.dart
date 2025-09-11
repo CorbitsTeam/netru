@@ -8,8 +8,7 @@ class StatisticsCards extends StatelessWidget {
   const StatisticsCards({super.key});
 
   // بيانات الـ cards
-  final List<Map<String, dynamic>> _cardsData =
-      const [
+  final List<Map<String, dynamic>> _cardsData = const [
     {
       'icon': AppIcons.alarm,
       'iconBackgroundColor': Color(0xFFFEE2E2),
@@ -54,19 +53,12 @@ class StatisticsCards extends StatelessWidget {
           return Container(
             width: 170.w,
             margin: EdgeInsets.only(
-              left: index == _cardsData.length - 1
-                  ? 0
-                  : 12.w,
+              left: index == _cardsData.length - 1 ? 0 : 12.w,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(8.r),
-              border: Border.all(
-                color:
-                    Colors.grey.withOpacity(0.2),
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
             ),
             child: Padding(
               padding: EdgeInsets.all(12.w),
@@ -75,12 +67,8 @@ class StatisticsCards extends StatelessWidget {
                   // النصوص والأرقام
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
                           children: [
@@ -88,27 +76,18 @@ class StatisticsCards extends StatelessWidget {
                             Container(
                               width: 32.w,
                               height: 32.h,
-                              decoration:
-                                  BoxDecoration(
-                                color: cardData[
-                                    'iconBackgroundColor'],
-                                shape: BoxShape
-                                    .circle,
+                              decoration: BoxDecoration(
+                                color: cardData['iconBackgroundColor'],
+                                shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding:
-                                    const EdgeInsets
-                                        .all(5),
-                                child: SvgPicture
-                                    .asset(
-                                  cardData[
-                                      'icon'],
+                                padding: const EdgeInsets.all(5),
+                                child: SvgPicture.asset(
+                                  cardData['icon'],
                                   height: 12.h,
                                   width: 12.w,
-                                  color: cardData[
-                                      'iconColor'],
-                                  fit: BoxFit
-                                      .contain,
+                                  color: cardData['iconColor'],
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
@@ -116,9 +95,7 @@ class StatisticsCards extends StatelessWidget {
                             // النص
                             Text(
                               cardData['title'],
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                              ),
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ],
                         ),
@@ -129,8 +106,7 @@ class StatisticsCards extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16.sp,
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(height: 5.h),
@@ -138,30 +114,22 @@ class StatisticsCards extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              cardData[
-                                  'percentage'],
+                              cardData['percentage'],
                               style: TextStyle(
-                                color: cardData[
-                                    'percentageColor'],
+                                color: cardData['percentageColor'],
                                 fontSize: 12.sp,
-                                fontWeight:
-                                    FontWeight
-                                        .w600,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             SizedBox(width: 4.w),
                             Expanded(
                               child: Text(
-                                cardData[
-                                    'percentageText'],
+                                cardData['percentageText'],
                                 style: TextStyle(
-                                  color: cardData[
-                                      'percentageColor'],
+                                  color: cardData['percentageColor'],
                                   fontSize: 12.sp,
                                 ),
-                                overflow:
-                                    TextOverflow
-                                        .ellipsis,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],

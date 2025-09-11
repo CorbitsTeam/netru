@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:netru_app/core/error/failures.dart';
+import 'package:netru_app/core/errors/failures.dart';
 import '../entities/user_entity.dart';
 
 abstract class AuthRepository {

@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:netru_app/core/error/failures.dart';
+import 'package:netru_app/core/errors/failures.dart';
 import 'package:netru_app/core/usecases/usecase.dart';
 import '../entities/identity_document.dart';
 import '../repositories/verification_repository.dart';

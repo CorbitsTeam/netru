@@ -11,7 +11,7 @@ class AppTheme {
       primaryColor: AppColors.primaryColor,
       scaffoldBackgroundColor: Colors.white,
       fontFamily: GoogleFonts.almarai().fontFamily,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primaryColor,
         secondary: AppColors.green,
         surface: Colors.white,
@@ -26,14 +26,14 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: AppColors.primaryColor),
+        iconTheme: const IconThemeData(color: AppColors.primaryColor),
         titleTextStyle: TextStyle(
           color: AppColors.primaryColor,
           fontSize: 20.sp,
           fontWeight: FontWeight.bold,
           fontFamily: GoogleFonts.almarai().fontFamily,
         ),
-        actionsIconTheme: IconThemeData(color: AppColors.primaryColor),
+        actionsIconTheme: const IconThemeData(color: AppColors.primaryColor),
       ),
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.all(AppColors.primaryColor),
@@ -103,7 +103,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryColor,
-          side: BorderSide(color: AppColors.primaryColor, width: 1.5),
+          side: const BorderSide(color: AppColors.primaryColor, width: 1.5),
           textStyle: textStyle(16.sp, FontWeight.w600, AppColors.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
@@ -133,11 +133,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.red),
+          borderSide: const BorderSide(color: AppColors.red),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         hintStyle: textStyle(14.sp, FontWeight.normal, AppColors.grey),

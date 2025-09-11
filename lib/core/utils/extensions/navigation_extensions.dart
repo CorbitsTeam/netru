@@ -48,7 +48,7 @@ extension NavigationExtensions on BuildContext {
     Object? arguments,
   }) => Navigator.of(this).pushNamedAndRemoveUntil<T>(
     routeName,
-     (route) => false,
+    (route) => false,
     arguments: arguments,
   );
 

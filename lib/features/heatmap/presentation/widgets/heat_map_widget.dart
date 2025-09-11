@@ -9,17 +9,13 @@ class HeatMapWidget extends StatefulWidget {
   const HeatMapWidget({super.key});
 
   @override
-  State<HeatMapWidget> createState() =>
-      _HeatMapWidgetState();
+  State<HeatMapWidget> createState() => _HeatMapWidgetState();
 }
 
-class _HeatMapWidgetState
-    extends State<HeatMapWidget>
+class _HeatMapWidgetState extends State<HeatMapWidget>
     with SingleTickerProviderStateMixin {
-  final MapController _mapController =
-      MapController();
-  final LocationService _locationService =
-      LocationService();
+  final MapController _mapController = MapController();
+  final LocationService _locationService = LocationService();
   late AnimationController _animationController;
   late Animation<double> _pulseAnimation;
 
@@ -82,17 +78,12 @@ class _HeatMapWidgetState
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
     _animationController.repeat();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _moveToCurrentLocation();
     });
   }
@@ -104,8 +95,7 @@ class _HeatMapWidgetState
   }
 
   void _moveToCurrentLocation() {
-    final currentLocation =
-        _locationService.currentLocation;
+    final currentLocation = _locationService.currentLocation;
     if (currentLocation != null) {
       _mapController.move(currentLocation, 11.0);
     }
@@ -114,8 +104,7 @@ class _HeatMapWidgetState
   @override
   Widget build(BuildContext context) {
     final currentLocation =
-        _locationService.currentLocation ??
-            const LatLng(30.0444, 31.2357);
+        _locationService.currentLocation ?? const LatLng(30.0444, 31.2357);
 
     return Stack(
       children: [
@@ -127,159 +116,121 @@ class _HeatMapWidgetState
             initialZoom: 11.0,
             minZoom: 5.0,
             maxZoom: 18.0,
-            interactionOptions:
-                const InteractionOptions(
+            interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
             ),
           ),
           children: [
             TileLayer(
-              urlTemplate:
-                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName:
-                  'com.example.netru_app',
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.netru_app',
             ),
             CircleLayer(
               circles: [
                 CircleMarker(
                   point: currentLocation,
                   radius: 100,
-                  color: Colors.blue
-                      .withOpacity(0.1),
-                  borderColor: Colors.blue
-                      .withOpacity(0.3),
+                  color: Colors.blue.withOpacity(0.1),
+                  borderColor: Colors.blue.withOpacity(0.3),
                   borderStrokeWidth: 1,
                   useRadiusInMeter: true,
                 ),
               ],
             ),
             CircleLayer(
-              circles: _crimeData
-                  .map((crime) => CircleMarker(
-                        point: crime.location,
-                        radius: _calculateRadius(
-                            crime.crimeCount),
-                        color: _getCrimeColor(
-                                crime.crimeCount)
-                            .withOpacity(0.6),
-                        borderColor:
-                            _getCrimeColor(
-                                crime.crimeCount),
-                        borderStrokeWidth: 2,
-                        useRadiusInMeter: true,
-                      ))
-                  .toList(),
+              circles:
+                  _crimeData
+                      .map(
+                        (crime) => CircleMarker(
+                          point: crime.location,
+                          radius: _calculateRadius(crime.crimeCount),
+                          color: _getCrimeColor(
+                            crime.crimeCount,
+                          ).withOpacity(0.6),
+                          borderColor: _getCrimeColor(crime.crimeCount),
+                          borderStrokeWidth: 2,
+                          useRadiusInMeter: true,
+                        ),
+                      )
+                      .toList(),
             ),
             MarkerLayer(
-              markers: _crimeData
-                  .map((crime) => Marker(
-                        point: crime.location,
-                        width: 120,
-                        height: 60,
-                        child: Column(
-                          mainAxisSize:
-                              MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding:
-                                  const EdgeInsets
-                                      .symmetric(
-                                      horizontal:
-                                          8,
-                                      vertical:
-                                          4),
-                              decoration:
-                                  BoxDecoration(
-                                color: Colors
-                                    .white
-                                    .withOpacity(
-                                        0.9),
-                                borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                            12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors
-                                        .black
-                                        .withOpacity(
-                                            0.2),
-                                    blurRadius: 4,
-                                    offset:
-                                        const Offset(
-                                            0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                crime.area,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
-                                  color: _getCrimeColor(
-                                      crime
-                                          .crimeCount),
+              markers:
+                  _crimeData
+                      .map(
+                        (crime) => Marker(
+                          point: crime.location,
+                          width: 120,
+                          height: 60,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
                                 ),
-                                textAlign:
-                                    TextAlign
-                                        .center,
-                              ),
-                            ),
-                            const SizedBox(
-                                height: 4),
-                            GestureDetector(
-                              onTap: () =>
-                                  _showCrimeDetails(
-                                      crime),
-                              child: Container(
-                                width: 24,
-                                height: 24,
-                                decoration:
-                                    BoxDecoration(
-                                  color: _getCrimeColor(
-                                      crime
-                                          .crimeCount),
-                                  shape: BoxShape
-                                      .circle,
-                                  border: Border.all(
-                                      color: Colors
-                                          .white,
-                                      width: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: _getCrimeColor(crime
-                                              .crimeCount)
-                                          .withOpacity(
-                                              0.4),
-                                      blurRadius:
-                                          6,
-                                      spreadRadius:
-                                          2,
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    '${crime.crimeCount}',
-                                    style:
-                                        const TextStyle(
-                                      color: Colors
-                                          .white,
-                                      fontSize: 8,
-                                      fontWeight:
-                                          FontWeight
-                                              .bold,
+                                child: Text(
+                                  crime.area,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: _getCrimeColor(crime.crimeCount),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              GestureDetector(
+                                onTap: () => _showCrimeDetails(crime),
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: _getCrimeColor(crime.crimeCount),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _getCrimeColor(
+                                          crime.crimeCount,
+                                        ).withOpacity(0.4),
+                                        blurRadius: 6,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${crime.crimeCount}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ))
-                  .toList(),
+                      )
+                      .toList(),
             ),
             MarkerLayer(
               markers: [
@@ -294,8 +245,7 @@ class _HeatMapWidgetState
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.blue
-                              .withOpacity(0.2),
+                          color: Colors.blue.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -305,14 +255,10 @@ class _HeatMapWidgetState
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                              color: Colors.white,
-                              width: 3),
+                          border: Border.all(color: Colors.white, width: 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.blue
-                                  .withOpacity(
-                                      0.5),
+                              color: Colors.blue.withOpacity(0.5),
                               blurRadius: 8,
                               spreadRadius: 2,
                             ),
@@ -359,12 +305,10 @@ class _HeatMapWidgetState
                 onPressed: () {
                   _mapController.move(
                     _mapController.camera.center,
-                    _mapController.camera.zoom +
-                        1,
+                    _mapController.camera.zoom + 1,
                   );
                 },
-                child: const Icon(Icons.add,
-                    color: Colors.black),
+                child: const Icon(Icons.add, color: Colors.black),
               ),
               SizedBox(height: 5.h),
               FloatingActionButton(
@@ -374,12 +318,10 @@ class _HeatMapWidgetState
                 onPressed: () {
                   _mapController.move(
                     _mapController.camera.center,
-                    _mapController.camera.zoom -
-                        1,
+                    _mapController.camera.zoom - 1,
                   );
                 },
-                child: const Icon(Icons.remove,
-                    color: Colors.black),
+                child: const Icon(Icons.remove, color: Colors.black),
               ),
             ],
           ),
@@ -457,120 +399,108 @@ class _HeatMapWidgetState
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(
-                    bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius:
-                      BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Row(
+      builder:
+          (context) => Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: _getCrimeColor(
-                        crime.crimeCount),
-                    shape: BoxShape.circle,
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    crime.area,
-                    style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight:
-                            FontWeight.bold),
+                Row(
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: _getCrimeColor(crime.crimeCount),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        crime.area,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  crime.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _getCrimeColor(crime.crimeCount).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.analytics_outlined,
+                        color: _getCrimeColor(crime.crimeCount),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'مستوى الكثافة: ${crime.crimeCount}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _getCrimeColor(crime.crimeCount),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _getCrimeColor(crime.crimeCount),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'إغلاق',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              crime.description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _getCrimeColor(
-                        crime.crimeCount)
-                    .withOpacity(0.1),
-                borderRadius:
-                    BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.analytics_outlined,
-                      color: _getCrimeColor(
-                          crime.crimeCount),
-                      size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'مستوى الكثافة: ${crime.crimeCount}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: _getCrimeColor(
-                          crime.crimeCount),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () =>
-                    Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _getCrimeColor(
-                      crime.crimeCount),
-                  padding:
-                      const EdgeInsets.symmetric(
-                          vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'إغلاق',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }

@@ -6,7 +6,6 @@ import '../../utils/app_shared_preferences.dart';
 part 'theme_state.dart';
 
 class ThemeCubit extends Cubit<ThemeState> {
-
   ThemeCubit() : super(ThemeState(_getInitialTheme()));
 
   static ThemeMode _getInitialTheme() {
@@ -21,14 +20,16 @@ class ThemeCubit extends Cubit<ThemeState> {
   }
 
   Future<void> changeTheme(ThemeMode newTheme) async {
-    await AppPreferences().setData(AppConstants.themeKey, _themeToString(newTheme));
+    await AppPreferences().setData(
+      AppConstants.themeKey,
+      _themeToString(newTheme),
+    );
     emit(ThemeState(newTheme));
   }
 
   Future<void> toggleTheme() async {
-    final newTheme = state.themeMode == ThemeMode.dark
-        ? ThemeMode.light
-        : ThemeMode.dark;
+    final newTheme =
+        state.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     await changeTheme(newTheme);
   }
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:logger/logger.dart';
-import 'package:netru_app/core/error/failures.dart';
+import 'package:netru_app/core/errors/failures.dart';
 import '../../domain/entities/identity_document.dart';
 import '../../domain/entities/extracted_document_data.dart';
 import '../../domain/repositories/verification_repository.dart';

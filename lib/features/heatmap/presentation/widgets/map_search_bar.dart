@@ -19,11 +19,7 @@ class MapSearchBar extends StatelessWidget {
           // زر البحث
           Padding(
             padding: const EdgeInsets.all(5.0),
-            child: Icon(
-              Icons.search,
-              color: Colors.grey[400],
-              size: 20,
-            ),
+            child: Icon(Icons.search, color: Colors.grey[400], size: 20),
           ),
 
           // حقل البحث
@@ -31,12 +27,8 @@ class MapSearchBar extends StatelessWidget {
             child: TextField(
               textAlign: TextAlign.right,
               decoration: InputDecoration(
-                hintText:
-                    'ابحث عن منطقة أو عنوان...',
-                hintStyle: TextStyle(
-                  fontSize: 12.sp,
-                  color: Colors.grey[400],
-                ),
+                hintText: 'ابحث عن منطقة أو عنوان...',
+                hintStyle: TextStyle(fontSize: 12.sp, color: Colors.grey[400]),
                 border: InputBorder.none,
               ),
             ),
@@ -48,14 +40,9 @@ class MapSearchBar extends StatelessWidget {
             height: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.primaryColor,
-              borderRadius:
-                  BorderRadius.circular(8.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            child: const Icon(
-              Icons.tune,
-              color: Colors.white,
-              size: 20,
-            ),
+            child: const Icon(Icons.tune, color: Colors.white, size: 20),
           ),
         ],
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
@@ -36,8 +35,7 @@ class NewsCubit extends Cubit<NewsState> {
     ),
     NewsModel(
       id: '3',
-      title:
-          'الداخلية تقبض على شبكة احتيال إلكتروني',
+      title: 'الداخلية تقبض على شبكة احتيال إلكتروني',
       date: '10 يوليو 2024',
       image: AppAssets.newsImage3,
       category: 'جرائم إلكترونية',
@@ -53,26 +51,22 @@ class NewsCubit extends Cubit<NewsState> {
   void loadNews() {
     emit(NewsLoading());
     try {
-      Future.delayed(
-          const Duration(milliseconds: 500), () {
+      Future.delayed(const Duration(milliseconds: 500), () {
         emit(NewsLoaded(newsList: _mockNews));
       });
     } catch (e) {
-      emit(NewsError(
-          message: 'حدث خطأ في تحميل الأخبار'));
+      emit(const NewsError(message: 'حدث خطأ في تحميل الأخبار'));
     }
   }
 
   void selectNews(String newsId) {
     final currentState = state;
     if (currentState is NewsLoaded) {
-      final selectedNews =
-          currentState.newsList.firstWhere(
+      final selectedNews = currentState.newsList.firstWhere(
         (news) => news.id == newsId,
         orElse: () => currentState.newsList.first,
       );
-      emit(currentState.copyWith(
-          selectedNews: selectedNews));
+      emit(currentState.copyWith(selectedNews: selectedNews));
     }
   }
 
@@ -81,20 +75,27 @@ class NewsCubit extends Cubit<NewsState> {
     final currentState = state;
     if (currentState is NewsLoaded) {
       if (query.isEmpty) {
-        emit(NewsLoaded(
+        emit(
+          NewsLoaded(
             newsList: _mockNews,
-            selectedNews:
-                currentState.selectedNews));
+            selectedNews: currentState.selectedNews,
+          ),
+        );
       } else {
-        final filteredNews = _mockNews
-            .where((news) =>
-                news.title.contains(query) ||
-                news.content.contains(query))
-            .toList();
-        emit(NewsLoaded(
+        final filteredNews =
+            _mockNews
+                .where(
+                  (news) =>
+                      news.title.contains(query) ||
+                      news.content.contains(query),
+                )
+                .toList();
+        emit(
+          NewsLoaded(
             newsList: filteredNews,
-            selectedNews:
-                currentState.selectedNews));
+            selectedNews: currentState.selectedNews,
+          ),
+        );
       }
     }
   }
@@ -104,10 +105,8 @@ class NewsCubit extends Cubit<NewsState> {
     if (category.isEmpty) {
       emit(NewsLoaded(newsList: _mockNews));
     } else {
-      final filteredNews = _mockNews
-          .where(
-              (news) => news.category == category)
-          .toList();
+      final filteredNews =
+          _mockNews.where((news) => news.category == category).toList();
       emit(NewsLoaded(newsList: filteredNews));
     }
   }
@@ -117,12 +116,14 @@ class NewsCubit extends Cubit<NewsState> {
     final currentState = state;
     if (currentState is NewsLoaded) {
       return currentState.newsList
-          .map((news) => {
-                'id': news.id,
-                'image': news.image,
-                'title': news.title,
-                'date': news.date,
-              })
+          .map(
+            (news) => {
+              'id': news.id,
+              'image': news.image,
+              'title': news.title,
+              'date': news.date,
+            },
+          )
           .toList();
     }
     return [];
@@ -137,18 +138,13 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   // الحصول على الأخبار بتصنيف معين
-  List<NewsModel> getNewsByCategory(
-      String category) {
-    return _mockNews
-        .where(
-            (news) => news.category == category)
-        .toList();
+  List<NewsModel> getNewsByCategory(String category) {
+    return _mockNews.where((news) => news.category == category).toList();
   }
 
   // الحصول على أحدث الأخبار
   List<NewsModel> getLatestNews({int limit = 3}) {
-    final sortedNews =
-        List<NewsModel>.from(_mockNews);
+    final sortedNews = List<NewsModel>.from(_mockNews);
     return sortedNews.take(limit).toList();
   }
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 enum SnackBarType { success, error, warning, info }
+
 void showModernSnackBar(
-    BuildContext context, {
-      required String message,
-      required SnackBarType type,
-    }) {
+  BuildContext context, {
+  required String message,
+  required SnackBarType type,
+}) {
   Color backgroundColor;
   IconData icon;
 
@@ -53,10 +54,7 @@ void showModernSnackBar(
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ],

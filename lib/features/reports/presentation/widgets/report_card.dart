@@ -38,38 +38,29 @@ class ReportCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 115.h,
-      margin: EdgeInsets.only(
-          bottom: 12.h), // مسافة بين الكروت
+      margin: EdgeInsets.only(bottom: 12.h), // مسافة بين الكروت
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xffCBCBCB),
-          width: 0.8,
-        ),
+        border: Border.all(color: const Color(0xffCBCBCB), width: 0.8),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: 15.w, vertical: 18.h),
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 18.h),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     Text(
                       'بلاغ رقم #${reportData.reportNumber}',
-                      style: TextStyle(
-                          fontSize: 14.sp),
+                      style: TextStyle(fontSize: 14.sp),
                     ),
                     SizedBox(width: 3.w),
                     Text(
                       '| ${reportData.reportType}',
-                      style: TextStyle(
-                          fontSize: 14.sp),
+                      style: TextStyle(fontSize: 14.sp),
                     ),
                   ],
                 ),
@@ -78,17 +69,12 @@ class ReportCard extends StatelessWidget {
                   width: 135.w,
                   decoration: BoxDecoration(
                     color: reportData.statusColor,
-                    borderRadius:
-                        BorderRadius.circular(
-                            12.r),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Center(
                     child: Text(
                       reportData.status,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 10.sp),
                     ),
                   ),
                 ),
@@ -99,16 +85,13 @@ class ReportCard extends StatelessWidget {
               children: [
                 Text(
                   reportData.date,
-                  style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
                 ),
               ],
             ),
             SizedBox(height: 5.h),
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -122,19 +105,11 @@ class ReportCard extends StatelessWidget {
                   ],
                 ),
                 GestureDetector(
-                  onTap:
-                      onDetailsPressed ?? () {},
+                  onTap: onDetailsPressed ?? () {},
                   child: Row(
                     children: [
-                      Text(
-                        'تفاصيل البلاغ',
-                        style: TextStyle(
-                            fontSize: 12.sp),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 14.sp,
-                      ),
+                      Text('تفاصيل البلاغ', style: TextStyle(fontSize: 12.sp)),
+                      Icon(Icons.arrow_forward_ios, size: 14.sp),
                     ],
                   ),
                 ),
@@ -152,12 +127,10 @@ class ReportsListPage extends StatelessWidget {
   const ReportsListPage({super.key});
 
   // دالة منفصلة لكل بلاغ حسب الرقم
-  void _handleReportDetails(
-      BuildContext context, String reportNumber) {
+  void _handleReportDetails(BuildContext context, String reportNumber) {
     switch (reportNumber) {
       case '21348':
-        Navigator.pushNamed(
-            context, Routes.reportDetailsPage);
+        Navigator.pushNamed(context, Routes.reportDetailsPage);
         break;
       case '21349':
         print('عرض تفاصيل بلاغ الاحتيال #21349');
@@ -169,8 +142,7 @@ class ReportsListPage extends StatelessWidget {
         print('عرض تفاصيل بلاغ التحرش #21351');
         break;
       case '21352':
-        print(
-            'عرض تفاصيل بلاغ السرقة الثاني #21352');
+        print('عرض تفاصيل بلاغ السرقة الثاني #21352');
         break;
       case '21353':
         print('عرض تفاصيل بلاغ النصب #21353');
@@ -179,8 +151,7 @@ class ReportsListPage extends StatelessWidget {
         print('عرض تفاصيل بلاغ الاعتداء #21354');
         break;
       case '21355':
-        print(
-            'عرض تفاصيل بلاغ السب والقذف #21355');
+        print('عرض تفاصيل بلاغ السب والقذف #21355');
         break;
       default:
         print('بلاغ غير معروف: $reportNumber');
@@ -264,8 +235,7 @@ class ReportsListPage extends StatelessWidget {
           return ReportCard(
             reportData: reports[index],
             onDetailsPressed: () {
-              _handleReportDetails(context,
-                  reports[index].reportNumber);
+              _handleReportDetails(context, reports[index].reportNumber);
             },
           );
         },

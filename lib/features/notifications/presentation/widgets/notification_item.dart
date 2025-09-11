@@ -17,8 +17,7 @@ class NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: 16.w, vertical: 4.h),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
         color: _getBackgroundColor(),
@@ -32,35 +31,27 @@ class NotificationItem extends StatelessWidget {
         ],
       ),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: _getIconColor()
-                  .withOpacity(0.1),
+              color: _getIconColor().withOpacity(0.1),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: _getIconColor()
-                      .withOpacity(0.2),
+                  color: _getIconColor().withOpacity(0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Icon(
-              _getIcon(),
-              color: _getIconColor(),
-              size: 20.sp,
-            ),
+            child: Icon(_getIcon(), color: _getIconColor(), size: 20.sp),
           ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   notification.title,
@@ -78,39 +69,29 @@ class NotificationItem extends StatelessWidget {
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: _getTextColor()
-                        .withValues(alpha: 0.8),
+                    color: _getTextColor().withValues(alpha: 0.8),
                     height: 1.4,
                   ),
                 ),
                 SizedBox(height: 8.h),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 8.w,
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: _getIconColor()
-                            .withOpacity(0.1),
-                        borderRadius:
-                            BorderRadius.circular(
-                                12.r),
+                        color: _getIconColor().withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
-                        _formatDate(notification
-                            .createdAt),
+                        _formatDate(notification.createdAt),
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: _getTextColor()
-                              .withValues(
-                                  alpha: 0.7),
-                          fontWeight:
-                              FontWeight.w500,
+                          color: _getTextColor().withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -122,11 +103,7 @@ class NotificationItem extends StatelessWidget {
           SizedBox(width: 8.w),
           GestureDetector(
             onTap: onDelete,
-            child: Icon(
-              Icons.close,
-              color: Colors.grey[600],
-              size: 16.sp,
-            ),
+            child: Icon(Icons.close, color: Colors.grey[600], size: 16.sp),
           ),
         ],
       ),
@@ -190,16 +167,14 @@ class NotificationItem extends StatelessWidget {
       'سبتمبر',
       'أكتوبر',
       'نوفمبر',
-      'ديسمبر'
+      'ديسمبر',
     ];
 
     final day = date.day;
     final month = arabicMonths[date.month - 1];
     final year = date.year;
-    final hour =
-        date.hour.toString().padLeft(2, '0');
-    final minute =
-        date.minute.toString().padLeft(2, '0');
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
 
     return '$day $month، $year - $hour:$minute';
   }

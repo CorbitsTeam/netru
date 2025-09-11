@@ -220,7 +220,7 @@ class VerificationSuccessWidget extends StatelessWidget {
             width: 6.w,
             height: 6.h,
             margin: EdgeInsets.only(top: 6.h, right: 8.w),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primaryColor,
               shape: BoxShape.circle,
             ),

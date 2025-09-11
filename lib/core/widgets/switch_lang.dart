@@ -47,9 +47,7 @@ class _SettingsSwitchWidgetState extends State<SettingsSwitchWidget> {
           backgroundColor: Theme.of(context).colorScheme.secondary,
           content: Text(
             'language_already_selected'.tr(),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onError,
-            ),
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
@@ -57,7 +55,6 @@ class _SettingsSwitchWidgetState extends State<SettingsSwitchWidget> {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-
       );
     } else {
       await _localeService.setLocale(context, newLocale.languageCode);
@@ -80,8 +77,6 @@ class _SettingsSwitchWidgetState extends State<SettingsSwitchWidget> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-
-
         // 🌙 Theme Switch
         IconButton(
           onPressed: _toggleTheme,

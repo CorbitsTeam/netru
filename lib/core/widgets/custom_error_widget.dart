@@ -4,11 +4,7 @@ class CustomErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const CustomErrorWidget({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const CustomErrorWidget({super.key, required this.message, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +15,7 @@ class CustomErrorWidget extends StatelessWidget {
           Text(message),
           if (onRetry != null) ...[
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: onRetry,
-              child: const Text('Retry'),
-            ),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],
         ],
       ),

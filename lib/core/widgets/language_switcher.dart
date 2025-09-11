@@ -13,14 +13,8 @@ class LanguageSwitcher extends StatelessWidget {
         return DropdownButton<Locale>(
           value: state.locale,
           items: const [
-            DropdownMenuItem(
-              value: Locale('en'),
-              child: Text('English'),
-            ),
-            DropdownMenuItem(
-              value: Locale('ar'),
-              child: Text('العربية'),
-            ),
+            DropdownMenuItem(value: Locale('en'), child: Text('English')),
+            DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
           ],
           onChanged: (newLocale) {
             if (newLocale != null) {

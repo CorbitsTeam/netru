@@ -138,7 +138,7 @@ class _DocumentScanPageState extends State<DocumentScanPage> {
                 Container(
                   width: 60.w,
                   height: 60.h,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primaryColor,
                     shape: BoxShape.circle,
                   ),
@@ -254,7 +254,7 @@ class _DocumentScanPageState extends State<DocumentScanPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppColors.primaryColor),
+            const CircularProgressIndicator(color: AppColors.primaryColor),
             SizedBox(height: 16.h),
             Text(
               'جاري تشغيل الكاميرا...',
