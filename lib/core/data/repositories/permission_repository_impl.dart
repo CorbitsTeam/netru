@@ -21,11 +21,11 @@ class PermissionRepositoryImpl implements PermissionRepository {
       return Right(result);
     } on PermissionException catch (e) {
       _logger.logError('Permission Exception in checkPermission', e);
-      return Left(PermissionFailure(message: e.message, code: e.statusCode));
+      return Left(PermissionFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in checkPermission', e);
       return Left(
-        PermissionFailure(message: 'Failed to check permission', code: 500),
+        PermissionFailure('Failed to check permission'),
       );
     }
   }
@@ -39,11 +39,11 @@ class PermissionRepositoryImpl implements PermissionRepository {
       return Right(result);
     } on PermissionException catch (e) {
       _logger.logError('Permission Exception in requestPermission', e);
-      return Left(PermissionFailure(message: e.message, code: e.statusCode));
+      return Left(PermissionFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in requestPermission', e);
       return Left(
-        PermissionFailure(message: 'Failed to request permission', code: 500),
+        PermissionFailure('Failed to request permission'),
       );
     }
   }
@@ -57,7 +57,7 @@ class PermissionRepositoryImpl implements PermissionRepository {
       return Right(result.cast<Permission>());
     } on PermissionException catch (e) {
       _logger.logError('Permission Exception in requestMultiplePermissions', e);
-      return Left(PermissionFailure(message: e.message, code: e.statusCode));
+      return Left(PermissionFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in requestMultiplePermissions', e);
       return Left(
@@ -76,11 +76,11 @@ class PermissionRepositoryImpl implements PermissionRepository {
       return Right(result);
     } on PermissionException catch (e) {
       _logger.logError('Permission Exception in openAppSettings', e);
-      return Left(PermissionFailure(message: e.message, code: e.statusCode));
+      return Left(PermissionFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in openAppSettings', e);
       return Left(
-        PermissionFailure(message: 'Failed to open app settings', code: 500),
+        PermissionFailure('Failed to open app settings'),
       );
     }
   }
@@ -92,7 +92,7 @@ class PermissionRepositoryImpl implements PermissionRepository {
       return Right(result.cast<Permission>());
     } on PermissionException catch (e) {
       _logger.logError('Permission Exception in getAllPermissionsStatus', e);
-      return Left(PermissionFailure(message: e.message, code: e.statusCode));
+      return Left(PermissionFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in getAllPermissionsStatus', e);
       return Left(

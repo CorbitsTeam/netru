@@ -23,11 +23,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in signInWithEmail', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in signInWithEmail', e);
       return const Left(
-        ServerFailure(message: 'Failed to sign in with email', code: 500),
+        ServerFailure('Failed to sign in with email'),
       );
     }
   }
@@ -42,11 +42,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in signUpWithEmail', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in signUpWithEmail', e);
       return const Left(
-        ServerFailure(message: 'Failed to sign up with email', code: 500),
+        ServerFailure('Failed to sign up with email'),
       );
     }
   }
@@ -58,11 +58,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in signInWithGoogle', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in signInWithGoogle', e);
       return const Left(
-        ServerFailure(message: 'Failed to sign in with Google', code: 500),
+        ServerFailure('Failed to sign in with Google'),
       );
     }
   }
@@ -74,11 +74,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in signInWithApple', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in signInWithApple', e);
       return const Left(
-        ServerFailure(message: 'Failed to sign in with Apple', code: 500),
+        ServerFailure('Failed to sign in with Apple'),
       );
     }
   }
@@ -90,11 +90,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in signOut', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in signOut', e);
       return const Left(
-        ServerFailure(message: 'Failed to sign out', code: 500),
+        ServerFailure('Failed to sign out'),
       );
     }
   }
@@ -106,11 +106,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in getCurrentUser', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in getCurrentUser', e);
       return const Left(
-        ServerFailure(message: 'Failed to get current user', code: 500),
+        ServerFailure('Failed to get current user'),
       );
     }
   }
@@ -122,11 +122,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in getCurrentSession', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in getCurrentSession', e);
       return const Left(
-        ServerFailure(message: 'Failed to get current session', code: 500),
+        ServerFailure('Failed to get current session'),
       );
     }
   }
@@ -138,7 +138,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in sendPasswordResetEmail', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in sendPasswordResetEmail', e);
       return const Left(
@@ -157,11 +157,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on ServerException catch (e) {
       _logger.logError('Auth Exception in refreshSession', e);
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       _logger.logError('Unexpected error in refreshSession', e);
       return const Left(
-        ServerFailure(message: 'Failed to refresh session', code: 500),
+        ServerFailure('Failed to refresh session'),
       );
     }
   }

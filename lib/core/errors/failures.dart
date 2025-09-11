@@ -1,90 +1,49 @@
 import 'package:equatable/equatable.dart';
 
 abstract class Failure extends Equatable {
-  const Failure([List<Object> properties = const <Object>[]]);
+  final String message;
+  const Failure(this.message);
+  
+  @override
+  List<Object> get props => [message];
 }
 
 // General failures
 class ServerFailure extends Failure {
-  final String message;
-  
-  const ServerFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const ServerFailure(super.message);
 }
 
 class CacheFailure extends Failure {
-  final String message;
-  
-  const CacheFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const CacheFailure(super.message);
 }
 
 class NetworkFailure extends Failure {
-  final String message;
-  
-  const NetworkFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const NetworkFailure(super.message);
 }
 
 class InvalidInputFailure extends Failure {
-  final String message;
-  
-  const InvalidInputFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const InvalidInputFailure(super.message);
 }
 
 class GenericFailure extends Failure {
-  final String message;
-  
-  const GenericFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const GenericFailure(super.message);
 }
 
 // Auth failures
 class AuthFailure extends Failure {
-  final String message;
-  
-  const AuthFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const AuthFailure(super.message);
 }
 
 // Permission failures
 class PermissionFailure extends Failure {
-  final String message;
-  
-  const PermissionFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const PermissionFailure(super.message);
 }
 
 // Document/Verification failures
 class DocumentScanFailure extends Failure {
-  final String message;
-  
-  const DocumentScanFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const DocumentScanFailure(super.message);
 }
 
 class FileUploadFailure extends Failure {
-  final String message;
-  
-  const FileUploadFailure(this.message);
-  
-  @override
-  List<Object> get props => [message];
+  const FileUploadFailure(super.message);
 }
