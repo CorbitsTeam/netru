@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                 SnackBar(
                   content: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.white),
+                      const Icon(Icons.error_outline, color: Colors.white),
                       SizedBox(width: 8.w),
                       Expanded(child: Text(state.message)),
                     ],
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
-                  duration: Duration(seconds: 4),
+                  duration: const Duration(seconds: 4),
                 ),
               );
             } else if (state is AuthAuthenticated) {

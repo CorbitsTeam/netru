@@ -2,8 +2,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
-  static final PermissionService _instance =
-      PermissionService._internal();
+  static final PermissionService _instance = PermissionService._internal();
   factory PermissionService() => _instance;
   PermissionService._internal();
 
@@ -11,8 +10,7 @@ class PermissionService {
   Future<bool> requestAllPermissions() async {
     try {
       // طلب صلاحية الموقع
-      final locationPermission =
-          await _requestLocationPermission();
+      final locationPermission = await _requestLocationPermission();
 
       // يمكنك إضافة صلاحيات أخرى هنا
       // final cameraPermission = await Permission.camera.request();
@@ -26,11 +24,9 @@ class PermissionService {
   }
 
   /// طلب صلاحية الموقع
-  Future<bool>
-      _requestLocationPermission() async {
+  Future<bool> _requestLocationPermission() async {
     // التحقق من حالة الصلاحية الحالية
-    PermissionStatus permission =
-        await Permission.location.status;
+    PermissionStatus permission = await Permission.location.status;
 
     if (permission.isGranted) {
       return await _checkLocationService();
@@ -38,8 +34,7 @@ class PermissionService {
 
     if (permission.isDenied) {
       // طلب الصلاحية
-      permission =
-          await Permission.location.request();
+      permission = await Permission.location.request();
 
       if (permission.isGranted) {
         return await _checkLocationService();
@@ -57,8 +52,7 @@ class PermissionService {
 
   /// التحقق من تفعيل خدمة الموقع
   Future<bool> _checkLocationService() async {
-    bool serviceEnabled = await Geolocator
-        .isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
       // طلب تفعيل خدمة الموقع
@@ -72,15 +66,12 @@ class PermissionService {
   Future<bool> _requestLocationService() async {
     try {
       // محاولة فتح إعدادات الموقع
-      bool opened =
-          await Geolocator.openLocationSettings();
+      bool opened = await Geolocator.openLocationSettings();
 
       if (opened) {
         // انتظار قليل ثم التحقق مرة أخرى
-        await Future.delayed(
-            const Duration(seconds: 2));
-        return await Geolocator
-            .isLocationServiceEnabled();
+        await Future.delayed(const Duration(seconds: 2));
+        return await Geolocator.isLocationServiceEnabled();
       }
 
       return false;
@@ -91,30 +82,24 @@ class PermissionService {
   }
 
   /// عرض dialog عند رفض الصلاحية نهائياً
-  Future<void>
-      _showPermissionDeniedDialog() async {
+  Future<void> _showPermissionDeniedDialog() async {
     // سيتم تنفيذ هذا من خلال الـ UI layer
     await openAppSettings();
   }
 
   /// التحقق من جميع الصلاحيات
   Future<bool> checkAllPermissions() async {
-    final locationGranted =
-        await Permission.location.isGranted;
-    final locationServiceEnabled =
-        await Geolocator
-            .isLocationServiceEnabled();
+    final locationGranted = await Permission.location.isGranted;
+    final locationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
-    return locationGranted &&
-        locationServiceEnabled;
+    return locationGranted && locationServiceEnabled;
   }
 
   /// الحصول على الموقع الحالي (للاختبار)
   Future<Position?> getCurrentLocation() async {
     try {
       if (await checkAllPermissions()) {
-        return await Geolocator
-            .getCurrentPosition(
+        return await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
       }

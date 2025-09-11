@@ -11,8 +11,7 @@ class ReportInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10.h,
       children: [
         Text(
@@ -23,10 +22,7 @@ class ReportInfoSection extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        CustomInfoContainer(
-          label: 'reportType'.tr(),
-          value: 'سرقة',
-        ),
+        CustomInfoContainer(label: 'reportType'.tr(), value: 'سرقة'),
         CustomInfoContainer(
           height: 80.h,
           label: 'reportDescription'.tr(),
@@ -35,8 +31,7 @@ class ReportInfoSection extends StatelessWidget {
         ),
         CustomInfoContainer(
           label: 'location'.tr(),
-          value:
-              'عبد الحميد دبس، المطار، إمبابة، محافظة الجيزة',
+          value: 'عبد الحميد دبس، المطار، إمبابة، محافظة الجيزة',
         ),
         CustomInfoContainer(
           label: 'reportDate'.tr(),

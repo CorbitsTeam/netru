@@ -11,9 +11,7 @@ class HomeUpBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: 10.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Row(
         children: [
           Row(
@@ -26,9 +24,7 @@ class HomeUpBar extends StatelessWidget {
                   color: Colors.grey,
                 ),
                 child: ClipOval(
-                  child: Image.asset(
-                      AppAssets.imageProfile,
-                      fit: BoxFit.cover),
+                  child: Image.asset(AppAssets.imageProfile, fit: BoxFit.cover),
                 ),
               ),
               SizedBox(width: 8.w),
@@ -39,39 +35,23 @@ class HomeUpBar extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "أحمد اسعد",
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                    ),
-                  ),
+                  Text("أحمد اسعد", style: TextStyle(fontSize: 11.sp)),
                   Text(
                     "القاهره",
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 11.sp, color: Colors.grey),
                   ),
                 ],
               ),
             ],
           ),
-          const Spacer(
-            flex: 1,
-          ),
+          const Spacer(flex: 1),
           Text(
             "home".tr(),
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
           ),
-          const Spacer(
-            flex: 2,
-          ),
+          const Spacer(flex: 2),
           IconButton(
             onPressed: () {},
             icon: Icon(

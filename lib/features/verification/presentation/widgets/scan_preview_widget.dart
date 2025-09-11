@@ -132,7 +132,7 @@ class ScanPreviewWidget extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onRetry,
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.orange),
+                  side: const BorderSide(color: AppColors.orange),
                   foregroundColor: AppColors.orange,
                 ),
                 child: const Text('إعادة المحاولة'),

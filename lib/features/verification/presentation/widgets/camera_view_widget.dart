@@ -136,7 +136,7 @@ class _CameraViewWidgetState extends State<CameraViewWidget> {
   }
 
   Widget _buildDocumentOverlay() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: double.infinity,
       child: CustomPaint(
@@ -192,7 +192,7 @@ class _CameraViewWidgetState extends State<CameraViewWidget> {
                       ? SizedBox(
                         width: 24.w,
                         height: 24.h,
-                        child: CircularProgressIndicator(
+                        child: const CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
@@ -298,7 +298,7 @@ class DocumentFramePainter extends CustomPainter {
     canvas.drawPath(overlayPath, overlayPaint);
 
     // Draw frame corners
-    final cornerLength = 30.0;
+    const cornerLength = 30.0;
     final cornerPaint =
         Paint()
           ..color = AppColors.primaryColor

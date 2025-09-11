@@ -10,8 +10,7 @@ class ProceduresSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'procedures'.tr(),
@@ -21,39 +20,26 @@ class ProceduresSection extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(
-          height: 10.h,
-        ),
+        SizedBox(height: 10.h),
         Container(
           width: 135.w,
           height: 25.h,
           decoration: BoxDecoration(
             color: AppColors.orange,
-            borderRadius:
-                BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Center(
             child: Text(
               "تم التحويل للجهات المعنية",
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 10.sp, color: Colors.white),
             ),
           ),
         ),
-        SizedBox(
-          height: 8.h,
-        ),
+        SizedBox(height: 8.h),
         Row(
           children: [
-            Icon(
-              Icons.info_rounded,
-              size: 18.sp,
-            ),
-            SizedBox(
-              width: 5.w,
-            ),
+            Icon(Icons.info_rounded, size: 18.sp),
+            SizedBox(width: 5.w),
             Expanded(
               child: Text(
                 "يتم التحقيق من قبل لجهات المعنية في محتوى البلاغ وسيتم إتخاذ إجراء فوري عند التحقق من صحة البلاغ .",

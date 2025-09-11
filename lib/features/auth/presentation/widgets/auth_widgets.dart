@@ -86,7 +86,7 @@ class AuthButton extends StatelessWidget {
                   SizedBox(width: 12.w),
                 ],
                 if (isLoading)
-                  Container(
+                  SizedBox(
                     width: 24.w,
                     height: 24.h,
                     child: CircularProgressIndicator(
@@ -246,7 +246,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14.r),
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: AppColors.primaryColor,
                   width: 2.5,
                 ),
@@ -511,7 +511,7 @@ class SocialButton extends StatelessWidget {
                   SizedBox(
                     width: 20.w,
                     height: 20.h,
-                    child: CircularProgressIndicator(
+                    child: const CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppColors.primaryColor,

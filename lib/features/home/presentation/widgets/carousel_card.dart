@@ -7,12 +7,10 @@ class CarouselCard extends StatefulWidget {
   const CarouselCard({super.key});
 
   @override
-  State<CarouselCard> createState() =>
-      _CarouselCardState();
+  State<CarouselCard> createState() => _CarouselCardState();
 }
 
-class _CarouselCardState
-    extends State<CarouselCard>
+class _CarouselCardState extends State<CarouselCard>
     with TickerProviderStateMixin {
   int _currentIndex = 0;
   late AnimationController _slideController;
@@ -20,25 +18,21 @@ class _CarouselCardState
   late Animation<Offset> _slideAnimation;
 
   // بيانات الصور والنصوص
-  final List<Map<String, String>> _carouselData =
-      [
+  final List<Map<String, String>> _carouselData = [
     {
       'image': AppAssets.newsImages,
-      'title':
-          'القبض على عنصر إرهابي شديد الخطورة',
-      'date': '15 يوليو 2024'
+      'title': 'القبض على عنصر إرهابي شديد الخطورة',
+      'date': '15 يوليو 2024',
     },
     {
       'image': AppAssets.newsImage2,
-      'title':
-          'الإستجابة لحالات التسول في الاسواق',
-      'date': '20 يوليو 2024'
+      'title': 'الإستجابة لحالات التسول في الاسواق',
+      'date': '20 يوليو 2024',
     },
     {
       'image': AppAssets.newsImage3,
-      'title':
-          'الداخلية تقبض على شبكة احتيال إلكتروني',
-      'date': '10 يوليو 2024'
+      'title': 'الداخلية تقبض على شبكة احتيال إلكتروني',
+      'date': '10 يوليو 2024',
     },
   ];
 
@@ -61,10 +55,9 @@ class _CarouselCardState
     _slideAnimation = Tween<Offset>(
       begin: const Offset(1.0, 0.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
+    );
 
     // بدء الـ animation
     _slideController.forward();
@@ -75,8 +68,7 @@ class _CarouselCardState
   }
 
   void _startAutoSlide() {
-    Future.delayed(const Duration(seconds: 2),
-        () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         _changeSlide();
         _startAutoSlide();
@@ -89,8 +81,7 @@ class _CarouselCardState
     await _slideController.reverse();
 
     setState(() {
-      _currentIndex = (_currentIndex + 1) %
-          _carouselData.length;
+      _currentIndex = (_currentIndex + 1) % _carouselData.length;
     });
 
     // slide in للصورة الجديدة
@@ -128,18 +119,13 @@ class _CarouselCardState
         child: Stack(
           children: [
             // الصورة الخلفية مع الـ slide animation
-            ...List.generate(_carouselData.length,
-                (index) {
+            ...List.generate(_carouselData.length, (index) {
               return Positioned.fill(
                 child: AnimatedOpacity(
-                  opacity: index == _currentIndex
-                      ? 1.0
-                      : 0.0,
-                  duration: const Duration(
-                      milliseconds: 300),
+                  opacity: index == _currentIndex ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
                   child: Image.asset(
-                    _carouselData[index]
-                        ['image']!,
+                    _carouselData[index]['image']!,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -153,11 +139,7 @@ class _CarouselCardState
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black
-                          .withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                   ),
                 ),
               ),
@@ -169,76 +151,46 @@ class _CarouselCardState
               left: 16.w,
               right: 16.w,
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // التاريخ مع النقط في نفس الصف
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment
-                            .spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // التاريخ
                       Text(
-                        _carouselData[
-                                _currentIndex]
-                            ['date']!,
+                        _carouselData[_currentIndex]['date']!,
                         style: TextStyle(
-                          color: Colors.white
-                              .withOpacity(0.8),
+                          color: Colors.white.withOpacity(0.8),
                           fontSize: 12.sp,
-                          fontWeight:
-                              FontWeight.w500,
+                          fontWeight: FontWeight.w500,
                         ),
-                        textDirection:
-                            TextDirection.rtl,
+                        textDirection: TextDirection.rtl,
                       ),
 
                       // النقط المتحركة
                       Row(
                         children: List.generate(
                           _carouselData.length,
-                          (index) =>
-                              AnimatedBuilder(
-                            animation:
-                                _dotController,
-                            builder:
-                                (context, child) {
+                          (index) => AnimatedBuilder(
+                            animation: _dotController,
+                            builder: (context, child) {
                               return Container(
-                                margin: EdgeInsets
-                                    .only(
-                                        left:
-                                            6.w),
-                                child:
-                                    AnimatedContainer(
-                                  duration:
-                                      Duration(
+                                margin: EdgeInsets.only(left: 6.w),
+                                child: AnimatedContainer(
+                                  duration: Duration(
                                     milliseconds:
-                                        index ==
-                                                _currentIndex
-                                            ? 300
-                                            : 150,
+                                        index == _currentIndex ? 300 : 150,
                                   ),
-                                  width: index ==
-                                          _currentIndex
-                                      ? 16.w
-                                      : 6.w,
+                                  width: index == _currentIndex ? 16.w : 6.w,
                                   height: 6.h,
-                                  decoration:
-                                      BoxDecoration(
-                                    color: index ==
-                                            _currentIndex
-                                        ? Colors
-                                            .white
-                                        : Colors
-                                            .white
-                                            .withOpacity(
-                                                0.5),
-                                    borderRadius:
-                                        BorderRadius
-                                            .circular(
-                                                3.r),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        index == _currentIndex
+                                            ? Colors.white
+                                            : Colors.white.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(3.r),
                                   ),
                                 ),
                               );
@@ -253,16 +205,14 @@ class _CarouselCardState
 
                   // العنوان
                   Text(
-                    _carouselData[_currentIndex]
-                        ['title']!,
+                    _carouselData[_currentIndex]['title']!,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       height: 1.2,
                     ),
-                    textDirection:
-                        TextDirection.rtl,
+                    textDirection: TextDirection.rtl,
                   ),
                 ],
               ),

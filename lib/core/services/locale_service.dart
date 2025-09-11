@@ -5,14 +5,12 @@ import 'package:easy_localization/easy_localization.dart';
 import '../utils/app_shared_preferences.dart';
 
 class LocaleService {
-
   LocaleService();
 
   static const _defaultLocale = Locale('en');
 
   /// Load saved locale or fallback
   Locale getCurrentLocale() {
-
     final localeCode = AppPreferences().getData(AppConstants.localeKey);
     if (localeCode != null) {
       return Locale(localeCode);

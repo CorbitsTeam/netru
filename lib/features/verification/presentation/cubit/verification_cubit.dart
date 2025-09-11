@@ -55,7 +55,7 @@ class VerificationCubit extends Cubit<VerificationState> {
       );
     } catch (e) {
       _logger.e('Unexpected error during document scan: $e');
-      emit(DocumentScanFailure('حدث خطأ غير متوقع أثناء مسح الوثيقة'));
+      emit(const DocumentScanFailure('حدث خطأ غير متوقع أثناء مسح الوثيقة'));
     }
   }
 

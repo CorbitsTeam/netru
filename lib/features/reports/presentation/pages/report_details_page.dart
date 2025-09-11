@@ -15,10 +15,7 @@ class ReportDetailsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'reportDetails'.tr(),
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -27,31 +24,19 @@ class ReportDetailsPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 15.h,
-                ),
+                SizedBox(height: 15.h),
                 const PersonalInfoSection(),
-                SizedBox(
-                  height: 15.h,
-                ),
+                SizedBox(height: 15.h),
                 const ReportInfoSection(),
-                SizedBox(
-                  height: 15.h,
-                ),
+                SizedBox(height: 15.h),
                 const MediaSection(),
-                SizedBox(
-                  height: 15.h,
-                ),
+                SizedBox(height: 15.h),
                 const ProceduresSection(),
-                SizedBox(
-                  height: 15.h,
-                ),
+                SizedBox(height: 15.h),
               ],
             ),
           ),

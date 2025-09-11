@@ -42,26 +42,27 @@ class PrimaryOutlinedButton extends StatelessWidget {
         ),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 600),
-          child: isLoading
-              ? SizedBox(
-            key: const ValueKey("loading"),
-            height: 25.h,
-            width: 25.h,
-            child: CircularProgressIndicator(
-              color: buttonColor,
-              strokeWidth: 3,
-              strokeCap: StrokeCap.round,
-            ),
-          )
-              : Text(
-            text,
-            key: const ValueKey("text"),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: buttonColor,
-            ),
-          ),
+          child:
+              isLoading
+                  ? SizedBox(
+                    key: const ValueKey("loading"),
+                    height: 25.h,
+                    width: 25.h,
+                    child: CircularProgressIndicator(
+                      color: buttonColor,
+                      strokeWidth: 3,
+                      strokeCap: StrokeCap.round,
+                    ),
+                  )
+                  : Text(
+                    text,
+                    key: const ValueKey("text"),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: buttonColor,
+                    ),
+                  ),
         ),
       ),
     );

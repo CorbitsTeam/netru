@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'newsdetails_state.dart';
 
-class NewsDetailsCubit
-    extends Cubit<NewsDetailsState> {
-  NewsDetailsCubit()
-      : super(NewsdetailsInitial());
+class NewsDetailsCubit extends Cubit<NewsDetailsState> {
+  NewsDetailsCubit() : super(NewsdetailsInitial());
 
   Future<void> doSomething() async {
     emit(NewsDetailsLoading());

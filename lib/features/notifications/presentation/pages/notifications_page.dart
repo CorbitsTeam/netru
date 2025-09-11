@@ -12,8 +12,7 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => NotificationCubit()
-        ..loadNotifications(),
+      create: (context) => NotificationCubit()..loadNotifications(),
       child: const NotificationsView(),
     );
   }
@@ -27,40 +26,30 @@ class NotificationsView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight),
-        child: BlocBuilder<NotificationCubit,
-            NotificationState>(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: BlocBuilder<NotificationCubit, NotificationState>(
           builder: (context, state) {
             final unreadCount =
-                state is NotificationLoaded
-                    ? state.unreadCount
-                    : 0;
+                state is NotificationLoaded ? state.unreadCount : 0;
             return NotificationAppBar(
               unreadCount: unreadCount,
               onMarkAllAsRead: () {
-                context
-                    .read<NotificationCubit>()
-                    .markAllAsRead();
+                context.read<NotificationCubit>().markAllAsRead();
               },
             );
           },
         ),
       ),
-      body: BlocBuilder<NotificationCubit,
-          NotificationState>(
+      body: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (state is NotificationError) {
             return Center(
               child: Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.error_outline,
@@ -70,21 +59,14 @@ class NotificationsView extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     state.message,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
                   ),
                   SizedBox(height: 16.h),
                   ElevatedButton(
                     onPressed: () {
-                      context
-                          .read<
-                              NotificationCubit>()
-                          .loadNotifications();
+                      context.read<NotificationCubit>().loadNotifications();
                     },
-                    child: const Text(
-                        'إعادة المحاولة'),
+                    child: const Text('إعادة المحاولة'),
                   ),
                 ],
               ),
@@ -95,8 +77,7 @@ class NotificationsView extends StatelessWidget {
             if (state.notifications.isEmpty) {
               return Center(
                 child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.notifications_none,
@@ -117,22 +98,18 @@ class NotificationsView extends StatelessWidget {
             }
 
             return ListView.builder(
-              padding: EdgeInsets.symmetric(
-                  vertical: 8.h),
-              itemCount:
-                  state.notifications.length,
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              itemCount: state.notifications.length,
               itemBuilder: (context, index) {
-                final notification =
-                    state.notifications[index];
+                final notification = state.notifications[index];
                 return NotificationItem(
                   key: ValueKey(notification.id),
                   notification: notification,
                   index: index,
                   onDelete: () {
-                    context
-                        .read<NotificationCubit>()
-                        .deleteNotification(
-                            notification.id);
+                    context.read<NotificationCubit>().deleteNotification(
+                      notification.id,
+                    );
                   },
                 );
               },

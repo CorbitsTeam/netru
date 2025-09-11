@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -8,21 +7,15 @@ import '../../../../core/theme/app_colors.dart';
 class NewsContentWidget extends StatelessWidget {
   final NewsModel news;
 
-  const NewsContentWidget({
-    super.key,
-    required this.news,
-  });
+  const NewsContentWidget({super.key, required this.news});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: const BoxDecoration(color: Colors.white),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // العنوان الرئيسي
           Text(
@@ -38,36 +31,25 @@ class NewsContentWidget extends StatelessWidget {
           SizedBox(height: 10.h),
 
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10.w,
-                  vertical: 5.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                 decoration: BoxDecoration(
-                  color: Colors.blue
-                      .withValues(alpha: 0.1),
-                  borderRadius:
-                      BorderRadius.circular(12.r),
+                  color: Colors.blue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 12.sp,
-                      color: Colors.blue,
-                    ),
+                    Icon(Icons.access_time, size: 12.sp, color: Colors.blue),
                     SizedBox(width: 4.w),
                     Text(
                       news.date,
                       style: TextStyle(
                         fontSize: 11.sp,
                         color: Colors.blue,
-                        fontWeight:
-                            FontWeight.w500,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -82,11 +64,8 @@ class NewsContentWidget extends StatelessWidget {
                     vertical: 5.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green
-                        .withValues(alpha: 0.1),
-                    borderRadius:
-                        BorderRadius.circular(
-                            12.r),
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
                     news.category,
@@ -106,8 +85,7 @@ class NewsContentWidget extends StatelessWidget {
             news.content,
             style: TextStyle(
               fontSize: 14.sp,
-              color: AppColors.grey
-                  .withValues(alpha: 0.9),
+              color: AppColors.grey.withValues(alpha: 0.9),
               height: 1.6,
               letterSpacing: 0.2,
             ),

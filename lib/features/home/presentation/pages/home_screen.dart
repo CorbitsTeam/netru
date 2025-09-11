@@ -18,26 +18,21 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 12.w),
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const HomeUpBar(),
                 SizedBox(height: 10.h),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "جهود الأجهزة الأمنية",
                       style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                         fontSize: 16.sp,
-                        color: AppColors
-                            .primaryColor,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ],

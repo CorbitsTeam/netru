@@ -103,5 +103,5 @@ extension ThemeExtensions on BuildContext {
 
   IconButtonThemeData get iconButtonTheme => Theme.of(this).iconButtonTheme;
 
- ColorScheme get colorScheme => Theme.of(this).colorScheme;
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
 }

@@ -11,14 +11,11 @@ class CrimeHeatMapPage extends StatefulWidget {
   const CrimeHeatMapPage({super.key});
 
   @override
-  State<CrimeHeatMapPage> createState() =>
-      _CrimeHeatMapPageState();
+  State<CrimeHeatMapPage> createState() => _CrimeHeatMapPageState();
 }
 
-class _CrimeHeatMapPageState
-    extends State<CrimeHeatMapPage> {
-  final LocationService _locationService =
-      LocationService();
+class _CrimeHeatMapPageState extends State<CrimeHeatMapPage> {
+  final LocationService _locationService = LocationService();
   bool _isLoadingLocation = true;
   String? _locationError;
 
@@ -35,16 +32,13 @@ class _CrimeHeatMapPageState
         _locationError = null;
       });
 
-      final hasPermission = await _locationService
-          .checkLocationPermission();
+      final hasPermission = await _locationService.checkLocationPermission();
 
       if (!hasPermission) {
-        final granted =
-            await _showLocationPermissionDialog();
+        final granted = await _showLocationPermissionDialog();
         if (!granted) {
           setState(() {
-            _locationError =
-                'يجب السماح بالوصول للموقع لعرض الخريطة';
+            _locationError = 'يجب السماح بالوصول للموقع لعرض الخريطة';
             _isLoadingLocation = false;
           });
           return;
@@ -54,8 +48,7 @@ class _CrimeHeatMapPageState
       await _locationService.getCurrentLocation();
     } catch (e) {
       setState(() {
-        _locationError =
-            'حدث خطأ في الحصول على الموقع: ${e.toString()}';
+        _locationError = 'حدث خطأ في الحصول على الموقع: ${e.toString()}';
       });
     } finally {
       setState(() {
@@ -64,13 +57,11 @@ class _CrimeHeatMapPageState
     }
   }
 
-  Future<bool>
-      _showLocationPermissionDialog() async {
+  Future<bool> _showLocationPermissionDialog() async {
     return await showDialog<bool>(
           context: context,
           barrierDismissible: false,
-          builder: (context) =>
-              const LocationPermissionDialog(),
+          builder: (context) => const LocationPermissionDialog(),
         ) ??
         false;
   }
@@ -84,19 +75,11 @@ class _CrimeHeatMapPageState
         child: Column(
           children: [
             // شريط البحث
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: MapSearchBar(),
-            ),
+            const Padding(padding: EdgeInsets.all(8), child: MapSearchBar()),
             // الخريطة
-            Expanded(
-              child: _buildMapContent(),
-            ),
+            Expanded(child: _buildMapContent()),
             // مفتاح الألوان
-            SizedBox(
-              height: 250.h,
-              child: const CrimeLegendWidget(),
-            ),
+            SizedBox(height: 250.h, child: const CrimeLegendWidget()),
           ],
         ),
       ),
@@ -111,17 +94,12 @@ class _CrimeHeatMapPageState
       centerTitle: true,
       title: Text(
         'heatMap'.tr(),
-        style: TextStyle(
-          fontSize: 16.sp,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
       ),
       actions: [
         IconButton(
           onPressed: _initializeLocation,
-          icon: const Icon(
-            Icons.my_location,
-          ),
+          icon: const Icon(Icons.my_location),
         ),
       ],
     );
@@ -131,8 +109,7 @@ class _CrimeHeatMapPageState
     if (_isLoadingLocation) {
       return const Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
@@ -145,22 +122,14 @@ class _CrimeHeatMapPageState
     if (_locationError != null) {
       return Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.location_off,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.location_off, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               _locationError!,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

@@ -57,9 +57,11 @@ extension DateTimeExtensions on DateTime {
 
   // Calculate the difference in days between two dates
   int differenceInDays(DateTime other) {
-    return DateTime(year, month, day)
-        .difference(DateTime(other.year, other.month, other.day))
-        .inDays;
+    return DateTime(
+      year,
+      month,
+      day,
+    ).difference(DateTime(other.year, other.month, other.day)).inDays;
   }
 
   // Check if the date falls on a weekend
