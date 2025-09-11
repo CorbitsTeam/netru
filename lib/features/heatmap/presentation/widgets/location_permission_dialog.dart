@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:geolocator/geolocator.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 class LocationPermissionDialog
     extends StatelessWidget {
@@ -34,7 +35,7 @@ class LocationPermissionDialog
                     .withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.location_on,
                 size: 40,
                 color: AppColors.primaryColor,
