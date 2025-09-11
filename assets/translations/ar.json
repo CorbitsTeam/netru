@@ -4,7 +4,6 @@
   "login": "تسجيل الدخول",
   "signUp": "إنشاء حساب",
   "home": "الرئيسية",
-  "security": "جهود الأجهزة الأمنية",
   "statistics": "إحصائيات",
   "latestCases": "أحدث القضايا",
   "trendingCases": "القضايا الرائجة",
@@ -25,5 +24,8 @@
   "reportDate": "تاريخ ووقت البلاغ",
   "procedures": "إجراءات",
   "media": "الوسائط",
-  "heatMap": "خريطة الجرائم الحرارية"
+  "heatMap": "خريطة الجرائم الحرارية",
+  "securityAgenciesEfforts": "جهود الأجهزة الأمنية",
+  "arrestOfaHighlyDangerousTerroristElement": "القبض على عنصر إرهابي شديد الخطورة",
+  "security": "أمن"
 }

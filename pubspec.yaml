@@ -71,3 +71,8 @@ flutter:
         - asset: assets/fonts/Almarai-Bold.ttf
         - asset: assets/fonts/Almarai-ExtraBold.ttf
         - asset: assets/fonts/Almarai-Light.ttf
+
+# إعدادات تخصيص أيقونة التطبيق
+flutter_native_splash:
+  android: false
+  ios: false
