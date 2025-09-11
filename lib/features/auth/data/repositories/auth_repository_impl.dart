@@ -21,7 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -41,7 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -51,7 +51,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await remoteDataSource.signInWithGoogle();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -75,7 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -99,7 +99,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -109,7 +109,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await remoteDataSource.getCurrentUser();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -119,7 +119,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.logout();
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -129,7 +129,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await remoteDataSource.isUserLoggedIn();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }
