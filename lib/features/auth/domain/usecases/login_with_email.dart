@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/errors/failures.dart';
+import 'package:netru_app/core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
@@ -11,8 +11,8 @@ class LoginWithEmailUseCase implements UseCase<UserEntity, LoginParams> {
   LoginWithEmailUseCase(this.repository);
 
   @override
-  Future<Either<Failure, UserEntity>> call(LoginParams params) async {
-    return await repository.loginWithEmail(
+  Future<Either<Failure, UserEntity>> call(LoginParams params) {
+    return repository.loginWithEmail(
       email: params.email,
       password: params.password,
     );

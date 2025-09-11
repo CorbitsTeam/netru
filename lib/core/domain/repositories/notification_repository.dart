@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../errors/failures.dart';
+import '../../error/failures.dart';
 import '../entities/notification_payload.dart';
 
 abstract class NotificationRepository {

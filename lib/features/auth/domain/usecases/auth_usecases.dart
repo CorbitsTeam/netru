@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failures.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
@@ -10,8 +10,8 @@ class GetCurrentUserUseCase implements UseCase<UserEntity?, NoParams> {
   GetCurrentUserUseCase(this.repository);
 
   @override
-  Future<Either<Failure, UserEntity?>> call(NoParams params) async {
-    return await repository.getCurrentUser();
+  Future<Either<Failure, UserEntity?>> call(NoParams params) {
+    return repository.getCurrentUser();
   }
 }
 
@@ -21,8 +21,8 @@ class LogoutUseCase implements UseCase<void, NoParams> {
   LogoutUseCase(this.repository);
 
   @override
-  Future<Either<Failure, void>> call(NoParams params) async {
-    return await repository.logout();
+  Future<Either<Failure, void>> call(NoParams params) {
+    return repository.logout();
   }
 }
 
@@ -32,7 +32,7 @@ class IsUserLoggedInUseCase implements UseCase<bool, NoParams> {
   IsUserLoggedInUseCase(this.repository);
 
   @override
-  Future<Either<Failure, bool>> call(NoParams params) async {
-    return await repository.isUserLoggedIn();
+  Future<Either<Failure, bool>> call(NoParams params) {
+    return repository.isUserLoggedIn();
   }
 }

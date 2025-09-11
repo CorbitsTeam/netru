@@ -192,10 +192,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         createdAt: DateTime.now(),
       );
 
-      // Insert into citizens table
-      await supabaseClient.from('citizens').insert(citizenProfile.toJson());
-
-      // Also insert into general users table
+      // Insert into citizens table first
       await supabaseClient.from('users').insert({
         'id': citizenProfile.id,
         'email': citizenProfile.email,
@@ -204,6 +201,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'user_type': 'egyptian',
         'created_at': citizenProfile.createdAt.toIso8601String(),
       });
+
+      // Then insert into citizens table with user_type
+      final citizenData = citizenProfile.toJson();
+      citizenData['user_type'] = 'egyptian';
+      await supabaseClient.from('citizens').insert(citizenData);
 
       return citizenProfile;
     } catch (e) {
@@ -240,10 +242,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         createdAt: DateTime.now(),
       );
 
-      // Insert into foreigners table
-      await supabaseClient.from('foreigners').insert(foreignerProfile.toJson());
-
-      // Also insert into general users table
+      // Insert into users table first
       await supabaseClient.from('users').insert({
         'id': foreignerProfile.id,
         'email': foreignerProfile.email,
@@ -252,6 +251,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'user_type': 'foreigner',
         'created_at': foreignerProfile.createdAt.toIso8601String(),
       });
+
+      // Then insert into foreigners table with user_type
+      final foreignerData = foreignerProfile.toJson();
+      foreignerData['user_type'] = 'foreigner';
+      await supabaseClient.from('foreigners').insert(foreignerData);
 
       return foreignerProfile;
     } catch (e) {
