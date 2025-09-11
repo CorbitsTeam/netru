@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/errors/failures.dart';
+import 'package:netru_app/core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
@@ -14,8 +14,8 @@ class RegisterForeignerUseCase
   @override
   Future<Either<Failure, ForeignerEntity>> call(
     RegisterForeignerParams params,
-  ) async {
-    return await repository.registerForeigner(
+  ) {
+    return repository.registerForeigner(
       email: params.email,
       password: params.password,
       fullName: params.fullName,

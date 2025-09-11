@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../errors/failures.dart';
+import '../../error/failures.dart';
 import '../entities/permission.dart';
 import '../repositories/permission_repository.dart';
 import 'usecase.dart';
@@ -10,8 +10,8 @@ class CheckPermissionUseCase extends UseCase<Permission, PermissionType> {
   CheckPermissionUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Permission>> call(PermissionType params) async {
-    return await repository.checkPermission(params);
+  Future<Either<Failure, Permission>> call(PermissionType params) {
+    return repository.checkPermission(params);
   }
 }
 
@@ -21,8 +21,8 @@ class RequestPermissionUseCase extends UseCase<Permission, PermissionType> {
   RequestPermissionUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Permission>> call(PermissionType params) async {
-    return await repository.requestPermission(params);
+  Future<Either<Failure, Permission>> call(PermissionType params) {
+    return repository.requestPermission(params);
   }
 }
 
@@ -33,10 +33,8 @@ class RequestMultiplePermissionsUseCase
   RequestMultiplePermissionsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<Permission>>> call(
-    List<PermissionType> params,
-  ) async {
-    return await repository.requestMultiplePermissions(params);
+  Future<Either<Failure, List<Permission>>> call(List<PermissionType> params) {
+    return repository.requestMultiplePermissions(params);
   }
 }
 
@@ -46,8 +44,8 @@ class OpenAppSettingsUseCase extends UseCase<bool, NoParams> {
   OpenAppSettingsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, bool>> call(NoParams params) async {
-    return await repository.openAppSettings();
+  Future<Either<Failure, bool>> call(NoParams params) {
+    return repository.openAppSettings();
   }
 }
 
@@ -58,7 +56,7 @@ class GetAllPermissionsStatusUseCase
   GetAllPermissionsStatusUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<Permission>>> call(NoParams params) async {
-    return await repository.getAllPermissionsStatus();
+  Future<Either<Failure, List<Permission>>> call(NoParams params) {
+    return repository.getAllPermissionsStatus();
   }
 }

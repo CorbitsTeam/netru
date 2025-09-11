@@ -8,4 +8,7 @@ class Routes {
   static const String crimeHeatMapPage = '/crimeHeatMapPage';
   static const String notificationsPage = '/notificationsPage';
   static const String permissionDemo = '/permissionDemo';
+  static const String profile = '/profile';
+  static const String documentScan = '/documentScan';
+  static const String verificationStatus = '/verificationStatus';
 }

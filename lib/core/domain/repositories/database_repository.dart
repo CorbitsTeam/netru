@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../errors/failures.dart';
+import '../../error/failures.dart';
 
 abstract class DatabaseRepository {
   Future<Either<Failure, List<Map<String, dynamic>>>> select(

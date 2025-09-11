@@ -6,7 +6,6 @@ import 'package:netru_app/core/cubit/permission/permission_cubit.dart';
 import 'package:netru_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:netru_app/features/auth/presentation/cubit/auth_state.dart';
 import 'package:netru_app/features/splash/presentation/widgets/permission_dialog.dart';
-import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/extensions/navigation_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -206,47 +205,114 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // شعار وزارة الداخلية
+                      // شعار وزارة الداخلية مع تصميم محسن
                       Container(
-                        width: 120.w,
-                        height: 120.h,
+                        width: 140.w,
+                        height: 140.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white,
+                              Colors.white.withOpacity(0.95),
+                              Colors.grey[50]!,
+                            ],
+                          ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 30,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 10),
+                            ),
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.8),
                               blurRadius: 20,
-                              spreadRadius: 5,
+                              spreadRadius: -5,
+                              offset: const Offset(0, -5),
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Image.asset(
-                            AppAssets.mainLogo,
-                            width: 80.w,
-                            height: 80.h,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.security_outlined,
-                                size: 60.sp,
-                                color: AppColors.primaryColor,
-                              );
-                            },
-                          ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Circle border effect
+                            Container(
+                              width: 130.w,
+                              height: 130.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.1,
+                                  ),
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            // Logo content
+                            Container(
+                              width: 100.w,
+                              height: 100.h,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.primaryColor,
+                                    AppColors.primaryColor.withOpacity(0.8),
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.security,
+                                size: 50.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 32.h),
 
-                      // اسم التطبيق
-                      Text(
-                        "نترو",
-                        style: TextStyle(
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 2,
+                      // اسم التطبيق مع تأثيرات جميلة
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.w,
+                          vertical: 12.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          "نترو",
+                          style: TextStyle(
+                            fontSize: 36.sp,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 3,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.3),
+                                offset: const Offset(0, 3),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 

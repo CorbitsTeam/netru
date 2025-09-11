@@ -3,6 +3,8 @@ import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
+import '../../../../core/constants/app_assets.dart';
+
 class NewsCubit extends Cubit<NewsState> {
   NewsCubit() : super(NewsInitial());
 
