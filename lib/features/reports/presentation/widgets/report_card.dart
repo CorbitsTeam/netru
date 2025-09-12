@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/core/routing/routes.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 // Model للبيانات
 class ReportData {
@@ -41,7 +42,7 @@ class ReportCard extends StatelessWidget {
           bottom: 12.h), // مسافة بين الكروت
       decoration: BoxDecoration(
         border: Border.all(
-          color: Color(0xffCBCBCB),
+          color: const Color(0xffCBCBCB),
           width: 0.8,
         ),
         borderRadius: BorderRadius.circular(8.r),
@@ -74,7 +75,7 @@ class ReportCard extends StatelessWidget {
                 ),
                 Container(
                   height: 25.h,
-                  width: 125.w,
+                  width: 135.w,
                   decoration: BoxDecoration(
                     color: reportData.statusColor,
                     borderRadius:

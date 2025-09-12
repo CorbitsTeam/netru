@@ -1,12 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/home/presentation/widgets/carousel_card.dart';
 import 'package:netru_app/features/home/presentation/widgets/home_up_bar.dart';
 import 'package:netru_app/features/home/presentation/widgets/latest_cases_card.dart';
 import 'package:netru_app/features/home/presentation/widgets/statistics_cards.dart';
 import 'package:netru_app/features/home/presentation/widgets/trending_cases_card.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,14 +24,14 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment:
                   CrossAxisAlignment.start,
               children: [
-                HomeUpBar(),
+                const HomeUpBar(),
                 SizedBox(height: 10.h),
                 Row(
                   mainAxisAlignment:
                       MainAxisAlignment.center,
                   children: [
                     Text(
-                      "security".tr(),
+                      "جهود الأجهزة الأمنية",
                       style: TextStyle(
                         fontWeight:
                             FontWeight.bold,
@@ -42,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 10.h),
-                CarouselCard(),
+                const CarouselCard(),
                 SizedBox(height: 15.h),
                 Text(
                   "statistics".tr(),
@@ -53,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                StatisticsCards(),
+                const StatisticsCards(),
                 SizedBox(height: 15.h),
                 Text(
                   "latestCases".tr(),
@@ -64,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                LatestCasesCard(),
+                const LatestCasesCard(),
                 SizedBox(height: 15.h),
                 Text(
                   "trendingCases".tr(),
@@ -75,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                TrendingCasesCard(),
+                const TrendingCasesCard(),
                 SizedBox(height: 10.h),
               ],
             ),

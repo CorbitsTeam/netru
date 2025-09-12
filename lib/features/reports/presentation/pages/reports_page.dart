@@ -22,9 +22,9 @@ class ReportsPage extends StatelessWidget {
           ),
         ),
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: Padding(
-          padding: EdgeInsetsGeometry.symmetric(
+          padding: EdgeInsets.symmetric(
               horizontal: 12),
           child: ReportsListPage(),
         ),
