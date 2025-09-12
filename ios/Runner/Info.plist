@@ -3,37 +3,51 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>en</string>
+
 	<key>CFBundleDisplayName</key>
 	<string>Netru App</string>
+
 	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
+	<string>Runner</string>
+
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>com.netru.app</string>
+
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+
 	<key>CFBundleName</key>
 	<string>netru_app</string>
+
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0.0</string>
+
 	<key>CFBundleSignature</key>
 	<string>????</string>
+
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>1</string>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -41,9 +55,29 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Location -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>يحتاج التطبيق إلى صلاحية الموقع لتوفير خدمات محسنة وأكثر دقة.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>يحتاج التطبيق إلى صلاحية الموقع المستمرة لتوفير خدمات أفضل.</string>
+
+    <!-- Camera -->
+    <key>NSCameraUsageDescription</key>
+    <string>يحتاج التطبيق إلى صلاحية الكاميرا لالتقاط الصور.</string>
+
+    <!-- Photos -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>يحتاج التطبيق إلى صلاحية الوصول لمكتبة الصور.</string>
+
+    <!-- Microphone (لو هتحتاج تسجيل صوت) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>يحتاج التطبيق إلى صلاحية الميكروفون لتسجيل الصوت.</string>
 </dict>
 </plist>

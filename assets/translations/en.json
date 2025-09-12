@@ -6,7 +6,6 @@
   "login": "Login",
   "signUp": "Sign Up",
   "home": "Home",
-  "security": "Security Services' Efforts",
   "statistics": "Statistics",
   "latestCases": "Latest Cases",
   "trendingCases": "Trending Cases",
@@ -26,5 +25,9 @@
   "location": "Location",
   "reportDate": "Report Date & Time",
   "procedures": "Procedures",
-  "media": "Media"
+  "media": "Media",
+  "heatMap": "Heat Map",
+  "securityAgenciesEfforts": "Security Agencies Efforts",
+  "arrestOfaHighlyDangerousTerroristElement": "Arrest of a highly dangerous terrorist element",
+  "security": "Security"
 }

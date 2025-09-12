@@ -1,46 +1,59 @@
 name: netru_app
 description: A new Flutter project with Clean Architecture
-# Flutter version on machine: 3.35.1
 publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.7.2
 
 dependencies:
   animate_do: ^4.2.0
-  animator: ^3.3.0
+  animator:
   cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.0
-  easy_localization: ^3.0.8
+  easy_localization:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
-  flutter_bloc: null
+  flutter_bloc: ^8.1.4
   flutter_launcher_icons: ^0.14.4
+  flutter_map: ^8.2.1
   flutter_native_splash: ^2.4.6
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.2.0
-  freezed_annotation: ^3.1.0
+  geolocator: ^14.0.2
   get_it: ^8.2.0
   google_fonts: ^6.3.0
-  intl: ^0.20.2
+  http: ^1.5.0
+  intl:
   json_annotation: ^4.9.0
+  latlong2: ^0.9.1
+  location: ^8.0.1
   lottie: ^3.3.1
+  permission_handler: ^12.0.1
   shared_preferences: ^2.5.3
+  change_app_package_name: ^1.5.0
+  # Supabase dependencies
+  supabase_flutter: ^2.8.1
+  # Google Sign-In dependency
+  google_sign_in: ^6.2.1
+  # Notification dependencies  
+#  firebase_core: ^2.25.4
+#  firebase_messaging: ^14.7.10
+#  flutter_local_notifications: ^17.2.1+2
+  # Additional dependencies for logging and utilities
+  logger: ^2.4.0
+  uuid: ^4.5.1
 
 dev_dependencies:
-  bloc_test: null
-  build_runner: null
-  flutter_lints: null
+  bloc_test: ^9.1.5
+  build_runner: ^2.4.10
+  flutter_lints: ^3.0.0
   flutter_test:
     sdk: flutter
-  freezed: null
-  json_serializable: null
-  mockito: null
 
 flutter:
   uses-material-design: true
@@ -58,3 +71,8 @@ flutter:
         - asset: assets/fonts/Almarai-Bold.ttf
         - asset: assets/fonts/Almarai-ExtraBold.ttf
         - asset: assets/fonts/Almarai-Light.ttf
+
+# إعدادات تخصيص أيقونة التطبيق
+flutter_native_splash:
+  android: false
+  ios: false

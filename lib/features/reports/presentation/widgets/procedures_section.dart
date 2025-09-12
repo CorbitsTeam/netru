@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 class ProceduresSection extends StatelessWidget {
   const ProceduresSection({super.key});
@@ -24,7 +25,7 @@ class ProceduresSection extends StatelessWidget {
           height: 10.h,
         ),
         Container(
-          width: 125.w,
+          width: 135.w,
           height: 25.h,
           decoration: BoxDecoration(
             color: AppColors.orange,

@@ -36,19 +36,19 @@ class ReportDetailsPage extends StatelessWidget {
                 SizedBox(
                   height: 15.h,
                 ),
-                PersonalInfoSection(),
+                const PersonalInfoSection(),
                 SizedBox(
                   height: 15.h,
                 ),
-                ReportInfoSection(),
+                const ReportInfoSection(),
                 SizedBox(
                   height: 15.h,
                 ),
-                MediaSection(),
+                const MediaSection(),
                 SizedBox(
                   height: 15.h,
                 ),
-                ProceduresSection(),
+                const ProceduresSection(),
                 SizedBox(
                   height: 15.h,
                 ),

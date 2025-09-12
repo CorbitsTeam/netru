@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
+
+import '../../../../core/constants/app_assets.dart';
 
 class LatestCasesCard extends StatefulWidget {
   const LatestCasesCard({super.key});
@@ -280,6 +281,9 @@ class _LatestCasesCardState
                       fontWeight: FontWeight.bold,
                       height: 1.2,
                     ),
+                    overflow:
+                        TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ],
               ),
