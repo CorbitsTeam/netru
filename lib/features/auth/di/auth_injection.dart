@@ -5,8 +5,7 @@ import '../../../core/services/location_service.dart';
 import '../data/datasources/auth_remote_data_source.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
-import '../domain/usecases/login_with_national_id.dart';
-import '../domain/usecases/login_with_passport.dart';
+import '../domain/usecases/login_with_email.dart';
 import '../domain/usecases/register_user.dart';
 import '../presentation/cubit/auth_cubit.dart';
 import '../presentation/cubit/signup_cubit.dart';
@@ -28,8 +27,7 @@ Future<void> initAuthDependencies() async {
   );
 
   // Use cases
-  sl.registerLazySingleton(() => LoginWithNationalIdUseCase(sl()));
-  sl.registerLazySingleton(() => LoginWithPassportUseCase(sl()));
+  sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
 
   // Services
@@ -37,11 +35,7 @@ Future<void> initAuthDependencies() async {
 
   // Cubits
   sl.registerFactory(
-    () => AuthCubit(
-      loginWithNationalIdUseCase: sl(),
-      loginWithPassportUseCase: sl(),
-      authRepository: sl(),
-    ),
+    () => AuthCubit(loginWithEmailUseCase: sl(), authRepository: sl()),
   );
 
   sl.registerFactory(

@@ -4,8 +4,7 @@ import '../models/user_model.dart';
 import '../models/identity_document_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel?> loginWithNationalId(String nationalId, String password);
-  Future<UserModel?> loginWithPassport(String passportNumber, String password);
+  Future<UserModel?> loginWithEmailAndPassword(String email, String password);
   Future<UserModel> createUser(UserModel user, String password);
 
   // New methods for two-phase signup with email verification
@@ -21,6 +20,7 @@ abstract class AuthRemoteDataSource {
   Future<bool> checkNationalIdExists(String nationalId);
   Future<bool> checkPassportExists(String passportNumber);
   Future<UserModel?> getCurrentUser();
+  Future<void> logout();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -30,50 +30,47 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     : _supabaseClient = supabaseClient;
 
   @override
-  Future<UserModel?> loginWithNationalId(
-    String nationalId,
+  Future<UserModel?> loginWithEmailAndPassword(
+    String email,
     String password,
   ) async {
+    // try {
+    //   await _supabaseClient.auth.signOut();
+    //   print('✅ تم تسجيل الخروج من الجلسة القديمة');
+    // } catch (e) {
+    //   print('⚠️ فشل تسجيل الخروج: $e');
+    // }
     try {
+      print('🔐 محاولة تسجيل الدخول بالبريد الإلكتروني: $email');
+
+      final AuthResponse authResponse = await _supabaseClient.auth
+          .signInWithPassword(email: email, password: password);
+
+      if (authResponse.user == null || authResponse.session == null) {
+        throw Exception('فشل في تسجيل الدخول - تحقق من البيانات المدخلة');
+      }
+
+      // جلب بيانات المستخدم الكاملة من جدول users
       final response =
           await _supabaseClient
               .from('users')
               .select()
-              .eq('national_id', nationalId)
+              .eq('email', email)
               .maybeSingle();
 
       if (response == null) {
-        throw Exception('المستخدم غير موجود');
-      }
-
-      // In a real app, you should verify the password hash
-      // For now, we'll assume password verification is handled elsewhere
-      return UserModel.fromJson(response);
-    } catch (e) {
-      throw Exception('خطأ في تسجيل الدخول: $e');
-    }
-  }
-
-  @override
-  Future<UserModel?> loginWithPassport(
-    String passportNumber,
-    String password,
-  ) async {
-    try {
-      final response =
-          await _supabaseClient
-              .from('users')
-              .select()
-              .eq('passport_number', passportNumber)
-              .maybeSingle();
-
-      if (response == null) {
-        throw Exception('المستخدم غير موجود');
+        throw Exception('بيانات المستخدم غير موجودة');
       }
 
       return UserModel.fromJson(response);
     } catch (e) {
-      throw Exception('خطأ في تسجيل الدخول: $e');
+      print('❌ خطأ في تسجيل الدخول: $e');
+
+      try {
+        await _supabaseClient.auth.signOut();
+      } catch (_) {}
+
+      throw Exception(_parseErrorMessage(e.toString()));
     }
   }
 
@@ -323,7 +320,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   String _parseErrorMessage(String error) {
     print('🔍 تحليل رسالة الخطأ: $error');
 
-    // Check for RLS policy errors first
+    // Check for authentication errors first
+    if (error.contains('Invalid login credentials') ||
+        error.contains('Email not confirmed') ||
+        error.contains('Invalid email or password')) {
+      return 'بيانات الدخول غير صحيحة';
+    }
+
+    if (error.contains('Email not found') ||
+        error.contains('User not found') ||
+        error.contains('المستخدم غير موجود')) {
+      return 'المستخدم غير موجود';
+    }
+
+    if (error.contains('فشل في تسجيل الدخول - تحقق من كلمة المرور')) {
+      return 'كلمة المرور غير صحيحة';
+    }
+
+    // Check for RLS policy errors
     if (error.contains('row-level security policy') ||
         error.contains('Unauthorized') ||
         error.contains('42501')) {
@@ -538,6 +552,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       print('❌ خطأ في إكمال ملف المستخدم: $e');
       throw Exception(_parseErrorMessage(e.toString()));
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await _supabaseClient.auth.signOut();
+      print('✅ تم تسجيل الخروج بنجاح');
+    } catch (e) {
+      print('❌ خطأ في تسجيل الخروج: $e');
+      throw Exception('خطأ في تسجيل الخروج');
     }
   }
 }

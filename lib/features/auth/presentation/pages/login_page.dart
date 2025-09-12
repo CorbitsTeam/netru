@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
@@ -19,49 +18,31 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _identityController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  late TabController _tabController;
   bool _obscurePassword = true;
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
   void dispose() {
-    _identityController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
-    _tabController.dispose();
     super.dispose();
   }
-
-  bool get _isCitizenTab => _tabController.index == 0;
 
   void _handleLogin() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final identity = _identityController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (_isCitizenTab) {
-      context.read<AuthCubit>().loginWithNationalId(
-        nationalId: identity,
-        password: password,
-      );
-    } else {
-      context.read<AuthCubit>().loginWithPassport(
-        passportNumber: identity,
-        password: password,
-      );
-    }
+    context.read<AuthCubit>().loginWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   void _showErrorSnackBar(String message) {
@@ -79,6 +60,22 @@ class _LoginPageState extends State<LoginPage>
     // For now, just navigate to the multi-step signup page
     // You'll need to set up proper dependency injection
     context.pushNamed(Routes.signupScreen);
+  }
+
+  TextInputType _getKeyboardType() {
+    return TextInputType.emailAddress;
+  }
+
+  String? Function(String?)? _getValidator() {
+    return AuthValidationUtils.validateEmail;
+  }
+
+  String _getHintText() {
+    return 'البريد الإلكتروني';
+  }
+
+  IconData _getPrefixIcon() {
+    return Icons.email_outlined;
   }
 
   @override
@@ -99,6 +96,7 @@ class _LoginPageState extends State<LoginPage>
           }
         },
         child: Container(
+          alignment: Alignment.center,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -203,8 +201,6 @@ class _LoginPageState extends State<LoginPage>
         ),
         child: Column(
           children: [
-            _buildTabSelection(),
-            SizedBox(height: 24.h),
             _buildLoginForm(),
             SizedBox(height: 28.h),
             _buildLoginButton(),
@@ -227,61 +223,12 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildTabSelection() {
-    return Container(
-      height: 50.h,
-      padding: EdgeInsets.all(3.w), // علشان يدي مسافة للـ indicator
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant, // خلفية ثابتة
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppColors.border.withOpacity(0.3), width: 1),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: AppColors.primary, // لون الـ indicator
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        labelColor: Colors.white,
-        unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14.sp,
-          fontFamily: 'Almarai',
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14.sp,
-          fontFamily: 'Almarai',
-        ),
-        dividerColor: Colors.transparent,
-        splashFactory: NoSplash.splashFactory,
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
-        tabs: const [Tab(text: 'مواطن مصري'), Tab(text: 'مقيم أجنبي')],
-        onTap: (index) {
-          setState(() {
-            _identityController.clear();
-            _passwordController.clear();
-          });
-        },
-      ),
-    );
-  }
-
   Widget _buildLoginForm() {
     return Form(
       key: _formKey,
       child: Column(
         children: [
-          // Identity Field
+          // Email Field
           Container(
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant.withOpacity(0.3),
@@ -292,20 +239,9 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
             child: TextFormField(
-              controller: _identityController,
-              keyboardType:
-                  _isCitizenTab ? TextInputType.number : TextInputType.text,
-              inputFormatters:
-                  _isCitizenTab
-                      ? [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(14),
-                      ]
-                      : [LengthLimitingTextInputFormatter(12)],
-              validator:
-                  _isCitizenTab
-                      ? AuthValidationUtils.validateNationalId
-                      : AuthValidationUtils.validatePassportNumber,
+              controller: _emailController,
+              keyboardType: _getKeyboardType(),
+              validator: _getValidator(),
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
@@ -313,7 +249,7 @@ class _LoginPageState extends State<LoginPage>
                 fontFamily: 'Almarai',
               ),
               decoration: InputDecoration(
-                hintText: _isCitizenTab ? 'الرقم القومي' : 'رقم الجواز',
+                hintText: _getHintText(),
                 hintStyle: TextStyle(
                   color: AppColors.textSecondary.withOpacity(0.7),
                   fontSize: 15.sp,
@@ -321,9 +257,7 @@ class _LoginPageState extends State<LoginPage>
                   fontFamily: 'Almarai',
                 ),
                 prefixIcon: Icon(
-                  _isCitizenTab
-                      ? Icons.credit_card_outlined
-                      : Icons.book_outlined,
+                  _getPrefixIcon(),
                   color: AppColors.primary.withOpacity(0.7),
                   size: 20.sp,
                 ),
