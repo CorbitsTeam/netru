@@ -2,8 +2,6 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-
 
 final sl = GetIt.instance;
 
@@ -32,8 +30,8 @@ Future<void> initializeDependencies() async {
   // UUID generator
   sl.registerLazySingleton<Uuid>(() => const Uuid());
 
-  // Google ML Kit Text Recognizer
-  sl.registerLazySingleton<TextRecognizer>(() => TextRecognizer());
+  // OCR: using Tesseract via ocr_service/ocr_utils. No ML Kit TextRecognizer
+  // registration here because the project now uses the `tesseract_ocr` plugin.
 
   // ===========================
   // Auth Feature

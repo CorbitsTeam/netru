@@ -119,7 +119,7 @@ class ReviewSubmitStep extends StatelessWidget {
           ),
 
           // Submit Button
-          _buildSubmitButton(),
+          // _buildSubmitButton(),
         ],
       ),
     );
@@ -163,10 +163,6 @@ class ReviewSubmitStep extends StatelessWidget {
         value: locationData['governorate'] ?? 'غير محددة',
       ),
       ReviewItem(label: 'المدينة', value: locationData['city'] ?? 'غير محددة'),
-      ReviewItem(
-        label: 'الحي / المنطقة',
-        value: locationData['district'] ?? 'غير محدد',
-      ),
     ];
   }
 
@@ -270,7 +266,7 @@ class ReviewSubmitStep extends StatelessWidget {
           SizedBox(
             width: 100.w,
             child: Text(
-              item.label,
+              '${item.label} : ',
               style: TextStyle(
                 fontSize: 14.sp,
                 color: AppColors.textSecondary,
@@ -283,7 +279,7 @@ class ReviewSubmitStep extends StatelessWidget {
             child: Text(
               item.value,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 12.sp,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),

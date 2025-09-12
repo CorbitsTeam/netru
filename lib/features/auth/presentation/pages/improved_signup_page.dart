@@ -6,6 +6,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/auth/presentation/widgets/data_entry_step.dart';
+import 'package:netru_app/features/auth/presentation/widgets/review_submit_step.dart';
 import '../../../../core/services/ocr_service.dart';
 import '../../../../core/services/location_service.dart';
 import '../widgets/user_type_selection_step.dart';
@@ -49,6 +50,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     'رفع المستندات',
     'البيانات الشخصية',
     'العنوان',
+    'مراجعة وإرسال',
   ];
 
   @override
@@ -160,6 +162,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                     _buildDocumentStep(),
                     _buildDataEntryStep(),
                     _buildLocationStep(),
+                    _buildReviewStep(),
                   ],
                 ),
               ),
@@ -205,7 +208,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget _buildProgressIndicator() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -225,7 +228,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           FadeInDown(
             duration: const Duration(milliseconds: 400),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12.h),
+              padding: EdgeInsets.symmetric(vertical: 8.h),
               child: Column(
                 children: [
                   Text(
@@ -261,7 +264,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 // This is a connector line
                 final stepIndex = index ~/ 2;
                 return Container(
-                  width: 30.w,
+                  width: 15.w,
                   height: 3.h,
                   margin: EdgeInsets.symmetric(horizontal: 4.w),
                   decoration: BoxDecoration(
@@ -445,6 +448,28 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     );
   }
 
+  Widget _buildReviewStep() {
+    // Prepare location data
+    Map<String, String> locationData = {
+      'governorate': _selectedGovernorate?.name ?? '',
+      'city': _selectedCity?.name ?? '',
+      'district': '', // Add district if available
+    };
+
+    // Prepare document paths
+    List<String> documentPaths =
+        _selectedDocuments.map((file) => file.path).toList();
+
+    return ReviewSubmitStep(
+      userType: _selectedUserType ?? UserType.citizen,
+      userData: _userData,
+      locationData: locationData,
+      documentPaths: documentPaths,
+      isSubmitting: _isSubmitting,
+      onSubmit: _submitRegistration,
+    );
+  }
+
   Widget _buildNavigationButtons() {
     return Container(
       padding: EdgeInsets.all(20.w),
@@ -490,6 +515,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         return _isDataValid();
       case 3:
         return _selectedGovernorate != null && _selectedCity != null;
+      case 4:
+        return true; // Review step can always proceed to submit
       default:
         return false;
     }
