@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:netru_app/features/auth/presentation/pages/login_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/signup_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:netru_app/features/auth/presentation/pages/multi_step_signup_page.dart';
+import '../di/auth_injection.dart' as auth_di;
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/auth/presentation/cubit/signup_cubit.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
-import 'package:netru_app/features/demo/presentation/screens/permission_demo_screen.dart';
-import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../routing/routes.dart';
 
 class AppRouter {
@@ -15,9 +18,19 @@ class AppRouter {
       case Routes.splashScreen:
         return _createRoute(const SplashScreen());
       case Routes.loginScreen:
-        return _createRoute(const LoginPage());
+        return _createRoute(
+          BlocProvider<AuthCubit>(
+            create: (context) => auth_di.sl<AuthCubit>(),
+            child: const LoginPage(),
+          ),
+        );
       case Routes.signupScreen:
-        return _createRoute(const SignUpPage());
+        return _createRoute(
+          BlocProvider<SignupCubit>(
+            create: (context) => auth_di.sl<SignupCubit>(),
+            child: const MultiStepSignupPage(),
+          ),
+        );
       case Routes.homeScreen:
         return _createRoute(const HomeScreen());
       case Routes.customBottomBar:
@@ -27,7 +40,7 @@ class AppRouter {
       case Routes.crimeHeatMapPage:
         return _createRoute(const CrimeHeatMapPage());
       case Routes.permissionDemo:
-        return _createRoute(const PermissionDemoScreen());
+        return _createRoute(const HomeScreen()); // Fallback to home
       default:
         return null;
     }

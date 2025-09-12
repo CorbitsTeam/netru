@@ -9,6 +9,7 @@ class AppAssets {
 
   // Logo assets
   static const String netruLogo = 'assets/images/netru_logo.png';
+  static const String corbitsTeam = 'assets/images/corbits.png';
   static const String egyptLogo = 'assets/images/egypt_logo.png';
   static const String ministryLogo = 'assets/images/ministry_logo.png';
 

@@ -9,10 +9,10 @@ import 'core/cubit/theme/theme_cubit.dart';
 import 'core/utils/app_shared_preferences.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/auth_injection.dart' as auth_di;
-import 'features/auth/presentation/cubit/auth_cubit.dart';
+
 import 'app.dart';
 import 'app_bloc_observer.dart';
-import 'core/cubit/permission/permission_cubit.dart';
+// import 'core/cubit/permission/permission_cubit.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/services/logger_service.dart';
 
@@ -73,11 +73,6 @@ void main() async {
           BlocProvider(create: (_) => LocaleCubit()),
           BlocProvider(create: (_) => ThemeCubit()),
 
-          // Permission Cubit with Dependency Injection
-          BlocProvider(create: (_) => sl<PermissionCubit>()),
-
-          // Auth Cubit with Dependency Injection
-          BlocProvider(create: (_) => auth_di.sl<AuthCubit>()),
         ],
         child: MyApp(appRouter: AppRouter()),
       ),

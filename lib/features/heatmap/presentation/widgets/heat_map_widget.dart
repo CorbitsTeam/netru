@@ -17,7 +17,6 @@ class _HeatMapWidgetState extends State<HeatMapWidget>
   final MapController _mapController = MapController();
   final LocationService _locationService = LocationService();
   late AnimationController _animationController;
-  late Animation<double> _pulseAnimation;
 
   // بيانات الجرائم التجريبية مع أسماء المدن المصرية
   final List<CrimeDataModel> _crimeData = [
@@ -77,9 +76,6 @@ class _HeatMapWidgetState extends State<HeatMapWidget>
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
-    );
-    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.repeat();
 
