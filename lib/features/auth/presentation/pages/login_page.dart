@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage>
   bool get _isCitizenTab => _tabController.index == 0;
 
   void _handleLogin() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final identity = _identityController.text.trim();
     final password = _passwordController.text;
@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage>
   void _navigateToSignup() {
     // For now, just navigate to the multi-step signup page
     // You'll need to set up proper dependency injection
-    context.pushReplacementNamed(Routes.signupScreen);
+    context.pushNamed(Routes.signupScreen);
   }
 
   @override

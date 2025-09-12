@@ -85,13 +85,10 @@ class UserModel extends UserEntity {
     if (nationalId != null) json['national_id'] = nationalId;
     if (passportNumber != null) json['passport_number'] = passportNumber;
     if (phone != null) json['phone'] = phone;
-    if (governorateId != null) json['governorate'] = governorateId;
-    if (cityId != null) json['city'] = cityId;
-    if (districtId != null) json['district'] = districtId;
+    if (governorateName != null) json['governorate'] = governorateName;
+    if (cityName != null) json['city'] = cityName;
+    if (districtName != null) json['district'] = districtName;
     if (address != null) json['address'] = address;
-    // Remove date_of_birth as it's not in the database schema
-    // if (dateOfBirth != null)
-    //   json['date_of_birth'] = dateOfBirth!.toIso8601String();
 
     return json;
   }
