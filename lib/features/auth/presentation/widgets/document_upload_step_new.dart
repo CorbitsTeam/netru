@@ -309,15 +309,15 @@ class DocumentUploadStep extends StatelessWidget {
               child: _buildUploadButton(
                 icon: Icons.document_scanner_outlined,
                 label: 'مسح تلقائي',
-                onTap: () => _pickImage(ImageSource.camera),
+                onTap: () => _scanDocumentWithOCR(),
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 8.w),
             Expanded(
               child: _buildUploadButton(
                 icon: Icons.photo_library_outlined,
                 label: 'من المعرض',
-                onTap: () => _pickImage(ImageSource.gallery),
+                onTap: () => _pickFromGallery(),
               ),
             ),
           ],
@@ -566,14 +566,6 @@ class DocumentUploadStep extends StatelessWidget {
       }
     } catch (e) {
       print('❌ خطأ في اختيار الصورة من المعرض: $e');
-    }
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    if (source == ImageSource.camera) {
-      await _scanDocumentWithOCR();
-    } else {
-      await _pickFromGallery();
     }
   }
 

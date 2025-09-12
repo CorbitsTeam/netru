@@ -45,6 +45,7 @@ dependencies:
   path_provider: ^2.1.4
   # Document scanner with automatic cropping
   edge_detection_plus: ^1.0.2
+  cunning_document_scanner: ^1.3.1
   # Additional utilities for file handling
   mime: ^1.0.6
   path: ^1.9.0
@@ -75,6 +76,7 @@ flutter:
     - assets/lottie/
     - assets/translations/
     - assets/tessdata/
+    - assets/tessdata_config.json
 
   fonts:
     - family: Almarai

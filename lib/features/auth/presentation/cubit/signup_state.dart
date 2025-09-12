@@ -214,6 +214,16 @@ class SignupSuccess extends SignupState {
   List<Object?> get props => [user];
 }
 
+// 🆕 New state for email verification flow
+class SignupEmailSent extends SignupState {
+  final String email;
+
+  const SignupEmailSent({required this.email});
+
+  @override
+  List<Object?> get props => [email];
+}
+
 class SignupFailure extends SignupState {
   final String message;
 

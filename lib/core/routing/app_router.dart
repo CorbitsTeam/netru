@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
+import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
+import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
 import '../di/auth_injection.dart' as auth_di;
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
@@ -29,6 +31,28 @@ class AppRouter {
           BlocProvider<SignupCubit>(
             create: (context) => auth_di.sl<SignupCubit>(),
             child: const ImprovedSignupPage(),
+          ),
+        );
+
+      // New routes for email verification flow
+      case Routes.emailVerification:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _createRoute(
+          EmailVerificationPage(
+            email: args['email'],
+            password: args['password'],
+          ),
+        );
+
+      case Routes.completeProfile:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _createRoute(
+          BlocProvider<SignupCubit>(
+            create: (context) => auth_di.sl<SignupCubit>(),
+            child: CompleteProfilePage(
+              email: args['email'],
+              password: args['password'],
+            ),
           ),
         );
       case Routes.homeScreen:
