@@ -17,12 +17,22 @@ class CustomTextField extends StatefulWidget {
   final void Function()? onTap;
   final bool readOnly;
   final int? maxLines;
+  final int? minLines;
   final int? maxLength;
   final List<TextInputFormatter>? inputFormatters;
   final bool isRequired;
   final Duration animationDuration;
   final String? errorText;
   final bool showError;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
+  final bool autofocus;
+  final String? initialValue;
+  final EdgeInsetsGeometry? contentPadding;
+  final Color? focusedBorderColor;
+  final Color? enabledBorderColor;
+  final Color? errorBorderColor;
+  final double borderRadius;
 
   const CustomTextField({
     super.key,
@@ -38,12 +48,22 @@ class CustomTextField extends StatefulWidget {
     this.onTap,
     this.readOnly = false,
     this.maxLines = 1,
+    this.minLines,
     this.maxLength,
     this.inputFormatters,
     this.isRequired = false,
     this.animationDuration = const Duration(milliseconds: 300),
     this.errorText,
     this.showError = true,
+    this.textInputAction,
+    this.onFieldSubmitted,
+    this.autofocus = false,
+    this.initialValue,
+    this.contentPadding,
+    this.focusedBorderColor,
+    this.enabledBorderColor,
+    this.errorBorderColor,
+    this.borderRadius = 12.0,
   });
 
   @override
@@ -53,12 +73,32 @@ class CustomTextField extends StatefulWidget {
 class _CustomTextFieldState extends State<CustomTextField> {
   late FocusNode _focusNode;
   bool _isFocused = false;
+  bool _isValid = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusNode.addListener(_onFocusChange);
+
+    // Validate initial value if provided
+    if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _validate(widget.initialValue);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(CustomTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.errorText != oldWidget.errorText) {
+      setState(() {
+        _errorMessage = widget.errorText;
+        _isValid = _errorMessage == null || _errorMessage!.isEmpty;
+      });
+    }
   }
 
   @override
@@ -72,12 +112,51 @@ class _CustomTextFieldState extends State<CustomTextField> {
     setState(() {
       _isFocused = _focusNode.hasFocus;
     });
+
+    // Validate when losing focus
+    if (!_focusNode.hasFocus && widget.controller != null) {
+      _validate(widget.controller!.text);
+    }
+  }
+
+  void _validate(String? value) {
+    if (widget.validator != null) {
+      final error = widget.validator!(value);
+      setState(() {
+        _errorMessage = error;
+        _isValid = error == null;
+      });
+    } else if (widget.isRequired && (value == null || value.isEmpty)) {
+      setState(() {
+        _errorMessage = 'This field is required';
+        _isValid = false;
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+        _isValid = true;
+      });
+    }
+  }
+
+  void _handleOnChanged(String value) {
+    // Real-time validation while typing
+    if (_focusNode.hasFocus) {
+      _validate(value);
+    }
+
+    if (widget.onChanged != null) {
+      widget.onChanged!(value);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+    final hasError = _errorMessage != null && _errorMessage!.isNotEmpty;
+    final effectiveErrorText = widget.errorText ?? _errorMessage;
+    final showError =
+        (hasError || effectiveErrorText != null) && widget.showError;
 
     return FadeInUp(
       duration: widget.animationDuration,
@@ -93,7 +172,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     widget.label!,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
+                      color:
+                          hasError
+                              ? widget.errorBorderColor ?? AppColors.error
+                              : theme.colorScheme.onSurface,
                     ),
                   ),
                   if (widget.isRequired)
@@ -107,25 +189,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ],
               ),
             ),
-          AnimatedContainer(
-            duration: widget.animationDuration,
+          Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                color:
-                    hasError
-                        ? AppColors.error
-                        : _isFocused
-                        ? AppColors.primary
-                        : AppColors.border,
-                width: _isFocused ? 2 : 1,
-              ),
-              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(widget.borderRadius.r),
               boxShadow:
-                  _isFocused
+                  _isFocused && _isValid
                       ? [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: (widget.focusedBorderColor ??
+                                  AppColors.surface)
+                              .withOpacity(0.15),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -138,17 +211,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
               validator: widget.validator,
-              onChanged: widget.onChanged,
+              onChanged: _handleOnChanged,
               onTap: widget.onTap,
               readOnly: widget.readOnly,
               maxLines: widget.maxLines,
+              minLines: widget.minLines,
               maxLength: widget.maxLength,
               inputFormatters: widget.inputFormatters,
-              style: theme.textTheme.bodyLarge,
+              textInputAction: widget.textInputAction,
+              onFieldSubmitted: widget.onFieldSubmitted,
+              autofocus: widget.autofocus,
+              initialValue: widget.initialValue,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color:
+                    widget.readOnly
+                        ? theme.colorScheme.onSurface.withOpacity(0.6)
+                        : theme.colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
                 ),
                 prefixIcon:
                     widget.prefixIcon != null
@@ -164,25 +247,70 @@ class _CustomTextFieldState extends State<CustomTextField> {
                           child: widget.suffixIcon,
                         )
                         : null,
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 16.h,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  borderSide: BorderSide(
+                    color: widget.enabledBorderColor ?? AppColors.border,
+                    width: 1,
+                  ),
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  borderSide: BorderSide(
+                    color:
+                        hasError
+                            ? widget.errorBorderColor ?? AppColors.error
+                            : widget.enabledBorderColor ?? AppColors.border,
+                    width: hasError ? 1.5 : 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  borderSide: BorderSide(
+                    color:
+                        hasError
+                            ? widget.errorBorderColor ?? AppColors.error
+                            : widget.focusedBorderColor ?? AppColors.primary,
+                    width: 1.5,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  borderSide: BorderSide(
+                    color: widget.errorBorderColor ?? AppColors.error,
+                    width: 1.5,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  borderSide: BorderSide(
+                    color: widget.errorBorderColor ?? AppColors.error,
+                    width: 1.5,
+                  ),
+                ),
+                filled: true,
+                fillColor:
+                    widget.readOnly
+                        ? AppColors.background.withOpacity(0.5)
+                        : AppColors.surface,
+                contentPadding:
+                    widget.contentPadding ??
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 counterText: '',
+                errorStyle: const TextStyle(height: 0, fontSize: 0),
               ),
             ),
           ),
-          if (hasError && widget.showError)
-            AnimatedContainer(
+          if (showError)
+            FadeIn(
               duration: widget.animationDuration,
-              height: hasError ? null : 0,
               child: Padding(
-                padding: EdgeInsets.only(top: 8.h, left: 4.w),
+                padding: EdgeInsets.only(top: 6.h, left: 4.w),
                 child: Text(
-                  widget.errorText!,
+                  effectiveErrorText!,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.error,
+                    color: widget.errorBorderColor ?? AppColors.error,
+                    fontSize: 12.sp,
                   ),
                 ),
               ),

@@ -32,11 +32,11 @@ class UserModel extends UserEntity {
       userType: _parseUserType(json['user_type']),
       phone: json['phone'],
       governorateId: json['governorate'],
-      governorateName: json['governorate_name'],
+      governorateName: json['governorate'], // Use same field for now
       cityId: json['city'],
-      cityName: json['city_name'],
+      cityName: json['city'], // Use same field for now
       districtId: json['district'],
-      districtName: json['district_name'],
+      districtName: json['district'], // Use same field for now
       address: json['address'],
       dateOfBirth:
           json['date_of_birth'] != null
@@ -81,7 +81,9 @@ class UserModel extends UserEntity {
       'verification_status': verificationStatus.name,
     };
 
+    // Email is required in database schema
     if (email != null) json['email'] = email;
+
     if (nationalId != null) json['national_id'] = nationalId;
     if (passportNumber != null) json['passport_number'] = passportNumber;
     if (phone != null) json['phone'] = phone;
@@ -89,6 +91,9 @@ class UserModel extends UserEntity {
     if (cityName != null) json['city'] = cityName;
     if (districtName != null) json['district'] = districtName;
     if (address != null) json['address'] = address;
+    if (dateOfBirth != null) {
+      json['date_of_birth'] = dateOfBirth?.toIso8601String();
+    }
 
     return json;
   }

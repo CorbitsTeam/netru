@@ -7,6 +7,13 @@ abstract class AuthRemoteDataSource {
   Future<UserModel?> loginWithNationalId(String nationalId, String password);
   Future<UserModel?> loginWithPassport(String passportNumber, String password);
   Future<UserModel> createUser(UserModel user, String password);
+
+  // New methods for two-phase signup with email verification
+  Future<String> signUpWithEmailOnly(String email, String password);
+  Future<UserModel> completeUserProfile(UserModel user, String authUserId);
+  Future<bool> resendVerificationEmail();
+  Future<UserModel?> verifyEmailAndCompleteSignup(UserModel userData);
+
   Future<IdentityDocumentModel> createIdentityDocument(
     IdentityDocumentModel document,
   );
@@ -75,6 +82,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       print('🔄 بدء إنشاء المستخدم: ${user.fullName}');
 
+      // Check if user is already authenticated (for profile completion flow)
+      final currentUser = _supabaseClient.auth.currentUser;
+      if (currentUser != null && currentUser.emailConfirmedAt != null) {
+        print('✅ مستخدم مصدق موجود بالفعل: ${currentUser.id}');
+        print('📧 إيميل المستخدم: ${currentUser.email}');
+
+        // Use the authenticated user's data for profile completion
+        return await _completeExistingUserProfile(user, currentUser);
+      }
+
+      // Continue with normal user creation flow if no authenticated user
+      print('🆕 لا يوجد مستخدم مصدق، إنشاء حساب جديد...');
+
       // Validate required fields
       if (user.fullName.trim().isEmpty) {
         throw Exception('الاسم الكامل مطلوب');
@@ -109,12 +129,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       print('📧 البريد المستخدم: $emailToUse');
 
-      // First, create user in Supabase Auth
+      // 1️⃣ إنشاء حساب المصادقة
       print('🔐 إنشاء حساب المصادقة...');
       final AuthResponse authResponse = await _supabaseClient.auth.signUp(
         email: emailToUse,
         password: password,
-        phone: user.phone,
       );
 
       if (authResponse.user == null) {
@@ -123,55 +142,45 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       print('✅ تم إنشاء حساب المصادقة بنجاح: ${authResponse.user!.id}');
-
-      // Get the auth user ID
       final authUserId = authResponse.user!.id;
 
-      // Prepare user data for database
-      final userData = user.toCreateJson();
-      userData['id'] = authUserId; // Use auth user ID as primary key
-      userData['password'] =
-          password; // Add password field as required by database schema
+      // 2️⃣ تسجيل الدخول فوراً للحصول على Session
+      final signInResponse = await _supabaseClient.auth.signInWithPassword(
+        email: emailToUse,
+        password: password,
+      );
 
-      // Add the actual email used for auth (database requires NOT NULL)
-      userData['email'] =
-          emailToUse; // Use the email used for auth (never null)
+      if (signInResponse.session == null) {
+        throw Exception('فشل تسجيل الدخول بعد إنشاء الحساب');
+      }
+
+      print(
+        '🔑 جلسة صالحة: ${signInResponse.session!.accessToken.substring(0, 15)}...',
+      );
+
+      // 3️⃣ تجهيز بيانات المستخدم للجدول
+      final userData = user.toCreateJson();
+      userData['id'] = authUserId;
+      userData['email'] = emailToUse;
+      userData['verification_status'] = 'pending';
 
       print('📝 بيانات المستخدم للقاعدة: $userData');
 
-      // Create user record in users table with auth user ID
+      // 4️⃣ إدخال البيانات في جدول users
       print('💾 حفظ بيانات المستخدم في قاعدة البيانات...');
-
-      // Try inserting a few times before giving up (helps if auth session
-      // isn't fully propagated or transient DB policies cause temporary
-      // failures). We'll keep the insert as the authenticated user.
-      const int maxAttempts = 3;
-      int attempt = 0;
-      dynamic response;
-      while (attempt < maxAttempts) {
-        try {
-          attempt++;
-          response =
-              await _supabaseClient
-                  .from('users')
-                  .insert(userData)
-                  .select()
-                  .single();
-          break; // success
-        } catch (err) {
-          print('⚠️ محاولة إدراج المستخدم فشلت (محاولة $attempt): $err');
-          if (attempt >= maxAttempts) throw err;
-          // small backoff
-          await Future.delayed(Duration(milliseconds: 500 * attempt));
-        }
-      }
+      final response =
+          await _supabaseClient
+              .from('users')
+              .insert(userData)
+              .select()
+              .single();
 
       print('✅ تم حفظ المستخدم في قاعدة البيانات بنجاح');
       return UserModel.fromJson(response);
     } catch (e) {
       print('❌ خطأ في إنشاء المستخدم: $e');
 
-      // Clean up auth user if database insert fails
+      // تنظيف الحساب إذا فشل التسجيل
       try {
         print('🔄 محاولة تنظيف حساب المصادقة...');
         await _supabaseClient.auth.signOut();
@@ -179,26 +188,147 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         print('⚠️ خطأ في تنظيف حساب المصادقة: $cleanupError');
       }
 
-      final errStr = e.toString();
-      // Detect common server-side RLS/policy recursion error and return
-      // actionable message to the developer/maintainer.
-      if (errStr.contains('infinite recursion')) {
-        throw Exception(
-          'خطأ في سياسات قاعدة البيانات (RLS) عند إدراج المستخدم.\n'
-          'الخطأ: infinite recursion detected in policy for relation "users".\n'
-          'الرجاء مراجعة سياسات RLS لجدول users في لوحة Supabase أو استخدام خدمة "service_role" '
-          'لإنشاء السجلات من جانب الخادم بدلاً من العميل.',
-        );
+      throw Exception(_parseErrorMessage(e.toString()));
+    }
+  }
+
+  // 🆕 New method for initial signup with email verification
+  @override
+  Future<String> signUpWithEmailOnly(String email, String password) async {
+    try {
+      print('📧 بدء إنشاء حساب مصادقة فقط للإيميل: $email');
+
+      // Validate email format
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+        throw Exception('عنوان البريد الإلكتروني غير صحيح');
       }
 
-      // Parse and return user-friendly error messages
-      String errorMessage = _parseErrorMessage(errStr);
-      throw Exception(errorMessage);
+      if (password.length < 6) {
+        throw Exception('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      }
+
+      // Create auth account only - no database entry yet
+      final AuthResponse authResponse = await _supabaseClient.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      if (authResponse.user == null) {
+        throw Exception('فشل في إنشاء حساب المصادقة');
+      }
+
+      print('✅ تم إنشاء حساب المصادقة: ${authResponse.user!.id}');
+      print('📩 تم إرسال رسالة تأكيد للبريد الإلكتروني');
+
+      return authResponse.user!.id;
+    } catch (e) {
+      print('❌ خطأ في إنشاء حساب المصادقة: $e');
+      throw Exception(_parseErrorMessage(e.toString()));
+    }
+  }
+
+  // 🆕 Complete user profile after email verification
+  @override
+  Future<UserModel> completeUserProfile(
+    UserModel user,
+    String authUserId,
+  ) async {
+    try {
+      print('📝 إكمال ملف المستخدم للـ ID: $authUserId');
+
+      // Prepare user data for database
+      final userData = user.toCreateJson();
+      userData['id'] = authUserId;
+      userData['verification_status'] = 'verified'; // Email is verified now
+
+      print('💾 حفظ بيانات المستخدم في قاعدة البيانات...');
+
+      final response =
+          await _supabaseClient
+              .from('users')
+              .insert(userData)
+              .select()
+              .single();
+
+      print('✅ تم حفظ ملف المستخدم بنجاح');
+      return UserModel.fromJson(response);
+    } catch (e) {
+      print('❌ خطأ في إكمال ملف المستخدم: $e');
+      throw Exception(_parseErrorMessage(e.toString()));
+    }
+  }
+
+  // 🆕 Resend verification email
+  @override
+  Future<bool> resendVerificationEmail() async {
+    try {
+      final user = _supabaseClient.auth.currentUser;
+      if (user == null || user.email == null) {
+        throw Exception('لا يوجد مستخدم مسجل دخول');
+      }
+
+      await _supabaseClient.auth.resend(
+        type: OtpType.signup,
+        email: user.email!,
+      );
+
+      print('📩 تم إعادة إرسال رسالة التأكيد');
+      return true;
+    } catch (e) {
+      print('❌ خطأ في إعادة إرسال رسالة التأكيد: $e');
+      return false;
+    }
+  }
+
+  // 🆕 Verify email and complete signup
+  @override
+  Future<UserModel?> verifyEmailAndCompleteSignup(UserModel userData) async {
+    try {
+      print('🔍 التحقق من حالة تأكيد الإيميل...');
+
+      final user = _supabaseClient.auth.currentUser;
+      if (user == null) {
+        print('❌ لا يوجد مستخدم مسجل دخول');
+        return null;
+      }
+
+      // Check if email is confirmed
+      if (user.emailConfirmedAt == null) {
+        print('⏳ البريد الإلكتروني لم يتم تأكيده بعد');
+        return null;
+      }
+
+      // Check if user profile already exists
+      final existingUser =
+          await _supabaseClient
+              .from('users')
+              .select()
+              .eq('id', user.id)
+              .maybeSingle();
+
+      if (existingUser != null) {
+        print('✅ ملف المستخدم موجود بالفعل');
+        return UserModel.fromJson(existingUser);
+      }
+
+      // Complete user profile
+      print('📝 إكمال ملف المستخدم...');
+      return await completeUserProfile(userData, user.id);
+    } catch (e) {
+      print('❌ خطأ في التحقق وإكمال التسجيل: $e');
+      throw Exception(_parseErrorMessage(e.toString()));
     }
   }
 
   String _parseErrorMessage(String error) {
     print('🔍 تحليل رسالة الخطأ: $error');
+
+    // Check for RLS policy errors first
+    if (error.contains('row-level security policy') ||
+        error.contains('Unauthorized') ||
+        error.contains('42501')) {
+      return 'خطأ في صلاحيات قاعدة البيانات - يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني';
+    }
 
     // Check for specific error types
     if (error.contains('unique') || error.contains('duplicate')) {
@@ -264,14 +394,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Create unique filename to avoid conflicts
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final uniqueFileName = '${timestamp}_${fileName.replaceAll(' ', '_')}';
+      final path = 'user_docs/$uniqueFileName';
 
-      print('📁 اسم الملف الفريد: $uniqueFileName');
+      print('📁 مسار الملف: $path');
 
       // Upload file using the correct Supabase format
       final String fullPath = await _supabaseClient.storage
-          .from('avatars') // Make sure this bucket exists in Supabase
+          .from('documents') // Use documents bucket for identity documents
           .upload(
-            uniqueFileName,
+            path,
             imageFile,
             fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
           );
@@ -280,8 +411,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       // Get the public URL
       final publicUrl = _supabaseClient.storage
-          .from('avatars')
-          .getPublicUrl(uniqueFileName);
+          .from('documents')
+          .getPublicUrl(path);
 
       print('🔗 الرابط العام: $publicUrl');
       return publicUrl;
@@ -293,7 +424,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           e.toString().contains('bucket does not exist')) {
         print('🔄 محاولة إنشاء bucket...');
         try {
-          await _supabaseClient.storage.createBucket('avatars');
+          await _supabaseClient.storage.createBucket(
+            'documents',
+            const BucketOptions(public: true),
+          );
           print('✅ تم إنشاء bucket بنجاح');
 
           // Retry upload
@@ -358,6 +492,52 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return UserModel.fromJson(response);
     } catch (e) {
       return null;
+    }
+  }
+
+  // Helper method for completing existing authenticated user profile
+  Future<UserModel> _completeExistingUserProfile(
+    UserModel user,
+    User currentUser,
+  ) async {
+    try {
+      print('📝 إكمال ملف المستخدم المصدق: ${currentUser.id}');
+
+      // Check if user profile already exists in database
+      final existingUser =
+          await _supabaseClient
+              .from('users')
+              .select('*')
+              .eq('id', currentUser.id)
+              .maybeSingle();
+
+      if (existingUser != null) {
+        print('✅ ملف المستخدم موجود بالفعل');
+        return UserModel.fromJson(existingUser);
+      }
+
+      // Create new user profile with authenticated user's ID
+      print('🆕 إنشاء ملف مستخدم جديد للمستخدم المصدق');
+
+      final userData = user.toCreateJson();
+      userData['id'] = currentUser.id;
+      userData['email'] = currentUser.email ?? user.email;
+      userData['verification_status'] = 'verified'; // Email is already verified
+
+      print('💾 حفظ بيانات المستخدم في قاعدة البيانات...');
+
+      final response =
+          await _supabaseClient
+              .from('users')
+              .insert(userData)
+              .select()
+              .single();
+
+      print('✅ تم حفظ ملف المستخدم بنجاح');
+      return UserModel.fromJson(response);
+    } catch (e) {
+      print('❌ خطأ في إكمال ملف المستخدم: $e');
+      throw Exception(_parseErrorMessage(e.toString()));
     }
   }
 }

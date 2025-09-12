@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
-
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/auth_validation_utils.dart';
@@ -12,7 +11,6 @@ import '../../../../core/routing/routes.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/animated_button.dart';
-import 'multi_step_signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -95,7 +93,7 @@ class _LoginPageState extends State<LoginPage>
           }
 
           if (state is AuthLoggedIn) {
-            Navigator.pushReplacementNamed(context, Routes.homeScreen);
+            Navigator.pushReplacementNamed(context, Routes.customBottomBar);
           } else if (state is AuthError) {
             _showErrorSnackBar(state.message);
           }
