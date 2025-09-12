@@ -5,6 +5,7 @@ import 'package:netru_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
+import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
 import 'package:netru_app/features/demo/presentation/screens/permission_demo_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
@@ -15,10 +16,12 @@ class AppRouter {
     switch (settings.name) {
       // case Routes.splashScreen:
       //   return _createRoute(const SplashScreen());
-      case Routes.submissionOfaReportPage:
-        return _createRoute(
-          const SubmissionOfaReportPage(),
-        );
+      case Routes.profileScreen:
+        return _createRoute(const ProfilePage());
+      // case Routes.submissionOfaReportPage:
+      //   return _createRoute(
+      //     const SubmissionOfaReportPage(),
+      //   );
       case Routes.loginScreen:
         return _createRoute(const LoginPage());
       case Routes.signupScreen:
