@@ -1,43 +1,28 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
-import 'package:netru_app/core/errors/failures.dart';
-import '../entities/user_entity.dart';
+import '../../../../core/errors/failures.dart';
+import '../../domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> loginWithEmail({
-    required String email,
+  Future<Either<Failure, UserEntity>> loginWithNationalId(
+    String nationalId,
+    String password,
+  );
+  Future<Either<Failure, UserEntity>> loginWithPassport(
+    String passportNumber,
+    String password,
+  );
+  Future<Either<Failure, UserEntity>> registerUser({
+    required UserEntity user,
     required String password,
+    required List<File> documents,
   });
-
-  Future<Either<Failure, UserEntity>> signUpWithEmail({
-    required String email,
-    required String password,
-    required String fullName,
-    String? phone,
-  });
-
-  Future<Either<Failure, UserEntity>> signInWithGoogle();
-
-  Future<Either<Failure, CitizenEntity>> registerCitizen({
-    required String email,
-    required String password,
-    required String fullName,
-    required String nationalId,
-    required String phone,
-    String? address,
-  });
-
-  Future<Either<Failure, ForeignerEntity>> registerForeigner({
-    required String email,
-    required String password,
-    required String fullName,
-    required String passportNumber,
-    required String nationality,
-    required String phone,
-  });
-
+  Future<Either<Failure, String>> uploadDocument(
+    File documentFile,
+    String fileName,
+  );
+  Future<Either<Failure, bool>> checkNationalIdExists(String nationalId);
+  Future<Either<Failure, bool>> checkPassportExists(String passportNumber);
   Future<Either<Failure, UserEntity?>> getCurrentUser();
-
   Future<Either<Failure, void>> logout();
-
-  Future<Either<Failure, bool>> isUserLoggedIn();
 }

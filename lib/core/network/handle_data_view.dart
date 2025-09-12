@@ -110,7 +110,7 @@ class _CustomImageLoadingState extends State<CustomImageLoading>
               );
             },
             child: Image.asset(
-              AppAssets.lottieLoading,
+              AppAssets.mainLogo,
               width: widget.size,
               height: widget.size,
             ),
