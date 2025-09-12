@@ -31,12 +31,12 @@ class UserModel extends UserEntity {
       passportNumber: json['passport_number'],
       userType: _parseUserType(json['user_type']),
       phone: json['phone'],
-      governorateId: json['governorate'],
-      governorateName: json['governorate'], // Use same field for now
-      cityId: json['city'],
-      cityName: json['city'], // Use same field for now
-      districtId: json['district'],
-      districtName: json['district'], // Use same field for now
+      governorateId: null, // Database stores names, not IDs
+      governorateName: json['governorate'], // Use text field from database
+      cityId: null, // Database stores names, not IDs
+      cityName: json['city'], // Use text field from database
+      districtId: null, // Database stores names, not IDs
+      districtName: json['district'], // Use text field from database
       address: json['address'],
       dateOfBirth:
           json['date_of_birth'] != null
@@ -63,9 +63,9 @@ class UserModel extends UserEntity {
       'passport_number': passportNumber,
       'user_type': userType.name,
       'phone': phone,
-      'governorate': governorateId,
-      'city': cityId,
-      'district': districtId,
+      'governorate': governorateName, // Use name field for database storage
+      'city': cityName, // Use name field for database storage
+      'district': districtName, // Use name field for database storage
       'address': address,
       'date_of_birth': dateOfBirth?.toIso8601String(),
       'verification_status': verificationStatus.name,

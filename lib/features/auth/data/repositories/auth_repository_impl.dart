@@ -16,32 +16,13 @@ class AuthRepositoryImpl implements AuthRepository {
     : _remoteDataSource = remoteDataSource;
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithNationalId(
-    String nationalId,
+  Future<Either<Failure, UserEntity>> loginWithEmailAndPassword(
+    String email,
     String password,
   ) async {
     try {
-      final user = await _remoteDataSource.loginWithNationalId(
-        nationalId,
-        password,
-      );
-      if (user == null) {
-        return Left(ServerFailure('المستخدم غير موجود'));
-      }
-      return Right(user);
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserEntity>> loginWithPassport(
-    String passportNumber,
-    String password,
-  ) async {
-    try {
-      final user = await _remoteDataSource.loginWithPassport(
-        passportNumber,
+      final user = await _remoteDataSource.loginWithEmailAndPassword(
+        email,
         password,
       );
       if (user == null) {
@@ -135,7 +116,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      // Implement logout logic if using Supabase auth
+      await _remoteDataSource.logout();
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

@@ -1,11 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/features/auth/domain/usecases/login_with_email.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/location_service.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/usecases/login_with_national_id.dart';
-import '../../features/auth/domain/usecases/login_with_passport.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
@@ -27,8 +26,7 @@ Future<void> initAuthDependencies() async {
   );
 
   // Use cases
-  sl.registerLazySingleton(() => LoginWithNationalIdUseCase(sl()));
-  sl.registerLazySingleton(() => LoginWithPassportUseCase(sl()));
+  sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
 
   // Services
@@ -36,11 +34,7 @@ Future<void> initAuthDependencies() async {
 
   // Cubits
   sl.registerFactory(
-    () => AuthCubit(
-      loginWithNationalIdUseCase: sl(),
-      loginWithPassportUseCase: sl(),
-      authRepository: sl(),
-    ),
+    () => AuthCubit(loginWithEmailUseCase: sl(), authRepository: sl()),
   );
 
   sl.registerFactory(
