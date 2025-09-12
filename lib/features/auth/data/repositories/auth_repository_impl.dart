@@ -152,22 +152,41 @@ class AuthRepositoryImpl implements AuthRepository {
             ? DocumentType.nationalId
             : DocumentType.passport;
 
-    for (int i = 0; i < documents.length; i++) {
-      final document = documents[i];
-      final isBack = i == 1 && userType == UserType.citizen;
-      final suffix = isBack ? 'back' : 'front';
-      final fileName = '${userId}_${docType.name}_$suffix.jpg';
+    try {
+      String? frontImageUrl;
+      String? backImageUrl;
 
-      final url = await _remoteDataSource.uploadImage(document, fileName);
+      // Upload front document
+      if (documents.isNotEmpty) {
+        final frontFileName = '${userId}_${docType.name}_front.jpg';
+        frontImageUrl = await _remoteDataSource.uploadImage(
+          documents[0],
+          frontFileName,
+        );
+      }
 
+      // Upload back document for citizens (national ID has front and back)
+      if (documents.length > 1 && userType == UserType.citizen) {
+        final backFileName = '${userId}_${docType.name}_back.jpg';
+        backImageUrl = await _remoteDataSource.uploadImage(
+          documents[1],
+          backFileName,
+        );
+      }
+
+      // Create identity document record
       final identityDoc = IdentityDocumentModel(
         userId: userId,
         docType: docType,
-        frontImageUrl: isBack ? null : url,
-        backImageUrl: isBack ? url : null,
+        frontImageUrl: frontImageUrl,
+        backImageUrl: backImageUrl,
       );
 
       await _remoteDataSource.createIdentityDocument(identityDoc);
+    } catch (e) {
+      print('خطأ في رفع المستندات: $e');
+      // Don't throw here, as user is already created
+      // Just log the error - user can upload documents later
     }
   }
 }
