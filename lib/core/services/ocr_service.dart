@@ -1,36 +1,32 @@
 import 'dart:io';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:tesseract_ocr/tesseract_ocr.dart';
 import '../../features/auth/domain/entities/extracted_document_data.dart';
 
 class OCRService {
-  // Use default text recognizer which supports multiple languages including Arabic
-  static final TextRecognizer _textRecognizer = TextRecognizer();
-
   /// استخراج النص من البطاقة الشخصية المصرية
   static Future<ExtractedDocumentData?> extractFromEgyptianID(
     File imageFile,
   ) async {
     try {
-      final inputImage = InputImage.fromFile(imageFile);
-      final recognizedText = await _textRecognizer.processImage(inputImage);
+      // استخراج النص باستخدام Tesseract مع دعم العربية والإنجليزية
+      String text = await TesseractOcr.extractText(imageFile.path);
 
-      // تنظيف النص المستخرج
-      String fullText = recognizedText.text;
+      print('🔍 النص المستخرج من البطاقة: $text');
+
+      if (text.isEmpty) return null;
+
       List<String> lines =
-          fullText
+          text
               .split('\n')
               .map((line) => line.trim())
               .where((line) => line.isNotEmpty)
               .toList();
 
-      print('OCR Extracted Text:');
-      for (int i = 0; i < lines.length; i++) {
-        print('Line $i: ${lines[i]}');
-      }
+      print('📄 الأسطر المستخرجة: $lines');
 
       return _parseEgyptianIDText(lines);
     } catch (e) {
-      print('خطأ في قراءة البطاقة الشخصية: $e');
+      print('❌ خطأ في استخراج النص من البطاقة: $e');
       return null;
     }
   }
@@ -40,25 +36,25 @@ class OCRService {
     File imageFile,
   ) async {
     try {
-      final inputImage = InputImage.fromFile(imageFile);
-      final recognizedText = await _textRecognizer.processImage(inputImage);
+      // استخراج النص باستخدام Tesseract مع دعم العربية والإنجليزية
+      String text = await TesseractOcr.extractText(imageFile.path);
 
-      String fullText = recognizedText.text;
+      print('🔍 النص المستخرج من جواز السفر: $text');
+
+      if (text.isEmpty) return null;
+
       List<String> lines =
-          fullText
+          text
               .split('\n')
               .map((line) => line.trim())
               .where((line) => line.isNotEmpty)
               .toList();
 
-      print('Passport OCR Extracted Text:');
-      for (int i = 0; i < lines.length; i++) {
-        print('Line $i: ${lines[i]}');
-      }
+      print('📄 الأسطر المستخرجة: $lines');
 
       return _parsePassportText(lines);
     } catch (e) {
-      print('خطأ في قراءة جواز السفر: $e');
+      print('❌ خطأ في استخراج النص من جواز السفر: $e');
       return null;
     }
   }
@@ -423,6 +419,6 @@ class OCRService {
 
   /// تنظيف الموارد
   static void dispose() {
-    _textRecognizer.close();
+    // No cleanup needed for Tesseract
   }
 }

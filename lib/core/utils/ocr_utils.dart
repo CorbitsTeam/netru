@@ -1,19 +1,17 @@
 import 'dart:io';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:tesseract_ocr/tesseract_ocr.dart';
 import 'egyptian_id_parser.dart';
 
 /// Utility class for OCR text extraction and processing
 class OCRUtils {
-  static final TextRecognizer _textRecognizer = TextRecognizer();
-
-  /// Extract text from image using ML Kit
+  /// Extract text from image using Tesseract OCR
   static Future<String?> extractTextFromImage(File imageFile) async {
     try {
-      final inputImage = InputImage.fromFile(imageFile);
-      final recognizedText = await _textRecognizer.processImage(inputImage);
-      return recognizedText.text;
+      final text = await TesseractOcr.extractText(imageFile.path);
+      print('🔍 OCR extracted text: $text');
+      return text.isNotEmpty ? text : null;
     } catch (e) {
-      print('Error extracting text: $e');
+      print('❌ Error extracting text: $e');
       return null;
     }
   }
@@ -161,6 +159,6 @@ class OCRUtils {
 
   /// Dispose resources
   static void dispose() {
-    _textRecognizer.close();
+    // No cleanup needed for Tesseract OCR
   }
 }

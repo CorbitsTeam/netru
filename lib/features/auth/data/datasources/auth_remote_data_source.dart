@@ -114,6 +114,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final AuthResponse authResponse = await _supabaseClient.auth.signUp(
         email: emailToUse,
         password: password,
+        phone: user.phone,
       );
 
       if (authResponse.user == null) {
@@ -129,20 +130,41 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Prepare user data for database
       final userData = user.toCreateJson();
       userData['id'] = authUserId; // Use auth user ID as primary key
+      userData['password'] =
+          password; // Add password field as required by database schema
 
-      // Add the actual email used for auth
-      userData['email'] = user.email; // Keep original email (can be null)
+      // Add the actual email used for auth (database requires NOT NULL)
+      userData['email'] =
+          emailToUse; // Use the email used for auth (never null)
 
       print('📝 بيانات المستخدم للقاعدة: $userData');
 
       // Create user record in users table with auth user ID
       print('💾 حفظ بيانات المستخدم في قاعدة البيانات...');
-      final response =
-          await _supabaseClient
-              .from('users')
-              .insert(userData)
-              .select()
-              .single();
+
+      // Try inserting a few times before giving up (helps if auth session
+      // isn't fully propagated or transient DB policies cause temporary
+      // failures). We'll keep the insert as the authenticated user.
+      const int maxAttempts = 3;
+      int attempt = 0;
+      dynamic response;
+      while (attempt < maxAttempts) {
+        try {
+          attempt++;
+          response =
+              await _supabaseClient
+                  .from('users')
+                  .insert(userData)
+                  .select()
+                  .single();
+          break; // success
+        } catch (err) {
+          print('⚠️ محاولة إدراج المستخدم فشلت (محاولة $attempt): $err');
+          if (attempt >= maxAttempts) throw err;
+          // small backoff
+          await Future.delayed(Duration(milliseconds: 500 * attempt));
+        }
+      }
 
       print('✅ تم حفظ المستخدم في قاعدة البيانات بنجاح');
       return UserModel.fromJson(response);
@@ -157,8 +179,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         print('⚠️ خطأ في تنظيف حساب المصادقة: $cleanupError');
       }
 
+      final errStr = e.toString();
+      // Detect common server-side RLS/policy recursion error and return
+      // actionable message to the developer/maintainer.
+      if (errStr.contains('infinite recursion')) {
+        throw Exception(
+          'خطأ في سياسات قاعدة البيانات (RLS) عند إدراج المستخدم.\n'
+          'الخطأ: infinite recursion detected in policy for relation "users".\n'
+          'الرجاء مراجعة سياسات RLS لجدول users في لوحة Supabase أو استخدام خدمة "service_role" '
+          'لإنشاء السجلات من جانب الخادم بدلاً من العميل.',
+        );
+      }
+
       // Parse and return user-friendly error messages
-      String errorMessage = _parseErrorMessage(e.toString());
+      String errorMessage = _parseErrorMessage(errStr);
       throw Exception(errorMessage);
     }
   }
