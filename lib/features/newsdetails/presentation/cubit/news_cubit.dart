@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/constants/app_assets.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
@@ -60,7 +59,7 @@ class NewsCubit extends Cubit<NewsState> {
       );
     } catch (e) {
       emit(
-        NewsError(
+        const NewsError(
           message: 'حدث خطأ في تحميل الأخبار',
         ),
       );

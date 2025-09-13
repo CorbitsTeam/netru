@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
@@ -16,7 +15,7 @@ class NewsContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
       ),
       child: Column(
