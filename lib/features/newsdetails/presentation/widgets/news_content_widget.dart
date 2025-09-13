@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/constants/app_constants.dart';
+import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
 class NewsContentWidget extends StatelessWidget {
@@ -45,8 +46,9 @@ class NewsContentWidget extends StatelessWidget {
                   vertical: 5.h,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.blue
-                      .withValues(alpha: 0.1),
+                  color: Colors.blue.withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius:
                       BorderRadius.circular(12.r),
                 ),
@@ -84,7 +86,8 @@ class NewsContentWidget extends StatelessWidget {
                         .withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(
-                            12.r),
+                          12.r,
+                        ),
                   ),
                   child: Text(
                     news.category,
@@ -104,8 +107,9 @@ class NewsContentWidget extends StatelessWidget {
             news.content,
             style: TextStyle(
               fontSize: 14.sp,
-              color: AppColors.grey
-                  .withValues(alpha: 0.9),
+              color: AppColors.grey.withValues(
+                alpha: 0.9,
+              ),
               height: 1.6,
               letterSpacing: 0.2,
             ),
