@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -14,6 +15,10 @@ class NewsContentWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: const BoxDecoration(color: Colors.white),
+
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,6 +43,11 @@ class NewsContentWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
+                  color: Colors.blue.withValues(
+                    alpha: 0.1,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(12.r),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -66,6 +76,13 @@ class NewsContentWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
+
+                    color: Colors.green
+                        .withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
                   ),
                   child: Text(
                     news.category,
@@ -86,6 +103,9 @@ class NewsContentWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.sp,
               color: AppColors.grey.withValues(alpha: 0.9),
+              color: AppColors.grey.withValues(
+                alpha: 0.9,
+              ),
               height: 1.6,
               letterSpacing: 0.2,
             ),

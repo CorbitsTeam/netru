@@ -6,73 +6,98 @@ extension ThemeExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
 
   // Existing extensions
-  IconThemeData get iconTheme => Theme.of(this).iconTheme;
+  IconThemeData get iconTheme =>
+      Theme.of(this).iconTheme;
 
-  TextTheme get textTheme => Theme.of(this).textTheme;
+  TextTheme get textTheme =>
+      Theme.of(this).textTheme;
 
-  AppBarTheme get appBarTheme => Theme.of(this).appBarTheme;
+  // AppBarTheme get appBarTheme => Theme.of(this).appBarTheme;
 
-  InputDecorationTheme get inputDecorationTheme =>
-      Theme.of(this).inputDecorationTheme;
+  // InputDecorationTheme get inputDecorationTheme =>
+  //     Theme.of(this).inputDecorationTheme;
 
-  CheckboxThemeData get checkboxTheme => Theme.of(this).checkboxTheme;
+  CheckboxThemeData get checkboxTheme =>
+      Theme.of(this).checkboxTheme;
 
-  ElevatedButtonThemeData get elevatedButtonTheme =>
+  ElevatedButtonThemeData
+  get elevatedButtonTheme =>
       Theme.of(this).elevatedButtonTheme;
 
-  OutlinedButtonThemeData get outlinedButtonTheme =>
+  OutlinedButtonThemeData
+  get outlinedButtonTheme =>
       Theme.of(this).outlinedButtonTheme;
 
-  TextButtonThemeData get textButtonTheme => Theme.of(this).textButtonTheme;
+  TextButtonThemeData get textButtonTheme =>
+      Theme.of(this).textButtonTheme;
 
-  CardThemeData get cardTheme => Theme.of(this).cardTheme;
+  CardThemeData get cardTheme =>
+      Theme.of(this).cardTheme;
 
-  DialogThemeData get dialogTheme => Theme.of(this).dialogTheme;
+  DialogThemeData get dialogTheme =>
+      Theme.of(this).dialogTheme;
 
-  FloatingActionButtonThemeData get floatingActionButtonTheme =>
+  FloatingActionButtonThemeData
+  get floatingActionButtonTheme =>
       Theme.of(this).floatingActionButtonTheme;
 
-  BottomNavigationBarThemeData get bottomNavigationBarTheme =>
+  BottomNavigationBarThemeData
+  get bottomNavigationBarTheme =>
       Theme.of(this).bottomNavigationBarTheme;
 
-  NavigationRailThemeData get navigationRailTheme =>
+  NavigationRailThemeData
+  get navigationRailTheme =>
       Theme.of(this).navigationRailTheme;
 
-  SliderThemeData get sliderTheme => Theme.of(this).sliderTheme;
+  SliderThemeData get sliderTheme =>
+      Theme.of(this).sliderTheme;
 
-  TabBarThemeData get tabBarTheme => Theme.of(this).tabBarTheme;
+  TabBarThemeData get tabBarTheme =>
+      Theme.of(this).tabBarTheme;
 
-  TooltipThemeData get tooltipTheme => Theme.of(this).tooltipTheme;
+  TooltipThemeData get tooltipTheme =>
+      Theme.of(this).tooltipTheme;
 
-  PopupMenuThemeData get popupMenuTheme => Theme.of(this).popupMenuTheme;
+  PopupMenuThemeData get popupMenuTheme =>
+      Theme.of(this).popupMenuTheme;
 
-  MaterialBannerThemeData get bannerTheme => Theme.of(this).bannerTheme;
+  MaterialBannerThemeData get bannerTheme =>
+      Theme.of(this).bannerTheme;
 
-  DividerThemeData get dividerTheme => Theme.of(this).dividerTheme;
+  DividerThemeData get dividerTheme =>
+      Theme.of(this).dividerTheme;
 
-  BottomSheetThemeData get bottomSheetTheme => Theme.of(this).bottomSheetTheme;
+  BottomSheetThemeData get bottomSheetTheme =>
+      Theme.of(this).bottomSheetTheme;
 
-  TimePickerThemeData get timePickerTheme => Theme.of(this).timePickerTheme;
+  TimePickerThemeData get timePickerTheme =>
+      Theme.of(this).timePickerTheme;
 
   ThemeData get darkTheme => ThemeData.dark();
 
   ThemeData get lightTheme => ThemeData.light();
 
   // Additional extensions
-  ButtonThemeData get buttonTheme => Theme.of(this).buttonTheme;
+  ButtonThemeData get buttonTheme =>
+      Theme.of(this).buttonTheme;
 
-  ChipThemeData get chipTheme => Theme.of(this).chipTheme;
+  ChipThemeData get chipTheme =>
+      Theme.of(this).chipTheme;
 
-  DataTableThemeData get dataTableTheme => Theme.of(this).dataTableTheme;
+  DataTableThemeData get dataTableTheme =>
+      Theme.of(this).dataTableTheme;
 
-  DrawerThemeData get drawerTheme => Theme.of(this).drawerTheme;
+  DrawerThemeData get drawerTheme =>
+      Theme.of(this).drawerTheme;
 
   ExpansionTileThemeData get expansionTileTheme =>
       Theme.of(this).expansionTileTheme;
 
-  ListTileThemeData get listTileTheme => Theme.of(this).listTileTheme;
+  ListTileThemeData get listTileTheme =>
+      Theme.of(this).listTileTheme;
 
-  MenuThemeData get menuTheme => Theme.of(this).menuTheme;
+  MenuThemeData get menuTheme =>
+      Theme.of(this).menuTheme;
 
   NavigationBarThemeData get navigationBarTheme =>
       Theme.of(this).navigationBarTheme;
@@ -80,28 +105,38 @@ extension ThemeExtensions on BuildContext {
   PageTransitionsTheme get pageTransitionsTheme =>
       Theme.of(this).pageTransitionsTheme;
 
-  ProgressIndicatorThemeData get progressIndicatorTheme =>
+  ProgressIndicatorThemeData
+  get progressIndicatorTheme =>
       Theme.of(this).progressIndicatorTheme;
 
-  RadioThemeData get radioTheme => Theme.of(this).radioTheme;
+  RadioThemeData get radioTheme =>
+      Theme.of(this).radioTheme;
 
-  ScrollbarThemeData get scrollbarTheme => Theme.of(this).scrollbarTheme;
+  ScrollbarThemeData get scrollbarTheme =>
+      Theme.of(this).scrollbarTheme;
 
-  SwitchThemeData get switchTheme => Theme.of(this).switchTheme;
+  SwitchThemeData get switchTheme =>
+      Theme.of(this).switchTheme;
 
   TextSelectionThemeData get textSelectionTheme =>
       Theme.of(this).textSelectionTheme;
 
-  BottomAppBarTheme get bottomAppBarTheme => Theme.of(this).bottomAppBarTheme;
+  // BottomAppBarTheme get bottomAppBarTheme => Theme.of(this).bottomAppBarTheme;
 
-  MaterialTapTargetSize get materialTapTargetSize =>
+  MaterialTapTargetSize
+  get materialTapTargetSize =>
       Theme.of(this).materialTapTargetSize;
 
-  Typography get typography => Theme.of(this).typography;
+  Typography get typography =>
+      Theme.of(this).typography;
 
-  VisualDensity get visualDensity => Theme.of(this).visualDensity;
+  VisualDensity get visualDensity =>
+      Theme.of(this).visualDensity;
 
-  IconButtonThemeData get iconButtonTheme => Theme.of(this).iconButtonTheme;
+  IconButtonThemeData get iconButtonTheme =>
+      Theme.of(this).iconButtonTheme;
 
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
+  ColorScheme get colorScheme =>
+      Theme.of(this).colorScheme;
 }
