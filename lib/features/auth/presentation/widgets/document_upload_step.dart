@@ -489,46 +489,45 @@ class DocumentUploadStep extends StatelessWidget {
   }
 
   /// Scan document using enhanced scanner with OCR (Camera only)
-  Future<void> _scanDocumentWithOCR() async {
-    try {
-      final int maxFiles = userType == UserType.citizen ? 2 : 1;
-      if (selectedDocuments.length >= maxFiles) {
-        return;
-      }
-
-      final DocumentType documentType =
-          userType == UserType.citizen
-              ? DocumentType.nationalId
-              : DocumentType.passport;
-
-      // Use camera scanning only
-      final result = await EnhancedDocumentScannerService.scanDocument(
-        documentType: documentType,
-      );
-
-      if (result != null) {
-        final List<File> newFiles = List.from(selectedDocuments);
-        newFiles.add(result.imageFile);
-        onDocumentsChanged(newFiles);
-
-        // If we extracted data and have a callback, notify the parent
-        if (result.extractedData != null && onDataExtracted != null) {
-          onDataExtracted!(result.extractedData);
-        }
-
-        print('📄 تم مسح المستند بنجاح باستخدام الكاميرا');
-        print('📊 نسبة الضغط: ${result.compressionRatio.toStringAsFixed(1)}%');
-        print(
-          '💾 الحجم الأصلي: ${result.originalImageSize.toStringAsFixed(1)} KB',
-        );
-        print(
-          '💾 الحجم المضغوط: ${result.compressedImageSize.toStringAsFixed(1)} KB',
-        );
-      }
-    } catch (e) {
-      print('❌ خطأ في مسح المستند: $e');
-    }
-  }
+  // Future<void> _scanDocumentWithOCR() async {
+  //   try {
+  //     final int maxFiles = userType == UserType.citizen ? 2 : 1;
+  //     if (selectedDocuments.length >= maxFiles) {
+  //       return;
+  //     }
+  //
+  //     final DocumentType documentType =
+  //         userType == UserType.citizen
+  //             ? DocumentType.nationalId
+  //             : DocumentType.passport;
+  //
+  //     // Use camera scanning only
+  //     final result = await EnhancedDocumentScannerService.scanDocument(
+  //       documentType: documentType,
+  //     );
+  //     if (result != null) {
+  //       final List<File> newFiles = List.from(selectedDocuments);
+  //       newFiles.add(result.imageFile);
+  //       onDocumentsChanged(newFiles);
+  //
+  //       // If we extracted data and have a callback, notify the parent
+  //       if (result.extractedData != null && onDataExtracted != null) {
+  //         onDataExtracted!(result.extractedData);
+  //       }
+  //
+  //       print('📄 تم مسح المستند بنجاح باستخدام الكاميرا');
+  //       print('📊 نسبة الضغط: ${result.compressionRatio.toStringAsFixed(1)}%');
+  //       print(
+  //         '💾 الحجم الأصلي: ${result.originalImageSize.toStringAsFixed(1)} KB',
+  //       );
+  //       print(
+  //         '💾 الحجم المضغوط: ${result.compressedImageSize.toStringAsFixed(1)} KB',
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('❌ خطأ في مسح المستند: $e');
+  //   }
+  // }
 
   /// Pick image from gallery (Simple image selection without OCR)
   Future<void> _pickFromGallery() async {
@@ -571,7 +570,7 @@ class DocumentUploadStep extends StatelessWidget {
 
   Future<void> _pickImage(ImageSource source) async {
     if (source == ImageSource.camera) {
-      await _scanDocumentWithOCR();
+      // await _scanDocumentWithOCR();
     } else {
       await _pickFromGallery();
     }

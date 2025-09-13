@@ -5,7 +5,6 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/register_user.dart';
 import '../../data/models/user_model.dart';
 import '../../../../core/services/location_service.dart';
-import '../../../../core/utils/ocr_utils.dart';
 import '../../../../core/utils/egyptian_id_parser.dart';
 import 'signup_state.dart';
 
@@ -36,50 +35,7 @@ class SignupCubit extends Cubit<SignupState> {
     }
   }
 
-  Future<void> processOCR(File frontDocument) async {
-    final currentState = state;
-    if (currentState is! SignupDocumentsUploaded) return;
 
-    emit(SignupOCRProcessing());
-
-    try {
-      final extractedText = await OCRUtils.extractTextFromImage(frontDocument);
-
-      if (extractedText != null) {
-        Map<String, String?> extractedData;
-
-        if (currentState.userType == UserType.citizen) {
-          extractedData = OCRUtils.extractNationalIdData(extractedText);
-        } else {
-          extractedData = OCRUtils.extractPassportData(extractedText);
-        }
-
-        emit(
-          SignupOCRCompleted(
-            userType: currentState.userType,
-            documents: currentState.documents,
-            extractedData: extractedData,
-          ),
-        );
-      } else {
-        emit(
-          SignupOCRCompleted(
-            userType: currentState.userType,
-            documents: currentState.documents,
-            extractedData: {},
-          ),
-        );
-      }
-    } catch (e) {
-      emit(
-        SignupOCRCompleted(
-          userType: currentState.userType,
-          documents: currentState.documents,
-          extractedData: {},
-        ),
-      );
-    }
-  }
 
   void enterFormData(Map<String, dynamic> formData) {
     final currentState = state;
