@@ -9,7 +9,6 @@ import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/auth/presentation/widgets/data_entry_step.dart';
 import 'package:netru_app/features/auth/presentation/widgets/review_submit_step.dart';
-import '../../../../core/services/ocr_service.dart';
 import '../../../../core/services/location_service.dart';
 import '../widgets/user_type_selection_step.dart';
 import '../widgets/document_upload_step.dart';
@@ -93,7 +92,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       node.dispose();
     }
     _resendTimer?.cancel();
-    OCRService.dispose();
+
     super.dispose();
   }
 
