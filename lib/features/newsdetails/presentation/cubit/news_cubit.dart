@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:netru_app/core/constants/app_assets.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
@@ -56,6 +58,18 @@ class NewsCubit extends Cubit<NewsState> {
       });
     } catch (e) {
       emit(const NewsError(message: 'حدث خطأ في تحميل الأخبار'));
+      Future.delayed(
+        const Duration(milliseconds: 500),
+        () {
+          emit(NewsLoaded(newsList: _mockNews));
+        },
+      );
+    } catch (e) {
+      emit(
+        const NewsError(
+          message: 'حدث خطأ في تحميل الأخبار',
+        ),
+      );
     }
   }
 
@@ -67,6 +81,18 @@ class NewsCubit extends Cubit<NewsState> {
         orElse: () => currentState.newsList.first,
       );
       emit(currentState.copyWith(selectedNews: selectedNews));
+
+      final selectedNews = currentState.newsList
+          .firstWhere(
+            (news) => news.id == newsId,
+            orElse:
+                () => currentState.newsList.first,
+          );
+      emit(
+        currentState.copyWith(
+          selectedNews: selectedNews,
+        ),
+      );
     }
   }
 
@@ -79,6 +105,9 @@ class NewsCubit extends Cubit<NewsState> {
           NewsLoaded(
             newsList: _mockNews,
             selectedNews: currentState.selectedNews,
+
+            selectedNews:
+                currentState.selectedNews,
           ),
         );
       } else {
@@ -88,12 +117,20 @@ class NewsCubit extends Cubit<NewsState> {
                   (news) =>
                       news.title.contains(query) ||
                       news.content.contains(query),
+                      news.title.contains(
+                        query,
+                      ) ||
+                      news.content.contains(
+                        query,
+                      ),
                 )
                 .toList();
         emit(
           NewsLoaded(
             newsList: filteredNews,
             selectedNews: currentState.selectedNews,
+            selectedNews:
+                currentState.selectedNews,
           ),
         );
       }
@@ -107,6 +144,13 @@ class NewsCubit extends Cubit<NewsState> {
     } else {
       final filteredNews =
           _mockNews.where((news) => news.category == category).toList();
+
+          _mockNews
+              .where(
+                (news) =>
+                    news.category == category,
+              )
+              .toList();
       emit(NewsLoaded(newsList: filteredNews));
     }
   }
@@ -140,11 +184,22 @@ class NewsCubit extends Cubit<NewsState> {
   // الحصول على الأخبار بتصنيف معين
   List<NewsModel> getNewsByCategory(String category) {
     return _mockNews.where((news) => news.category == category).toList();
+  List<NewsModel> getNewsByCategory(
+    String category,
+  ) {
+    return _mockNews
+        .where(
+          (news) => news.category == category,
+        )
+        .toList();
   }
 
   // الحصول على أحدث الأخبار
   List<NewsModel> getLatestNews({int limit = 3}) {
     final sortedNews = List<NewsModel>.from(_mockNews);
+    final sortedNews = List<NewsModel>.from(
+      _mockNews,
+    );
     return sortedNews.take(limit).toList();
   }
 }
