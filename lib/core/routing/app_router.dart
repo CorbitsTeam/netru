@@ -14,14 +14,14 @@ import '../routing/routes.dart';
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // case Routes.splashScreen:
-      //   return _createRoute(const SplashScreen());
+      case Routes.splashScreen:
+        return _createRoute(const SplashScreen());
       case Routes.profileScreen:
         return _createRoute(const ProfilePage());
-      // case Routes.submissionOfaReportPage:
-      //   return _createRoute(
-      //     const SubmissionOfaReportPage(),
-      //   );
+      case Routes.submissionOfaReportPage:
+        return _createRoute(
+          const SubmissionOfaReportPage(),
+        );
       case Routes.loginScreen:
         return _createRoute(const LoginPage());
       case Routes.signupScreen:
