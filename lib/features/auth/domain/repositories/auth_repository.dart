@@ -4,7 +4,7 @@ import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> loginWithEmailAndPassword(
+  Future<Either<Failure, UserEntity>> loginWithEmail(
     String email,
     String password,
   );

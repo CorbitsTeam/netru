@@ -137,6 +137,5 @@ extension ThemeExtensions on BuildContext {
       Theme.of(this).iconButtonTheme;
 
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
-  ColorScheme get colorScheme =>
-      Theme.of(this).colorScheme;
+
 }

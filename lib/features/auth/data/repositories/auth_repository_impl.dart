@@ -16,15 +16,12 @@ class AuthRepositoryImpl implements AuthRepository {
     : _remoteDataSource = remoteDataSource;
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithEmailAndPassword(
+  Future<Either<Failure, UserEntity>> loginWithEmail(
     String email,
     String password,
   ) async {
     try {
-      final user = await _remoteDataSource.loginWithEmailAndPassword(
-        email,
-        password,
-      );
+      final user = await _remoteDataSource.loginWithEmail(email, password);
       if (user == null) {
         return Left(ServerFailure('المستخدم غير موجود'));
       }
