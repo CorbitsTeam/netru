@@ -1,8 +1,9 @@
 class Routes {
-  // static const String splashScreen = '/';
-  static const String profileScreen = '/';
-  // static const String submissionOfaReportPage =
-  //     '/submissionOfaReportPage';
+  static const String splashScreen = '/';
+  static const String profileScreen =
+      '/profileScreen';
+  static const String submissionOfaReportPage =
+      '/submissionOfaReportPage';
   static const String loginScreen =
       '/loginScreen';
   static const String signupScreen =
