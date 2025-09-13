@@ -22,14 +22,5 @@ class Routes {
   // New routes for email verification flow
   static const String emailVerification = '/emailVerification';
   static const String completeProfile = '/completeProfile';
-  static const String customBottomBar =
-      '/customBottomBar';
-  static const String reportDetailsPage =
-      '/reportDetailsPage';
-  static const String crimeHeatMapPage =
-      '/crimeHeatMapPage';
-  static const String notificationsPage =
-      '/notificationsPage';
-  static const String permissionDemo =
-      '/permissionDemo';
+
 }

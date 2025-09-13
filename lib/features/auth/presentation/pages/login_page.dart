@@ -18,7 +18,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -39,10 +40,7 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    context.read<AuthCubit>().loginWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    context.read<AuthCubit>().loginWithEmail(email: email, password: password);
   }
 
   void _showErrorSnackBar(String message) {
@@ -60,22 +58,6 @@ class _LoginPageState extends State<LoginPage> {
     // For now, just navigate to the multi-step signup page
     // You'll need to set up proper dependency injection
     context.pushNamed(Routes.signupScreen);
-  }
-
-  TextInputType _getKeyboardType() {
-    return TextInputType.emailAddress;
-  }
-
-  String? Function(String?)? _getValidator() {
-    return AuthValidationUtils.validateEmail;
-  }
-
-  String _getHintText() {
-    return 'البريد الإلكتروني';
-  }
-
-  IconData _getPrefixIcon() {
-    return Icons.email_outlined;
   }
 
   @override
@@ -240,8 +222,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             child: TextFormField(
               controller: _emailController,
-              keyboardType: _getKeyboardType(),
-              validator: _getValidator(),
+              keyboardType: TextInputType.emailAddress,
+              validator: AuthValidationUtils.validateEmail,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
@@ -249,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                 fontFamily: 'Almarai',
               ),
               decoration: InputDecoration(
-                hintText: _getHintText(),
+                hintText: 'البريد الإلكتروني',
                 hintStyle: TextStyle(
                   color: AppColors.textSecondary.withOpacity(0.7),
                   fontSize: 15.sp,
@@ -257,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                   fontFamily: 'Almarai',
                 ),
                 prefixIcon: Icon(
-                  _getPrefixIcon(),
+                  Icons.email_outlined,
                   color: AppColors.primary.withOpacity(0.7),
                   size: 20.sp,
                 ),

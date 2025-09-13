@@ -14,7 +14,7 @@ class AuthCubit extends Cubit<AuthState> {
        _authRepository = authRepository,
        super(AuthInitial());
 
-  Future<void> loginWithEmailAndPassword({
+  Future<void> loginWithEmail({
     required String email,
     required String password,
   }) async {

@@ -4,7 +4,7 @@ import '../models/user_model.dart';
 import '../models/identity_document_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel?> loginWithEmailAndPassword(String email, String password);
+  Future<UserModel?> loginWithEmail(String email, String password);
   Future<UserModel> createUser(UserModel user, String password);
 
   // New methods for two-phase signup with email verification
@@ -30,46 +30,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     : _supabaseClient = supabaseClient;
 
   @override
-  Future<UserModel?> loginWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    // try {
-    //   await _supabaseClient.auth.signOut();
-    //   print('✅ تم تسجيل الخروج من الجلسة القديمة');
-    // } catch (e) {
-    //   print('⚠️ فشل تسجيل الخروج: $e');
-    // }
+  Future<UserModel?> loginWithEmail(String email, String password) async {
     try {
-      print('🔐 محاولة تسجيل الدخول بالبريد الإلكتروني: $email');
+      print('🔐 محاولة تسجيل الدخول بالإيميل: $email');
 
+      // تسجيل الدخول باستخدام Firebase Auth مع Supabase
       final AuthResponse authResponse = await _supabaseClient.auth
           .signInWithPassword(email: email, password: password);
 
       if (authResponse.user == null || authResponse.session == null) {
-        throw Exception('فشل في تسجيل الدخول - تحقق من البيانات المدخلة');
+        throw Exception('فشل في تسجيل الدخول - تحقق من البريد أو كلمة المرور');
       }
+
+      print('✅ تم تسجيل الدخول بنجاح للمستخدم: ${authResponse.user!.id}');
 
       // جلب بيانات المستخدم الكاملة من جدول users
       final response =
           await _supabaseClient
               .from('users')
-              .select()
-              .eq('email', email)
+              .select('*')
+              .eq('id', authResponse.user!.id)
               .maybeSingle();
 
       if (response == null) {
-        throw Exception('بيانات المستخدم غير موجودة');
+        throw Exception('ملف المستخدم غير موجود - يرجى استكمال ملفك');
       }
 
       return UserModel.fromJson(response);
     } catch (e) {
       print('❌ خطأ في تسجيل الدخول: $e');
-
-      try {
-        await _supabaseClient.auth.signOut();
-      } catch (_) {}
-
       throw Exception(_parseErrorMessage(e.toString()));
     }
   }

@@ -42,7 +42,6 @@ dependencies:
   supabase_flutter: ^2.8.1
   # Google Sign-In dependency (used in auth flows)
   tesseract_ocr: ^0.5.0
-  image_picker: ^1.1.2
   image: ^4.2.0
   path_provider: ^2.1.4
   # Document scanner with automatic cropping
@@ -52,7 +51,6 @@ dependencies:
   mime: ^1.0.6
   path: ^1.9.0
   # Additional dependencies for logging and utilities
-  logger: ^2.4.0
 
   uuid: ^4.5.1
   # Additional packages for enhanced mobile login & signup

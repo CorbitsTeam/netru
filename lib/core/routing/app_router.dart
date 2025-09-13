@@ -9,7 +9,6 @@ import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/login_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
@@ -79,11 +78,7 @@ class AppRouter {
         return _createRoute(
           const CrimeHeatMapPage(),
         );
-      case Routes.permissionDemo:
-        return _createRoute(const HomeScreen()); // Fallback to home
-        return _createRoute(
-          const PermissionDemoScreen(),
-        );
+
       default:
         return null;
     }
