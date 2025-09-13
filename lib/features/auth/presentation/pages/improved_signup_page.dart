@@ -448,34 +448,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             _selectedDocuments = documents;
           });
         },
-        onDataExtracted: (extractedData) {
-          if (extractedData != null) {
-            setState(() {
-              _extractedData = extractedData;
-
-              // Auto-fill form fields from extracted data
-              if (extractedData.fullName != null) {
-                _userData['fullName'] = extractedData.fullName!;
-              }
-              if (extractedData.nationalId != null) {
-                _userData['nationalId'] = extractedData.nationalId!;
-              }
-              if (extractedData.passportNumber != null) {
-                _userData['passportNumber'] = extractedData.passportNumber!;
-              }
-              if (extractedData.birthDate != null) {
-                _userData['birthDate'] =
-                    '${extractedData.birthDate!.year}-${extractedData.birthDate!.month.toString().padLeft(2, '0')}-${extractedData.birthDate!.day.toString().padLeft(2, '0')}';
-              }
-              if (extractedData.nationality != null) {
-                _userData['nationality'] = extractedData.nationality!;
-              }
-            });
-
-            print('✅ تم استخراج البيانات وملء النموذج تلقائياً');
-          }
-        },
-        isProcessingOCR: _isProcessingOCR,
+    
       ),
     );
   }
