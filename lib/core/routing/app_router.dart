@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
-import '../di/auth_injection.dart' as auth_di;
-import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
+import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
@@ -17,7 +18,6 @@ import '../../features/splash/splash_screen.dart';
 import '../routing/routes.dart';
 
 // Chatbot imports
-import '../../features/chatbot/di/chatbot_di.dart' as chatbot_di;
 import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 import '../../features/chatbot/presentation/pages/chat_page.dart';
 import '../../features/chatbot/presentation/pages/chat_sessions_page.dart';
@@ -33,15 +33,15 @@ class AppRouter {
         return _createRoute(const SubmissionOfaReportPage());
       case Routes.loginScreen:
         return _createRoute(
-          BlocProvider<AuthCubit>(
-            create: (context) => auth_di.sl<AuthCubit>(),
+          BlocProvider<LoginCubit>(
+            create: (context) => sl<LoginCubit>(),
             child: const LoginPage(),
           ),
         );
       case Routes.signupScreen:
         return _createRoute(
           BlocProvider<SignupCubit>(
-            create: (context) => auth_di.sl<SignupCubit>(),
+            create: (context) => sl<SignupCubit>(),
             child: const ImprovedSignupPage(),
           ),
         );
@@ -60,7 +60,7 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         return _createRoute(
           BlocProvider<SignupCubit>(
-            create: (context) => auth_di.sl<SignupCubit>(),
+            create: (context) => sl<SignupCubit>(),
             child: CompleteProfilePage(
               email: args['email'],
               password: args['password'],
@@ -76,12 +76,16 @@ class AppRouter {
       case Routes.crimeHeatMapPage:
         return _createRoute(const CrimeHeatMapPage());
 
+      // Admin route
+      case '/admin-dashboard':
+        return _createRoute(const AdminDashboardPage());
+
       // Chatbot routes
       case Routes.chatPage:
         final args = settings.arguments as Map<String, dynamic>?;
         return _createRoute(
           BlocProvider<ChatCubit>(
-            create: (context) => chatbot_di.getIt<ChatCubit>(),
+            create: (context) => sl<ChatCubit>(),
             child: ChatPage(sessionId: args?['sessionId']),
           ),
         );
@@ -89,7 +93,7 @@ class AppRouter {
       case Routes.chatSessions:
         return _createRoute(
           BlocProvider<ChatCubit>(
-            create: (context) => chatbot_di.getIt<ChatCubit>(),
+            create: (context) => sl<ChatCubit>(),
             child: const ChatSessionsPage(),
           ),
         );

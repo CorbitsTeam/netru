@@ -5,39 +5,49 @@ class LoggerService {
   factory LoggerService() => _instance;
   LoggerService._internal();
 
-  late final Logger _logger;
+  Logger? _logger;
 
   void init() {
-    _logger = Logger(
-      printer: PrettyPrinter(
-        methodCount: 2,
-        errorMethodCount: 8,
-        lineLength: 120,
-        colors: true,
-        printEmojis: true,
-        printTime: true,
-      ),
-    );
+    // Only initialize if not already initialized
+    if (_logger == null) {
+      _logger = Logger(
+        printer: PrettyPrinter(
+          methodCount: 2,
+          errorMethodCount: 8,
+          lineLength: 120,
+          colors: true,
+          printEmojis: true,
+          printTime: true,
+        ),
+      );
+    }
+  }
+
+  Logger get logger {
+    if (_logger == null) {
+      init();
+    }
+    return _logger!;
   }
 
   void logInfo(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.i(message, error: error, stackTrace: stackTrace);
+    logger.i(message, error: error, stackTrace: stackTrace);
   }
 
   void logDebug(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.d(message, error: error, stackTrace: stackTrace);
+    logger.d(message, error: error, stackTrace: stackTrace);
   }
 
   void logWarning(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.w(message, error: error, stackTrace: stackTrace);
+    logger.w(message, error: error, stackTrace: stackTrace);
   }
 
   void logError(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.e(message, error: error, stackTrace: stackTrace);
+    logger.e(message, error: error, stackTrace: stackTrace);
   }
 
   void logFatal(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.f(message, error: error, stackTrace: stackTrace);
+    logger.f(message, error: error, stackTrace: stackTrace);
   }
 
   // Specific logging methods for different app events
