@@ -59,7 +59,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Step 2: Documents
   List<File> _selectedDocuments = [];
-  bool _isProcessingOCR = false;
+  final bool _isProcessingOCR = false;
   ExtractedDocumentData? _extractedData;
 
   // Step 3: Data Entry
@@ -1143,7 +1143,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                   SizedBox(
                     width: 30.w,
                     height: 30.h,
-                    child: CircularProgressIndicator(
+                    child: const CircularProgressIndicator(
                       strokeWidth: 3,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppColors.primary,
@@ -1226,8 +1226,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 Expanded(
                   child: Text(
                     _isEmailMode
-                        ? 'تم إرسال رمز التحقق إلى ${username}'
-                        : 'تم إرسال رمز التحقق عبر SMS إلى ${username}',
+                        ? 'تم إرسال رمز التحقق إلى $username'
+                        : 'تم إرسال رمز التحقق عبر SMS إلى $username',
                   ),
                 ),
               ],
@@ -1392,7 +1392,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             SizedBox(
               width: 16.w,
               height: 16.w,
-              child: CircularProgressIndicator(
+              child: const CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),

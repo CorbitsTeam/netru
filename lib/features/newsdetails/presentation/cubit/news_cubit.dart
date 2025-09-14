@@ -4,7 +4,6 @@ import 'package:netru_app/core/constants/app_assets.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
-import '../../../../core/constants/app_assets.dart';
 
 class NewsCubit extends Cubit<NewsState> {
   NewsCubit() : super(NewsInitial());
@@ -63,12 +62,6 @@ class NewsCubit extends Cubit<NewsState> {
         () {
           emit(NewsLoaded(newsList: _mockNews));
         },
-      );
-    } catch (e) {
-      emit(
-        const NewsError(
-          message: 'حدث خطأ في تحميل الأخبار',
-        ),
       );
     }
   }

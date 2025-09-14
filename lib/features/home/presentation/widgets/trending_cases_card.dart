@@ -14,7 +14,6 @@ class _TrendingCasesCardState extends State<TrendingCasesCard>
     with TickerProviderStateMixin {
   int _currentIndex = 0;
   late AnimationController _slideController;
-  late Animation<Offset> _slideAnimation;
 
   // بيانات الصور والنصوص
   final List<Map<String, String>> _carouselData = [
@@ -44,12 +43,6 @@ class _TrendingCasesCardState extends State<TrendingCasesCard>
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
-    );
     // بدء الـ animation الأولى
     _slideController.forward();
   }

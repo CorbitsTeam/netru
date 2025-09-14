@@ -1,4 +1,5 @@
 /// تصدير جميع الواجهات البسيطة المخصصة للمواطن المصري
+library;
 
 // Core widgets
 export 'custom_button.dart';

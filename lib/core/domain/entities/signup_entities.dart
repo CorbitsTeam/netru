@@ -67,7 +67,7 @@ class SignupStepData extends Equatable {
   factory SignupStepData.initial({required UserType userType}) {
     return SignupStepData(
       userType: userType,
-      data: {},
+      data: const {},
       currentStep: 1,
       totalSteps: 4,
     );

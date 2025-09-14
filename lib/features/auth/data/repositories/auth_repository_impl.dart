@@ -23,7 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final user = await _remoteDataSource.loginWithEmail(email, password);
       if (user == null) {
-        return Left(ServerFailure('المستخدم غير موجود'));
+        return const Left(ServerFailure('المستخدم غير موجود'));
       }
       return Right(user);
     } catch (e) {

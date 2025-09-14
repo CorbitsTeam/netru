@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
-import '../../../../core/theme/app_colors.dart';
 
 class NewsContentWidget extends StatelessWidget {
   final NewsModel news;

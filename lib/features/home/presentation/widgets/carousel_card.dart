@@ -15,7 +15,6 @@ class _CarouselCardState extends State<CarouselCard>
   int _currentIndex = 0;
   late AnimationController _slideController;
   late AnimationController _dotController;
-  late Animation<Offset> _slideAnimation;
 
   // بيانات الصور والنصوص
   final List<Map<String, String>> _carouselData = [
@@ -52,12 +51,6 @@ class _CarouselCardState extends State<CarouselCard>
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
-    );
 
     // بدء الـ animation
     _slideController.forward();

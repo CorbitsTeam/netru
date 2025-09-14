@@ -28,7 +28,7 @@ class DocumentUploadStep extends StatelessWidget {
       padding: EdgeInsets.all(24.w),
       child: SingleChildScrollView(
         child: ConstrainedBox(
-          constraints: BoxConstraints(minWidth: double.infinity),
+          constraints: const BoxConstraints(minWidth: double.infinity),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,7 +162,7 @@ class DocumentUploadStep extends StatelessWidget {
             width: 6.w,
             height: 6.h,
             margin: EdgeInsets.only(top: 6.h, left: 8.w),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.info,
               shape: BoxShape.circle,
             ),
@@ -199,7 +199,7 @@ class DocumentUploadStep extends StatelessWidget {
             SizedBox(
               width: 40.w,
               height: 40.h,
-              child: CircularProgressIndicator(
+              child: const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.info),
                 strokeWidth: 3,
               ),
