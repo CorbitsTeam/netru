@@ -9,6 +9,7 @@ import 'core/cubit/theme/theme_cubit.dart';
 import 'core/utils/app_shared_preferences.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/auth_injection.dart' as auth_di;
+import 'features/chatbot/di/chatbot_di.dart' as chatbot_di;
 
 import 'app.dart';
 import 'app_bloc_observer.dart';
@@ -39,6 +40,10 @@ void main() async {
   // Initialize auth dependencies
   await auth_di.initAuthDependencies();
   logger.logInfo('✅ Auth Dependencies Initialized');
+
+  // Initialize chatbot dependencies
+  await chatbot_di.initChatbotDependencies();
+  logger.logInfo('✅ Chatbot Dependencies Initialized');
 
   // Initialize localization
   await EasyLocalization.ensureInitialized();
@@ -72,7 +77,6 @@ void main() async {
           // Core Cubits
           BlocProvider(create: (_) => LocaleCubit()),
           BlocProvider(create: (_) => ThemeCubit()),
-
         ],
         child: MyApp(appRouter: AppRouter()),
       ),

@@ -166,15 +166,15 @@ class _LocationSelectorModalState extends State<LocationSelectorModal> {
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(color: AppColors.border),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(color: AppColors.border),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(color: AppColors.primary, width: 2),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
                   ),
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 16.h,
@@ -196,14 +196,14 @@ class _LocationSelectorModalState extends State<LocationSelectorModal> {
 
   Widget _buildContent() {
     if (_isLoading) {
-      return Container(
+      return SizedBox(
         height: 200.h,
         child: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_error != null) {
-      return Container(
+      return SizedBox(
         height: 200.h,
         child: Center(
           child: Column(
@@ -228,7 +228,7 @@ class _LocationSelectorModalState extends State<LocationSelectorModal> {
     }
 
     if (_filteredItems.isEmpty) {
-      return Container(
+      return SizedBox(
         height: 200.h,
         child: Center(
           child: Column(

@@ -54,7 +54,7 @@ class SignupCubit extends Cubit<SignupState> {
         SignupDataEntered(
           userType: currentState.userType,
           documents: currentState.documents,
-          extractedData: {},
+          extractedData: const {},
           formData: formData,
         ),
       );
@@ -235,7 +235,7 @@ class SignupCubit extends Cubit<SignupState> {
 
       if (fullName == null || fullName.trim().isEmpty) {
         print('❌ فشل: اسم فارغ');
-        emit(SignupFailure(message: 'يرجى إدخال الاسم الكامل'));
+        emit(const SignupFailure(message: 'يرجى إدخال الاسم الكامل'));
         return;
       }
 
@@ -243,21 +243,21 @@ class SignupCubit extends Cubit<SignupState> {
       if (email != null && email.isNotEmpty) {
         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
           print('❌ فشل: بريد إلكتروني غير صحيح');
-          emit(SignupFailure(message: 'عنوان البريد الإلكتروني غير صحيح'));
+          emit(const SignupFailure(message: 'عنوان البريد الإلكتروني غير صحيح'));
           return;
         }
       }
 
       if (phone == null || phone.trim().isEmpty) {
         print('❌ فشل: رقم هاتف فارغ');
-        emit(SignupFailure(message: 'يرجى إدخال رقم الهاتف'));
+        emit(const SignupFailure(message: 'يرجى إدخال رقم الهاتف'));
         return;
       }
 
       if (password == null || password.length < 6) {
         print('❌ فشل: كلمة مرور قصيرة');
         emit(
-          SignupFailure(message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
+          const SignupFailure(message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
         );
         return;
       }
@@ -271,19 +271,19 @@ class SignupCubit extends Cubit<SignupState> {
         print('  - الرقم القومي: $nationalId');
         if (nationalId == null || nationalId.trim().isEmpty) {
           print('❌ فشل: رقم قومي فارغ');
-          emit(SignupFailure(message: 'يرجى إدخال الرقم القومي'));
+          emit(const SignupFailure(message: 'يرجى إدخال الرقم القومي'));
           return;
         }
         if (nationalId.length != 14) {
           print('❌ فشل: رقم قومي غير صحيح - الطول ${nationalId.length}');
-          emit(SignupFailure(message: 'الرقم القومي يجب أن يكون 14 رقم'));
+          emit(const SignupFailure(message: 'الرقم القومي يجب أن يكون 14 رقم'));
           return;
         }
         // Validate that national ID contains only digits
         if (!RegExp(r'^\d{14}$').hasMatch(nationalId)) {
           print('❌ فشل: رقم قومي يحتوي على أحرف');
           emit(
-            SignupFailure(message: 'الرقم القومي يجب أن يحتوي على أرقام فقط'),
+            const SignupFailure(message: 'الرقم القومي يجب أن يحتوي على أرقام فقط'),
           );
           return;
         }
@@ -294,7 +294,7 @@ class SignupCubit extends Cubit<SignupState> {
         print('  - رقم الجواز: $passportNumber');
         if (passportNumber == null || passportNumber.trim().isEmpty) {
           print('❌ فشل: رقم جواز فارغ');
-          emit(SignupFailure(message: 'يرجى إدخال رقم جواز السفر'));
+          emit(const SignupFailure(message: 'يرجى إدخال رقم جواز السفر'));
           return;
         }
       }
@@ -449,9 +449,9 @@ class SignupCubit extends Cubit<SignupState> {
           documents: currentState.documents,
           extractedData: currentState.extractedData,
           formData: currentState.formData,
-          governorates: [],
-          cities: [],
-          districts: [],
+          governorates: const [],
+          cities: const [],
+          districts: const [],
           selectedGovernorate: currentState.selectedGovernorate,
           selectedCity: currentState.selectedCity,
         ),
@@ -567,7 +567,7 @@ class SignupCubit extends Cubit<SignupState> {
       if (currentUser == null) {
         print('❌ خطأ: لا يمكن المصادقة');
         emit(
-          SignupFailure(message: 'خطأ في المصادقة. يرجى المحاولة مرة أخرى.'),
+          const SignupFailure(message: 'خطأ في المصادقة. يرجى المحاولة مرة أخرى.'),
         );
         return;
       }
@@ -590,7 +590,7 @@ class SignupCubit extends Cubit<SignupState> {
 
       if (fullName == null || fullName.trim().isEmpty) {
         print('❌ فشل: اسم فارغ');
-        emit(SignupFailure(message: 'يرجى إدخال الاسم الكامل'));
+        emit(const SignupFailure(message: 'يرجى إدخال الاسم الكامل'));
         return;
       }
 
@@ -604,7 +604,7 @@ class SignupCubit extends Cubit<SignupState> {
             nationalId.trim().isEmpty ||
             nationalId.length != 14) {
           print('❌ فشل: رقم قومي غير صحيح');
-          emit(SignupFailure(message: 'الرقم القومي يجب أن يكون 14 رقم'));
+          emit(const SignupFailure(message: 'الرقم القومي يجب أن يكون 14 رقم'));
           return;
         }
       } else {
@@ -613,7 +613,7 @@ class SignupCubit extends Cubit<SignupState> {
         print('  - رقم الجواز: $passportNumber');
         if (passportNumber == null || passportNumber.trim().isEmpty) {
           print('❌ فشل: رقم جواز فارغ');
-          emit(SignupFailure(message: 'يرجى إدخال رقم جواز السفر'));
+          emit(const SignupFailure(message: 'يرجى إدخال رقم جواز السفر'));
           return;
         }
       }
@@ -651,7 +651,7 @@ class SignupCubit extends Cubit<SignupState> {
               print('✅ تم رفع المستند ${i + 1}: $fileName');
             } catch (e) {
               print('❌ خطأ في رفع المستند ${i + 1}: $e');
-              emit(SignupFailure(message: 'خطأ في رفع المستندات'));
+              emit(const SignupFailure(message: 'خطأ في رفع المستندات'));
               return;
             }
           }
@@ -807,7 +807,7 @@ class SignupCubit extends Cubit<SignupState> {
             // Note: We need to store the password somewhere accessible
             // For now, we'll handle this differently
             print('⚠️ يجب تسجيل الدخول يدوياً');
-            emit(SignupFailure(message: 'يرجى تسجيل الدخول مرة أخرى'));
+            emit(const SignupFailure(message: 'يرجى تسجيل الدخول مرة أخرى'));
             return;
           } catch (signInError) {
             print('❌ فشل تسجيل الدخول: $signInError');
@@ -818,7 +818,7 @@ class SignupCubit extends Cubit<SignupState> {
       if (currentUser == null) {
         print('❌ لا يوجد مستخدم مصدق');
         emit(
-          SignupFailure(
+          const SignupFailure(
             message: 'خطأ في المصادقة. يرجى تسجيل الدخول مرة أخرى.',
           ),
         );
@@ -853,7 +853,7 @@ class SignupCubit extends Cubit<SignupState> {
     } catch (e) {
       print('❌ خطأ غير متوقع في إكمال ملف المستخدم: $e');
       emit(
-        SignupFailure(
+        const SignupFailure(
           message: 'حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.',
         ),
       );

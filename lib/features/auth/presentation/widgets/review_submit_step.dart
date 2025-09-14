@@ -387,7 +387,7 @@ class ReviewSubmitStep extends StatelessWidget {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ] else ...[
                     Container(
                       padding: EdgeInsets.all(12.w),

@@ -503,7 +503,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     if (currentUser == null) {
       print('❌ لا يوجد مستخدم مصدق حالياً');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('خطأ في المصادقة. يرجى تسجيل الدخول مرة أخرى'),
           backgroundColor: Colors.red,
         ),

@@ -137,7 +137,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
         print('❌ فشل في تسجيل الدخول التلقائي');
         // Still navigate but show error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('تم تأكيد الإيميل لكن فشل في تسجيل الدخول التلقائي'),
             backgroundColor: AppColors.warning,
           ),
@@ -157,7 +157,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       print('❌ خطأ في تسجيل الدخول التلقائي: $e');
       // Still navigate but show error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('تم تأكيد الإيميل لكن حدث خطأ في تسجيل الدخول'),
           backgroundColor: AppColors.error,
         ),
@@ -179,7 +179,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
   Future<void> _verifyOTP() async {
     if (_otpCode.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('يرجى إدخال رمز التحقق كاملاً (6 أرقام)'),
           backgroundColor: AppColors.error,
         ),
@@ -204,7 +204,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       } else {
         print('❌ فشل في التحقق من OTP');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('رمز التحقق غير صحيح'),
             backgroundColor: AppColors.error,
           ),
@@ -267,8 +267,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('تم إعادة إرسال رسالة التأكيد'),
+        const SnackBar(
+          content: Text('تم إعادة إرسال رسالة التأكيد'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -565,7 +565,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                 SizedBox(
                   width: 20.w,
                   height: 20.h,
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primary,
@@ -675,7 +675,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
               SizedBox(
                 width: 30.w,
                 height: 30.h,
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   strokeWidth: 3,
                   valueColor: AlwaysStoppedAnimation<Color>(AppColors.success),
                 ),

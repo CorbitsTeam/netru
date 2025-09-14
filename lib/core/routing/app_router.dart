@@ -8,7 +8,6 @@ import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/login_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
@@ -16,6 +15,12 @@ import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
 import '../../features/splash/splash_screen.dart';
 import '../routing/routes.dart';
+
+// Chatbot imports
+import '../../features/chatbot/di/chatbot_di.dart' as chatbot_di;
+import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
+import '../../features/chatbot/presentation/pages/chat_page.dart';
+import '../../features/chatbot/presentation/pages/chat_sessions_page.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -25,9 +30,7 @@ class AppRouter {
       case Routes.profileScreen:
         return _createRoute(const ProfilePage());
       case Routes.submissionOfaReportPage:
-        return _createRoute(
-          const SubmissionOfaReportPage(),
-        );
+        return _createRoute(const SubmissionOfaReportPage());
       case Routes.loginScreen:
         return _createRoute(
           BlocProvider<AuthCubit>(
@@ -67,16 +70,28 @@ class AppRouter {
       case Routes.homeScreen:
         return _createRoute(const HomeScreen());
       case Routes.customBottomBar:
-        return _createRoute(
-          const CustomBottomBar(),
-        );
+        return _createRoute(const CustomBottomBar());
       case Routes.reportDetailsPage:
-        return _createRoute(
-          const ReportDetailsPage(),
-        );
+        return _createRoute(const ReportDetailsPage());
       case Routes.crimeHeatMapPage:
+        return _createRoute(const CrimeHeatMapPage());
+
+      // Chatbot routes
+      case Routes.chatPage:
+        final args = settings.arguments as Map<String, dynamic>?;
         return _createRoute(
-          const CrimeHeatMapPage(),
+          BlocProvider<ChatCubit>(
+            create: (context) => chatbot_di.getIt<ChatCubit>(),
+            child: ChatPage(sessionId: args?['sessionId']),
+          ),
+        );
+
+      case Routes.chatSessions:
+        return _createRoute(
+          BlocProvider<ChatCubit>(
+            create: (context) => chatbot_di.getIt<ChatCubit>(),
+            child: const ChatSessionsPage(),
+          ),
         );
 
       default:
@@ -86,25 +101,10 @@ class AppRouter {
 
   PageRouteBuilder _createRoute(Widget page) {
     return PageRouteBuilder(
-      transitionDuration: const Duration(
-        milliseconds: 400,
-      ),
-      pageBuilder:
-          (
-            context,
-            animation,
-            secondaryAnimation,
-          ) => page,
-      transitionsBuilder: (
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      ) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
       },
     );
   }

@@ -306,8 +306,9 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
   String _buildAddressText() {
     List<String> parts = [];
     if (widget.selectedCity != null) parts.add(widget.selectedCity!.name);
-    if (widget.selectedGovernorate != null)
+    if (widget.selectedGovernorate != null) {
       parts.add(widget.selectedGovernorate!.name);
+    }
     return parts.isNotEmpty ? parts.join(' - ') : 'لم يتم تحديد العنوان';
   }
 }

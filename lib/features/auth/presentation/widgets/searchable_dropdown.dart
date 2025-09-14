@@ -190,7 +190,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                                   : Text(
                                     widget.selectedItem != null
                                         ? widget.displayText(
-                                          widget.selectedItem!,
+                                          widget.selectedItem as T,
                                         )
                                         : widget.hint,
                                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -238,7 +238,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
 
   Widget _buildDropdownContent(ThemeData theme) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Column(
@@ -255,7 +255,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                 prefixIcon: Icon(Icons.search, size: 20.sp),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
-                  borderSide: BorderSide(color: AppColors.border),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 12.w,

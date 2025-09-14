@@ -1,13 +1,9 @@
 class Routes {
   static const String splashScreen = '/';
-  static const String profileScreen =
-      '/profileScreen';
-  static const String submissionOfaReportPage =
-      '/submissionOfaReportPage';
-  static const String loginScreen =
-      '/loginScreen';
-  static const String signupScreen =
-      '/signupScreen';
+  static const String profileScreen = '/profileScreen';
+  static const String submissionOfaReportPage = '/submissionOfaReportPage';
+  static const String loginScreen = '/loginScreen';
+  static const String signupScreen = '/signupScreen';
   static const String homeScreen = '/homeScreen';
   static const String homePage = '/homeScreen'; // Alias for compatibility
   static const String customBottomBar = '/customBottomBar';
@@ -23,4 +19,7 @@ class Routes {
   static const String emailVerification = '/emailVerification';
   static const String completeProfile = '/completeProfile';
 
+  // Chatbot routes
+  static const String chatPage = '/chatPage';
+  static const String chatSessions = '/chatSessions';
 }
