@@ -562,7 +562,7 @@ class SignupCubit extends Cubit<SignupState> {
 
           if (existingUsers != null) {
             print('❌ البريد الإلكتروني موجود في auth.users');
-            emit(SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+            emit(const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
             return;
           }
         } catch (authCheckError) {
@@ -577,7 +577,7 @@ class SignupCubit extends Cubit<SignupState> {
 
             if (existingUser != null) {
               print('❌ البريد الإلكتروني موجود في public.users');
-              emit(SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+              emit(const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
               return;
             }
           } catch (publicCheckError) {
