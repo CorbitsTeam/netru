@@ -63,7 +63,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
       floatingActionButton: _selectedIndex == 0 ? _buildChatFab(context) : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
-        height: 95.h,
+        // height: 100.h,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
