@@ -17,6 +17,9 @@ import 'package:netru_app/features/reports/presentation/pages/report_details_pag
 import '../../features/splash/splash_screen.dart';
 import '../routing/routes.dart';
 
+// Onboarding imports
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+
 // Chatbot imports
 import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 import '../../features/chatbot/presentation/pages/chat_page.dart';
@@ -27,6 +30,8 @@ class AppRouter {
     switch (settings.name) {
       case Routes.splashScreen:
         return _createRoute(const SplashScreen());
+      case Routes.onboardingScreen:
+        return _createRoute(const OnboardingPage());
       case Routes.profileScreen:
         return _createRoute(const ProfilePage());
       case Routes.submissionOfaReportPage:

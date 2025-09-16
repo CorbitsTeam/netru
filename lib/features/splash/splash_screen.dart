@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
+import '../onboarding/utils/onboarding_prefs.dart';
 
 import '../../core/constants/app_assets.dart';
 
@@ -85,10 +86,19 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void _navigateToNextScreen() {
-    // Check if user is logged in
-    // For now, navigate to login
-    context.pushReplacementNamed(Routes.loginScreen);
+  void _navigateToNextScreen() async {
+    // Check if user has seen onboarding
+    final hasSeenOnboarding = await OnboardingPrefs.hasSeenOnboarding();
+
+    if (mounted) {
+      if (hasSeenOnboarding) {
+        // Navigate to login if onboarding was seen
+        context.pushReplacementNamed(Routes.loginScreen);
+      } else {
+        // Navigate to onboarding if first time
+        context.pushReplacementNamed(Routes.onboardingScreen);
+      }
+    }
   }
 
   @override

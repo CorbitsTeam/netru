@@ -13,6 +13,11 @@ class AppAssets {
   static const String egyptLogo = 'assets/images/egypt_logo.png';
   static const String ministryLogo = 'assets/images/ministry_logo.png';
 
+  // Onboarding assets (optional - using existing assets for now)
+  static const String onboarding1 = 'assets/images/onboarding3.png';
+  static const String onboarding2 = 'assets/images/onboarding2.png';
+  static const String onboarding3 = 'assets/images/onboarding1.png';
+
   static const String lottieAddress = 'assets/lottie/address.json';
   static const String lottieAll = 'assets/lottie/all.json';
   static const String lottieBag = 'assets/lottie/bag.json';
