@@ -57,22 +57,18 @@ class _OnboardingView extends StatelessWidget {
           context.read<OnboardingCubit>().navigateToLogin(context);
         }
       },
-      child: SafeArea(
-        top: false,
-        maintainBottomViewPadding: true,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Column(
-            children: [
-              // Main content area with PageView
-              Expanded(flex: 6, child: _buildPageView(context)),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Column(
+          children: [
+            // Main content area with PageView
+            Expanded(flex: 6, child: _buildPageView(context)),
 
-              // Bottom section with dots and navigation
-              _buildBottomSection(context),
+            // Bottom section with dots and navigation
+            _buildBottomSection(context),
 
-              SizedBox(height: 24.h),
-            ],
-          ),
+            SizedBox(height: 40.h),
+          ],
         ),
       ),
     );
