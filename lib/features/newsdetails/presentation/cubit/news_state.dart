@@ -16,23 +16,15 @@ class NewsLoaded extends NewsState {
   final List<NewsModel> newsList;
   final NewsModel? selectedNews;
 
-  const NewsLoaded({
-    required this.newsList,
-    this.selectedNews,
-  });
+  const NewsLoaded({required this.newsList, this.selectedNews});
 
   @override
-  List<Object?> get props =>
-      [newsList, selectedNews];
+  List<Object?> get props => [newsList, selectedNews];
 
-  NewsLoaded copyWith({
-    List<NewsModel>? newsList,
-    NewsModel? selectedNews,
-  }) {
+  NewsLoaded copyWith({List<NewsModel>? newsList, NewsModel? selectedNews}) {
     return NewsLoaded(
       newsList: newsList ?? this.newsList,
-      selectedNews:
-          selectedNews ?? this.selectedNews,
+      selectedNews: selectedNews ?? this.selectedNews,
     );
   }
 }

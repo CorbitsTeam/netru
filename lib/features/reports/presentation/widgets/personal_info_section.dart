@@ -5,15 +5,13 @@ import 'package:netru_app/features/reports/presentation/widgets/custom_info_cont
 
 import '../../../../core/theme/app_colors.dart';
 
-class PersonalInfoSection
-    extends StatelessWidget {
+class PersonalInfoSection extends StatelessWidget {
   const PersonalInfoSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10.h,
       children: [
         Text(
@@ -25,8 +23,7 @@ class PersonalInfoSection
           ),
         ),
         Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: CustomInfoContainer(
@@ -34,9 +31,7 @@ class PersonalInfoSection
                 value: 'أحمد',
               ),
             ),
-            SizedBox(
-              width: 8.w,
-            ),
+            SizedBox(width: 8.w),
             Expanded(
               child: CustomInfoContainer(
                 label: 'lastName'.tr(),
@@ -45,14 +40,8 @@ class PersonalInfoSection
             ),
           ],
         ),
-        CustomInfoContainer(
-          label: 'idNumber'.tr(),
-          value: '30205047915647',
-        ),
-        CustomInfoContainer(
-          label: 'phone'.tr(),
-          value: '012345678911',
-        ),
+        CustomInfoContainer(label: 'idNumber'.tr(), value: '30205047915647'),
+        CustomInfoContainer(label: 'phone'.tr(), value: '012345678911'),
       ],
     );
   }

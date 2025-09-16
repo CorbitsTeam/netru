@@ -12,20 +12,18 @@ class CrimeLegendWidget extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(20.w),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'النشاط الأخير للنقاط الساخنة',
               style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryColor,
+              ),
             ),
 
             SizedBox(height: 16.h),
@@ -34,8 +32,7 @@ class CrimeLegendWidget extends StatelessWidget {
             _buildLegendItem(
               color: Colors.red,
               title: 'وسط القاهرة',
-              subtitle:
-                  'تم الكشف عن نشاط سرقة مرتفع',
+              subtitle: 'تم الكشف عن نشاط سرقة مرتفع',
               time: 'آخر تحديث: منذ ساعتين',
             ),
             SizedBox(height: 12.h),
@@ -51,8 +48,7 @@ class CrimeLegendWidget extends StatelessWidget {
             _buildLegendItem(
               color: Colors.green,
               title: 'ميناء الإسكندرية',
-              subtitle:
-                  'حالات الاعتداء المُبلّغ عنها',
+              subtitle: 'حالات الاعتداء المُبلّغ عنها',
               time: 'آخر تحديث: منذ 6 ساعات',
             ),
           ],
@@ -71,25 +67,19 @@ class CrimeLegendWidget extends StatelessWidget {
       width: double.infinity,
       height: 80.h,
       decoration: BoxDecoration(
-          borderRadius:
-              BorderRadius.circular(8.r),
-          color: Colors.white,
-          border: Border.all(
-            color: Colors.grey[300]!,
-          )),
-      padding: EdgeInsets.symmetric(
-          horizontal: 12.w, vertical: 8.h),
+        borderRadius: BorderRadius.circular(8.r),
+        color: Colors.white,
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // النصوص
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -125,10 +115,7 @@ class CrimeLegendWidget extends StatelessWidget {
             width: 12.w,
             height: 12.h,
             margin: EdgeInsets.only(top: 4.h),
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
         ],
       ),

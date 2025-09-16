@@ -1,7 +1,11 @@
 {
   "en": "English",
   "ar": "Arabic",
-  "appName": "My App",
+  "appName": "Netru",
+  "netru_app": "Netru",
+  "secure_digital_identity": "For the security and safety of Egypt",
+  "powered_by_corbits": "Powered by Corbits Team",
+  "arab_republic_of_egypt": "Arab Republic of Egypt",
   "welcome": "Welcome",
   "login": "Login",
   "signUp": "Sign Up",

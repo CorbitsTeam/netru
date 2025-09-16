@@ -30,12 +30,40 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     });
   }
 
+  Widget _buildChatFab(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/chatPage');
+        },
+        backgroundColor: AppColors.primaryColor,
+        child: Icon(
+          Icons.chat_bubble_outline,
+          color: Colors.white,
+          size: 24.sp,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
+      floatingActionButton: _selectedIndex == 0 ? _buildChatFab(context) : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
-        height: 95.h,
+        // height: 100.h,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_constants.dart';
+
+import '../../../../core/theme/app_colors.dart';
 
 class NotificationAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -21,11 +22,7 @@ class NotificationAppBar extends StatelessWidget
       centerTitle: true,
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.black,
-          size: 20.sp,
-        ),
+        icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20.sp),
       ),
       title: Text(
         'التنبيهات',

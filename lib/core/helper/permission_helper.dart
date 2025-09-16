@@ -3,11 +3,9 @@ import 'package:geolocator/geolocator.dart';
 
 class PermissionHelper {
   /// التحقق من صلاحية الموقع مع رسائل مفصلة
-  static Future<LocationPermissionResult>
-      checkLocationPermission() async {
+  static Future<LocationPermissionResult> checkLocationPermission() async {
     // التحقق من تفعيل خدمة الموقع أولاً
-    bool serviceEnabled = await Geolocator
-        .isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return LocationPermissionResult(
         isGranted: false,
@@ -17,8 +15,7 @@ class PermissionHelper {
     }
 
     // التحقق من صلاحية الموقع
-    LocationPermission permission =
-        await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
 
     switch (permission) {
       case LocationPermission.always:
@@ -55,11 +52,9 @@ class PermissionHelper {
   }
 
   /// طلب صلاحية الموقع
-  static Future<LocationPermissionResult>
-      requestLocationPermission() async {
+  static Future<LocationPermissionResult> requestLocationPermission() async {
     // التحقق من تفعيل الخدمة أولاً
-    bool serviceEnabled = await Geolocator
-        .isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return LocationPermissionResult(
         isGranted: false,
@@ -69,8 +64,7 @@ class PermissionHelper {
     }
 
     // طلب الصلاحية
-    LocationPermission permission =
-        await Geolocator.requestPermission();
+    LocationPermission permission = await Geolocator.requestPermission();
 
     switch (permission) {
       case LocationPermission.always:
@@ -94,8 +88,7 @@ class PermissionHelper {
           isGranted: false,
           needsService: false,
           canRequest: false,
-          message:
-              'تم رفض الصلاحية نهائياً. يرجى فتح الإعدادات.',
+          message: 'تم رفض الصلاحية نهائياً. يرجى فتح الإعدادات.',
         );
 
       default:
@@ -108,11 +101,9 @@ class PermissionHelper {
   }
 
   /// فتح إعدادات الموقع
-  static Future<bool>
-      openLocationSettings() async {
+  static Future<bool> openLocationSettings() async {
     try {
-      return await Geolocator
-          .openLocationSettings();
+      return await Geolocator.openLocationSettings();
     } catch (e) {
       print('خطأ في فتح إعدادات الموقع: $e');
       return false;
@@ -130,10 +121,8 @@ class PermissionHelper {
   }
 
   /// التحقق من جميع الصلاحيات المطلوبة
-  static Future<bool>
-      checkAllRequiredPermissions() async {
-    final locationResult =
-        await checkLocationPermission();
+  static Future<bool> checkAllRequiredPermissions() async {
+    final locationResult = await checkLocationPermission();
 
     // يمكنك إضافة صلاحيات أخرى هنا
     // final cameraGranted = await Permission.camera.isGranted;
@@ -153,20 +142,15 @@ class PermissionHelper {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: onDeny,
-            child: const Text('لا شكراً'),
+      builder:
+          (context) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(onPressed: onDeny, child: const Text('لا شكراً')),
+              ElevatedButton(onPressed: onAccept, child: const Text('موافق')),
+            ],
           ),
-          ElevatedButton(
-            onPressed: onAccept,
-            child: const Text('موافق'),
-          ),
-        ],
-      ),
     );
   }
 }

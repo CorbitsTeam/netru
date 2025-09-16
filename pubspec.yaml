@@ -8,12 +8,12 @@ environment:
 
 dependencies:
   animate_do: ^4.2.0
-  animator:
+  animator: null
   cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.0
-  easy_localization:
+  easy_localization: null
   equatable: ^2.0.7
   flutter:
     sdk: flutter
@@ -27,26 +27,33 @@ dependencies:
   geolocator: ^14.0.2
   get_it: ^8.2.0
   google_fonts: ^6.3.0
-  http: ^1.5.0
-  intl:
+  google_sign_in: ^6.2.1
+  image_picker: ^1.2.0
+  intl: null
   json_annotation: ^4.9.0
   latlong2: ^0.9.1
   location: ^8.0.1
+  logger: ^2.4.0
   lottie: ^3.3.1
   permission_handler: ^12.0.1
   shared_preferences: ^2.5.3
-  change_app_package_name: ^1.5.0
-  # Supabase dependencies
   supabase_flutter: ^2.8.1
-  # Google Sign-In dependency
-  google_sign_in: ^6.2.1
-  # Notification dependencies  
-#  firebase_core: ^2.25.4
-#  firebase_messaging: ^14.7.10
-#  flutter_local_notifications: ^17.2.1+2
+  # Google Sign-In dependency (used in auth flows)
+  image: ^4.2.0
+  path_provider: ^2.1.4
+  # Document scanner with automatic cropping
+  cunning_document_scanner: ^1.3.1
+  # Additional utilities for file handling
+  mime: ^1.0.6
+  path: ^1.9.0
   # Additional dependencies for logging and utilities
-  logger: ^2.4.0
+
   uuid: ^4.5.1
+  # Additional packages for enhanced mobile login & signup
+  pin_code_fields: ^8.0.1  # For OTP input
+  country_picker: ^2.0.24  # Country code picker for phone
+  flutter_image_compress: ^2.4.0 # Image compression (replacement for flutter_native_image)
+  image_cropper: ^8.0.2  # Image cropping for documents
 
 dev_dependencies:
   bloc_test: ^9.1.5
@@ -76,3 +83,11 @@ flutter:
 flutter_native_splash:
   android: false
   ios: false
+# logoapp.png
+
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/logoapp.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21

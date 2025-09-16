@@ -8,8 +8,7 @@ import 'core/cubit/theme/theme_cubit.dart';
 
 class MyApp extends StatelessWidget {
   final AppRouter appRouter;
-  const MyApp(
-      {super.key, required this.appRouter});
+  const MyApp({super.key, required this.appRouter});
 
   @override
   Widget build(BuildContext context) {
@@ -17,25 +16,21 @@ class MyApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
-        return BlocBuilder<ThemeCubit,
-            ThemeState>(
+        return BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: AppConstants.appName,
               theme: ThemeData(
-                  scaffoldBackgroundColor:
-                      Colors.white,
-                  fontFamily: "Almarai"),
+                scaffoldBackgroundColor: Colors.white,
+                fontFamily: "Almarai",
+              ),
               // darkTheme: AppTheme.darkTheme,
               themeMode: themeState.themeMode,
               locale: context.locale,
-              supportedLocales:
-                  context.supportedLocales,
-              localizationsDelegates:
-                  context.localizationDelegates,
-              onGenerateRoute:
-                  appRouter.generateRoute,
+              supportedLocales: context.supportedLocales,
+              localizationsDelegates: context.localizationDelegates,
+              onGenerateRoute: appRouter.generateRoute,
               initialRoute: '/',
             );
           },

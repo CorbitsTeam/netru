@@ -1,103 +1,100 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/image_compression_utils.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/identity_document_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
+import '../models/user_model.dart';
+import '../models/identity_document_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
+  final AuthRemoteDataSource _remoteDataSource;
 
-  AuthRepositoryImpl({required this.remoteDataSource});
+  AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
+    : _remoteDataSource = remoteDataSource;
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithEmail({
-    required String email,
-    required String password,
-  }) async {
+  Future<Either<Failure, UserEntity>> loginWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
-      final result = await remoteDataSource.loginWithEmail(
-        email: email,
-        password: password,
-      );
-      return Right(result);
+      final user = await _remoteDataSource.loginWithEmail(email, password);
+      if (user == null) {
+        return const Left(ServerFailure('المستخدم غير موجود'));
+      }
+      return Right(user);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, UserEntity>> signUpWithEmail({
-    required String email,
+  Future<Either<Failure, UserEntity>> registerUser({
+    required UserEntity user,
     required String password,
-    required String fullName,
-    String? phone,
+    required List<File> documents,
   }) async {
     try {
-      final result = await remoteDataSource.signUpWithEmail(
-        email: email,
-        password: password,
-        fullName: fullName,
-        phone: phone,
+      // Create user in database
+      final userModel = UserModel.fromEntity(user);
+      final createdUser = await _remoteDataSource.createUser(
+        userModel,
+        password,
       );
-      return Right(result);
+
+      // Upload documents
+      if (documents.isNotEmpty) {
+        await _uploadUserDocuments(createdUser.id!, documents, user.userType);
+      }
+
+      return Right(createdUser);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, UserEntity>> signInWithGoogle() async {
+  Future<Either<Failure, String>> uploadDocument(
+    File documentFile,
+    String fileName,
+  ) async {
     try {
-      final result = await remoteDataSource.signInWithGoogle();
-      return Right(result);
+      // Compress image before upload
+      final compressedFile = await ImageCompressionUtils.compressImageToSize(
+        documentFile,
+        targetSizeKB: 1024, // 1MB max
+      );
+
+      final fileToUpload = compressedFile ?? documentFile;
+      final url = await _remoteDataSource.uploadImage(fileToUpload, fileName);
+      return Right(url);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, CitizenEntity>> registerCitizen({
-    required String email,
-    required String password,
-    required String fullName,
-    required String nationalId,
-    required String phone,
-    String? address,
-  }) async {
+  Future<Either<Failure, bool>> checkNationalIdExists(String nationalId) async {
     try {
-      final result = await remoteDataSource.registerCitizen(
-        email: email,
-        password: password,
-        fullName: fullName,
-        nationalId: nationalId,
-        phone: phone,
-        address: address,
-      );
-      return Right(result);
+      final exists = await _remoteDataSource.checkNationalIdExists(nationalId);
+      return Right(exists);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, ForeignerEntity>> registerForeigner({
-    required String email,
-    required String password,
-    required String fullName,
-    required String passportNumber,
-    required String nationality,
-    required String phone,
-  }) async {
+  Future<Either<Failure, bool>> checkPassportExists(
+    String passportNumber,
+  ) async {
     try {
-      final result = await remoteDataSource.registerForeigner(
-        email: email,
-        password: password,
-        fullName: fullName,
-        passportNumber: passportNumber,
-        nationality: nationality,
-        phone: phone,
+      final exists = await _remoteDataSource.checkPassportExists(
+        passportNumber,
       );
-      return Right(result);
+      return Right(exists);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -106,8 +103,8 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserEntity?>> getCurrentUser() async {
     try {
-      final result = await remoteDataSource.getCurrentUser();
-      return Right(result);
+      final user = await _remoteDataSource.getCurrentUser();
+      return Right(user);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -116,20 +113,58 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      await remoteDataSource.logout();
+      await _remoteDataSource.logout();
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
-  @override
-  Future<Either<Failure, bool>> isUserLoggedIn() async {
+  Future<void> _uploadUserDocuments(
+    String userId,
+    List<File> documents,
+    UserType userType,
+  ) async {
+    final docType =
+        userType == UserType.citizen
+            ? DocumentType.nationalId
+            : DocumentType.passport;
+
     try {
-      final result = await remoteDataSource.isUserLoggedIn();
-      return Right(result);
+      String? frontImageUrl;
+      String? backImageUrl;
+
+      // Upload front document
+      if (documents.isNotEmpty) {
+        final frontFileName = '${userId}_${docType.name}_front.jpg';
+        frontImageUrl = await _remoteDataSource.uploadImage(
+          documents[0],
+          frontFileName,
+        );
+      }
+
+      // Upload back document for citizens (national ID has front and back)
+      if (documents.length > 1 && userType == UserType.citizen) {
+        final backFileName = '${userId}_${docType.name}_back.jpg';
+        backImageUrl = await _remoteDataSource.uploadImage(
+          documents[1],
+          backFileName,
+        );
+      }
+
+      // Create identity document record
+      final identityDoc = IdentityDocumentModel(
+        userId: userId,
+        docType: docType,
+        frontImageUrl: frontImageUrl,
+        backImageUrl: backImageUrl,
+      );
+
+      await _remoteDataSource.createIdentityDocument(identityDoc);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      print('خطأ في رفع المستندات: $e');
+      // Don't throw here, as user is already created
+      // Just log the error - user can upload documents later
     }
   }
 }

@@ -1,0 +1,8 @@
+<!-- Egypt Flag Icon -->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="2" y="4" width="20" height="6" fill="#CE1126"/>
+<rect x="2" y="10" width="20" height="6" fill="white"/>
+<rect x="2" y="16" width="20" height="4" fill="#000"/>
+<circle cx="12" cy="12" r="3" fill="#FFD700"/>
+<path d="M12 10L12.5 11.5H14L12.75 12.5L13.25 14L12 13L10.75 14L11.25 12.5L10 11.5H11.5L12 10Z" fill="#CE1126"/>
+</svg>

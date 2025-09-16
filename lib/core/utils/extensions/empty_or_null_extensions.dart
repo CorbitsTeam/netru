@@ -13,11 +13,11 @@ extension NullableStringExtension on String? {
 //   bool isEmptyOrNull() => this == null || this!.isEmpty;
 // }
 
-
-// for Map 
+// for Map
 extension NullableMapExtension<K, V> on Map<K, V>? {
   bool isEmptyOrNull() => this == null || this!.isEmpty;
 }
+
 // for List and Set
 extension NullableCollectionExtension<T> on Iterable<T>? {
   bool isEmptyOrNull() => this == null || this!.isEmpty;

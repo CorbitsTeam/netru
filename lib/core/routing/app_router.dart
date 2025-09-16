@@ -1,23 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:netru_app/features/auth/presentation/pages/login_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/signup_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
+import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
+import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
+import '../di/injection_container.dart';
+import '../../features/auth/presentation/cubit/signup_cubit.dart';
+import '../../features/auth/presentation/cubit/login_cubit.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
+import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
-import 'package:netru_app/features/demo/presentation/screens/permission_demo_screen.dart';
-import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../routing/routes.dart';
+
+// Onboarding imports
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+
+// Chatbot imports
+import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
+import '../../features/chatbot/presentation/pages/chat_page.dart';
+import '../../features/chatbot/presentation/pages/chat_sessions_page.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.splashScreen:
         return _createRoute(const SplashScreen());
+      case Routes.onboardingScreen:
+        return _createRoute(const OnboardingPage());
+      case Routes.profileScreen:
+        return _createRoute(const ProfilePage());
+      case Routes.submissionOfaReportPage:
+        return _createRoute(const SubmissionOfaReportPage());
       case Routes.loginScreen:
-        return _createRoute(const LoginPage());
+        return _createRoute(
+          BlocProvider<LoginCubit>(
+            create: (context) => sl<LoginCubit>(),
+            child: const LoginPage(),
+          ),
+        );
       case Routes.signupScreen:
-        return _createRoute(const SignUpPage());
+        return _createRoute(
+          BlocProvider<SignupCubit>(
+            create: (context) => sl<SignupCubit>(),
+            child: const ImprovedSignupPage(),
+          ),
+        );
+
+      // New routes for email verification flow
+      case Routes.emailVerification:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _createRoute(
+          EmailVerificationPage(
+            email: args['email'],
+            password: args['password'],
+          ),
+        );
+
+      case Routes.completeProfile:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _createRoute(
+          BlocProvider<SignupCubit>(
+            create: (context) => sl<SignupCubit>(),
+            child: CompleteProfilePage(
+              email: args['email'],
+              password: args['password'],
+            ),
+          ),
+        );
       case Routes.homeScreen:
         return _createRoute(const HomeScreen());
       case Routes.customBottomBar:
@@ -26,8 +80,29 @@ class AppRouter {
         return _createRoute(const ReportDetailsPage());
       case Routes.crimeHeatMapPage:
         return _createRoute(const CrimeHeatMapPage());
-      case Routes.permissionDemo:
-        return _createRoute(const PermissionDemoScreen());
+
+      // Admin route
+      case '/admin-dashboard':
+        return _createRoute(const AdminDashboardPage());
+
+      // Chatbot routes
+      case Routes.chatPage:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          BlocProvider<ChatCubit>(
+            create: (context) => sl<ChatCubit>(),
+            child: ChatPage(sessionId: args?['sessionId']),
+          ),
+        );
+
+      case Routes.chatSessions:
+        return _createRoute(
+          BlocProvider<ChatCubit>(
+            create: (context) => sl<ChatCubit>(),
+            child: const ChatSessionsPage(),
+          ),
+        );
+
       default:
         return null;
     }
