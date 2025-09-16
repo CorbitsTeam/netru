@@ -38,7 +38,6 @@ dependencies:
   permission_handler: ^12.0.1
   shared_preferences: ^2.5.3
   supabase_flutter: ^2.8.1
-  # Google Sign-In dependency (used in auth flows)
   image: ^4.2.0
   path_provider: ^2.1.4
   # Document scanner with automatic cropping
@@ -46,14 +45,15 @@ dependencies:
   # Additional utilities for file handling
   mime: ^1.0.6
   path: ^1.9.0
-  # Additional dependencies for logging and utilities
-
   uuid: ^4.5.1
   # Additional packages for enhanced mobile login & signup
   pin_code_fields: ^8.0.1  # For OTP input
   country_picker: ^2.0.24  # Country code picker for phone
   flutter_image_compress: ^2.4.0 # Image compression (replacement for flutter_native_image)
   image_cropper: ^8.0.2  # Image cropping for documents
+  flutter_local_notifications: ^19.1.0
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.5
 
 dev_dependencies:
   bloc_test: ^9.1.5
