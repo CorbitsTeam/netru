@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/register_user.dart';
+import '../../domain/usecases/signup_user.dart';
 import '../../data/models/user_model.dart';
 import '../../../../core/services/location_service.dart';
 import '../../../../core/utils/egyptian_id_parser.dart';
@@ -10,12 +11,15 @@ import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   final RegisterUserUseCase _registerUserUseCase;
+  final SignUpUserUseCase _signUpUserUseCase;
   final LocationService _locationService;
 
   SignupCubit({
     required RegisterUserUseCase registerUserUseCase,
+    required SignUpUserUseCase signUpUserUseCase,
     required LocationService locationService,
   }) : _registerUserUseCase = registerUserUseCase,
+       _signUpUserUseCase = signUpUserUseCase,
        _locationService = locationService,
        super(SignupInitial());
 
@@ -34,8 +38,6 @@ class SignupCubit extends Cubit<SignupState> {
       );
     }
   }
-
-
 
   void enterFormData(Map<String, dynamic> formData) {
     final currentState = state;
@@ -243,7 +245,9 @@ class SignupCubit extends Cubit<SignupState> {
       if (email != null && email.isNotEmpty) {
         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
           print('❌ فشل: بريد إلكتروني غير صحيح');
-          emit(const SignupFailure(message: 'عنوان البريد الإلكتروني غير صحيح'));
+          emit(
+            const SignupFailure(message: 'عنوان البريد الإلكتروني غير صحيح'),
+          );
           return;
         }
       }
@@ -257,7 +261,9 @@ class SignupCubit extends Cubit<SignupState> {
       if (password == null || password.length < 6) {
         print('❌ فشل: كلمة مرور قصيرة');
         emit(
-          const SignupFailure(message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
+          const SignupFailure(
+            message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+          ),
         );
         return;
       }
@@ -283,7 +289,9 @@ class SignupCubit extends Cubit<SignupState> {
         if (!RegExp(r'^\d{14}$').hasMatch(nationalId)) {
           print('❌ فشل: رقم قومي يحتوي على أحرف');
           emit(
-            const SignupFailure(message: 'الرقم القومي يجب أن يحتوي على أرقام فقط'),
+            const SignupFailure(
+              message: 'الرقم القومي يجب أن يحتوي على أرقام فقط',
+            ),
           );
           return;
         }
@@ -373,6 +381,60 @@ class SignupCubit extends Cubit<SignupState> {
       }
 
       emit(SignupFailure(message: errorMessage));
+    }
+  }
+
+  // 🆕 Simple signup method using the new use case
+  Future<void> signUpUser(Map<String, dynamic> userData) async {
+    emit(SignupLoading());
+
+    try {
+      // Validate identifier conflicts before proceeding
+      final userType = UserType.values.firstWhere(
+        (type) => type.name == userData['user_type'],
+        orElse: () => UserType.citizen,
+      );
+
+      // Enforce identifier restrictions based on user type
+      if (userType == UserType.citizen) {
+        // Citizens must have nationalId, can optionally have phone
+        if (userData['national_id'] == null ||
+            (userData['national_id'] as String).trim().isEmpty) {
+          emit(
+            const SignupFailure(
+              message: 'المواطنون يجب أن يقدموا الرقم القومي',
+            ),
+          );
+          return;
+        }
+        // Clear email for citizens if provided
+        userData.remove('email');
+      } else if (userType == UserType.foreigner) {
+        // Foreigners must have passportNumber, can optionally have email
+        if (userData['passport_number'] == null ||
+            (userData['passport_number'] as String).trim().isEmpty) {
+          emit(
+            const SignupFailure(
+              message: 'الأجانب يجب أن يقدموا رقم جواز السفر',
+            ),
+          );
+          return;
+        }
+        // Clear phone for foreigners if provided
+        userData.remove('phone');
+      }
+
+      // Ensure only one identifier type is sent to repository
+      final result = await _signUpUserUseCase(
+        SignUpUserParams(userData: userData),
+      );
+
+      result.fold(
+        (failure) => emit(SignupFailure(message: failure.message)),
+        (user) => emit(SignupSuccess(user: user as UserEntity)),
+      );
+    } catch (e) {
+      emit(SignupFailure(message: 'خطأ في إنشاء الحساب: ${e.toString()}'));
     }
   }
 
@@ -470,7 +532,60 @@ class SignupCubit extends Cubit<SignupState> {
     try {
       print('📧 بدء التسجيل مع: $username (${isEmailMode ? 'إيميل' : 'هاتف'})');
 
+      // Validate input format based on mode
       if (isEmailMode) {
+        // Validate email format
+        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(username)) {
+          emit(
+            const SignupFailure(message: 'عنوان البريد الإلكتروني غير صحيح'),
+          );
+          return;
+        }
+      } else {
+        // Validate phone format
+        final cleanPhone = username.replaceAll(RegExp(r'[\s-]'), '');
+        if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(cleanPhone)) {
+          emit(const SignupFailure(message: 'رقم الهاتف غير صحيح'));
+          return;
+        }
+      }
+
+      if (isEmailMode) {
+        // Check if email already exists in auth.users table
+        try {
+          final existingUsers =
+              await Supabase.instance.client
+                  .from('auth.users')
+                  .select('id')
+                  .eq('email', username)
+                  .maybeSingle();
+
+          if (existingUsers != null) {
+            print('❌ البريد الإلكتروني موجود في auth.users');
+            emit(SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+            return;
+          }
+        } catch (authCheckError) {
+          // If auth table check fails, check public.users table as fallback
+          try {
+            final existingUser =
+                await Supabase.instance.client
+                    .from('users')
+                    .select('id')
+                    .eq('email', username)
+                    .maybeSingle();
+
+            if (existingUser != null) {
+              print('❌ البريد الإلكتروني موجود في public.users');
+              emit(SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+              return;
+            }
+          } catch (publicCheckError) {
+            print('⚠️ فشل فحص البريد الإلكتروني المكرر: $publicCheckError');
+            // Continue with signup if both checks fail (let Supabase handle it)
+          }
+        }
+
         // Email signup
         final response = await Supabase.instance.client.auth.signUp(
           email: username,
@@ -567,7 +682,9 @@ class SignupCubit extends Cubit<SignupState> {
       if (currentUser == null) {
         print('❌ خطأ: لا يمكن المصادقة');
         emit(
-          const SignupFailure(message: 'خطأ في المصادقة. يرجى المحاولة مرة أخرى.'),
+          const SignupFailure(
+            message: 'خطأ في المصادقة. يرجى المحاولة مرة أخرى.',
+          ),
         );
         return;
       }

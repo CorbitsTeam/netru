@@ -37,4 +37,16 @@ class UserRepositoryImpl implements UserRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, LoginUserEntity>> signUpUser(
+    Map<String, dynamic> userData,
+  ) async {
+    try {
+      final user = await _userDataSource.signUpUser(userData);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

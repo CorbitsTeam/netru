@@ -19,6 +19,7 @@ import '../../features/auth/domain/usecases/login_with_email.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
 import '../../features/auth/domain/usecases/check_user_exists.dart';
+import '../../features/auth/domain/usecases/signup_user.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 
@@ -112,10 +113,15 @@ Future<void> _initAuthDependencies() async {
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
   sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
 
   // Cubits
   sl.registerFactory(
-    () => SignupCubit(registerUserUseCase: sl(), locationService: sl()),
+    () => SignupCubit(
+      registerUserUseCase: sl(),
+      signUpUserUseCase: sl(),
+      locationService: sl(),
+    ),
   );
 
   sl.registerFactory(

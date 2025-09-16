@@ -7,6 +7,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
+import 'package:netru_app/core/widgets/custom_snack_bar.dart';
 import 'package:netru_app/features/auth/presentation/widgets/data_entry_step.dart';
 import 'package:netru_app/features/auth/presentation/widgets/review_submit_step.dart';
 import '../../../../core/services/location_service.dart';
@@ -59,7 +60,6 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Step 2: Documents
   List<File> _selectedDocuments = [];
-  final bool _isProcessingOCR = false;
   ExtractedDocumentData? _extractedData;
 
   // Step 3: Data Entry
@@ -78,6 +78,16 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     'العنوان',
     'مراجعة وإرسال',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Add listeners to text controllers to update UI when typing
+    _usernameController.addListener(() => setState(() {}));
+    _passwordController.addListener(() => setState(() {}));
+    _confirmPasswordController.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
@@ -107,65 +117,22 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 state is SignupError
                     ? state.message
                     : (state as SignupFailure).message;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Text(
-                        message,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: AppColors.error,
-                duration: const Duration(seconds: 5),
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16.w),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+
+            // Use custom snackbar for error messages
+            showModernSnackBar(
+              context,
+              message: message,
+              type: SnackBarType.error,
             );
+
             setState(() {
               _isSubmitting = false;
             });
           } else if (state is SignupCompleted || state is SignupSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline,
-                      color: Colors.white,
-                      size: 20.sp,
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Text(
-                        'تم إنشاء الحساب بنجاح! مرحباً بك في نترو',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: AppColors.success,
-                duration: const Duration(seconds: 3),
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16.w),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+            showModernSnackBar(
+              context,
+              message: 'تم إنشاء الحساب بنجاح! مرحباً بك',
+              type: SnackBarType.success,
             );
             // Navigate after a short delay to show the success message
             Future.delayed(const Duration(seconds: 1), () {
@@ -448,7 +415,6 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             _selectedDocuments = documents;
           });
         },
-    
       ),
     );
   }
@@ -537,6 +503,16 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   }
 
   Widget _buildNavigationButtons() {
+    // Dynamic button text based on current step
+    String buttonText = 'التالي';
+    if (_currentStep == 0) {
+      buttonText = _isEmailMode ? 'إرسال رمز التحقق' : 'إرسال رمز SMS';
+    } else if (_currentStep == 1) {
+      buttonText = _isVerified ? 'التالي' : 'تأكيد الرمز';
+    } else if (_currentStep == _stepTitles.length - 1) {
+      buttonText = _isSubmitting ? 'جاري الإنشاء...' : 'إنشاء الحساب';
+    }
+
     return Container(
       padding: EdgeInsets.all(20.w),
       child: Row(
@@ -555,13 +531,18 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           Expanded(
             flex: _currentStep > 0 ? 2 : 1,
             child: AnimatedButton(
-              text:
-                  _currentStep == _stepTitles.length - 1
-                      ? (_isSubmitting ? 'جاري الإنشاء...' : 'إنشاء الحساب')
-                      : 'التالي',
+              text: buttonText,
               onPressed:
-                  _canProceedToNext() && !_isSubmitting ? _nextStep : null,
-              isLoading: _isSubmitting,
+                  _canProceedToNext() &&
+                          !_isSubmitting &&
+                          !_isCheckingVerification
+                      ? () {
+                        // Prevent multiple rapid presses
+                        if (_isSubmitting || _isCheckingVerification) return;
+                        _nextStep();
+                      }
+                      : null,
+              isLoading: _isSubmitting || _isCheckingVerification,
               height: 48.h,
             ),
           ),
@@ -571,11 +552,19 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   }
 
   bool _canProceedToNext() {
+    // Prevent navigation if currently processing
+    if (_isSubmitting || _isCheckingVerification) return false;
+
     switch (_currentStep) {
       case 0: // Username and Password step
-        return _formKey.currentState?.validate() == true;
+        // Allow button to be enabled if basic fields have content
+        // Form validation will happen in _nextStep()
+        return _usernameController.text.trim().isNotEmpty &&
+            _passwordController.text.trim().isNotEmpty &&
+            _confirmPasswordController.text.trim().isNotEmpty;
       case 1: // OTP verification step
-        return _isVerified;
+        // For step 1, allow if verified OR if OTP code is complete for verification
+        return _isVerified || _otpCode.length == 6;
       case 2: // User type step
         return _selectedUserType != null;
       case 3: // Document upload step
@@ -672,9 +661,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   }
 
   void _nextStep() async {
+    // Dismiss keyboard and clear focus
+    FocusScope.of(context).unfocus();
+
     if (_currentStep == 0) {
       // Username and password step - send OTP
-      if (_formKey.currentState?.validate() == true) {
+      // Force form validation first
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
         await _sendOTP();
       }
     } else if (_currentStep == 1) {
@@ -692,9 +686,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   }
 
   void _proceedToNextStep() {
+    // Dismiss keyboard and clear focus first
+    FocusScope.of(context).unfocus();
+
     setState(() {
       _currentStep++;
     });
+
+    // Animate to next page
     _pageController.animateToPage(
       _currentStep,
       duration: const Duration(milliseconds: 300),
@@ -835,7 +834,12 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _isEmailMode = true),
+                        onTap: () {
+                          setState(() => _isEmailMode = true);
+                          // Clear form validation state when switching modes
+                          _formKey.currentState?.reset();
+                          _usernameController.clear();
+                        },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -863,7 +867,12 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _isEmailMode = false),
+                        onTap: () {
+                          setState(() => _isEmailMode = false);
+                          // Clear form validation state when switching modes
+                          _formKey.currentState?.reset();
+                          _usernameController.clear();
+                        },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -1167,9 +1176,28 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Send OTP to email or phone
   Future<void> _sendOTP() async {
+    // Ensure keyboard is dismissed and focus is cleared
+    FocusScope.of(context).unfocus();
+
+    // Force form validation and save
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    _formKey.currentState!.save();
+
     try {
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
+
+      // Validate input before proceeding
+      if (username.isEmpty || password.isEmpty) {
+        showModernSnackBar(
+          context,
+          message: 'يرجى ملء جميع الحقول المطلوبة',
+          type: SnackBarType.error,
+        );
+        return;
+      }
 
       // Show sending message based on mode
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1211,39 +1239,52 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         _isEmailMode,
       );
 
-      // Start countdown timer for resend
-      _startResendTimer();
+      // Wait a bit to let the cubit process the request
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Show success message after a delay
-      await Future.delayed(const Duration(milliseconds: 1500));
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Text(
-                    _isEmailMode
-                        ? 'تم إرسال رمز التحقق إلى $username'
-                        : 'تم إرسال رمز التحقق عبر SMS إلى $username',
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(16.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-          ),
-        );
+      // Check if the state is failure and stop execution
+      final currentState = context.read<SignupCubit>().state;
+      if (currentState is SignupFailure) {
+        // Stop execution - error is already handled by BlocListener
+        return;
       }
 
-      _proceedToNextStep();
+      // Only proceed if we have a success state
+      if (currentState is SignupEmailSent) {
+        // Start countdown timer for resend
+        _startResendTimer();
+
+        // Show success message after a delay
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      _isEmailMode
+                          ? 'تم إرسال رمز التحقق إلى $username'
+                          : 'تم إرسال رمز التحقق عبر SMS إلى $username',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.success,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(16.w),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+            ),
+          );
+        }
+
+        _proceedToNextStep();
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

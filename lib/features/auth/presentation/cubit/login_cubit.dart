@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:netru_app/core/routing/routes.dart';
 import '../../domain/entities/login_user_entity.dart';
 import '../../domain/usecases/check_user_exists.dart';
 import '../../domain/usecases/login_user.dart';
@@ -18,7 +20,7 @@ class LoginCubit extends Cubit<LoginState> {
   /// Check if user exists by identifier
   Future<void> checkUserExists(String identifier) async {
     if (identifier.trim().isEmpty) {
-      emit(const UserExistsCheckFailure(error: 'Identifier cannot be empty'));
+      emit(const UserExistsCheckFailure(error: 'المعرف لا يمكن أن يكون فارغ'));
       return;
     }
 
@@ -41,7 +43,7 @@ class LoginCubit extends Cubit<LoginState> {
     required UserType userType,
   }) async {
     if (identifier.trim().isEmpty || password.trim().isEmpty) {
-      emit(const LoginFailure(error: 'Please fill in all required fields'));
+      emit(const LoginFailure(error: 'يرجى ملء جميع الحقول المطلوبة'));
       return;
     }
 
@@ -80,9 +82,9 @@ class LoginCubit extends Cubit<LoginState> {
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:
-        return '/home';
+        return Routes.customBottomBar;
       case UserType.admin:
-        return '/admin-dashboard';
+        return Routes.customBottomBar;
     }
   }
 
@@ -91,11 +93,11 @@ class LoginCubit extends Cubit<LoginState> {
     if (value == null || value.trim().isEmpty) {
       switch (userType) {
         case UserType.citizen:
-          return 'National ID is required';
+          return 'يرجى إدخال الرقم القومي';
         case UserType.foreigner:
-          return 'Passport number is required';
+          return 'يرجى إدخال رقم جواز السفر';
         case UserType.admin:
-          return 'Email is required';
+          return 'يرجى إدخال البريد الإلكتروني';
       }
     }
 
@@ -112,10 +114,10 @@ class LoginCubit extends Cubit<LoginState> {
   /// Validate Egyptian National ID (14 digits)
   String? _validateNationalId(String nationalId) {
     if (nationalId.length != 14) {
-      return 'National ID must be 14 digits';
+      return 'الرقم القومي يجب أن يكون 14 رقم';
     }
     if (!RegExp(r'^[0-9]+$').hasMatch(nationalId)) {
-      return 'National ID must contain only numbers';
+      return 'الرقم القومي يجب أن يحتوي على أرقام فقط';
     }
     return null;
   }
@@ -123,10 +125,10 @@ class LoginCubit extends Cubit<LoginState> {
   /// Validate passport number (basic format check)
   String? _validatePassportNumber(String passportNumber) {
     if (passportNumber.length < 6 || passportNumber.length > 15) {
-      return 'Invalid passport number format';
+      return 'تنسيق رقم جواز السفر غير صحيح';
     }
     if (!RegExp(r'^[A-Z0-9]+$').hasMatch(passportNumber.toUpperCase())) {
-      return 'Passport number must contain only letters and numbers';
+      return 'رقم جواز السفر يجب أن يحتوي على أحرف وأرقام فقط';
     }
     return null;
   }
@@ -136,7 +138,7 @@ class LoginCubit extends Cubit<LoginState> {
     if (!RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     ).hasMatch(email)) {
-      return 'Please enter a valid email address';
+      return 'يرجى إدخال بريد إلكتروني صحيح';
     }
     return null;
   }
@@ -144,10 +146,10 @@ class LoginCubit extends Cubit<LoginState> {
   /// Validate password
   String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Password is required';
+      return 'يرجى إدخال كلمة المرور';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
     }
     return null;
   }

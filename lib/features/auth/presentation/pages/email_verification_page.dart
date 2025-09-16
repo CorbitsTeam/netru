@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routing/routes.dart';
 import '../widgets/animated_button.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   final String email;
@@ -536,105 +537,104 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
   }
 
   Widget _buildOTPInput() {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1000),
-      delay: const Duration(milliseconds: 300),
-      child: Column(
-        children: [
-          Text(
-            'أدخل رمز التحقق',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: FadeInUp(
+        duration: const Duration(milliseconds: 1000),
+        delay: const Duration(milliseconds: 300),
+        child: Column(
+          children: [
+            Text(
+              'أدخل رمز التحقق',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني',
-            style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 24.h),
-          _buildOTPInputBoxes(),
-          SizedBox(height: 24.h),
-          if (_isVerifyingOTP)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 20.w,
-                  height: 20.h,
-                  child: const CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
+            SizedBox(height: 16.h),
+            Text(
+              'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24.h),
+            _buildOTPInputBoxes(),
+            SizedBox(height: 24.h),
+            if (_isVerifyingOTP)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20.w,
+                    height: 20.h,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12.w),
-                Text(
-                  'جاري التحقق...',
-                  style: TextStyle(fontSize: 14.sp, color: AppColors.primary),
-                ),
-              ],
-            ),
-          SizedBox(height: 20.h),
-        ],
+                  SizedBox(width: 12.w),
+                  Text(
+                    'جاري التحقق...',
+                    style: TextStyle(fontSize: 14.sp, color: AppColors.primary),
+                  ),
+                ],
+              ),
+            SizedBox(height: 20.h),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildOTPInputBoxes() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(6, (index) {
-        return Container(
-          width: 45.w,
-          height: 55.h,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color:
-                  _otpControllers[index].text.isNotEmpty
-                      ? AppColors.primary
-                      : Colors.grey.shade300,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(12.r),
-            color: Colors.white,
-          ),
-          child: TextField(
-            controller: _otpControllers[index],
-            focusNode: _otpFocusNodes[index],
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            maxLength: 1,
-            style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              counterText: '',
-            ),
-            onChanged: (value) {
-              if (value.isNotEmpty) {
-                // Move to next field
-                if (index < 5) {
-                  _otpFocusNodes[index + 1].requestFocus();
-                }
-              } else {
-                // Move to previous field if backspace
-                if (index > 0) {
-                  _otpFocusNodes[index - 1].requestFocus();
-                }
-              }
-              _updateOTPCode();
-            },
-          ),
-        );
-      }),
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: PinCodeTextField(
+        appContext: context, // Required by PinCodeTextField
+        length: 6, // Number of OTP digits
+        controller:
+            TextEditingController(), // You can use a single controller or keep individual controllers
+        focusNode: FocusNode(), // Optional: Manage focus if needed
+        keyboardType: TextInputType.number,
+        textStyle: TextStyle(
+          fontSize:
+              24.sp, // Adjust for your responsive sizing (e.g., flutter_screenutil)
+          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+        ),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        pinTheme: PinTheme(
+          shape: PinCodeFieldShape.box,
+          borderRadius: BorderRadius.circular(12.r),
+          fieldHeight: 55.h,
+          fieldWidth: 45.w,
+          activeColor: AppColors.primary, // Border color when focused or filled
+          inactiveColor: Colors.grey.shade300, // Border color when empty
+          selectedColor: AppColors.primary, // Border color when selected
+          activeFillColor: Colors.white, // Background color when active
+          inactiveFillColor: Colors.white, // Background color when inactive
+          selectedFillColor: Colors.white, // Background color when selected
+          borderWidth: 2,
+        ),
+        enableActiveFill: true, // Enables background fill for the boxes
+        animationType:
+            AnimationType.none, // Disable animation for simplicity (optional)
+        onChanged: (value) {
+          _updateOTPCode(); // Call your existing method to update the OTP code
+        },
+        onCompleted: (value) {
+          // Optional: Handle when all fields are filled
+          _updateOTPCode();
+        },
+        // Ensure the fields are always enabled
+        enabled: true,
+        // Prevent cursor blinking if desired
+        cursorColor: AppColors.primary,
+        showCursor: true,
+      ),
     );
   }
 

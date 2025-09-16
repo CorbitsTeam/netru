@@ -94,10 +94,29 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        margin: EdgeInsets.all(16.w),
+        duration: const Duration(seconds: 4),
       ),
     );
   }
@@ -209,7 +228,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             style: TextStyle(
               fontSize: 32.sp,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1a1a1a),
+              color: const Color(0xFF1a1a1a),
               fontFamily: 'Almarai',
             ),
             textAlign: TextAlign.center,
@@ -219,7 +238,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             'سجل دخولك للمتابعة',
             style: TextStyle(
               fontSize: 16.sp,
-              color: Color(0xFF6B7280),
+              color: const Color(0xFF6B7280),
               fontFamily: 'Almarai',
             ),
             textAlign: TextAlign.center,
@@ -233,7 +252,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     return Container(
       height: 50.h,
       decoration: BoxDecoration(
-        color: Color(0xFFF8F9FA),
+        color: const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(25.r),
       ),
       child: TabBar(
@@ -245,7 +264,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: Color(0xFF6B7280),
+        unselectedLabelColor: const Color(0xFF6B7280),
         labelStyle: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.w600,
@@ -257,9 +276,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           fontFamily: 'Almarai',
         ),
         tabs: [
-          Tab(text: 'مواطن مصري'),
-          Tab(text: 'مقيم أجنبي'),
-          if (_showAdminTab) Tab(text: 'مدير'),
+          const Tab(text: 'مواطن مصري'),
+          const Tab(text: 'مقيم أجنبي'),
+          if (_showAdminTab) const Tab(text: 'مدير'),
         ],
       ),
     );
@@ -374,9 +393,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _buildLoginButton(VoidCallback onPressed) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: 56.h,
+      height: 50.h,
       child: ElevatedButton(
         onPressed: _isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -393,7 +412,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 ? SizedBox(
                   width: 24.w,
                   height: 24.h,
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     color: Colors.white,
                     strokeWidth: 2,
                   ),
@@ -426,7 +445,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1a1a1a),
+            color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
         ),
@@ -441,39 +460,39 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   : TextDirection.rtl,
           style: TextStyle(
             fontSize: 16.sp,
-            color: Color(0xFF1a1a1a),
+            color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Color(0xFF9CA3AF),
+              color: const Color(0xFF9CA3AF),
               fontSize: 15.sp,
               fontFamily: 'Almarai',
             ),
             prefixIcon: Icon(icon, color: AppColors.primary, size: 22.sp),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.error),
+              borderSide: const BorderSide(color: AppColors.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.error, width: 2),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             filled: true,
-            fillColor: Color(0xFFF9FAFB),
+            fillColor: const Color(0xFFF9FAFB),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
               vertical: 16.h,
@@ -498,7 +517,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1a1a1a),
+            color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
         ),
@@ -509,13 +528,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           validator: validator,
           style: TextStyle(
             fontSize: 16.sp,
-            color: Color(0xFF1a1a1a),
+            color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
           decoration: InputDecoration(
             hintText: 'أدخل كلمة المرور',
             hintStyle: TextStyle(
-              color: Color(0xFF9CA3AF),
+              color: const Color(0xFF9CA3AF),
               fontSize: 15.sp,
               fontFamily: 'Almarai',
             ),
@@ -529,33 +548,33 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 obscureText
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: Color(0xFF6B7280),
+                color: const Color(0xFF6B7280),
                 size: 22.sp,
               ),
               onPressed: onToggleVisibility,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.error),
+              borderSide: const BorderSide(color: AppColors.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.error, width: 2),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             filled: true,
-            fillColor: Color(0xFFF9FAFB),
+            fillColor: const Color(0xFFF9FAFB),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
               vertical: 16.h,
@@ -576,7 +595,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           Text(
             'ليس لديك حساب؟ ',
             style: TextStyle(
-              color: Color(0xFF6B7280),
+              color: const Color(0xFF6B7280),
               fontSize: 15.sp,
               fontFamily: 'Almarai',
             ),
