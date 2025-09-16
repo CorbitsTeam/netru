@@ -9,7 +9,6 @@ import 'core/cubit/theme/theme_cubit.dart';
 import 'core/utils/app_shared_preferences.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/injection_container.dart';
-
 import 'app.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logger_service.dart';
