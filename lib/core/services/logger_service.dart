@@ -9,8 +9,7 @@ class LoggerService {
 
   void init() {
     // Only initialize if not already initialized
-    if (_logger == null) {
-      _logger = Logger(
+    _logger ??= Logger(
         printer: PrettyPrinter(
           methodCount: 2,
           errorMethodCount: 8,
@@ -20,7 +19,6 @@ class LoggerService {
           printTime: true,
         ),
       );
-    }
   }
 
   Logger get logger {

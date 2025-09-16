@@ -12,4 +12,9 @@ abstract class UserRepository {
     String password,
     UserType userType,
   );
+
+  /// Signs up a new user
+  Future<Either<Failure, LoginUserEntity>> signUpUser(
+    Map<String, dynamic> userData,
+  );
 }
