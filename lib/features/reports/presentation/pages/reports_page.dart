@@ -16,16 +16,12 @@ class ReportsPage extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: Text(
           "reportsStatus".tr(),
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
         ),
       ),
       body: const SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: 12),
           child: ReportsListPage(),
         ),
       ),

@@ -11,8 +11,7 @@ class MediaSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'media'.tr(),
@@ -24,22 +23,17 @@ class MediaSection extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               width: 170.w,
               height: 100.h,
               decoration: BoxDecoration(
-                color: AppColors.grey
-                    .withValues(alpha: 0.12),
-                borderRadius:
-                    BorderRadius.circular(8.r),
+                color: AppColors.grey.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8.r),
                 image: const DecorationImage(
                   fit: BoxFit.cover,
-                  image: AssetImage(
-                    AppAssets.media,
-                  ),
+                  image: AssetImage(AppAssets.media),
                 ),
               ),
             ),
@@ -47,23 +41,15 @@ class MediaSection extends StatelessWidget {
               width: 170.w,
               height: 100.h,
               decoration: BoxDecoration(
-                color: AppColors.grey
-                    .withValues(alpha: 0.12),
-                borderRadius:
-                    BorderRadius.circular(8.r),
+                color: AppColors.grey.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8.r),
                 image: const DecorationImage(
                   fit: BoxFit.cover,
-                  image: AssetImage(
-                    AppAssets.media2,
-                  ),
+                  image: AssetImage(AppAssets.media2),
                 ),
               ),
               child: Center(
-                child: Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 40.sp,
-                ),
+                child: Icon(Icons.play_arrow, color: Colors.white, size: 40.sp),
               ),
             ),
           ],

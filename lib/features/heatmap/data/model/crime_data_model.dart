@@ -27,8 +27,7 @@ class CrimeDataModel {
   }
 
   /// تحويل البيانات من JSON
-  factory CrimeDataModel.fromJson(
-      Map<String, dynamic> json) {
+  factory CrimeDataModel.fromJson(Map<String, dynamic> json) {
     return CrimeDataModel(
       location: LatLng(
         json['latitude']?.toDouble() ?? 0.0,
@@ -37,12 +36,14 @@ class CrimeDataModel {
       crimeCount: json['crimeCount'] ?? 0,
       area: json['area'] ?? '',
       description: json['description'] ?? '',
-      lastIncident: json['lastIncident'] != null
-          ? DateTime.parse(json['lastIncident'])
-          : null,
-      crimeTypes: json['crimeTypes'] != null
-          ? List<String>.from(json['crimeTypes'])
-          : null,
+      lastIncident:
+          json['lastIncident'] != null
+              ? DateTime.parse(json['lastIncident'])
+              : null,
+      crimeTypes:
+          json['crimeTypes'] != null
+              ? List<String>.from(json['crimeTypes'])
+              : null,
     );
   }
 
@@ -54,8 +55,7 @@ class CrimeDataModel {
       'crimeCount': crimeCount,
       'area': area,
       'description': description,
-      'lastIncident':
-          lastIncident?.toIso8601String(),
+      'lastIncident': lastIncident?.toIso8601String(),
       'crimeTypes': crimeTypes,
     };
   }
@@ -76,9 +76,7 @@ class CrimeDataModel {
 
   @override
   int get hashCode {
-    return location.hashCode ^
-        crimeCount.hashCode ^
-        area.hashCode;
+    return location.hashCode ^ crimeCount.hashCode ^ area.hashCode;
   }
 }
 

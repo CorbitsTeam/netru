@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/routing/routes.dart';
-import '../../../../core/extensions/navigation_extensions.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:netru_app/core/extensions/navigation_extensions.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../cubit/auth_cubit.dart';
-import '../cubit/auth_state.dart';
-import '../widgets/auth_widgets.dart';
+import '../../../../core/routing/routes.dart';
+import '../../domain/entities/login_user_entity.dart';
+import '../cubit/login_cubit.dart';
+import '../cubit/login_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,261 +17,602 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  // Form keys for each tab
+  final _citizenFormKey = GlobalKey<FormState>();
+  final _foreignerFormKey = GlobalKey<FormState>();
+  final _adminFormKey = GlobalKey<FormState>();
+
+  // Controllers for each form
+  final _citizenNationalIdController = TextEditingController();
+  final _citizenPasswordController = TextEditingController();
+
+  final _foreignerPassportController = TextEditingController();
+  final _foreignerPasswordController = TextEditingController();
+
+  final _adminEmailController = TextEditingController();
+  final _adminPasswordController = TextEditingController();
+
+  bool _obscureCitizenPassword = true;
+  bool _obscureForeignerPassword = true;
+  bool _obscureAdminPassword = true;
+  bool _isLoading = false;
+  bool _showAdminTab = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _tabController.dispose();
+    _citizenNationalIdController.dispose();
+    _citizenPasswordController.dispose();
+    _foreignerPassportController.dispose();
+    _foreignerPasswordController.dispose();
+    _adminEmailController.dispose();
+    _adminPasswordController.dispose();
     super.dispose();
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      context.read<AuthCubit>().loginWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+  void _handleLogin(UserType userType) {
+    GlobalKey<FormState> formKey;
+    String identifier;
+    String password;
+
+    switch (userType) {
+      case UserType.citizen:
+        formKey = _citizenFormKey;
+        identifier = _citizenNationalIdController.text.trim();
+        password = _citizenPasswordController.text;
+        break;
+      case UserType.foreigner:
+        formKey = _foreignerFormKey;
+        identifier = _foreignerPassportController.text.trim();
+        password = _foreignerPasswordController.text;
+        break;
+      case UserType.admin:
+        formKey = _adminFormKey;
+        identifier = _adminEmailController.text.trim();
+        password = _adminPasswordController.text;
+        break;
+    }
+
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    context.read<LoginCubit>().loginUser(
+      identifier: identifier,
+      password: password,
+      userType: userType,
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        margin: EdgeInsets.all(16.w),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  void _navigateToSignup() {
+    context.pushNamed(Routes.signupScreen);
+  }
+
+  void _navigateBasedOnUserType(LoginUserEntity user) {
+    switch (user.userType) {
+      case UserType.citizen:
+      case UserType.foreigner:
+        Navigator.pushReplacementNamed(context, Routes.customBottomBar);
+        break;
+      case UserType.admin:
+        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+        break;
     }
   }
 
-  void _googleSignIn() {
-    context.read<AuthCubit>().signInWithGoogle();
+  void _onLogoDoubleTap() {
+    if (!_showAdminTab) {
+      setState(() {
+        _showAdminTab = true;
+        // Dispose the old controller properly
+        final oldIndex = _tabController.index;
+        _tabController.dispose();
+        _tabController = TabController(length: 3, vsync: this);
+        // Keep the current tab if it's still valid, otherwise go to admin tab
+        if (oldIndex < 2) {
+          _tabController.index = oldIndex;
+        } else {
+          _tabController.animateTo(2); // Switch to admin tab
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: BlocListener<AuthCubit, AuthState>(
+      backgroundColor: Colors.white,
+      body: BlocListener<LoginCubit, LoginState>(
         listener: (context, state) {
-          if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-              ),
-            );
-          } else if (state is AuthAuthenticated) {
-            context.pushNamedAndRemoveUntil(Routes.customBottomBar);
+          if (state is LoginLoading) {
+            setState(() => _isLoading = true);
+          } else {
+            setState(() => _isLoading = false);
+          }
+
+          if (state is LoginSuccess) {
+            _navigateBasedOnUserType(state.user);
+          } else if (state is LoginFailure) {
+            _showErrorSnackBar(state.error);
           }
         },
         child: SafeArea(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 40.h),
-
-                  // Header
-                  const AuthHeader(
-                    title: "مرحباً بك مرة أخرى",
-                    subtitle:
-                        "قم بتسجيل الدخول للوصول إلى حسابك في تطبيق نترو الأمني",
-                  ),
-
-                  SizedBox(height: 40.h),
-
-                  // Login Form
-                  Container(
-                    padding: EdgeInsets.all(24.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Email Field
-                        AuthTextField(
-                          label: "البريد الإلكتروني",
-                          hint: "أدخل بريدك الإلكتروني",
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icons.email_outlined,
-                          validator: context.read<AuthCubit>().validateEmail,
-                        ),
-
-                        SizedBox(height: 20.h),
-
-                        // Password Field
-                        AuthTextField(
-                          label: "كلمة المرور",
-                          hint: "أدخل كلمة المرور",
-                          controller: _passwordController,
-                          isPassword: true,
-                          prefixIcon: Icons.lock_outline,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'كلمة المرور مطلوبة';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: 16.h),
-
-                        // Forgot Password
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton(
-                            onPressed: () {
-                              // TODO: Navigate to forgot password
-                            },
-                            child: Text(
-                              "نسيت كلمة المرور؟",
-                              style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        // Login Button
-                        BlocBuilder<AuthCubit, AuthState>(
-                          builder: (context, state) {
-                            return AuthButton(
-                              text: "تسجيل الدخول",
-                              onPressed: _login,
-                              isLoading: state is AuthLoading,
-                              icon: Icons.login,
-                            );
-                          },
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        // Divider
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey[300],
-                                thickness: 1,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              child: Text(
-                                "أو",
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14.sp,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey[300],
-                                thickness: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        // Google Sign In Button
-                        BlocBuilder<AuthCubit, AuthState>(
-                          builder: (context, state) {
-                            return SocialButton(
-                              text: "تسجيل الدخول بجوجل",
-                              iconPath: "assets/icons/google.svg",
-                              onPressed: _googleSignIn,
-                              isLoading: state is AuthLoading,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 24.h),
-
-                  // Sign Up Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              children: [
+                SizedBox(height: 40.h),
+                _buildHeader(),
+                SizedBox(height: 40.h),
+                _buildTabBar(),
+                // SizedBox(height: 24.h),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: TabBarView(
+                    controller: _tabController,
                     children: [
-                      Text(
-                        "ليس لديك حساب؟ ",
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          context.pushNamed(Routes.signupScreen);
-                        },
-                        child: Text(
-                          "إنشاء حساب جديد",
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      _buildCitizenForm(),
+                      _buildForeignerForm(),
+                      if (_showAdminTab) _buildAdminForm(),
                     ],
                   ),
-
-                  SizedBox(height: 24.h),
-
-                  // Security Note
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: Colors.blue[100]!, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.security,
-                          color: Colors.blue[600],
-                          size: 20.sp,
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            "جميع بياناتك محمية ومشفرة وفقاً لمعايير الأمان العالمية",
-                            style: TextStyle(
-                              color: Colors.blue[700],
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 40.h),
-                ],
-              ),
+                ),
+                SizedBox(height: 30.h),
+                _buildBottomSection(),
+                SizedBox(height: 30.h),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return FadeInDown(
+      duration: const Duration(milliseconds: 800),
+      child: Column(
+        children: [
+          // اللوغو بدون إطار - واضح وبسيط
+          GestureDetector(
+            onDoubleTap: _onLogoDoubleTap,
+            child: Image.asset(
+              AppAssets.mainLogo,
+              width: 120.w,
+              height: 120.h,
+              fit: BoxFit.contain,
+            ),
+          ),
+          SizedBox(height: 32.h),
+
+          // النص الترحيبي
+          Text(
+            'أهلاً وسهلاً',
+            style: TextStyle(
+              fontSize: 32.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1a1a1a),
+              fontFamily: 'Almarai',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'سجل دخولك للمتابعة',
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: const Color(0xFF6B7280),
+              fontFamily: 'Almarai',
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      height: 50.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(25.r),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        indicator: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(25.r),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF6B7280),
+        labelStyle: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Almarai',
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Almarai',
+        ),
+        tabs: [
+          const Tab(text: 'مواطن مصري'),
+          const Tab(text: 'مقيم أجنبي'),
+          if (_showAdminTab) const Tab(text: 'مدير'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCitizenForm() {
+    return Form(
+      key: _citizenFormKey,
+      child: Column(
+        children: [
+          SizedBox(height: 32.h),
+          _buildTextField(
+            controller: _citizenNationalIdController,
+            label: 'الرقم القومي',
+            hint: 'أدخل الرقم القومي (14 رقم)',
+            icon: Icons.person_outline,
+            keyboardType: TextInputType.number,
+            validator:
+                (value) => context.read<LoginCubit>().validateIdentifier(
+                  value,
+                  UserType.citizen,
+                ),
+          ),
+          SizedBox(height: 24.h),
+          _buildPasswordField(
+            controller: _citizenPasswordController,
+            validator:
+                (value) => context.read<LoginCubit>().validatePassword(value),
+            obscureText: _obscureCitizenPassword,
+            onToggleVisibility:
+                () => setState(
+                  () => _obscureCitizenPassword = !_obscureCitizenPassword,
+                ),
+          ),
+          SizedBox(height: 40.h),
+          _buildLoginButton(() => _handleLogin(UserType.citizen)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildForeignerForm() {
+    return Form(
+      key: _foreignerFormKey,
+      child: Column(
+        children: [
+          SizedBox(height: 32.h),
+          _buildTextField(
+            controller: _foreignerPassportController,
+            label: 'رقم جواز السفر',
+            hint: 'أدخل رقم جواز السفر',
+            icon: Icons.flight_outlined,
+            keyboardType: TextInputType.text,
+            validator:
+                (value) => context.read<LoginCubit>().validateIdentifier(
+                  value,
+                  UserType.foreigner,
+                ),
+          ),
+          SizedBox(height: 24.h),
+          _buildPasswordField(
+            controller: _foreignerPasswordController,
+            validator:
+                (value) => context.read<LoginCubit>().validatePassword(value),
+            obscureText: _obscureForeignerPassword,
+            onToggleVisibility:
+                () => setState(
+                  () => _obscureForeignerPassword = !_obscureForeignerPassword,
+                ),
+          ),
+          SizedBox(height: 40.h),
+          _buildLoginButton(() => _handleLogin(UserType.foreigner)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminForm() {
+    return Form(
+      key: _adminFormKey,
+      child: Column(
+        children: [
+          SizedBox(height: 32.h),
+          _buildTextField(
+            controller: _adminEmailController,
+            label: 'البريد الإلكتروني',
+            hint: 'أدخل البريد الإلكتروني',
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            validator:
+                (value) => context.read<LoginCubit>().validateIdentifier(
+                  value,
+                  UserType.admin,
+                ),
+          ),
+          SizedBox(height: 24.h),
+          _buildPasswordField(
+            controller: _adminPasswordController,
+            validator:
+                (value) => context.read<LoginCubit>().validatePassword(value),
+            obscureText: _obscureAdminPassword,
+            onToggleVisibility:
+                () => setState(
+                  () => _obscureAdminPassword = !_obscureAdminPassword,
+                ),
+          ),
+          SizedBox(height: 40.h),
+          _buildLoginButton(() => _handleLogin(UserType.admin)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginButton(VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50.h,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+        child:
+            _isLoading
+                ? SizedBox(
+                  width: 24.w,
+                  height: 24.h,
+                  child: const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                : Text(
+                  'تسجيل الدخول',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Almarai',
+                  ),
+                ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required TextInputType keyboardType,
+    required String? Function(String?) validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1a1a1a),
+            fontFamily: 'Almarai',
+          ),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          validator: validator,
+          textDirection:
+              keyboardType == TextInputType.emailAddress
+                  ? TextDirection.ltr
+                  : TextDirection.rtl,
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: const Color(0xFF1a1a1a),
+            fontFamily: 'Almarai',
+          ),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: const Color(0xFF9CA3AF),
+              fontSize: 15.sp,
+              fontFamily: 'Almarai',
+            ),
+            prefixIcon: Icon(icon, color: AppColors.primary, size: 22.sp),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
+            ),
+            filled: true,
+            fillColor: const Color(0xFFF9FAFB),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 16.h,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String? Function(String?) validator,
+    required bool obscureText,
+    required VoidCallback onToggleVisibility,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'كلمة المرور',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1a1a1a),
+            fontFamily: 'Almarai',
+          ),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          validator: validator,
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: const Color(0xFF1a1a1a),
+            fontFamily: 'Almarai',
+          ),
+          decoration: InputDecoration(
+            hintText: 'أدخل كلمة المرور',
+            hintStyle: TextStyle(
+              color: const Color(0xFF9CA3AF),
+              fontSize: 15.sp,
+              fontFamily: 'Almarai',
+            ),
+            prefixIcon: Icon(
+              Icons.lock_outline,
+              color: AppColors.primary,
+              size: 22.sp,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                obscureText
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: const Color(0xFF6B7280),
+                size: 22.sp,
+              ),
+              onPressed: onToggleVisibility,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
+            ),
+            filled: true,
+            fillColor: const Color(0xFFF9FAFB),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 16.h,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomSection() {
+    return FadeInUp(
+      duration: const Duration(milliseconds: 800),
+      delay: const Duration(milliseconds: 800),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'ليس لديك حساب؟ ',
+            style: TextStyle(
+              color: const Color(0xFF6B7280),
+              fontSize: 15.sp,
+              fontFamily: 'Almarai',
+            ),
+          ),
+          GestureDetector(
+            onTap: _navigateToSignup,
+            child: Text(
+              'إنشاء حساب جديد',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Almarai',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

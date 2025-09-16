@@ -8,6 +8,8 @@ import 'package:netru_app/features/home/presentation/widgets/statistics_cards.da
 import 'package:netru_app/features/home/presentation/widgets/trending_cases_card.dart';
 
 import '../../../../core/theme/app_colors.dart';
+// import '../../../auth/presentation/cubit/auth_cubit.dart';
+// import '../../../../core/di/auth_injection.dart' as auth_di;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,26 +20,21 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 12.w),
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const HomeUpBar(),
                 SizedBox(height: 10.h),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "جهود الأجهزة الأمنية",
                       style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                         fontSize: 16.sp,
-                        color: AppColors
-                            .primaryColor,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ],

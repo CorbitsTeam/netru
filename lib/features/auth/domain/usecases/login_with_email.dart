@@ -5,25 +5,23 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 
-class LoginWithEmailUseCase implements UseCase<UserEntity, LoginParams> {
+class LoginWithEmailUseCase
+    implements UseCase<UserEntity, LoginWithEmailParams> {
   final AuthRepository repository;
 
   LoginWithEmailUseCase(this.repository);
 
   @override
-  Future<Either<Failure, UserEntity>> call(LoginParams params) async {
-    return await repository.loginWithEmail(
-      email: params.email,
-      password: params.password,
-    );
+  Future<Either<Failure, UserEntity>> call(LoginWithEmailParams params) async {
+    return await repository.loginWithEmail(params.email, params.password);
   }
 }
 
-class LoginParams extends Equatable {
+class LoginWithEmailParams extends Equatable {
   final String email;
   final String password;
 
-  const LoginParams({required this.email, required this.password});
+  const LoginWithEmailParams({required this.email, required this.password});
 
   @override
   List<Object> get props => [email, password];

@@ -20,12 +20,10 @@ class NewsDetailsScreen extends StatelessWidget {
           }
 
           if (state is NewsError) {
-            return _buildErrorState(
-                context, state.message);
+            return _buildErrorState(context, state.message);
           }
 
-          if (state is NewsLoaded &&
-              state.selectedNews != null) {
+          if (state is NewsLoaded && state.selectedNews != null) {
             final news = state.selectedNews!;
             return SingleChildScrollView(
               child: Column(
@@ -33,16 +31,13 @@ class NewsDetailsScreen extends StatelessWidget {
                   // الهيدر مع الصورة
                   NewsHeaderWidget(
                     image: news.image,
-                    onBackPressed: () =>
-                        Navigator.of(context)
-                            .pop(),
+                    onBackPressed: () => Navigator.of(context).pop(),
                   ),
 
                   // المحتوى
                   Transform.translate(
                     offset: Offset(0, -25.h),
-                    child: NewsContentWidget(
-                        news: news),
+                    child: NewsContentWidget(news: news),
                   ),
                 ],
               ),
@@ -55,8 +50,7 @@ class NewsDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingState(
-      BuildContext context) {
+  Widget _buildLoadingState(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -74,27 +68,18 @@ class NewsDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            print(
-                "Back button pressed from loading");
+            print("Back button pressed from loading");
             Navigator.of(context).pop();
           },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black87,
-            size: 20.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20.sp),
           tooltip: 'رجوع',
         ),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              color: Colors.blue,
-              strokeWidth: 3.w,
-            ),
+            CircularProgressIndicator(color: Colors.blue, strokeWidth: 3.w),
             SizedBox(height: 16.h),
             Text(
               'جاري تحميل التفاصيل...',
@@ -110,8 +95,7 @@ class NewsDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorState(
-      BuildContext context, String message) {
+  Widget _buildErrorState(BuildContext context, String message) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -129,33 +113,24 @@ class NewsDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            print(
-                "Back button pressed from error");
+            print("Back button pressed from error");
             Navigator.of(context).pop();
           },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black87,
-            size: 20.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20.sp),
           tooltip: 'رجوع',
         ),
       ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: 24.w),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color:
-                      Colors.red.withOpacity(0.1),
-                  borderRadius:
-                      BorderRadius.circular(50.r),
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(50.r),
                 ),
                 child: Icon(
                   Icons.error_outline,
@@ -190,10 +165,8 @@ class NewsDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print(
-                            "Back button pressed");
-                        Navigator.of(context)
-                            .pop();
+                        print("Back button pressed");
+                        Navigator.of(context).pop();
                       },
                       icon: Icon(
                         Icons.arrow_back,
@@ -205,24 +178,17 @@ class NewsDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16.sp,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      style: ElevatedButton
-                          .styleFrom(
-                        backgroundColor:
-                            Colors.blue,
-                        padding:
-                            EdgeInsets.symmetric(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(
                           horizontal: 24.w,
                           vertical: 16.h,
                         ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius
-                                  .circular(12.r),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         elevation: 2,
                       ),
@@ -233,10 +199,8 @@ class NewsDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        print(
-                            "Retry button pressed");
-                        final newsCubit = context
-                            .read<NewsCubit>();
+                        print("Retry button pressed");
+                        final newsCubit = context.read<NewsCubit>();
                         newsCubit.loadNews();
                       },
                       icon: Icon(
@@ -249,26 +213,17 @@ class NewsDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.blue,
                           fontSize: 16.sp,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      style: OutlinedButton
-                          .styleFrom(
-                        side: BorderSide(
-                          color: Colors.blue,
-                          width: 1.5,
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.blue, width: 1.5),
+                        padding: EdgeInsets.symmetric(
                           horizontal: 24.w,
                           vertical: 16.h,
                         ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius
-                                  .circular(12.r),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
                     ),
@@ -282,8 +237,7 @@ class NewsDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotFoundState(
-      BuildContext context) {
+  Widget _buildNotFoundState(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -301,33 +255,24 @@ class NewsDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            print(
-                "Back button pressed from not found");
+            print("Back button pressed from not found");
             Navigator.of(context).pop();
           },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black87,
-            size: 20.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20.sp),
           tooltip: 'رجوع',
         ),
       ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: 24.w),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.grey
-                      .withValues(alpha: 0.1),
-                  borderRadius:
-                      BorderRadius.circular(50.r),
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(50.r),
                 ),
                 child: Icon(
                   Icons.article_outlined,
@@ -362,40 +307,28 @@ class NewsDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print(
-                            "Home button pressed");
-                        Navigator.of(context)
-                            .popUntil((route) =>
-                                route.isFirst);
+                        print("Home button pressed");
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
                       },
-                      icon: Icon(
-                        Icons.home,
-                        size: 18.sp,
-                        color: Colors.white,
-                      ),
+                      icon: Icon(Icons.home, size: 18.sp, color: Colors.white),
                       label: Text(
                         'الصفحة الرئيسية',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16.sp,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      style: ElevatedButton
-                          .styleFrom(
-                        backgroundColor:
-                            Colors.blue,
-                        padding:
-                            EdgeInsets.symmetric(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(
                           horizontal: 20.w,
                           vertical: 16.h,
                         ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius
-                                  .circular(12.r),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         elevation: 2,
                       ),
@@ -406,10 +339,8 @@ class NewsDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        print(
-                            "Back button pressed from not found body");
-                        Navigator.of(context)
-                            .pop();
+                        print("Back button pressed from not found body");
+                        Navigator.of(context).pop();
                       },
                       icon: Icon(
                         Icons.arrow_back,
@@ -421,26 +352,17 @@ class NewsDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.blue,
                           fontSize: 16.sp,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      style: OutlinedButton
-                          .styleFrom(
-                        side: BorderSide(
-                          color: Colors.blue,
-                          width: 1.5,
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.blue, width: 1.5),
+                        padding: EdgeInsets.symmetric(
                           horizontal: 24.w,
                           vertical: 16.h,
                         ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius
-                                  .circular(12.r),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
                     ),

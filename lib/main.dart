@@ -8,12 +8,9 @@ import 'core/cubit/locale/locale_cubit.dart';
 import 'core/cubit/theme/theme_cubit.dart';
 import 'core/utils/app_shared_preferences.dart';
 import 'core/routing/app_router.dart';
-import 'core/di/auth_injection.dart' as auth_di;
-import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'core/di/injection_container.dart';
 import 'app.dart';
 import 'app_bloc_observer.dart';
-import 'core/cubit/permission/permission_cubit.dart';
-import 'core/di/dependency_injection.dart';
 import 'core/services/logger_service.dart';
 
 void main() async {
@@ -33,12 +30,8 @@ void main() async {
   logger.logInfo('✅ Supabase Initialized');
 
   // Initialize dependency injection
-  await setupLocator();
-  logger.logInfo('✅ Dependency Injection Initialized');
-
-  // Initialize auth dependencies
-  await auth_di.initAuthDependencies();
-  logger.logInfo('✅ Auth Dependencies Initialized');
+  await initializeDependencies();
+  logger.logInfo('✅ All Dependencies Initialized');
 
   // Initialize localization
   await EasyLocalization.ensureInitialized();
@@ -72,12 +65,6 @@ void main() async {
           // Core Cubits
           BlocProvider(create: (_) => LocaleCubit()),
           BlocProvider(create: (_) => ThemeCubit()),
-
-          // Permission Cubit with Dependency Injection
-          BlocProvider(create: (_) => sl<PermissionCubit>()),
-
-          // Auth Cubit with Dependency Injection
-          BlocProvider(create: (_) => auth_di.sl<AuthCubit>()),
         ],
         child: MyApp(appRouter: AppRouter()),
       ),

@@ -14,8 +14,7 @@ class NewsModel {
     this.category = '',
   });
 
-  factory NewsModel.fromJson(
-      Map<String, dynamic> json) {
+  factory NewsModel.fromJson(Map<String, dynamic> json) {
     return NewsModel(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
