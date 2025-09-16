@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "663829016945",
+    "project_id": "netru-cefb8",
+    "storage_bucket": "netru-cefb8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663829016945:android:0a3ee3bf33421e27a786d0",
+        "android_client_info": {
+          "package_name": "com.corbits.netru"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB07yq_kKopuUyobHlrWMjc_K2jdMIAaH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
