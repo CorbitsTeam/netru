@@ -14,7 +14,7 @@ import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
 import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
-import '../../features/splash/splash_screen.dart';
+import '../../features/splash/presentation/splash_screen.dart';
 import '../routing/routes.dart';
 
 // Onboarding imports

@@ -4,9 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import '../onboarding/utils/onboarding_prefs.dart';
+import '../../onboarding/utils/onboarding_prefs.dart';
 
-import '../../core/constants/app_assets.dart';
+import '../../../core/constants/app_assets.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
