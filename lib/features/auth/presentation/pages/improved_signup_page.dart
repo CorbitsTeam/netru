@@ -449,8 +449,10 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   Widget _buildDataEntryStep() {
     // Ensure password is in userData if not already there
-    if (_userData['password']?.isEmpty ?? true) {
-      _userData['password'] = _passwordController.text.trim();
+    final currentPassword = _passwordController.text.trim();
+    if (currentPassword.isNotEmpty && (_userData['password']?.isEmpty ?? true)) {
+      _userData['password'] = currentPassword;
+      print('🔐 تم تعيين كلمة المرور من الـ controller: $currentPassword');
     }
 
     // Pre-fill email/phone based on registration method
@@ -460,6 +462,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     if (!_isEmailMode && (_userData['phone']?.isEmpty ?? true)) {
       _userData['phone'] = _usernameController.text.trim();
     }
+
+    print('🔍 Before DataEntryStep - _userData: $_userData');
 
     return SingleChildScrollView(
       child: DataEntryStep(
@@ -471,15 +475,42 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 .trim(), // Pass the username from first step
         isEmailMode:
             _isEmailMode, // Pass the mode to know if it's email or phone
-        initialPassword:
-            _passwordController.text.trim(), // Pass initial password
+        initialPassword: currentPassword, // Pass initial password
         onDataChanged: (data) {
           setState(() {
-            _userData = data;
-            // Always preserve password from initial step if not set in data entry
-            if (_userData['password']?.isEmpty ?? true) {
-              _userData['password'] = _passwordController.text.trim();
+            // Prefer the password from the original password controller (source of truth)
+            final currentPassword = _passwordController.text.trim();
+
+            // Merge incoming data with existing _userData but preserve the controller password
+            final merged = Map<String, String>.from(_userData);
+            // Add/overwrite with new fields from data
+            data.forEach((k, v) {
+              merged[k] = v.toString();
+            });
+
+            // Ensure password is the most complete candidate among controller, existing, and incoming
+            final incomingPassword = data['password']?.toString() ?? '';
+            final existingPassword = _userData['password'] ?? '';
+            final controllerPassword = currentPassword;
+
+            // Choose the non-empty password with the greatest length (best guess of completeness)
+            String bestPassword = '';
+            for (final p in [
+              controllerPassword,
+              existingPassword,
+              incomingPassword,
+            ]) {
+              if (p.isNotEmpty && p.length > bestPassword.length) {
+                bestPassword = p;
+              }
             }
+            if (bestPassword.isNotEmpty) merged['password'] = bestPassword;
+
+            _userData = merged;
+
+            print('🔐 Password preservation:');
+            print('  - controller: $currentPassword');
+            print('  - merged password: ${_userData['password']}');
           });
           // Debug print to check data validity
           print('🔍 البيانات المحدثة: $_userData');
@@ -637,8 +668,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       }
     }
 
-    // Check password length
-    final password = _userData['password'] ?? '';
+    // Check password length - with fallback to original password controller
+    final password = _passwordController.text.trim() ?? _passwordController.text.trim();
+    print('🔐 Password Debug in _isDataValid:');
+    print('  - _userData[password]: ${_userData['password']}');
+    print('  - _passwordController.text: ${_passwordController.text.trim()}');
+    print('  - Final password for validation: $password');
+    print('  - Password length: ${password.length}');
+
     if (password.length < 6) {
       print('❌ كلمة المرور قصيرة: ${password.length}');
       return false;
