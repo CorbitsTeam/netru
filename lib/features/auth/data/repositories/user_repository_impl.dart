@@ -49,4 +49,48 @@ class UserRepositoryImpl implements UserRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, LoginUserEntity>> getUserById(String userId) async {
+    try {
+      final user = await _userDataSource.getUserById(userId);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LoginUserEntity>> getUserByEmail(String email) async {
+    try {
+      final user = await _userDataSource.getUserByEmail(email);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LoginUserEntity>> getUserByNationalId(
+    String nationalId,
+  ) async {
+    try {
+      final user = await _userDataSource.getUserByNationalId(nationalId);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LoginUserEntity>> getUserByPassport(
+    String passportNumber,
+  ) async {
+    try {
+      final user = await _userDataSource.getUserByPassport(passportNumber);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

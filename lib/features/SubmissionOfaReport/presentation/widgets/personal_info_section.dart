@@ -5,12 +5,10 @@ import 'package:netru_app/core/helper/validation_helper.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'custom_text_field.dart';
 
-class PersonalInfoSection
-    extends StatelessWidget {
+class PersonalInfoSection extends StatelessWidget {
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
-  final TextEditingController
-  nationalIdController;
+  final TextEditingController nationalIdController;
   final TextEditingController phoneController;
 
   const PersonalInfoSection({
@@ -24,16 +22,12 @@ class PersonalInfoSection
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section Title
         Text(
           'المعلومات الشخصية',
-          style: TextStyle(
-            fontSize: 16.sp,
-            color: AppColors.primaryColor,
-          ),
+          style: TextStyle(fontSize: 16.sp, color: AppColors.primaryColor),
         ),
         SizedBox(height: 10.h),
 
@@ -46,9 +40,9 @@ class PersonalInfoSection
                 controller: firstNameController,
                 label: 'الاسم الأول',
                 hintText: 'أدخل الاسم الأول',
-                validator:
-                    ValidationHelper.validateName,
+                validator: ValidationHelper.validateName,
                 keyboardType: TextInputType.text,
+                readOnly: true,
               ),
             ),
             SizedBox(width: 12.w),
@@ -59,9 +53,9 @@ class PersonalInfoSection
                 controller: lastNameController,
                 label: 'الاسم الأخير',
                 hintText: 'أدخل الاسم الأخير',
-                validator:
-                    ValidationHelper.validateName,
+                validator: ValidationHelper.validateName,
                 keyboardType: TextInputType.text,
+                readOnly: true,
               ),
             ),
           ],
@@ -73,19 +67,16 @@ class PersonalInfoSection
           controller: nationalIdController,
           label: 'الرقم القومي',
           hintText: 'أدخل الرقم القومي (14 رقم)',
-          validator:
-              ValidationHelper.validateNationalId,
+          validator: ValidationHelper.validateNationalId,
           keyboardType: TextInputType.number,
           maxLength: 14,
+          
+          readOnly: true,
           inputFormatters: [
-            FilteringTextInputFormatter
-                .digitsOnly,
+            FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(14),
           ],
-          prefixIcon: const Icon(
-            Icons.credit_card,
-            color: Colors.grey,
-          ),
+          prefixIcon: const Icon(Icons.credit_card, color: Colors.grey),
         ),
         SizedBox(height: 10.sp),
 
@@ -94,19 +85,14 @@ class PersonalInfoSection
           controller: phoneController,
           label: 'رقم الهاتف',
           hintText: 'أدخل رقم الهاتف (11 رقم)',
-          validator:
-              ValidationHelper.validatePhone,
+          validator: ValidationHelper.validatePhone,
           keyboardType: TextInputType.phone,
           maxLength: 11,
           inputFormatters: [
-            FilteringTextInputFormatter
-                .digitsOnly,
+            FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(11),
           ],
-          prefixIcon: const Icon(
-            Icons.phone_outlined,
-            color: Colors.grey,
-          ),
+          prefixIcon: const Icon(Icons.phone_outlined, color: Colors.grey),
         ),
       ],
     );

@@ -8,13 +8,6 @@ CREATE TABLE public.cities (
   CONSTRAINT cities_pkey PRIMARY KEY (id),
   CONSTRAINT cities_governorate_id_fkey FOREIGN KEY (governorate_id) REFERENCES public.governorates(id)
 );
-CREATE TABLE public.districts (
-  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  city_id bigint,
-  name text NOT NULL,
-  CONSTRAINT districts_pkey PRIMARY KEY (id),
-  CONSTRAINT districts_city_id_fkey FOREIGN KEY (city_id) REFERENCES public.cities(id)
-);
 CREATE TABLE public.governorates (
   id integer GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
   name text NOT NULL UNIQUE,
@@ -27,8 +20,111 @@ CREATE TABLE public.identity_documents (
   front_image_url text,
   back_image_url text,
   uploaded_at timestamp without time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT identity_documents_pkey PRIMARY KEY (id),
   CONSTRAINT identity_documents_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.report_assignments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  report_id uuid NOT NULL,
+  assigned_to uuid NOT NULL,
+  assigned_by uuid NOT NULL,
+  assigned_at timestamp without time zone DEFAULT now(),
+  unassigned_at timestamp without time zone,
+  assignment_notes text,
+  is_active boolean DEFAULT true,
+  CONSTRAINT report_assignments_pkey PRIMARY KEY (id),
+  CONSTRAINT report_assignments_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id),
+  CONSTRAINT report_assignments_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id),
+  CONSTRAINT report_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.report_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  report_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  comment_text text NOT NULL,
+  is_internal boolean DEFAULT false,
+  parent_comment_id uuid,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now(),
+  is_deleted boolean DEFAULT false,
+  CONSTRAINT report_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT report_comments_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id),
+  CONSTRAINT report_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT report_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.report_comments(id)
+);
+CREATE TABLE public.report_media (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  report_id uuid NOT NULL,
+  media_type text NOT NULL CHECK (media_type = ANY (ARRAY['image'::text, 'video'::text, 'audio'::text, 'document'::text])),
+  file_url text NOT NULL,
+  file_name text,
+  file_size bigint,
+  mime_type text,
+  description text,
+  uploaded_at timestamp without time zone DEFAULT now(),
+  is_evidence boolean DEFAULT false,
+  metadata jsonb,
+  CONSTRAINT report_media_pkey PRIMARY KEY (id),
+  CONSTRAINT report_media_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id)
+);
+CREATE TABLE public.report_status_history (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  report_id uuid NOT NULL,
+  previous_status text,
+  new_status text NOT NULL,
+  changed_by uuid,
+  change_reason text,
+  changed_at timestamp without time zone DEFAULT now(),
+  notes text,
+  CONSTRAINT report_status_history_pkey PRIMARY KEY (id),
+  CONSTRAINT report_status_history_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id),
+  CONSTRAINT report_status_history_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.report_types (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name text NOT NULL UNIQUE,
+  name_ar text NOT NULL UNIQUE,
+  description text,
+  priority_level text DEFAULT 'medium'::text CHECK (priority_level = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'urgent'::text])),
+  is_active boolean DEFAULT true,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT report_types_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.reports (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  reporter_first_name text NOT NULL,
+  reporter_last_name text NOT NULL,
+  reporter_national_id text NOT NULL,
+  reporter_phone text NOT NULL,
+  report_type_id bigint,
+  report_type_custom text,
+  report_details text NOT NULL,
+  incident_location_latitude numeric,
+  incident_location_longitude numeric,
+  incident_location_address text,
+  incident_datetime timestamp without time zone,
+  report_status text DEFAULT 'pending'::text CHECK (report_status = ANY (ARRAY['pending'::text, 'under_investigation'::text, 'resolved'::text, 'closed'::text, 'rejected'::text])),
+  priority_level text DEFAULT 'medium'::text CHECK (priority_level = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'urgent'::text])),
+  assigned_to uuid,
+  case_number text UNIQUE,
+  submitted_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now(),
+  resolved_at timestamp without time zone,
+  admin_notes text,
+  public_notes text,
+  is_anonymous boolean DEFAULT false,
+  verification_status text DEFAULT 'unverified'::text CHECK (verification_status = ANY (ARRAY['unverified'::text, 'verified'::text, 'flagged'::text])),
+  CONSTRAINT reports_pkey PRIMARY KEY (id),
+  CONSTRAINT reports_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT reports_report_type_id_fkey FOREIGN KEY (report_type_id) REFERENCES public.report_types(id),
+  CONSTRAINT reports_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id)
 );
 CREATE TABLE public.user_logs (
   id bigint NOT NULL DEFAULT nextval('user_logs_id_seq'::regclass),
