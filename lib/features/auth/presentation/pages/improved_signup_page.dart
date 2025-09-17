@@ -128,6 +128,34 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             setState(() {
               _isSubmitting = false;
             });
+          } else if (state is SignupEmailSent) {
+            // 🆕 Handle OTP sent state - transition to next step
+            setState(() {
+              _isSubmitting = false;
+            });
+
+            _startResendTimer();
+
+            showModernSnackBar(
+              context,
+              message:
+                  _isEmailMode
+                      ? 'تم إرسال رمز التحقق إلى ${state.email}'
+                      : 'تم إرسال رمز التحقق عبر SMS إلى ${state.email}',
+              type: SnackBarType.success,
+            );
+
+            // Transition to OTP verification step
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _proceedToNextStep();
+              }
+            });
+          } else if (state is SignupLoading) {
+            // Handle loading state
+            setState(() {
+              _isSubmitting = true;
+            });
           } else if (state is SignupCompleted || state is SignupSuccess) {
             showModernSnackBar(
               context,
@@ -1176,6 +1204,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Send OTP to email or phone
   Future<void> _sendOTP() async {
+    // Prevent multiple requests if already processing
+    if (_isSubmitting) return;
+
     // Ensure keyboard is dismissed and focus is cleared
     FocusScope.of(context).unfocus();
 
@@ -1184,6 +1215,10 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       return;
     }
     _formKey.currentState!.save();
+
+    setState(() {
+      _isSubmitting = true;
+    });
 
     try {
       final username = _usernameController.text.trim();
@@ -1232,60 +1267,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         ),
       );
 
-      // Use the cubit to send OTP
+      // Use the cubit to send OTP - state transitions will be handled by BlocListener
       context.read<SignupCubit>().signUpWithUsernameAndPassword(
         username,
         password,
         _isEmailMode,
       );
-
-      // Wait a bit to let the cubit process the request
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Check if the state is failure and stop execution
-      final currentState = context.read<SignupCubit>().state;
-      if (currentState is SignupFailure) {
-        // Stop execution - error is already handled by BlocListener
-        return;
-      }
-
-      // Only proceed if we have a success state
-      if (currentState is SignupEmailSent) {
-        // Start countdown timer for resend
-        _startResendTimer();
-
-        // Show success message after a delay
-        await Future.delayed(const Duration(milliseconds: 1000));
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      _isEmailMode
-                          ? 'تم إرسال رمز التحقق إلى $username'
-                          : 'تم إرسال رمز التحقق عبر SMS إلى $username',
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: AppColors.success,
-              duration: const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.all(16.w),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          );
-        }
-
-        _proceedToNextStep();
-      }
     } catch (e) {
+      setState(() {
+        _isSubmitting = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

@@ -562,7 +562,9 @@ class SignupCubit extends Cubit<SignupState> {
 
           if (existingUsers != null) {
             print('❌ البريد الإلكتروني موجود في auth.users');
-            emit(const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+            emit(
+              const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'),
+            );
             return;
           }
         } catch (authCheckError) {
@@ -577,7 +579,9 @@ class SignupCubit extends Cubit<SignupState> {
 
             if (existingUser != null) {
               print('❌ البريد الإلكتروني موجود في public.users');
-              emit(const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'));
+              emit(
+                const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'),
+              );
               return;
             }
           } catch (publicCheckError) {
@@ -626,7 +630,10 @@ class SignupCubit extends Cubit<SignupState> {
     } catch (e) {
       print('❌ خطأ في التسجيل: $e');
       String errorMessage = 'خطأ في إنشاء الحساب';
-      if (e.toString().contains('already') ||
+
+      if (e.toString().contains('over_email_send_rate_limit')) {
+        errorMessage = 'يرجى الانتظار 31 ثانية قبل إعادة المحاولة';
+      } else if (e.toString().contains('already') ||
           e.toString().contains('registered')) {
         errorMessage =
             isEmailMode
