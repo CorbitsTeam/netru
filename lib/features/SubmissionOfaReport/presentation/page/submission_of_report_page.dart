@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/di/injection_container.dart' as di;
+import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_cubit.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_state.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/location_date_time_section.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/media_section.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/personal_info_section.dart';
 import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/report_info_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/submit_button.dart';
 
-class SubmissionOfaReportPage
-    extends StatelessWidget {
+class SubmissionOfaReportPage extends StatelessWidget {
   const SubmissionOfaReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReportFormCubit(),
+      create: (context) => di.sl<ReportFormCubit>(),
       child: const ReportFormView(),
     );
   }
@@ -26,29 +26,19 @@ class ReportFormView extends StatefulWidget {
   const ReportFormView({super.key});
 
   @override
-  State<ReportFormView> createState() =>
-      _ReportFormViewState();
+  State<ReportFormView> createState() => _ReportFormViewState();
 }
 
-class _ReportFormViewState
-    extends State<ReportFormView> {
+class _ReportFormViewState extends State<ReportFormView> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController =
-      TextEditingController();
-  final _lastNameController =
-      TextEditingController();
-  final _nationalIdController =
-      TextEditingController();
-  final _phoneController =
-      TextEditingController();
-  final _reportTypeController =
-      TextEditingController();
-  final _reportDetailsController =
-      TextEditingController();
-  final _locationController =
-      TextEditingController();
-  final _dateTimeController =
-      TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _nationalIdController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _reportTypeController = TextEditingController();
+  final _reportDetailsController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _dateTimeController = TextEditingController();
 
   final List<String> _reportTypes = [
     'سرقة',
@@ -71,6 +61,23 @@ class _ReportFormViewState
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() {
+    final userHelper = UserDataHelper();
+
+    // Pre-fill form with user data if available
+    _firstNameController.text = userHelper.getUserFirstName();
+    _lastNameController.text = userHelper.getUserLastName();
+    _nationalIdController.text = userHelper.getUserNationalId() ?? '';
+    print("getUserNationalId : ${userHelper.getUserNationalId()}");
+    _phoneController.text = userHelper.getUserPhone() ?? '';
+  }
+
+  @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
@@ -88,62 +95,45 @@ class _ReportFormViewState
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: BlocConsumer<
-        ReportFormCubit,
-        ReportFormState
-      >(
+      body: BlocConsumer<ReportFormCubit, ReportFormState>(
         listener: (context, state) {
           if (state.isSubmitted) {
             _showSuccessDialog(context);
           }
           if (state.errorMessage.isNotEmpty) {
-            _showErrorSnackBar(
-              context,
-              state.errorMessage,
-            );
+            _showErrorSnackBar(context, state.errorMessage);
           }
         },
         builder: (context, state) {
           return SingleChildScrollView(
-            physics:
-                const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             child: Form(
               key: _formKey,
               child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.w,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
                 child: Column(
                   children: [
                     // Personal Information Section
                     PersonalInfoSection(
-                      firstNameController:
-                          _firstNameController,
-                      lastNameController:
-                          _lastNameController,
-                      nationalIdController:
-                          _nationalIdController,
-                      phoneController:
-                          _phoneController,
+                      firstNameController: _firstNameController,
+                      lastNameController: _lastNameController,
+                      nationalIdController: _nationalIdController,
+                      phoneController: _phoneController,
                     ),
                     SizedBox(height: 10.h),
 
                     // Report Information Section
                     ReportInfoSection(
-                      reportTypeController:
-                          _reportTypeController,
-                      reportDetailsController:
-                          _reportDetailsController,
+                      reportTypeController: _reportTypeController,
+                      reportDetailsController: _reportDetailsController,
                       reportTypes: _reportTypes,
                     ),
                     SizedBox(height: 10.h),
 
                     // Location & DateTime Section
                     LocationDateTimeSection(
-                      locationController:
-                          _locationController,
-                      dateTimeController:
-                          _dateTimeController,
+                      locationController: _locationController,
+                      dateTimeController: _dateTimeController,
                     ),
                     SizedBox(height: 10.h),
 
@@ -152,9 +142,7 @@ class _ReportFormViewState
                     SizedBox(height: 20.h),
 
                     // Submit Section
-                    SubmitButton(
-                      onSubmit: _submitForm,
-                    ),
+                    _buildSubmitButton(),
                     SizedBox(height: 18.h),
                   ],
                 ),
@@ -166,9 +154,7 @@ class _ReportFormViewState
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-    BuildContext context,
-  ) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -197,10 +183,64 @@ class _ReportFormViewState
             color: Color(0xFF1E3A8A),
             size: 20,
           ),
-          onPressed:
-              () => _showHelpDialog(context),
+          onPressed: () => _showHelpDialog(context),
         ),
       ],
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return BlocBuilder<ReportFormCubit, ReportFormState>(
+      builder: (context, state) {
+        return SizedBox(
+          width: double.infinity,
+          height: 50.h,
+          child: ElevatedButton(
+            onPressed: state.isLoading ? null : _submitForm,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E3A8A),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              disabledBackgroundColor: Colors.grey.withOpacity(0.3),
+            ),
+            child:
+                state.isLoading
+                    ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20.w,
+                          height: 20.h,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        const Text(
+                          'جاري الإرسال...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                    : const Text(
+                      'إرسال البلاغ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+          ),
+        );
+      },
     );
   }
 
@@ -208,39 +248,25 @@ class _ReportFormViewState
     if (_formKey.currentState!.validate()) {
       // Check required fields that might not be validated by form
       if (_locationController.text.isEmpty) {
-        _showErrorSnackBar(
-          context,
-          'يرجى تحديد الموقع الجغرافي',
-        );
+        _showErrorSnackBar(context, 'يرجى تحديد الموقع الجغرافي');
         return;
       }
 
       if (_dateTimeController.text.isEmpty) {
-        _showErrorSnackBar(
-          context,
-          'يرجى اختيار التاريخ والوقت',
-        );
+        _showErrorSnackBar(context, 'يرجى اختيار التاريخ والوقت');
         return;
       }
 
-      context
-          .read<ReportFormCubit>()
-          .submitReport(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            nationalId:
-                _nationalIdController.text,
-            phone: _phoneController.text,
-            reportType:
-                _reportTypeController.text,
-            reportDetails:
-                _reportDetailsController.text,
-          );
-    } else {
-      _showErrorSnackBar(
-        context,
-        'يرجى مراجعة البيانات المدخلة',
+      context.read<ReportFormCubit>().submitReport(
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        nationalId: _nationalIdController.text,
+        phone: _phoneController.text,
+        reportType: _reportTypeController.text,
+        reportDetails: _reportDetailsController.text,
       );
+    } else {
+      _showErrorSnackBar(context, 'يرجى مراجعة البيانات المدخلة');
     }
   }
 
@@ -251,15 +277,12 @@ class _ReportFormViewState
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                20,
-              ),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
               ),
               child: Column(
@@ -296,10 +319,7 @@ class _ReportFormViewState
                   // Success Message
                   Text(
                     'شكراً لك، سيتم مراجعة بلاغك والرد عليك في أقرب وقت',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -310,23 +330,13 @@ class _ReportFormViewState
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(
-                          context,
-                        ).pop(); // Close dialog
-                        Navigator.of(
-                          context,
-                        ).pop(); // Go back to home
+                        Navigator.of(context).pop(); // Close dialog
+                        Navigator.of(context).pop(); // Go back to home
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color(
-                              0xFF1E3A8A,
-                            ),
+                        backgroundColor: const Color(0xFF1E3A8A),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                                12,
-                              ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: const Text(
@@ -334,8 +344,7 @@ class _ReportFormViewState
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -347,36 +356,24 @@ class _ReportFormViewState
     );
   }
 
-  void _showErrorSnackBar(
-    BuildContext context,
-    String message,
-  ) {
+  void _showErrorSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.white,
-              size: 20,
-            ),
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 3),
       ),
@@ -389,21 +386,17 @@ class _ReportFormViewState
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                20,
-              ),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Help Title
                   const Row(
@@ -418,8 +411,7 @@ class _ReportFormViewState
                         'مساعدة',
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight:
-                              FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
@@ -455,25 +447,16 @@ class _ReportFormViewState
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
-                      onPressed:
-                          () => Navigator.pop(
-                            context,
-                          ),
+                      onPressed: () => Navigator.pop(context),
                       style: TextButton.styleFrom(
-                        padding:
-                            const EdgeInsets.symmetric(
-                              vertical: 12,
-                            ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: const Text(
                         'فهمت',
                         style: TextStyle(
-                          color: Color(
-                            0xFF1E3A8A,
-                          ),
+                          color: Color(0xFF1E3A8A),
                           fontSize: 16,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -485,31 +468,19 @@ class _ReportFormViewState
     );
   }
 
-  Widget _buildHelpItem(
-    String text,
-    IconData icon,
-  ) {
+  Widget _buildHelpItem(String text, IconData icon) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(
-                0xFF1E3A8A,
-              ).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                6,
-              ),
+              color: const Color(0xFF1E3A8A).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(
-              icon,
-              size: 16,
-              color: const Color(0xFF1E3A8A),
-            ),
+            child: Icon(icon, size: 16, color: const Color(0xFF1E3A8A)),
           ),
           const SizedBox(width: 12),
           Expanded(

@@ -478,67 +478,6 @@ class ReviewSubmitStep extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildSubmitButton() {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1300),
-      child: SizedBox(
-        width: double.infinity,
-        height: 56.h,
-        child: ElevatedButton(
-          onPressed: isSubmitting ? null : onSubmit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            disabledBackgroundColor: AppColors.grey.withOpacity(0.3),
-          ),
-          child:
-              isSubmitting
-                  ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 20.w,
-                        height: 20.h,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'جاري إرسال الطلب...',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )
-                  : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.send_rounded, size: 20.sp),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'إرسال الطلب',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-        ),
-      ),
-    );
-  }
 }
 
 class ReviewItem {

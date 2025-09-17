@@ -19,6 +19,7 @@ import '../../features/auth/domain/usecases/login_with_email.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
 import '../../features/auth/domain/usecases/check_user_exists.dart';
+import '../../features/auth/domain/usecases/get_user_by_id.dart';
 import '../../features/auth/domain/usecases/signup_user.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
@@ -35,6 +36,16 @@ import '../../features/chatbot/domain/usecases/get_user_sessions.dart';
 import '../../features/chatbot/domain/usecases/get_help_menu.dart';
 import '../../features/chatbot/domain/usecases/get_law_info.dart';
 import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
+
+// Reports Feature
+import '../../features/reports/data/datasources/reports_remote_datasource.dart';
+import '../../features/reports/data/repositories/reports_repository_impl.dart';
+import '../../features/reports/domain/repositories/reports_repository.dart';
+import '../../features/reports/domain/usecases/reports_usecase.dart';
+import '../../features/reports/presentation/cubit/reports_cubit.dart';
+
+// Submission of Report Feature
+import '../../features/SubmissionOfaReport/presentation/cubit/submission_report_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -81,6 +92,12 @@ Future<void> initializeDependencies() async {
 
   await _initChatbotDependencies();
 
+  // ===========================
+  // Reports Feature Dependencies
+  // ===========================
+
+  await _initReportsDependencies();
+
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
   );
@@ -113,6 +130,7 @@ Future<void> _initAuthDependencies() async {
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
   sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
 
   // Cubits
@@ -178,6 +196,40 @@ Future<void> _initChatbotDependencies() async {
   );
 
   sl.get<LoggerService>().logInfo('✅ Chatbot dependencies initialized');
+}
+
+/// Initialize Reports feature dependencies
+Future<void> _initReportsDependencies() async {
+  // Data sources
+  sl.registerLazySingleton<ReportsRemoteDataSource>(
+    () => ReportsRemoteDataSourceImpl(supabaseClient: sl()),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<ReportsRepository>(
+    () => ReportsRepositoryImpl(sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetAllReportsUseCase(sl()));
+  sl.registerLazySingleton(() => GetReportByIdUseCase(sl()));
+  sl.registerLazySingleton(() => CreateReportUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateReportStatusUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteReportUseCase(sl()));
+
+  // Cubits
+  sl.registerFactory(
+    () => ReportsCubit(
+      getAllReportsUseCase: sl(),
+      getReportByIdUseCase: sl(),
+      updateReportStatusUseCase: sl(),
+      deleteReportUseCase: sl(),
+    ),
+  );
+
+  sl.registerFactory(() => ReportFormCubit(createReportUseCase: sl()));
+
+  sl.get<LoggerService>().logInfo('✅ Reports dependencies initialized');
 }
 
 /// Helper method to reset all dependencies (useful for testing)

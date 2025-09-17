@@ -6,6 +6,7 @@ import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/utils/user_data_helper.dart';
 import '../../domain/entities/login_user_entity.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
@@ -125,14 +126,25 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     context.pushNamed(Routes.signupScreen);
   }
 
-  void _navigateBasedOnUserType(LoginUserEntity user) {
+  void _navigateBasedOnUserType(LoginUserEntity user) async {
+    // Save user data to SharedPreferences and refresh from database
+    try {
+      final userHelper = UserDataHelper();
+      await userHelper.saveCurrentUser(user);
+
+      // Refresh user data from database to get complete information
+      await userHelper.refreshUserDataFromDatabase();
+    } catch (e) {
+      print('Error saving/refreshing user data: $e');
+    }
+
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:
-        Navigator.pushReplacementNamed(context, Routes.customBottomBar);
+        context.pushReplacementNamed(Routes.customBottomBar);
         break;
       case UserType.admin:
-        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+        context.pushReplacementNamed(Routes.customBottomBar);
         break;
     }
   }
