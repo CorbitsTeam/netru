@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -102,7 +103,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       ),
                     ),
                     // Attachment button
-                    _buildAttachmentButton(),
                   ],
                 ),
               ),
@@ -138,17 +138,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
     );
   }
 
-  Widget _buildAttachmentButton() {
-    return IconButton(
-      onPressed: widget.isEnabled ? _showAttachmentOptions : null,
-      icon: Icon(
-        Icons.attach_file,
-        color: widget.isEnabled ? AppColors.secondary : AppColors.disabled,
-        size: 20.sp,
-      ),
-    );
-  }
-
   Widget _buildSendButton() {
     return Container(
       width: 44.w,
@@ -175,19 +164,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
             onActionSelected: (action) {
               Navigator.pop(context);
               widget.onSendMessage(action);
-            },
-          ),
-    );
-  }
-
-  void _showAttachmentOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder:
-          (context) => _AttachmentOptionsBottomSheet(
-            onOptionSelected: (option) {
-              Navigator.pop(context);
-              // Handle attachment options
             },
           ),
     );
@@ -252,58 +228,6 @@ class _QuickActionsBottomSheet extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(title, style: AppTextStyles.bodyMedium),
       onTap: () => onActionSelected(action),
-    );
-  }
-}
-
-class _AttachmentOptionsBottomSheet extends StatelessWidget {
-  final Function(String) onOptionSelected;
-
-  const _AttachmentOptionsBottomSheet({required this.onOptionSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'إرفاق ملف',
-            style: AppTextStyles.titleLarge.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          _buildAttachmentTile(
-            icon: Icons.photo,
-            title: 'صورة',
-            option: 'image',
-          ),
-          _buildAttachmentTile(
-            icon: Icons.insert_drive_file,
-            title: 'مستند',
-            option: 'document',
-          ),
-          _buildAttachmentTile(
-            icon: Icons.location_on,
-            title: 'الموقع',
-            option: 'location',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAttachmentTile({
-    required IconData icon,
-    required String title,
-    required String option,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.primary),
-      title: Text(title, style: AppTextStyles.bodyMedium),
-      onTap: () => onOptionSelected(option),
     );
   }
 }

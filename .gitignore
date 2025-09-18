@@ -43,3 +43,17 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment and Secret Files
+.env
+.env.local
+.env.production
+.env.staging
+*.secrets
+*.secret
+api_keys.txt
+secrets.json
+
+# Firebase config (if containing sensitive data)
+# google-services.json  # Uncomment if this contains sensitive data
+# GoogleService-Info.plist  # Uncomment if this contains sensitive data

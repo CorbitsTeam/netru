@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -56,6 +57,8 @@ import '../../features/reports/domain/repositories/reports_repository.dart';
 import '../../features/reports/domain/usecases/reports_usecase.dart';
 import '../../features/reports/presentation/cubit/reports_cubit.dart';
 // Core Services
+import '../config/environment_config.dart';
+import '../services/api_key_service.dart';
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
 
@@ -82,6 +85,21 @@ Future<void> initializeDependencies() async {
 
   sl.registerLazySingleton<Uuid>(() => const Uuid());
   sl.registerLazySingleton(() => LocationService());
+
+  // Secure Storage
+  const secureStorage = FlutterSecureStorage();
+  sl.registerLazySingleton<FlutterSecureStorage>(() => secureStorage);
+
+  // Environment Config
+  sl.registerLazySingleton<EnvironmentConfig>(() => EnvironmentConfig.instance);
+
+  // API Key Service
+  sl.registerLazySingleton<ApiKeyService>(
+    () => ApiKeyService(secureStorage: sl(), logger: sl(), envConfig: sl()),
+  );
+
+  // Initialize API Key Service
+  await sl<ApiKeyService>().initialize();
 
   // ===========================
   // Feature Dependencies
@@ -144,12 +162,12 @@ Future<void> _initAuthDependencies() async {
 /// Chatbot
 /// ===========================
 Future<void> _initChatbotDependencies() async {
+  // Get API key from secure service
+  final apiKeyService = sl<ApiKeyService>();
+  final groqApiKey = await apiKeyService.getGroqApiKey();
+
   sl.registerLazySingleton<ChatbotRemoteDataSource>(
-    () => ChatbotRemoteDataSourceImpl(
-      dio: sl(),
-      groqApiKey:
-          'gsk_replace_with_actual_key', // ⚠️ Replace with your actual key
-    ),
+    () => ChatbotRemoteDataSourceImpl(dio: sl(), groqApiKey: groqApiKey),
   );
 
   sl.registerLazySingleton<ChatbotLocalDataSource>(
