@@ -38,8 +38,10 @@ class CreateReportUseCase {
       reportDetails: params.reportDetails,
       latitude: params.latitude,
       longitude: params.longitude,
+      locationName: params.locationName,
       reportDateTime: params.reportDateTime,
       mediaFile: params.mediaFile,
+      submittedBy: params.submittedBy,
     );
   }
 }
@@ -76,8 +78,10 @@ class CreateReportParams {
   final String reportDetails;
   final double? latitude;
   final double? longitude;
+  final String? locationName;
   final DateTime reportDateTime;
   final File? mediaFile;
+  final String? submittedBy;
 
   CreateReportParams({
     required this.firstName,
@@ -88,7 +92,9 @@ class CreateReportParams {
     required this.reportDetails,
     this.latitude,
     this.longitude,
+    this.locationName,
     required this.reportDateTime,
     this.mediaFile,
+    this.submittedBy,
   });
 }

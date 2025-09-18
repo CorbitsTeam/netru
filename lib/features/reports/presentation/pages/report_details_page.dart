@@ -5,6 +5,8 @@ import '../widgets/media_section.dart';
 import '../widgets/personal_info_section.dart';
 import '../widgets/report_info_section.dart';
 import '../widgets/procedures_section.dart';
+import '../widgets/report_status_tracker.dart';
+import '../../domain/entities/reports_entity.dart';
 
 class ReportDetailsPage extends StatelessWidget {
   const ReportDetailsPage({super.key});
@@ -61,6 +63,14 @@ class ReportDetailsPage extends StatelessWidget {
                 SizedBox(height: 15.h),
                 const MediaSection(),
                 SizedBox(height: 15.h),
+
+                // Add the new status tracker
+                ReportStatusTracker(
+                  currentStatus: ReportStatus.underReview, // Example status
+                  createdAt: DateTime.now(),
+                ),
+                SizedBox(height: 15.h),
+
                 const ProceduresSection(),
                 SizedBox(height: 15.h),
               ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 
 class SearchableDropdown<T> extends StatefulWidget {
   final String label;

@@ -9,6 +9,7 @@ class ReportFormState extends Equatable {
     this.isGettingLocation = false,
     this.latitude,
     this.longitude,
+    this.locationName,
     this.selectedDateTime,
     this.selectedMedia,
     this.errorMessage = '',
@@ -20,6 +21,7 @@ class ReportFormState extends Equatable {
   final bool isGettingLocation;
   final double? latitude;
   final double? longitude;
+  final String? locationName;
   final DateTime? selectedDateTime;
   final File? selectedMedia;
   final String errorMessage;
@@ -32,6 +34,7 @@ class ReportFormState extends Equatable {
     isGettingLocation,
     latitude,
     longitude,
+    locationName,
     selectedDateTime,
     selectedMedia,
     errorMessage,
@@ -44,6 +47,7 @@ class ReportFormState extends Equatable {
     bool? isGettingLocation,
     double? latitude,
     double? longitude,
+    String? locationName,
     DateTime? selectedDateTime,
     File? selectedMedia,
     String? errorMessage,
@@ -56,6 +60,7 @@ class ReportFormState extends Equatable {
       isGettingLocation: isGettingLocation ?? this.isGettingLocation,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      locationName: locationName ?? this.locationName,
       selectedDateTime: selectedDateTime ?? this.selectedDateTime,
       selectedMedia:
           removeMedia == true ? null : (selectedMedia ?? this.selectedMedia),

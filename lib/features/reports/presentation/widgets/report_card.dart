@@ -106,9 +106,13 @@ class ReportCard extends StatelessWidget {
 
   Color _getStatusColor(ReportStatus status) {
     switch (status) {
-      case ReportStatus.pending:
+      case ReportStatus.received:
+        return AppColors.primaryColor;
+      case ReportStatus.underReview:
         return AppColors.grey;
-      case ReportStatus.inProgress:
+      case ReportStatus.dataVerification:
+        return Colors.yellow;
+      case ReportStatus.actionTaken:
         return AppColors.orange;
       case ReportStatus.completed:
         return AppColors.green;

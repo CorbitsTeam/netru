@@ -41,8 +41,10 @@ class ReportsRepositoryImpl implements ReportsRepository {
     required String reportDetails,
     double? latitude,
     double? longitude,
+    String? locationName,
     required DateTime reportDateTime,
     File? mediaFile,
+    String? submittedBy,
   }) async {
     try {
       // Create the report first
@@ -56,8 +58,10 @@ class ReportsRepositoryImpl implements ReportsRepository {
         reportDetails: reportDetails,
         latitude: latitude,
         longitude: longitude,
+        locationName: locationName,
         reportDateTime: reportDateTime,
-        status: ReportStatus.pending,
+        status: ReportStatus.received,
+        submittedBy: submittedBy,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -110,10 +114,12 @@ class ReportsRepositoryImpl implements ReportsRepository {
               reportDetails: createdReport.reportDetails,
               latitude: createdReport.latitude,
               longitude: createdReport.longitude,
+              locationName: createdReport.locationName,
               reportDateTime: createdReport.reportDateTime,
               mediaUrl: mediaUrl,
               mediaType: mediaType,
               status: createdReport.status,
+              submittedBy: createdReport.submittedBy,
               createdAt: createdReport.createdAt,
               updatedAt: createdReport.updatedAt,
             ),
@@ -147,10 +153,12 @@ class ReportsRepositoryImpl implements ReportsRepository {
         reportDetails: currentReport.reportDetails,
         latitude: currentReport.latitude,
         longitude: currentReport.longitude,
+        locationName: currentReport.locationName,
         reportDateTime: currentReport.reportDateTime,
         mediaUrl: currentReport.mediaUrl,
         mediaType: currentReport.mediaType,
         status: status,
+        submittedBy: currentReport.submittedBy,
         createdAt: currentReport.createdAt,
         updatedAt: DateTime.now(),
       );

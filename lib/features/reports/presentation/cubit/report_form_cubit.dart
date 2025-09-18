@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'report_form_state.dart';
 import '../../domain/usecases/reports_usecase.dart';
 import 'dart:io';
@@ -13,8 +14,14 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     emit(state.copyWith(isGettingLocation: isGetting));
   }
 
-  void setLocation(double latitude, double longitude) {
-    emit(state.copyWith(latitude: latitude, longitude: longitude));
+  void setLocation(double latitude, double longitude, [String? locationName]) {
+    emit(
+      state.copyWith(
+        latitude: latitude,
+        longitude: longitude,
+        locationName: locationName,
+      ),
+    );
   }
 
   void setDateTime(DateTime dateTime) {
@@ -40,6 +47,10 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     emit(state.copyWith(isLoading: true, errorMessage: ''));
 
     try {
+      // Get current user ID
+      final userHelper = UserDataHelper();
+      final userId = userHelper.getUserId();
+
       final params = CreateReportParams(
         firstName: firstName,
         lastName: lastName,
@@ -49,8 +60,10 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         reportDetails: reportDetails,
         latitude: state.latitude,
         longitude: state.longitude,
+        locationName: state.locationName,
         reportDateTime: state.selectedDateTime ?? DateTime.now(),
         mediaFile: state.selectedMedia,
+        submittedBy: userId, // Link report to current user
       );
 
       final result = await createReportUseCase.call(params);

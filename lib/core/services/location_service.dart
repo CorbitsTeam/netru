@@ -182,6 +182,47 @@ class LocationService {
       return Left(ServerFailure('فشل في البحث: ${e.toString()}'));
     }
   }
+
+  // Get location details by coordinates (reverse geocoding)
+  Future<Either<Failure, LocationDetails>> getLocationByCoordinates(
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      // في التطبيق الحقيقي، يمكنك استخدام خدمة مثل Google Geocoding API
+      // أو OpenStreetMap Nominatim للحصول على العنوان الفعلي
+
+      // للاختبار، سنقوم بإرجاع عنوان تجريبي
+      String street = 'شارع الملك فهد';
+      String city = 'الرياض';
+      String state = 'منطقة الرياض';
+      String country = 'المملكة العربية السعودية';
+
+      // يمكنك تخصيص العنوان حسب الإحداثيات
+      if (latitude > 24.7 && latitude < 24.8) {
+        street = 'شارع العليا';
+        city = 'الرياض';
+      } else if (latitude > 21.4 && latitude < 21.6) {
+        street = 'كورنيش جدة';
+        city = 'جدة';
+        state = 'منطقة مكة المكرمة';
+      }
+
+      return Right(
+        LocationDetails(
+          latitude: latitude,
+          longitude: longitude,
+          formattedAddress: '$street، $city، $state، $country',
+          street: street,
+          city: city,
+          state: state,
+          country: country,
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure('Failed to get location details: $e'));
+    }
+  }
 }
 
 // Models based on actual database schema
@@ -295,4 +336,43 @@ class LocationSearchResult {
     required this.type,
     this.parentId,
   });
+}
+
+class LocationDetails {
+  final double latitude;
+  final double longitude;
+  final String formattedAddress;
+  final String? street;
+  final String? city;
+  final String? state;
+  final String? country;
+  final GovernorateModel? governorate;
+  final CityModel? cityModel;
+  final DistrictModel? district;
+
+  LocationDetails({
+    required this.latitude,
+    required this.longitude,
+    required this.formattedAddress,
+    this.street,
+    this.city,
+    this.state,
+    this.country,
+    this.governorate,
+    this.cityModel,
+    this.district,
+  });
+
+  String get displayName {
+    List<String> parts = [];
+    if (street != null && street!.isNotEmpty) parts.add(street!);
+    if (city != null && city!.isNotEmpty) parts.add(city!);
+    if (state != null && state!.isNotEmpty) parts.add(state!);
+    if (country != null && country!.isNotEmpty) parts.add(country!);
+
+    if (parts.isNotEmpty) {
+      return parts.join(' - ');
+    }
+    return formattedAddress;
+  }
 }

@@ -4,11 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:netru_app/core/helper/validation_helper.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
+import 'package:netru_app/core/services/location_service.dart';
 import '../cubit/report_form_cubit.dart';
 import '../cubit/report_form_state.dart';
 import 'custom_text_field.dart';
 
-class LocationDateTimeSection extends StatelessWidget {
+class LocationDateTimeSection extends StatefulWidget {
   final TextEditingController locationController;
   final TextEditingController dateTimeController;
 
@@ -17,6 +18,42 @@ class LocationDateTimeSection extends StatelessWidget {
     required this.locationController,
     required this.dateTimeController,
   });
+
+  @override
+  State<LocationDateTimeSection> createState() =>
+      _LocationDateTimeSectionState();
+}
+
+class _LocationDateTimeSectionState extends State<LocationDateTimeSection> {
+  double? _currentLatitude;
+  double? _currentLongitude;
+  String _locationDetails = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _setCurrentDateTime();
+  }
+
+  void _setCurrentDateTime() {
+    final now = DateTime.now();
+    final timeOfDay = TimeOfDay.fromDateTime(now);
+
+    // Format time manually to avoid context dependency in initState
+    final hour = timeOfDay.hourOfPeriod;
+    final minute = timeOfDay.minute.toString().padLeft(2, '0');
+    final period = timeOfDay.period == DayPeriod.am ? 'ص' : 'م';
+
+    widget.dateTimeController.text =
+        '${now.day}/${now.month}/${now.year} - $hour:$minute $period';
+
+    // Set the current time in the cubit as well
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ReportFormCubit>().setDateTime(now);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +75,83 @@ class LocationDateTimeSection extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
 
+        // Display location details if available
+        if (_locationDetails.isNotEmpty)
+          Container(
+            margin: EdgeInsets.only(bottom: 10.h),
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.blue[200]!, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: Colors.blue[600],
+                      size: 16.sp,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'تفاصيل الموقع:',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                    const Spacer(),
+                    if (_currentLatitude != null && _currentLongitude != null)
+                      InkWell(
+                        onTap: () => _openLocationInMaps(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[600],
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.map, color: Colors.white, size: 12.sp),
+                              SizedBox(width: 4.w),
+                              Text(
+                                'عرض في الخريطة',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  _locationDetails,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: Colors.grey[700],
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         // DateTime Field
         CustomTextField(
-          controller: dateTimeController,
+          controller: widget.dateTimeController,
           label: 'التاريخ والوقت',
           hintText: 'اختر التاريخ والوقت',
           validator: ValidationHelper.validateDateTime,
@@ -55,6 +166,19 @@ class LocationDateTimeSection extends StatelessWidget {
     );
   }
 
+  // دوال مساعدة للوصول إلى الإحداثيات المحفوظة
+  double? get currentLatitude => _currentLatitude;
+  double? get currentLongitude => _currentLongitude;
+  String get locationDetails => _locationDetails;
+
+  // دالة للحصول على الإحداثيات كـ Map
+  Map<String, double>? get coordinates {
+    if (_currentLatitude != null && _currentLongitude != null) {
+      return {'latitude': _currentLatitude!, 'longitude': _currentLongitude!};
+    }
+    return null;
+  }
+
   Widget _buildLocationField(BuildContext context, ReportFormState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +189,7 @@ class LocationDateTimeSection extends StatelessWidget {
             // Text Field
             Expanded(
               child: TextFormField(
-                controller: locationController,
+                controller: widget.locationController,
                 validator: ValidationHelper.validateLocation,
                 textAlign: TextAlign.right,
                 readOnly: true,
@@ -185,7 +309,7 @@ class LocationDateTimeSection extends StatelessWidget {
         ),
 
         // Location status
-        if (locationController.text.isNotEmpty)
+        if (widget.locationController.text.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Row(
@@ -228,9 +352,65 @@ class LocationDateTimeSection extends StatelessWidget {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      locationController.text =
-          '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
-      cubit.setLocation(position.latitude, position.longitude);
+      // حفظ الإحداثيات في المتغيرات
+      _currentLatitude = position.latitude;
+      _currentLongitude = position.longitude;
+
+      // Get location details using the location service
+      final locationService = LocationService();
+      final locationResult = await locationService.getLocationByCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String locationName =
+          'الموقع: ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
+
+      locationResult.fold(
+        (failure) {
+          // Fallback to coordinates if service fails
+          widget.locationController.text = locationName;
+          _locationDetails = ''; // إخفاء التفاصيل إذا فشل الحصول عليها
+        },
+        (locationDetails) {
+          // عرض معلومات العنوان المفصلة
+          widget.locationController.text = locationDetails.displayName;
+
+          // بناء سلسلة نصية تحتوي على تفاصيل العنوان
+          String details = '';
+          if (locationDetails.street != null &&
+              locationDetails.street!.isNotEmpty) {
+            details += 'الشارع: ${locationDetails.street}\n';
+          }
+          if (locationDetails.city != null &&
+              locationDetails.city!.isNotEmpty) {
+            details += 'المدينة: ${locationDetails.city}\n';
+          }
+          if (locationDetails.state != null &&
+              locationDetails.state!.isNotEmpty) {
+            details += 'المحافظة: ${locationDetails.state}\n';
+          }
+          if (locationDetails.country != null &&
+              locationDetails.country!.isNotEmpty) {
+            details += 'الدولة: ${locationDetails.country}\n';
+          }
+
+          // إضافة الإحداثيات في النهاية
+          details +=
+              'الإحداثيات: ${_currentLatitude!.toStringAsFixed(6)}, ${_currentLongitude!.toStringAsFixed(6)}';
+
+          setState(() {
+            _locationDetails = details;
+          });
+        },
+      );
+
+      // إرسال البيانات إلى الـ cubit مع العنوان الكامل
+      cubit.setLocation(
+        position.latitude,
+        position.longitude,
+        widget.locationController.text,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -293,10 +473,38 @@ class LocationDateTimeSection extends StatelessWidget {
           time.minute,
         );
 
-        dateTimeController.text =
+        widget.dateTimeController.text =
             '${date.day}/${date.month}/${date.year} - ${time.format(context)}';
         context.read<ReportFormCubit>().setDateTime(dateTime);
       }
+    }
+  }
+
+  // دالة لفتح الموقع في تطبيق الخرائط
+  void _openLocationInMaps() {
+    if (_currentLatitude != null && _currentLongitude != null) {
+      // عرض معلومات الموقع مع إمكانية النسخ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('إحداثيات الموقع:'),
+              Text('العرض: $_currentLatitude'),
+              Text('الطول: $_currentLongitude'),
+            ],
+          ),
+          action: SnackBarAction(
+            label: 'نسخ الإحداثيات',
+            onPressed: () {
+              // يمكنك إضافة نسخ النص إلى الحافظة هنا
+              // Clipboard.setData(ClipboardData(text: '$_currentLatitude, $_currentLongitude'));
+            },
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
     }
   }
 }

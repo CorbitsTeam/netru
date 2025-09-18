@@ -152,6 +152,12 @@ class UserDataHelper {
     return user?.nationalId;
   }
 
+  /// Get user's ID
+  String? getUserId() {
+    final user = getCurrentUser();
+    return user?.id;
+  }
+
   /// Get user's verification status
   VerificationStatus? getUserVerificationStatus() {
     final user = getCurrentUser();
