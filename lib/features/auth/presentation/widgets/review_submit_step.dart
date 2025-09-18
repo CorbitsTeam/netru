@@ -1,6 +1,7 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:animate_do/animate_do.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/user_entity.dart';
 
