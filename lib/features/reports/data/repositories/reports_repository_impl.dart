@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dartz/dartz.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/reports_entity.dart';
@@ -38,6 +39,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
     required String nationalId,
     required String phone,
     required String reportType,
+    int? reportTypeId,
     required String reportDetails,
     double? latitude,
     double? longitude,
@@ -55,6 +57,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
         nationalId: nationalId,
         phone: phone,
         reportType: reportType,
+        reportTypeId: reportTypeId,
         reportDetails: reportDetails,
         latitude: latitude,
         longitude: longitude,
@@ -70,60 +73,77 @@ class ReportsRepositoryImpl implements ReportsRepository {
 
       // Upload media if provided and attach to report
       if (mediaFile != null) {
-        final fileName =
-            'report_${createdReport.id}_${DateTime.now().millisecondsSinceEpoch}';
-        final mediaUrl = await remoteDataSource.uploadMedia(
-          mediaFile,
-          fileName,
-        );
+        try {
+          final fileName =
+              'report_${createdReport.id}_${DateTime.now().millisecondsSinceEpoch}';
+          final mediaUrl = await remoteDataSource.uploadMedia(
+            mediaFile,
+            fileName,
+          );
 
-        if (mediaUrl != null) {
-          // Determine media type
-          final extension = mediaFile.path.split('.').last.toLowerCase();
-          String mediaType;
-          if ([
-            'jpg',
-            'jpeg',
-            'png',
-            'gif',
-            'bmp',
-            'webp',
-          ].contains(extension)) {
-            mediaType = 'image';
-          } else if (['mp4', 'avi', 'mov', 'wmv', 'flv'].contains(extension)) {
-            mediaType = 'video';
-          } else {
-            mediaType = 'document';
+          if (mediaUrl != null) {
+            // Determine media type
+            final extension = mediaFile.path.split('.').last.toLowerCase();
+            String mediaType;
+            if ([
+              'jpg',
+              'jpeg',
+              'png',
+              'gif',
+              'bmp',
+              'webp',
+            ].contains(extension)) {
+              mediaType = 'image';
+            } else if ([
+              'mp4',
+              'avi',
+              'mov',
+              'wmv',
+              'flv',
+            ].contains(extension)) {
+              mediaType = 'video';
+            } else {
+              mediaType = 'document';
+            }
+
+            await remoteDataSource.attachMediaToReport(
+              createdReport.id,
+              mediaUrl,
+              mediaType,
+            );
+
+            // Return updated report with media info
+            return Right(
+              ReportModel(
+                id: createdReport.id,
+                firstName: createdReport.firstName,
+                lastName: createdReport.lastName,
+                nationalId: createdReport.nationalId,
+                phone: createdReport.phone,
+                reportType: createdReport.reportType,
+                reportTypeId: createdReport.reportTypeId,
+                reportDetails: createdReport.reportDetails,
+                latitude: createdReport.latitude,
+                longitude: createdReport.longitude,
+                locationName: createdReport.locationName,
+                reportDateTime: createdReport.reportDateTime,
+                mediaUrl: mediaUrl,
+                mediaType: mediaType,
+                status: createdReport.status,
+                submittedBy: createdReport.submittedBy,
+                createdAt: createdReport.createdAt,
+                updatedAt: createdReport.updatedAt,
+              ),
+            );
           }
-
-          await remoteDataSource.attachMediaToReport(
-            createdReport.id,
-            mediaUrl,
-            mediaType,
+        } catch (mediaError) {
+          // Log media upload error but don't fail the report creation
+          // Use debugPrint with wrapWidth to avoid extremely long single-line logs
+          debugPrint(
+            'Warning: Failed to upload media for report ${createdReport.id}: $mediaError',
+            wrapWidth: 1024,
           );
-
-          // Return updated report with media info
-          return Right(
-            ReportModel(
-              id: createdReport.id,
-              firstName: createdReport.firstName,
-              lastName: createdReport.lastName,
-              nationalId: createdReport.nationalId,
-              phone: createdReport.phone,
-              reportType: createdReport.reportType,
-              reportDetails: createdReport.reportDetails,
-              latitude: createdReport.latitude,
-              longitude: createdReport.longitude,
-              locationName: createdReport.locationName,
-              reportDateTime: createdReport.reportDateTime,
-              mediaUrl: mediaUrl,
-              mediaType: mediaType,
-              status: createdReport.status,
-              submittedBy: createdReport.submittedBy,
-              createdAt: createdReport.createdAt,
-              updatedAt: createdReport.updatedAt,
-            ),
-          );
+          // Continue with report creation without media
         }
       }
 

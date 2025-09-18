@@ -55,6 +55,7 @@ import '../../features/reports/presentation/cubit/report_form_cubit.dart';
 // Core Services
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
+import '../services/report_types_service.dart';
 
 final sl = GetIt.instance;
 
@@ -214,6 +215,12 @@ Future<void> _initReportsDependencies() async {
     () => ReportsRepositoryImpl(sl()),
   );
 
+  sl.registerLazySingleton<ReportTypesService>(() {
+    final service = ReportTypesService();
+    service.initialize();
+    return service;
+  });
+
   sl.registerLazySingleton(() => GetAllReportsUseCase(sl()));
   sl.registerLazySingleton(() => GetReportByIdUseCase(sl()));
   sl.registerLazySingleton(() => CreateReportUseCase(sl()));
@@ -229,7 +236,9 @@ Future<void> _initReportsDependencies() async {
     ),
   );
 
-  sl.registerFactory(() => ReportFormCubit(createReportUseCase: sl()));
+  sl.registerFactory(
+    () => ReportFormCubit(createReportUseCase: sl(), reportTypesService: sl()),
+  );
 
   sl.get<LoggerService>().logInfo('✅ Reports dependencies initialized');
 }

@@ -35,6 +35,7 @@ class CreateReportUseCase {
       nationalId: params.nationalId,
       phone: params.phone,
       reportType: params.reportType,
+      reportTypeId: params.reportTypeId,
       reportDetails: params.reportDetails,
       latitude: params.latitude,
       longitude: params.longitude,
@@ -75,6 +76,7 @@ class CreateReportParams {
   final String nationalId;
   final String phone;
   final String reportType;
+  final int? reportTypeId;
   final String reportDetails;
   final double? latitude;
   final double? longitude;
@@ -89,6 +91,7 @@ class CreateReportParams {
     required this.nationalId,
     required this.phone,
     required this.reportType,
+    this.reportTypeId,
     required this.reportDetails,
     this.latitude,
     this.longitude,

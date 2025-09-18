@@ -7,6 +7,7 @@ class ReportEntity extends Equatable {
   final String nationalId;
   final String phone;
   final String reportType;
+  final int? reportTypeId; // Added report type ID
   final String reportDetails;
   final double? latitude;
   final double? longitude;
@@ -26,6 +27,7 @@ class ReportEntity extends Equatable {
     required this.nationalId,
     required this.phone,
     required this.reportType,
+    this.reportTypeId,
     required this.reportDetails,
     this.latitude,
     this.longitude,
@@ -47,6 +49,7 @@ class ReportEntity extends Equatable {
     nationalId,
     phone,
     reportType,
+    reportTypeId,
     reportDetails,
     latitude,
     longitude,

@@ -1,14 +1,42 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
+import 'package:netru_app/core/services/report_types_service.dart';
 import 'report_form_state.dart';
 import '../../domain/usecases/reports_usecase.dart';
+import '../../data/models/report_type_model.dart';
 import 'dart:io';
 
 class ReportFormCubit extends Cubit<ReportFormState> {
   final CreateReportUseCase createReportUseCase;
+  final ReportTypesService reportTypesService;
 
-  ReportFormCubit({required this.createReportUseCase})
-    : super(const ReportFormState());
+  ReportFormCubit({
+    required this.createReportUseCase,
+    required this.reportTypesService,
+  }) : super(const ReportFormState()) {
+    loadReportTypes();
+  }
+
+  void loadReportTypes() async {
+    emit(state.copyWith(isLoadingReportTypes: true));
+    try {
+      final reportTypes = await reportTypesService.getAllReportTypes();
+      emit(
+        state.copyWith(reportTypes: reportTypes, isLoadingReportTypes: false),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isLoadingReportTypes: false,
+          errorMessage: 'فشل في تحميل أنواع البلاغات: $e',
+        ),
+      );
+    }
+  }
+
+  void setSelectedReportType(ReportTypeModel reportType) {
+    emit(state.copyWith(selectedReportType: reportType));
+  }
 
   void setGettingLocation(bool isGetting) {
     emit(state.copyWith(isGettingLocation: isGetting));
@@ -41,12 +69,22 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     required String lastName,
     required String nationalId,
     required String phone,
-    required String reportType,
     required String reportDetails,
   }) async {
     emit(state.copyWith(isLoading: true, errorMessage: ''));
 
     try {
+      // Validate that a report type is selected
+      if (state.selectedReportType == null) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: 'يرجى اختيار نوع البلاغ',
+          ),
+        );
+        return;
+      }
+
       // Get current user ID
       final userHelper = UserDataHelper();
       final userId = userHelper.getUserId();
@@ -56,7 +94,8 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         lastName: lastName,
         nationalId: nationalId,
         phone: phone,
-        reportType: reportType,
+        reportType: state.selectedReportType!.nameAr, // Use Arabic name
+        reportTypeId: state.selectedReportType!.id, // Store ID
         reportDetails: reportDetails,
         latitude: state.latitude,
         longitude: state.longitude,
@@ -70,11 +109,22 @@ class ReportFormCubit extends Cubit<ReportFormState> {
 
       result.fold(
         (error) {
+          String userFriendlyError;
+          if (error.contains('Failed to upload media')) {
+            userFriendlyError =
+                'تم إنشاء البلاغ بنجاح ولكن فشل في رفع الوسائط. يمكنك إرفاق الوسائط لاحقاً.';
+          } else if (error.contains('PathNotFoundException') ||
+              error.contains('File does not exist')) {
+            userFriendlyError =
+                'فشل في الوصول إلى الملف المحدد. يرجى اختيار ملف آخر.';
+          } else if (error.contains('file is empty')) {
+            userFriendlyError = 'الملف المحدد فارغ. يرجى اختيار ملف صالح.';
+          } else {
+            userFriendlyError = 'حدث خطأ أثناء إرسال البلاغ: $error';
+          }
+
           emit(
-            state.copyWith(
-              isLoading: false,
-              errorMessage: 'حدث خطأ أثناء إرسال البلاغ: $error',
-            ),
+            state.copyWith(isLoading: false, errorMessage: userFriendlyError),
           );
         },
         (report) {
@@ -99,5 +149,6 @@ class ReportFormCubit extends Cubit<ReportFormState> {
 
   void reset() {
     emit(const ReportFormState());
+    loadReportTypes(); // Reload report types after reset
   }
 }

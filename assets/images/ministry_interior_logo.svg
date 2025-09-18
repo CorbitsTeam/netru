@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Ministry of Interior Logo -->
+  <defs>
+    <radialGradient id="goldGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="blueGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#4169E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#191970;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Outer circle - gold -->
+  <circle cx="100" cy="100" r="95" fill="url(#goldGrad)" stroke="#8B4513" stroke-width="3"/>
+  
+  <!-- Inner circle - blue -->
+  <circle cx="100" cy="100" r="70" fill="url(#blueGrad)" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- Star -->
+  <polygon points="100,40 108,68 136,68 114,86 122,114 100,96 78,114 86,86 64,68 92,68" 
+           fill="#FFD700" stroke="#FFFFFF" stroke-width="1"/>
+  
+  <!-- Arabic text representation -->
+  <text x="100" y="130" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#FFD700">وزارة</text>
+  <text x="100" y="145" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#FFD700">الداخلية</text>
+  
+  <!-- Bottom decorative element -->
+  <ellipse cx="100" cy="165" rx="40" ry="8" fill="#FFD700" opacity="0.7"/>
+</svg>

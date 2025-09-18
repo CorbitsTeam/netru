@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:netru_app/core/utils/app_shared_preferences.dart';
 import 'package:netru_app/features/auth/data/models/login_user_model.dart';
 import 'package:netru_app/features/auth/domain/entities/login_user_entity.dart';
@@ -21,7 +22,7 @@ class UserDataHelper {
         (json) => LoginUserModel.fromJson(json),
       );
     } catch (e) {
-      print('Error getting current user: $e');
+      debugPrint('Error getting current user: $e', wrapWidth: 1024);
       return null;
     }
   }
@@ -35,7 +36,7 @@ class UserDataHelper {
         (user) => LoginUserModel.fromEntity(user).toJson(),
       );
     } catch (e) {
-      print('Error saving current user: $e');
+      debugPrint('Error saving current user: $e', wrapWidth: 1024);
     }
   }
 
@@ -44,7 +45,7 @@ class UserDataHelper {
     try {
       await AppPreferences().removeData('current_user');
     } catch (e) {
-      print('Error clearing current user: $e');
+      debugPrint('Error clearing current user: $e', wrapWidth: 1024);
     }
   }
 
@@ -53,7 +54,7 @@ class UserDataHelper {
     try {
       final currentUser = getCurrentUser();
       if (currentUser?.id == null) {
-        print('No current user ID found');
+        debugPrint('No current user ID found', wrapWidth: 1024);
         return false;
       }
 
@@ -65,18 +66,21 @@ class UserDataHelper {
 
       return result.fold(
         (failure) {
-          print('Failed to refresh user data: ${failure.message}');
+          debugPrint(
+            'Failed to refresh user data: ${failure.message}',
+            wrapWidth: 1024,
+          );
           return false;
         },
         (freshUser) async {
           // Update local storage with fresh data
           await saveCurrentUser(freshUser);
-          print('User data refreshed successfully');
+          debugPrint('User data refreshed successfully', wrapWidth: 1024);
           return true;
         },
       );
     } catch (e) {
-      print('Error refreshing user data: $e');
+      debugPrint('Error refreshing user data: $e', wrapWidth: 1024);
       return false;
     }
   }
@@ -85,14 +89,17 @@ class UserDataHelper {
   Future<bool> initializeUserData() async {
     try {
       if (isUserLoggedIn()) {
-        print('User is logged in, refreshing data from database...');
+        debugPrint(
+          'User is logged in, refreshing data from database...',
+          wrapWidth: 1024,
+        );
         return await refreshUserDataFromDatabase();
       } else {
-        print('No user logged in');
+        debugPrint('No user logged in', wrapWidth: 1024);
         return false;
       }
     } catch (e) {
-      print('Error initializing user data: $e');
+      debugPrint('Error initializing user data: $e', wrapWidth: 1024);
       return false;
     }
   }
@@ -148,7 +155,7 @@ class UserDataHelper {
   /// Get user's national ID (for citizens)
   String? getUserNationalId() {
     final user = getCurrentUser();
-    print("user : $user");
+    debugPrint("user : $user", wrapWidth: 1024);
     return user?.nationalId;
   }
 

@@ -11,6 +11,7 @@ abstract class ReportsRepository {
     required String nationalId,
     required String phone,
     required String reportType,
+    int? reportTypeId,
     required String reportDetails,
     double? latitude,
     double? longitude,

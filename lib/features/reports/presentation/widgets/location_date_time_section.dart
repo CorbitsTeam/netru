@@ -348,69 +348,76 @@ class _LocationDateTimeSectionState extends State<LocationDateTimeSection> {
         throw 'تم رفض إذن الموقع نهائياً. يرجى تفعيله من الإعدادات';
       }
 
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // حفظ الإحداثيات في المتغيرات
-      _currentLatitude = position.latitude;
-      _currentLongitude = position.longitude;
-
-      // Get location details using the location service
+      // استخدام LocationService المحدث
       final locationService = LocationService();
-      final locationResult = await locationService.getLocationByCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      final location = await locationService.getCurrentLocation();
 
-      String locationName =
-          'الموقع: ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
+      if (location != null) {
+        // حفظ الإحداثيات في المتغيرات
+        _currentLatitude = location.latitude;
+        _currentLongitude = location.longitude;
 
-      locationResult.fold(
-        (failure) {
-          // Fallback to coordinates if service fails
-          widget.locationController.text = locationName;
-          _locationDetails = ''; // إخفاء التفاصيل إذا فشل الحصول عليها
-        },
-        (locationDetails) {
-          // عرض معلومات العنوان المفصلة
-          widget.locationController.text = locationDetails.displayName;
+        // الحصول على تفاصيل العنوان باستخدام الخدمة المحسنة
+        final locationResult = await locationService.getLocationByCoordinates(
+          location.latitude,
+          location.longitude,
+        );
 
-          // بناء سلسلة نصية تحتوي على تفاصيل العنوان
-          String details = '';
-          if (locationDetails.street != null &&
-              locationDetails.street!.isNotEmpty) {
-            details += 'الشارع: ${locationDetails.street}\n';
-          }
-          if (locationDetails.city != null &&
-              locationDetails.city!.isNotEmpty) {
-            details += 'المدينة: ${locationDetails.city}\n';
-          }
-          if (locationDetails.state != null &&
-              locationDetails.state!.isNotEmpty) {
-            details += 'المحافظة: ${locationDetails.state}\n';
-          }
-          if (locationDetails.country != null &&
-              locationDetails.country!.isNotEmpty) {
-            details += 'الدولة: ${locationDetails.country}\n';
-          }
+        String locationName =
+            'الموقع: ${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}';
 
-          // إضافة الإحداثيات في النهاية
-          details +=
-              'الإحداثيات: ${_currentLatitude!.toStringAsFixed(6)}, ${_currentLongitude!.toStringAsFixed(6)}';
+        locationResult.fold(
+          (failure) {
+            // Fallback to coordinates if service fails
+            widget.locationController.text = locationName;
+            _locationDetails = ''; // إخفاء التفاصيل إذا فشل الحصول عليها
+          },
+          (locationDetails) {
+            // عرض معلومات العنوان المفصلة
+            widget.locationController.text = locationDetails.displayName;
 
-          setState(() {
-            _locationDetails = details;
-          });
-        },
-      );
+            // بناء سلسلة نصية تحتوي على تفاصيل العنوان
+            String details = '';
+            if (locationDetails.street != null &&
+                locationDetails.street!.isNotEmpty &&
+                locationDetails.street != 'غير محدد') {
+              details += 'الشارع: ${locationDetails.street}\n';
+            }
+            if (locationDetails.city != null &&
+                locationDetails.city!.isNotEmpty &&
+                locationDetails.city != 'غير محدد') {
+              details += 'المدينة: ${locationDetails.city}\n';
+            }
+            if (locationDetails.state != null &&
+                locationDetails.state!.isNotEmpty &&
+                locationDetails.state != 'غير محدد') {
+              details += 'المحافظة: ${locationDetails.state}\n';
+            }
+            if (locationDetails.country != null &&
+                locationDetails.country!.isNotEmpty &&
+                locationDetails.country != 'غير محدد') {
+              details += 'الدولة: ${locationDetails.country}\n';
+            }
 
-      // إرسال البيانات إلى الـ cubit مع العنوان الكامل
-      cubit.setLocation(
-        position.latitude,
-        position.longitude,
-        widget.locationController.text,
-      );
+            // إضافة الإحداثيات في النهاية
+            details +=
+                'الإحداثيات: ${_currentLatitude!.toStringAsFixed(6)}, ${_currentLongitude!.toStringAsFixed(6)}';
+
+            setState(() {
+              _locationDetails = details;
+            });
+          },
+        );
+
+        // إرسال البيانات إلى الـ cubit مع العنوان الكامل
+        cubit.setLocation(
+          location.latitude,
+          location.longitude,
+          widget.locationController.text,
+        );
+      } else {
+        throw 'فشل في الحصول على الموقع';
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -481,30 +488,25 @@ class _LocationDateTimeSectionState extends State<LocationDateTimeSection> {
   }
 
   // دالة لفتح الموقع في تطبيق الخرائط
-  void _openLocationInMaps() {
+  void _openLocationInMaps() async {
     if (_currentLatitude != null && _currentLongitude != null) {
-      // عرض معلومات الموقع مع إمكانية النسخ
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('إحداثيات الموقع:'),
-              Text('العرض: $_currentLatitude'),
-              Text('الطول: $_currentLongitude'),
-            ],
+      try {
+        await LocationService.openInGoogleMaps(
+          _currentLatitude!,
+          _currentLongitude!,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في فتح الخرائط: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          action: SnackBarAction(
-            label: 'نسخ الإحداثيات',
-            onPressed: () {
-              // يمكنك إضافة نسخ النص إلى الحافظة هنا
-              // Clipboard.setData(ClipboardData(text: '$_currentLatitude, $_currentLongitude'));
-            },
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+        );
+      }
     }
   }
 }

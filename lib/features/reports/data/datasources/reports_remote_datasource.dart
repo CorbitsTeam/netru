@@ -125,15 +125,35 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
   @override
   Future<String?> uploadMedia(File file, String fileName) async {
     try {
+      // Check if file exists before attempting to read
+      if (!await file.exists()) {
+        throw Exception('File does not exist at path: ${file.path}');
+      }
+
+      // Check if file is readable
+      try {
+        final fileStats = await file.stat();
+        if (fileStats.size == 0) {
+          throw Exception('File is empty: ${file.path}');
+        }
+      } catch (e) {
+        throw Exception('Cannot access file: ${file.path} - $e');
+      }
+
       final bytes = await file.readAsBytes();
+
+      // Add file extension to fileName if not present
+      final extension = file.path.split('.').last.toLowerCase();
+      final fullFileName =
+          fileName.contains('.') ? fileName : '$fileName.$extension';
 
       await supabaseClient.storage
           .from('reports-media')
-          .uploadBinary(fileName, bytes);
+          .uploadBinary(fullFileName, bytes);
 
       final url = supabaseClient.storage
           .from('reports-media')
-          .getPublicUrl(fileName);
+          .getPublicUrl(fullFileName);
 
       return url;
     } catch (e) {

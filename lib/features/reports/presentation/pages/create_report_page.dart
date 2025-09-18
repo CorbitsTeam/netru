@@ -16,7 +16,11 @@ class CreateReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => di.sl<ReportFormCubit>(),
+      create:
+          (context) => ReportFormCubit(
+            createReportUseCase: di.sl(),
+            reportTypesService: di.sl(),
+          ),
       child: const ReportFormView(),
     );
   }
@@ -35,45 +39,25 @@ class _ReportFormViewState extends State<ReportFormView> {
   final _lastNameController = TextEditingController();
   final _nationalIdController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _reportTypeController = TextEditingController();
   final _reportDetailsController = TextEditingController();
   final _locationController = TextEditingController();
   final _dateTimeController = TextEditingController();
-
-  final List<String> _reportTypes = [
-    'سرقة',
-    'عنف أسري',
-    'بلاغ مفقودات',
-    'أعمال شغب او تجمع غير قانوني',
-    'حادث مروري جسيم',
-    'حريق / محاولة تخريب',
-    'رشوة / فساد مالي',
-    'جريمة إلكترونية ( اختراق - نصب إلكتروني )',
-    'ابتزاز  / تهديد',
-    'خطف / إختفاء',
-    'أسلحة غير مرخصة',
-    'مخدرات ( تعاطي - اتجار - تصنيع )',
-    'اعتداء جسدي',
-    'إرهاب / نشاط مشبوه',
-    'قتل / محاولة قتل',
-    'سطو مسلح',
-    'بلاغ آخر',
-  ];
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    // Load report types when the page initializes
+    context.read<ReportFormCubit>().loadReportTypes();
   }
 
   void _loadUserData() {
+    // Pre-fill form with user data if available - using placeholder methods
+    // You can uncomment and modify these lines once the methods are implemented
     final userHelper = UserDataHelper();
-
-    // Pre-fill form with user data if available
     _firstNameController.text = userHelper.getUserFirstName();
     _lastNameController.text = userHelper.getUserLastName();
     _nationalIdController.text = userHelper.getUserNationalId() ?? '';
-    print("getUserNationalId : ${userHelper.getUserNationalId()}");
     _phoneController.text = userHelper.getUserPhone() ?? '';
   }
 
@@ -83,7 +67,6 @@ class _ReportFormViewState extends State<ReportFormView> {
     _lastNameController.dispose();
     _nationalIdController.dispose();
     _phoneController.dispose();
-    _reportTypeController.dispose();
     _reportDetailsController.dispose();
     _locationController.dispose();
     _dateTimeController.dispose();
@@ -93,154 +76,152 @@ class _ReportFormViewState extends State<ReportFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(context),
-      body: BlocConsumer<ReportFormCubit, ReportFormState>(
+      body: BlocListener<ReportFormCubit, ReportFormState>(
         listener: (context, state) {
-          if (state.isSubmitted) {
+          if (state.isSubmitted && !state.isLoading) {
+            // Clear UI fields and reset cubit state, then show success dialog
+            _resetForm();
             _showSuccessDialog(context);
-          }
-          if (state.errorMessage.isNotEmpty) {
+          } else if (state.errorMessage.isNotEmpty && !state.isLoading) {
             _showErrorSnackBar(context, state.errorMessage);
           }
         },
-        builder: (context, state) {
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Form(
-              key: _formKey,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                child: Column(
-                  children: [
-                    // Personal Information Section
-                    PersonalInfoSection(
-                      firstNameController: _firstNameController,
-                      lastNameController: _lastNameController,
-                      nationalIdController: _nationalIdController,
-                      phoneController: _phoneController,
-                    ),
-                    SizedBox(height: 10.h),
-
-                    // Report Information Section
-                    ReportInfoSection(
-                      reportTypeController: _reportTypeController,
-                      reportDetailsController: _reportDetailsController,
-                      reportTypes: _reportTypes,
-                    ),
-                    SizedBox(height: 10.h),
-
-                    // Location & DateTime Section
-                    LocationDateTimeSection(
-                      locationController: _locationController,
-                      dateTimeController: _dateTimeController,
-                    ),
-                    SizedBox(height: 10.h),
-
-                    // Media Section
-                    const MediaSection(),
-                    SizedBox(height: 20.h),
-
-                    // Submit Section
-                    _buildSubmitButton(),
-                    SizedBox(height: 18.h),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      // leading: IconButton(
-      //   icon: const Icon(
-      //     Icons.arrow_back_ios_new,
-      //     color: Colors.black87,
-      //     size: 20,
-      //   ),
-      //   onPressed: () => Navigator.pop(context),
-      // ),
-      title: Text(
-        'تقديم بلاغ',
-        style: TextStyle(
-          color: Colors.black87,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.help_outline,
-            color: Color(0xFF1E3A8A),
-            size: 20,
-          ),
-          onPressed: () => _showHelpDialog(context),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return BlocBuilder<ReportFormCubit, ReportFormState>(
-      builder: (context, state) {
-        return SizedBox(
-          width: double.infinity,
-          height: 50.h,
-          child: ElevatedButton(
-            onPressed: state.isLoading ? null : _submitForm,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1E3A8A),
-              foregroundColor: Colors.white,
+        child: CustomScrollView(
+          slivers: [
+            // App Bar
+            SliverAppBar(
+              expandedHeight: 60.h,
+              floating: false,
+              pinned: true,
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  'تقديم بلاغ',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                centerTitle: true,
               ),
-              disabledBackgroundColor: Colors.grey.withOpacity(0.3),
+              // leading: IconButton(
+              //   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+              //   onPressed: () => Navigator.of(context).pop(),
+              // ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.help_outline, color: Colors.black),
+                  onPressed: () => _showHelpDialog(context),
+                ),
+              ],
             ),
-            child:
-                state.isLoading
-                    ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+
+            // Form Content
+            SliverPadding(
+              padding: EdgeInsets.all(16.w),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(
-                          width: 20.w,
-                          height: 20.h,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
+                        // Personal Information Section
+                        PersonalInfoSection(
+                          firstNameController: _firstNameController,
+                          lastNameController: _lastNameController,
+                          nationalIdController: _nationalIdController,
+                          phoneController: _phoneController,
                         ),
-                        SizedBox(width: 12.w),
-                        const Text(
-                          'جاري الإرسال...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        SizedBox(height: 20.h),
+
+                        // Report Information Section
+                        ReportInfoSection(
+                          reportDetailsController: _reportDetailsController,
                         ),
+                        SizedBox(height: 20.h),
+
+                        // Location and Date/Time Section
+                        LocationDateTimeSection(
+                          locationController: _locationController,
+                          dateTimeController: _dateTimeController,
+                        ),
+                        SizedBox(height: 20.h),
+
+                        // Media Section
+                        const MediaSection(),
+                        SizedBox(height: 40.h),
+
+                        // Submit Button
+                        BlocBuilder<ReportFormCubit, ReportFormState>(
+                          builder: (context, state) {
+                            return ElevatedButton(
+                              onPressed: state.isLoading ? null : _submitForm,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue[800],
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                elevation: 3,
+                              ),
+                              child:
+                                  state.isLoading
+                                      ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 20.w,
+                                            height: 20.h,
+                                            child:
+                                                const CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Text(
+                                            'جاري الإرسال...',
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                      : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.send, size: 20.sp),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            'إرسال البلاغ',
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 20.h),
                       ],
-                    )
-                    : const Text(
-                      'إرسال البلاغ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
-          ),
-        );
-      },
+                  ),
+                ]),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -262,12 +243,33 @@ class _ReportFormViewState extends State<ReportFormView> {
         lastName: _lastNameController.text,
         nationalId: _nationalIdController.text,
         phone: _phoneController.text,
-        reportType: _reportTypeController.text,
         reportDetails: _reportDetailsController.text,
       );
     } else {
       _showErrorSnackBar(context, 'يرجى مراجعة البيانات المدخلة');
     }
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   void _showSuccessDialog(BuildContext context) {
@@ -318,36 +320,63 @@ class _ReportFormViewState extends State<ReportFormView> {
 
                   // Success Message
                   Text(
-                    'شكراً لك، سيتم مراجعة بلاغك والرد عليك في أقرب وقت',
+                    'شكراً لك على إرسال البلاغ. سيتم مراجعته من قبل فريقنا في أقرب وقت ممكن.',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
 
-                  // OK Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close dialog
-                        Navigator.of(context).pop(); // Go back to home
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1E3A8A),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                            _resetForm(); // Reset form for new report
+                          },
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            side: BorderSide(color: Colors.blue[800]!),
+                          ),
+                          child: Text(
+                            'بلاغ جديد',
+                            style: TextStyle(
+                              color: Colors.blue[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'العودة للرئيسية',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                            Navigator.of(
+                              context,
+                            ).pop(); // Go back to previous page
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[800],
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'العودة',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -356,28 +385,23 @@ class _ReportFormViewState extends State<ReportFormView> {
     );
   }
 
-  void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+  void _resetForm() {
+    // Clear form fields
+    _formKey.currentState?.reset();
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _nationalIdController.clear();
+    _phoneController.clear();
+    _reportDetailsController.clear();
+    _locationController.clear();
+    _dateTimeController.clear();
+
+    // Reset the cubit state so selected report type, media, coords, etc. are cleared
+    try {
+      context.read<ReportFormCubit>().reset();
+    } catch (_) {
+      // If cubit is not available, ignore
+    }
   }
 
   void _showHelpDialog(BuildContext context) {
@@ -386,77 +410,86 @@ class _ReportFormViewState extends State<ReportFormView> {
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-              ),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Help Title
-                  const Row(
+                  // Header
+                  Row(
                     children: [
                       Icon(
                         Icons.help_outline,
-                        color: Color(0xFF1E3A8A),
-                        size: 24,
+                        color: Colors.blue[800],
+                        size: 28,
                       ),
-                      SizedBox(width: 8),
-                      Text(
-                        'مساعدة',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'مساعدة إنشاء البلاغ',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 16),
 
                   // Help Content
-                  _buildHelpItem(
-                    '1. املأ جميع البيانات المطلوبة بدقة',
-                    Icons.edit_outlined,
-                  ),
-                  _buildHelpItem(
-                    '2. حدد موقعك الجغرافي بالضغط على زر الموقع',
-                    Icons.location_on_outlined,
-                  ),
-                  _buildHelpItem(
-                    '3. اختر التاريخ والوقت المناسب',
-                    Icons.access_time_outlined,
-                  ),
-                  _buildHelpItem(
-                    '4. يمكنك إضافة صور أو فيديوهات (اختياري)',
-                    Icons.photo_camera_outlined,
-                  ),
-                  _buildHelpItem(
-                    '5. تأكد من صحة البيانات ثم اضغط إرسال',
-                    Icons.send_outlined,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHelpItem(
+                        '📝 املأ جميع البيانات الشخصية المطلوبة',
+                        'تأكد من صحة الاسم الأول والأخير ورقم الهوية ورقم الهاتف',
+                      ),
+                      _buildHelpItem(
+                        '📍 حدد الموقع بدقة',
+                        'استخدم GPS أو أدخل العنوان يدوياً للحصول على أفضل خدمة',
+                      ),
+                      _buildHelpItem(
+                        '📅 اختر التاريخ والوقت الصحيح',
+                        'حدد متى وقع الحدث بالضبط لمساعدتنا في المتابعة',
+                      ),
+                      _buildHelpItem(
+                        '📸 أرفق صور أو مقاطع فيديو',
+                        'الأدلة البصرية تساعد في سرعة معالجة البلاغ',
+                      ),
+                      _buildHelpItem(
+                        '✅ راجع البيانات قبل الإرسال',
+                        'تأكد من جميع المعلومات قبل الضغط على "إرسال البلاغ"',
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // Close Button
                   SizedBox(
                     width: double.infinity,
-                    child: TextButton(
+                    child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[800],
                         padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       child: const Text(
                         'فهمت',
                         style: TextStyle(
-                          color: Color(0xFF1E3A8A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -468,29 +501,38 @@ class _ReportFormViewState extends State<ReportFormView> {
     );
   }
 
-  Widget _buildHelpItem(String text, IconData icon) {
+  Widget _buildHelpItem(String title, String description) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(top: 6, left: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E3A8A).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(6),
+              color: Colors.blue[800],
+              shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 16, color: const Color(0xFF1E3A8A)),
           ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-                height: 1.4,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+              ],
             ),
           ),
         ],

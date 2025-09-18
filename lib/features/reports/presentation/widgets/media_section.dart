@@ -357,6 +357,24 @@ class MediaSection extends StatelessWidget {
 
     if (result != null) {
       final file = File(result.path);
+
+      // Validate file exists and is accessible
+      if (!await file.exists()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'الملف المحدد غير موجود أو لا يمكن الوصول إليه',
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        return;
+      }
+
       final fileSize = await file.length();
 
       // Check file size (50MB = 52428800 bytes)
@@ -364,6 +382,21 @@ class MediaSection extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('حجم الملف كبير جداً. الحد الأقصى 50 ميجا'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Check if file is empty
+      if (fileSize == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('الملف المحدد فارغ. يرجى اختيار ملف صالح'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
