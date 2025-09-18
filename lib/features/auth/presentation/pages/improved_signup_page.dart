@@ -128,6 +128,34 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             setState(() {
               _isSubmitting = false;
             });
+          } else if (state is SignupEmailSent) {
+            // 🆕 Handle OTP sent state - transition to next step
+            setState(() {
+              _isSubmitting = false;
+            });
+
+            _startResendTimer();
+
+            showModernSnackBar(
+              context,
+              message:
+                  _isEmailMode
+                      ? 'تم إرسال رمز التحقق إلى ${state.email}'
+                      : 'تم إرسال رمز التحقق عبر SMS إلى ${state.email}',
+              type: SnackBarType.success,
+            );
+
+            // Transition to OTP verification step
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _proceedToNextStep();
+              }
+            });
+          } else if (state is SignupLoading) {
+            // Handle loading state
+            setState(() {
+              _isSubmitting = true;
+            });
           } else if (state is SignupCompleted || state is SignupSuccess) {
             showModernSnackBar(
               context,
@@ -421,8 +449,10 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   Widget _buildDataEntryStep() {
     // Ensure password is in userData if not already there
-    if (_userData['password']?.isEmpty ?? true) {
-      _userData['password'] = _passwordController.text.trim();
+    final currentPassword = _passwordController.text.trim();
+    if (currentPassword.isNotEmpty && (_userData['password']?.isEmpty ?? true)) {
+      _userData['password'] = currentPassword;
+      print('🔐 تم تعيين كلمة المرور من الـ controller: $currentPassword');
     }
 
     // Pre-fill email/phone based on registration method
@@ -432,6 +462,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     if (!_isEmailMode && (_userData['phone']?.isEmpty ?? true)) {
       _userData['phone'] = _usernameController.text.trim();
     }
+
+    print('🔍 Before DataEntryStep - _userData: $_userData');
 
     return SingleChildScrollView(
       child: DataEntryStep(
@@ -443,15 +475,42 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 .trim(), // Pass the username from first step
         isEmailMode:
             _isEmailMode, // Pass the mode to know if it's email or phone
-        initialPassword:
-            _passwordController.text.trim(), // Pass initial password
+        initialPassword: currentPassword, // Pass initial password
         onDataChanged: (data) {
           setState(() {
-            _userData = data;
-            // Always preserve password from initial step if not set in data entry
-            if (_userData['password']?.isEmpty ?? true) {
-              _userData['password'] = _passwordController.text.trim();
+            // Prefer the password from the original password controller (source of truth)
+            final currentPassword = _passwordController.text.trim();
+
+            // Merge incoming data with existing _userData but preserve the controller password
+            final merged = Map<String, String>.from(_userData);
+            // Add/overwrite with new fields from data
+            data.forEach((k, v) {
+              merged[k] = v.toString();
+            });
+
+            // Ensure password is the most complete candidate among controller, existing, and incoming
+            final incomingPassword = data['password']?.toString() ?? '';
+            final existingPassword = _userData['password'] ?? '';
+            final controllerPassword = currentPassword;
+
+            // Choose the non-empty password with the greatest length (best guess of completeness)
+            String bestPassword = '';
+            for (final p in [
+              controllerPassword,
+              existingPassword,
+              incomingPassword,
+            ]) {
+              if (p.isNotEmpty && p.length > bestPassword.length) {
+                bestPassword = p;
+              }
             }
+            if (bestPassword.isNotEmpty) merged['password'] = bestPassword;
+
+            _userData = merged;
+
+            print('🔐 Password preservation:');
+            print('  - controller: $currentPassword');
+            print('  - merged password: ${_userData['password']}');
           });
           // Debug print to check data validity
           print('🔍 البيانات المحدثة: $_userData');
@@ -609,8 +668,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       }
     }
 
-    // Check password length
-    final password = _userData['password'] ?? '';
+    // Check password length - with fallback to original password controller
+    final password = _passwordController.text.trim() ?? _passwordController.text.trim();
+    print('🔐 Password Debug in _isDataValid:');
+    print('  - _userData[password]: ${_userData['password']}');
+    print('  - _passwordController.text: ${_passwordController.text.trim()}');
+    print('  - Final password for validation: $password');
+    print('  - Password length: ${password.length}');
+
     if (password.length < 6) {
       print('❌ كلمة المرور قصيرة: ${password.length}');
       return false;
@@ -1176,6 +1241,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Send OTP to email or phone
   Future<void> _sendOTP() async {
+    // Prevent multiple requests if already processing
+    if (_isSubmitting) return;
+
     // Ensure keyboard is dismissed and focus is cleared
     FocusScope.of(context).unfocus();
 
@@ -1184,6 +1252,10 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       return;
     }
     _formKey.currentState!.save();
+
+    setState(() {
+      _isSubmitting = true;
+    });
 
     try {
       final username = _usernameController.text.trim();
@@ -1232,60 +1304,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         ),
       );
 
-      // Use the cubit to send OTP
+      // Use the cubit to send OTP - state transitions will be handled by BlocListener
       context.read<SignupCubit>().signUpWithUsernameAndPassword(
         username,
         password,
         _isEmailMode,
       );
-
-      // Wait a bit to let the cubit process the request
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Check if the state is failure and stop execution
-      final currentState = context.read<SignupCubit>().state;
-      if (currentState is SignupFailure) {
-        // Stop execution - error is already handled by BlocListener
-        return;
-      }
-
-      // Only proceed if we have a success state
-      if (currentState is SignupEmailSent) {
-        // Start countdown timer for resend
-        _startResendTimer();
-
-        // Show success message after a delay
-        await Future.delayed(const Duration(milliseconds: 1000));
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      _isEmailMode
-                          ? 'تم إرسال رمز التحقق إلى $username'
-                          : 'تم إرسال رمز التحقق عبر SMS إلى $username',
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: AppColors.success,
-              duration: const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.all(16.w),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          );
-        }
-
-        _proceedToNextStep();
-      }
     } catch (e) {
+      setState(() {
+        _isSubmitting = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
