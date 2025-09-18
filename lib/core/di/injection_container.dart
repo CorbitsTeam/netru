@@ -36,6 +36,13 @@ import '../../features/chatbot/domain/usecases/get_help_menu.dart';
 import '../../features/chatbot/domain/usecases/get_law_info.dart';
 import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 
+// News Feature
+import '../../features/newsdetails/data/datasources/news_local_datasource.dart';
+import '../../features/newsdetails/data/repositories/newsdetails_repository_impl.dart';
+import '../../features/newsdetails/domain/repositories/newsdetails_repository.dart';
+import '../../features/newsdetails/domain/usecases/newsdetails_usecase.dart';
+import '../../features/newsdetails/presentation/cubit/news_cubit.dart';
+
 final sl = GetIt.instance;
 
 /// Main dependency injection setup function
@@ -80,6 +87,12 @@ Future<void> initializeDependencies() async {
   // ===========================
 
   await _initChatbotDependencies();
+
+  // ===========================
+  // News Feature Dependencies
+  // ===========================
+
+  await _initNewsDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -178,6 +191,27 @@ Future<void> _initChatbotDependencies() async {
   );
 
   sl.get<LoggerService>().logInfo('✅ Chatbot dependencies initialized');
+}
+
+/// Initialize News feature dependencies
+Future<void> _initNewsDependencies() async {
+  // Data sources
+  sl.registerLazySingleton<NewsLocalDataSource>(
+    () => NewsLocalDataSourceImpl(),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<NewsdetailsRepository>(
+    () => NewsdetailsRepositoryImpl(sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => NewsdetailsUseCase(sl()));
+
+  // Cubits
+  sl.registerFactory(() => NewsCubit(sl()));
+
+  sl.get<LoggerService>().logInfo('✅ News dependencies initialized');
 }
 
 /// Helper method to reset all dependencies (useful for testing)

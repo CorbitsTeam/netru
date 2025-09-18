@@ -1,10 +1,28 @@
 import '../../domain/repositories/newsdetails_repository.dart';
-import '../datasources/newsdetails_remote_datasource.dart';
+import '../datasources/news_local_datasource.dart';
+import '../models/news_model.dart';
 
 class NewsdetailsRepositoryImpl implements NewsdetailsRepository {
-  final NewsdetailsRemoteDataSource remoteDataSource;
+  final NewsLocalDataSource localDataSource;
 
-  NewsdetailsRepositoryImpl(this.remoteDataSource);
+  NewsdetailsRepositoryImpl(this.localDataSource);
 
-  // TODO: Implement repository logic
+  @override
+  Future<List<NewsModel>> getNews() async {
+    try {
+      return await localDataSource.getNewsFromJson();
+    } catch (e) {
+      throw Exception('Failed to get news: $e');
+    }
+  }
+
+  @override
+  Future<NewsModel?> getNewsById(int id) async {
+    try {
+      final newsList = await localDataSource.getNewsFromJson();
+      return newsList.where((news) => news.id == id).firstOrNull;
+    } catch (e) {
+      throw Exception('Failed to get news by id: $e');
+    }
+  }
 }
