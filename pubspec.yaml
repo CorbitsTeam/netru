@@ -54,6 +54,8 @@ dependencies:
   flutter_local_notifications: ^19.1.0
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.5
+  url_launcher: ^6.3.0  # For opening URLs
+  share_plus: ^10.1.2  # For sharing content
 
 dev_dependencies:
   bloc_test: ^9.1.5
@@ -70,6 +72,8 @@ flutter:
     - assets/icons/
     - assets/lottie/
     - assets/translations/
+    - assets/news/
+
 
   fonts:
     - family: Almarai
