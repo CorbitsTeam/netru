@@ -70,7 +70,7 @@ class PersonalInfoSection extends StatelessWidget {
           validator: ValidationHelper.validateNationalId,
           keyboardType: TextInputType.number,
           maxLength: 14,
-          
+
           readOnly: true,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,

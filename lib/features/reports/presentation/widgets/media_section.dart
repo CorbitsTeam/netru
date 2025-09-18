@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:netru_app/core/theme/app_colors.dart' show AppColors;
 import 'dart:io';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_cubit.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_state.dart';
+import '../cubit/report_form_cubit.dart';
+import '../cubit/report_form_state.dart';
 
 class MediaSection extends StatelessWidget {
   const MediaSection({super.key});

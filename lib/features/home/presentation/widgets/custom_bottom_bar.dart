@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
+import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
@@ -21,7 +21,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const CrimeHeatMapPage(),
-    const SubmissionOfaReportPage(),
+    const CreateReportPage(),
     const ReportsPage(),
     const ProfilePage(),
   ];

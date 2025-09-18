@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/di/injection_container.dart' as di;
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_cubit.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_state.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/location_date_time_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/media_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/personal_info_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/report_info_section.dart';
+import '../cubit/report_form_cubit.dart';
+import '../cubit/report_form_state.dart';
+import '../widgets/location_date_time_section.dart';
+import '../widgets/media_section.dart';
+import '../widgets/personal_info_section.dart';
+import '../widgets/report_info_section.dart';
 
-class SubmissionOfaReportPage extends StatelessWidget {
-  const SubmissionOfaReportPage({super.key});
+class CreateReportPage extends StatelessWidget {
+  const CreateReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {

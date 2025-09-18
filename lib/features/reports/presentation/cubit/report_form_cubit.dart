@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/cubit/submission_report_state.dart';
-import 'package:netru_app/features/reports/domain/usecases/reports_usecase.dart';
+import 'report_form_state.dart';
+import '../../domain/usecases/reports_usecase.dart';
 import 'dart:io';
 
 class ReportFormCubit extends Cubit<ReportFormState> {

@@ -69,10 +69,7 @@ class CustomTextField extends StatelessWidget {
                 required isFocused,
                 maxLength,
               }) => null,
-      style: TextStyle(
-        fontSize: 14.sp,
-        color: AppColors.primaryColor,
-      ),
+      style: TextStyle(fontSize: 14.sp, color: AppColors.primaryColor),
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
@@ -85,13 +82,8 @@ class CustomTextField extends StatelessWidget {
           fontSize: 12.sp,
           fontWeight: FontWeight.w600,
         ),
-        hintText:
-            hintText ??
-            (readOnly ? 'اضغط للاختيار' : null),
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12.sp,
-        ),
+        hintText: hintText ?? (readOnly ? 'اضغط للاختيار' : null),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 12.sp),
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         filled: true,
@@ -99,52 +91,32 @@ class CustomTextField extends StatelessWidget {
 
         // Default border
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
 
         // Enabled border
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
 
         // Focused border
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Color(0xFF1E3A8A),
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Color(0xFF1E3A8A)),
         ),
 
         // Error border
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Colors.red,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Colors.red),
         ),
 
         // Focused error border
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Colors.red,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Colors.red),
         ),
 
         contentPadding: EdgeInsets.symmetric(
@@ -153,18 +125,14 @@ class CustomTextField extends StatelessWidget {
         ),
 
         // Error style
-        errorStyle: TextStyle(
-          color: Colors.red,
-          fontSize: 10.sp,
-        ),
+        errorStyle: TextStyle(color: Colors.red, fontSize: 10.sp),
       ),
     );
   }
 }
 
 // Custom Dropdown Field
-class CustomDropdownField
-    extends StatelessWidget {
+class CustomDropdownField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final List<String> items;
@@ -185,10 +153,7 @@ class CustomDropdownField
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value:
-          controller.text.isEmpty
-              ? null
-              : controller.text,
+      value: controller.text.isEmpty ? null : controller.text,
       onChanged: (value) {
         if (value != null) {
           controller.text = value;
@@ -197,72 +162,44 @@ class CustomDropdownField
       validator: isRequired ? validator : null,
       decoration: InputDecoration(
         hintText: hintText ?? 'اختر من القائمة',
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 10.sp,
-        ),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 10.sp),
         filled: true,
         fillColor: Colors.grey[100],
 
         // Default border
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
 
         // Enabled border
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
 
         // Focused border
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Color(0xFF1E3A8A),
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Color(0xFF1E3A8A)),
         ),
 
         // Error border
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Colors.red,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Colors.red),
         ),
 
         // Focused error border
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Colors.red,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: Colors.red),
         ),
 
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 12.w,
-        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12.w),
 
         // Error style
-        errorStyle: TextStyle(
-          color: Colors.red,
-          fontSize: 10.sp,
-        ),
+        errorStyle: TextStyle(color: Colors.red, fontSize: 10.sp),
       ),
 
       // Dropdown items
@@ -274,10 +211,7 @@ class CustomDropdownField
                 alignment: Alignment.centerRight,
                 child: Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
               ),
@@ -286,10 +220,7 @@ class CustomDropdownField
 
       isExpanded: true,
       menuMaxHeight: 300,
-      icon: const Icon(
-        Icons.keyboard_arrow_down,
-        color: Colors.grey,
-      ),
+      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
       dropdownColor: Colors.white,
       borderRadius: BorderRadius.circular(8.r),
     );

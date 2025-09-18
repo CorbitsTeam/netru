@@ -8,7 +8,7 @@ import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/page/submission_of_report_page.dart';
+import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
@@ -35,7 +35,7 @@ class AppRouter {
       case Routes.profileScreen:
         return _createRoute(const ProfilePage());
       case Routes.submissionOfaReportPage:
-        return _createRoute(const SubmissionOfaReportPage());
+        return _createRoute(const CreateReportPage());
       case Routes.loginScreen:
         return _createRoute(
           BlocProvider<LoginCubit>(

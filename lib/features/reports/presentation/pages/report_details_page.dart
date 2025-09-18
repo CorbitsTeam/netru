@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/media_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/personal_info_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/report_info_section.dart';
-import 'package:netru_app/features/SubmissionOfaReport/presentation/widgets/procedures_section.dart';
+import '../widgets/media_section.dart';
+import '../widgets/personal_info_section.dart';
+import '../widgets/report_info_section.dart';
+import '../widgets/procedures_section.dart';
 
 class ReportDetailsPage extends StatelessWidget {
   const ReportDetailsPage({super.key});
