@@ -1,44 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/routing/routes.dart';
-
+import 'package:intl/intl.dart';
+import '../../domain/entities/reports_entity.dart';
 import '../../../../core/theme/app_colors.dart';
 
-// Model للبيانات
-class ReportData {
-  final String reportNumber;
-  final String reportType;
-  final String date;
-  final String location;
-  final String status;
-  final Color statusColor;
-
-  ReportData({
-    required this.reportNumber,
-    required this.reportType,
-    required this.date,
-    required this.location,
-    required this.status,
-    required this.statusColor,
-  });
-}
-
 class ReportCard extends StatelessWidget {
-  final ReportData reportData;
+  final ReportEntity report;
   final VoidCallback? onDetailsPressed;
 
-  const ReportCard({
-    super.key,
-    required this.reportData,
-    this.onDetailsPressed,
-  });
+  const ReportCard({super.key, required this.report, this.onDetailsPressed});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: 115.h,
-      margin: EdgeInsets.only(bottom: 12.h), // مسافة بين الكروت
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xffCBCBCB), width: 0.8),
         borderRadius: BorderRadius.circular(8.r),
@@ -51,29 +29,34 @@ class ReportCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'بلاغ رقم #${reportData.reportNumber}',
-                      style: TextStyle(fontSize: 14.sp),
-                    ),
-                    SizedBox(width: 3.w),
-                    Text(
-                      '| ${reportData.reportType}',
-                      style: TextStyle(fontSize: 14.sp),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text(
+                        'بلاغ رقم #${report.id.substring(0, 8)}',
+                        style: TextStyle(fontSize: 14.sp),
+                      ),
+                      SizedBox(width: 3.w),
+                      Expanded(
+                        child: Text(
+                          '| ${report.reportType}',
+                          style: TextStyle(fontSize: 14.sp),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   height: 25.h,
                   width: 135.w,
                   decoration: BoxDecoration(
-                    color: reportData.statusColor,
+                    color: _getStatusColor(report.status),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Center(
                     child: Text(
-                      reportData.status,
+                      report.status.arabicName,
                       style: TextStyle(color: Colors.white, fontSize: 10.sp),
                     ),
                   ),
@@ -84,7 +67,10 @@ class ReportCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  reportData.date,
+                  DateFormat(
+                    'dd MMMM yyyy - HH:mm',
+                    'ar',
+                  ).format(report.reportDateTime),
                   style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
                 ),
               ],
@@ -93,20 +79,17 @@ class ReportCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      reportData.location,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: Text(
+                    _getLocationText(),
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 GestureDetector(
-                  onTap: onDetailsPressed ?? () {},
+                  onTap: onDetailsPressed ?? () => _navigateToDetails(context),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('تفاصيل البلاغ', style: TextStyle(fontSize: 12.sp)),
                       Icon(Icons.arrow_forward_ios, size: 14.sp),
@@ -120,126 +103,28 @@ class ReportCard extends StatelessWidget {
       ),
     );
   }
-}
 
-// الصفحة الي هتعرض الـ ListView
-class ReportsListPage extends StatelessWidget {
-  const ReportsListPage({super.key});
-
-  // دالة منفصلة لكل بلاغ حسب الرقم
-  void _handleReportDetails(BuildContext context, String reportNumber) {
-    switch (reportNumber) {
-      case '21348':
-        Navigator.pushNamed(context, Routes.reportDetailsPage);
-        break;
-      case '21349':
-        print('عرض تفاصيل بلاغ الاحتيال #21349');
-        break;
-      case '21350':
-        print('عرض تفاصيل بلاغ العنف #21350');
-        break;
-      case '21351':
-        print('عرض تفاصيل بلاغ التحرش #21351');
-        break;
-      case '21352':
-        print('عرض تفاصيل بلاغ السرقة الثاني #21352');
-        break;
-      case '21353':
-        print('عرض تفاصيل بلاغ النصب #21353');
-        break;
-      case '21354':
-        print('عرض تفاصيل بلاغ الاعتداء #21354');
-        break;
-      case '21355':
-        print('عرض تفاصيل بلاغ السب والقذف #21355');
-        break;
-      default:
-        print('بلاغ غير معروف: $reportNumber');
+  Color _getStatusColor(ReportStatus status) {
+    switch (status) {
+      case ReportStatus.pending:
+        return AppColors.grey;
+      case ReportStatus.inProgress:
+        return AppColors.orange;
+      case ReportStatus.completed:
+        return AppColors.green;
+      case ReportStatus.rejected:
+        return AppColors.red;
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // البيانات التجريبية - تقدر تغيرها زي ما تحب
-    final List<ReportData> reports = [
-      ReportData(
-        reportNumber: '21348',
-        reportType: 'سرقة',
-        date: '16 أغسطس 2026 - 6:45 م',
-        location: 'القاهرة - مصر الجديدة',
-        status: 'تحت المراجعة',
-        statusColor: AppColors.grey,
-      ),
-      ReportData(
-        reportNumber: '21349',
-        reportType: 'احتيال',
-        date: '17 أغسطس 2026 - 2:30 م',
-        location: 'الجيزة - المهندسين',
-        status: 'تم التحويل للجهات المعنية',
-        statusColor: AppColors.orange,
-      ),
-      ReportData(
-        reportNumber: '21350',
-        reportType: 'عنف',
-        date: '18 أغسطس 2026 - 10:15 ص',
-        location: 'الإسكندرية - سموحة',
-        status: 'تم الحل',
-        statusColor: AppColors.green,
-      ),
-      ReportData(
-        reportNumber: '21351',
-        reportType: 'تحرش',
-        date: '19 أغسطس 2026 - 8:20 م',
-        location: 'القاهرة - وسط البلد',
-        status: 'بلاغ كاذب',
-        statusColor: AppColors.red,
-      ),
-      ReportData(
-        reportNumber: '21352',
-        reportType: 'سرقة',
-        date: '20 أغسطس 2026 - 4:45 م',
-        location: 'المنوفية - شبين الكوم',
-        status: 'تحت المراجعة',
-        statusColor: AppColors.grey,
-      ),
-      ReportData(
-        reportNumber: '21353',
-        reportType: 'نصب',
-        date: '21 أغسطس 2026 - 11:30 ص',
-        location: 'القليوبية - بنها',
-        status: 'تم الحل',
-        statusColor: AppColors.green,
-      ),
-      ReportData(
-        reportNumber: '21354',
-        reportType: 'اعتداء',
-        date: '22 أغسطس 2026 - 7:15 م',
-        location: 'البحيرة - دمنهور',
-        status: 'بلاغ كاذب',
-        statusColor: AppColors.red,
-      ),
-      ReportData(
-        reportNumber: '21355',
-        reportType: 'سب وقذف',
-        date: '23 أغسطس 2026 - 1:00 م',
-        location: 'المنيا - ملوي',
-        status: 'تم الحل',
-        statusColor: AppColors.green,
-      ),
-    ];
+  String _getLocationText() {
+    if (report.latitude != null && report.longitude != null) {
+      return '${report.latitude!.toStringAsFixed(6)}, ${report.longitude!.toStringAsFixed(6)}';
+    }
+    return 'الموقع غير محدد';
+  }
 
-    return Scaffold(
-      body: ListView.builder(
-        itemCount: reports.length,
-        itemBuilder: (context, index) {
-          return ReportCard(
-            reportData: reports[index],
-            onDetailsPressed: () {
-              _handleReportDetails(context, reports[index].reportNumber);
-            },
-          );
-        },
-      ),
-    );
+  void _navigateToDetails(BuildContext context) {
+    Navigator.pushNamed(context, Routes.reportDetailsPage, arguments: report);
   }
 }

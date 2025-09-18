@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/constants/app_assets.dart';
+import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'package:netru_app/features/profile/presentation/widgets/account_info.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -8,6 +9,10 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userHelper = UserDataHelper();
+    final userName = userHelper.getUserFullName();
+    final userLocation = userHelper.getCurrentUser()?.location ?? 'غير محدد';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -23,39 +28,31 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 12.w,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 12.w),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
                       radius: 30.r,
                       backgroundImage:
-                          const AssetImage(
-                            AppAssets
-                                .imageProfile,
-                          ),
+                          userHelper.getUserProfileImage() != null
+                              ? NetworkImage(userHelper.getUserProfileImage()!)
+                              : const AssetImage(AppAssets.imageProfile)
+                                  as ImageProvider,
                     ),
                     SizedBox(height: 5.h),
                     Text(
-                      'عبدالرحمن سمكه',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.black87,
-                      ),
+                      userName,
+                      style: TextStyle(fontSize: 12.sp, color: Colors.black87),
                     ),
                     Text(
-                      'القاهره',
+                      userLocation,
                       style: TextStyle(
                         fontSize: 10.sp,
                         color: Colors.grey[600],

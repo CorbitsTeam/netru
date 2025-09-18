@@ -12,6 +12,7 @@ class ReportFormState extends Equatable {
     this.selectedDateTime,
     this.selectedMedia,
     this.errorMessage = '',
+    this.submittedReportId,
   });
 
   final bool isLoading;
@@ -22,6 +23,7 @@ class ReportFormState extends Equatable {
   final DateTime? selectedDateTime;
   final File? selectedMedia;
   final String errorMessage;
+  final String? submittedReportId;
 
   @override
   List<Object?> get props => [
@@ -33,6 +35,7 @@ class ReportFormState extends Equatable {
     selectedDateTime,
     selectedMedia,
     errorMessage,
+    submittedReportId,
   ];
 
   ReportFormState copyWith({
@@ -45,26 +48,19 @@ class ReportFormState extends Equatable {
     File? selectedMedia,
     String? errorMessage,
     bool? removeMedia,
+    String? submittedReportId,
   }) {
     return ReportFormState(
       isLoading: isLoading ?? this.isLoading,
-      isSubmitted:
-          isSubmitted ?? this.isSubmitted,
-      isGettingLocation:
-          isGettingLocation ??
-          this.isGettingLocation,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
+      isGettingLocation: isGettingLocation ?? this.isGettingLocation,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      selectedDateTime:
-          selectedDateTime ??
-          this.selectedDateTime,
+      selectedDateTime: selectedDateTime ?? this.selectedDateTime,
       selectedMedia:
-          removeMedia == true
-              ? null
-              : (selectedMedia ??
-                  this.selectedMedia),
-      errorMessage:
-          errorMessage ?? this.errorMessage,
+          removeMedia == true ? null : (selectedMedia ?? this.selectedMedia),
+      errorMessage: errorMessage ?? this.errorMessage,
+      submittedReportId: submittedReportId ?? this.submittedReportId,
     );
   }
 }

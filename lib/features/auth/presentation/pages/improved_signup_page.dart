@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/widgets/custom_snack_bar.dart';
@@ -37,6 +38,11 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _passwordObscured = true;
+  bool _confirmPasswordObscured = true;
+  late final VoidCallback _usernameListener;
+  late final VoidCallback _passwordListener;
+  late final VoidCallback _confirmPasswordListener;
   final _formKey = GlobalKey<FormState>();
   bool _isEmailMode = true; // true for email, false for phone
 
@@ -44,14 +50,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   bool _isVerified = false;
   bool _isCheckingVerification = false;
   String _otpCode = '';
-  final List<TextEditingController> _otpControllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-  final List<FocusNode> _otpFocusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
+  final TextEditingController _otpController = TextEditingController();
+  StreamController<ErrorAnimationType>? _otpErrorController;
   Timer? _resendTimer;
   int _resendCountdown = 0;
 
@@ -83,24 +83,45 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   void initState() {
     super.initState();
 
+    // Initialize OTP error controller
+    _otpErrorController = StreamController<ErrorAnimationType>();
+
     // Add listeners to text controllers to update UI when typing
-    _usernameController.addListener(() => setState(() {}));
-    _passwordController.addListener(() => setState(() {}));
-    _confirmPasswordController.addListener(() => setState(() {}));
+    _usernameListener = () {
+      if (!mounted) return;
+      setState(() {});
+    };
+    _passwordListener = () {
+      if (!mounted) return;
+      setState(() {});
+    };
+    _confirmPasswordListener = () {
+      if (!mounted) return;
+      setState(() {});
+    };
+
+    _usernameController.addListener(_usernameListener);
+    _passwordController.addListener(_passwordListener);
+    _confirmPasswordController.addListener(_confirmPasswordListener);
   }
 
   @override
   void dispose() {
+    // Remove listeners first to avoid them firing after controllers are disposed
+    try {
+      _usernameController.removeListener(_usernameListener);
+      _passwordController.removeListener(_passwordListener);
+      _confirmPasswordController.removeListener(_confirmPasswordListener);
+    } catch (_) {
+      // ignore: no-empty-block
+    }
+
     _pageController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    for (final controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (final node in _otpFocusNodes) {
-      node.dispose();
-    }
+    _otpController.dispose();
+    _otpErrorController?.close();
     _resendTimer?.cancel();
 
     super.dispose();
@@ -450,7 +471,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget _buildDataEntryStep() {
     // Ensure password is in userData if not already there
     final currentPassword = _passwordController.text.trim();
-    if (currentPassword.isNotEmpty && (_userData['password']?.isEmpty ?? true)) {
+    if (currentPassword.isNotEmpty &&
+        (_userData['password']?.isEmpty ?? true)) {
       _userData['password'] = currentPassword;
       print('🔐 تم تعيين كلمة المرور من الـ controller: $currentPassword');
     }
@@ -669,7 +691,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     }
 
     // Check password length - with fallback to original password controller
-    final password = _passwordController.text.trim() ?? _passwordController.text.trim();
+    final password = _userData['password'] ?? _passwordController.text.trim();
     print('🔐 Password Debug in _isDataValid:');
     print('  - _userData[password]: ${_userData['password']}');
     print('  - _passwordController.text: ${_passwordController.text.trim()}');
@@ -1018,7 +1040,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 label: 'كلمة المرور',
                 hint: 'أدخل كلمة مرور قوية',
                 prefixIcon: const Icon(Icons.lock_outline),
-                obscureText: true,
+                obscureText: _passwordObscured,
+                suffixIcon: IconButton(
+                  onPressed:
+                      () => setState(() {
+                        _passwordObscured = !_passwordObscured;
+                      }),
+                  icon: Icon(
+                    _passwordObscured ? Icons.visibility_off : Icons.visibility,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'كلمة المرور مطلوبة';
@@ -1041,7 +1073,19 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 label: 'تأكيد كلمة المرور',
                 hint: 'أعد كتابة كلمة المرور',
                 prefixIcon: const Icon(Icons.lock_outline),
-                obscureText: true,
+                obscureText: _confirmPasswordObscured,
+                suffixIcon: IconButton(
+                  onPressed:
+                      () => setState(() {
+                        _confirmPasswordObscured = !_confirmPasswordObscured;
+                      }),
+                  icon: Icon(
+                    _confirmPasswordObscured
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'تأكيد كلمة المرور مطلوب';
@@ -1154,7 +1198,7 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           SizedBox(height: 40.h),
 
           if (!_isVerified) ...[
-            // OTP Input Fields (6 separate boxes)
+            // OTP Input Fields using pin_code_fields
             FadeInUp(
               duration: const Duration(milliseconds: 600),
               child: Column(
@@ -1168,7 +1212,69 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  _buildOTPInputBoxes(),
+                  Directionality(
+                    textDirection: TextDirection.ltr, // Force LTR for OTP
+                    child: PinCodeTextField(
+                      appContext: context,
+                      pastedTextStyle: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      length: 6,
+                      obscureText: false,
+                      obscuringCharacter: '*',
+                      blinkWhenObscuring: true,
+                      animationType: AnimationType.fade,
+                      validator: (v) {
+                        if (v!.length < 6) {
+                          return "يجب إدخال الرمز كاملاً";
+                        } else {
+                          return null;
+                        }
+                      },
+                      pinTheme: PinTheme(
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(12.r),
+                        fieldHeight: 60.h,
+                        fieldWidth: 50.w,
+                        activeFillColor: Colors.white,
+                        inactiveFillColor: Colors.white,
+                        selectedFillColor: Colors.white,
+                        activeColor: AppColors.primary,
+                        inactiveColor: Colors.grey.shade300,
+                        selectedColor: AppColors.primary,
+                        borderWidth: 2,
+                        errorBorderColor: AppColors.error,
+                      ),
+                      cursorColor: AppColors.primary,
+                      animationDuration: const Duration(milliseconds: 300),
+                      enableActiveFill: true,
+                      errorAnimationController: _otpErrorController,
+                      controller: _otpController,
+                      keyboardType: TextInputType.number,
+                      boxShadows: const [
+                        BoxShadow(
+                          offset: Offset(0, 1),
+                          color: Colors.black12,
+                          blurRadius: 10,
+                        ),
+                      ],
+                      onCompleted: (v) {
+                        print("OTP Completed: $v");
+                        _verifyOTP();
+                      },
+                      onChanged: (value) {
+                        print("OTP Changed: $value");
+                        setState(() {
+                          _otpCode = value;
+                        });
+                      },
+                      beforeTextPaste: (text) {
+                        print("Allowing to paste $text");
+                        return true;
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1443,14 +1549,12 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   // Clear OTP input fields
   void _clearOTPFields() {
-    for (int i = 0; i < _otpControllers.length; i++) {
-      _otpControllers[i].clear();
-    }
+    _otpController.clear();
     setState(() {
       _otpCode = '';
     });
-    // Focus on first field
-    _otpFocusNodes[0].requestFocus();
+    // Trigger error animation
+    _otpErrorController?.add(ErrorAnimationType.shake);
   }
 
   // Resend OTP
@@ -1504,97 +1608,5 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         }
       });
     });
-  }
-
-  // Build OTP input boxes (6 separate boxes)
-  Widget _buildOTPInputBoxes() {
-    return Directionality(
-      textDirection: TextDirection.rtl, // <- هنا مهم
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(6, (index) {
-          return Container(
-            width: 50.w,
-            height: 60.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                color:
-                    _otpControllers[index].text.isNotEmpty
-                        ? AppColors.primary
-                        : Colors.grey.shade300,
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      _otpControllers[index].text.isNotEmpty
-                          ? AppColors.primary.withOpacity(0.1)
-                          : Colors.grey.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: _otpControllers[index],
-              focusNode: _otpFocusNodes[index],
-              textAlign: TextAlign.center,
-              keyboardType: TextInputType.number,
-              maxLength: 1,
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-              ),
-              onChanged: (value) {
-                if (value.isNotEmpty) {
-                  // Move to next field
-                  if (index < 5) {
-                    _otpFocusNodes[index + 1].requestFocus();
-                  } else {
-                    // Last field, hide keyboard and verify
-                    _otpFocusNodes[index].unfocus();
-                  }
-                } else {
-                  // Move to previous field
-                  if (index > 0) {
-                    _otpFocusNodes[index - 1].requestFocus();
-                  }
-                }
-
-                // Update OTP code
-                _updateOTPCode();
-              },
-              onSubmitted: (value) {
-                if (index == 5 && _otpCode.length == 6) {
-                  _verifyOTP();
-                }
-              },
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  // Update OTP code from individual controllers
-  void _updateOTPCode() {
-    final code = _otpControllers.map((controller) => controller.text).join();
-    setState(() {
-      _otpCode = code;
-    });
-
-    // Auto-verify when all 6 digits are entered
-    if (code.length == 6) {
-      _verifyOTP();
-    }
   }
 }
