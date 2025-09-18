@@ -1,9 +1,94 @@
+import 'dart:io';
+import 'package:dartz/dartz.dart';
+import '../entities/reports_entity.dart';
 import '../repositories/reports_repository.dart';
 
-class ReportsUseCase {
+class GetAllReportsUseCase {
   final ReportsRepository repository;
 
-  ReportsUseCase(this.repository);
+  GetAllReportsUseCase(this.repository);
 
-  // TODO: Implement call logic
+  Future<Either<String, List<ReportEntity>>> call() async {
+    return await repository.getAllReports();
+  }
+}
+
+class GetReportByIdUseCase {
+  final ReportsRepository repository;
+
+  GetReportByIdUseCase(this.repository);
+
+  Future<Either<String, ReportEntity>> call(String id) async {
+    return await repository.getReportById(id);
+  }
+}
+
+class CreateReportUseCase {
+  final ReportsRepository repository;
+
+  CreateReportUseCase(this.repository);
+
+  Future<Either<String, ReportEntity>> call(CreateReportParams params) async {
+    return await repository.createReport(
+      firstName: params.firstName,
+      lastName: params.lastName,
+      nationalId: params.nationalId,
+      phone: params.phone,
+      reportType: params.reportType,
+      reportDetails: params.reportDetails,
+      latitude: params.latitude,
+      longitude: params.longitude,
+      reportDateTime: params.reportDateTime,
+      mediaFile: params.mediaFile,
+    );
+  }
+}
+
+class UpdateReportStatusUseCase {
+  final ReportsRepository repository;
+
+  UpdateReportStatusUseCase(this.repository);
+
+  Future<Either<String, ReportEntity>> call(
+    String id,
+    ReportStatus status,
+  ) async {
+    return await repository.updateReportStatus(id, status);
+  }
+}
+
+class DeleteReportUseCase {
+  final ReportsRepository repository;
+
+  DeleteReportUseCase(this.repository);
+
+  Future<Either<String, void>> call(String id) async {
+    return await repository.deleteReport(id);
+  }
+}
+
+class CreateReportParams {
+  final String firstName;
+  final String lastName;
+  final String nationalId;
+  final String phone;
+  final String reportType;
+  final String reportDetails;
+  final double? latitude;
+  final double? longitude;
+  final DateTime reportDateTime;
+  final File? mediaFile;
+
+  CreateReportParams({
+    required this.firstName,
+    required this.lastName,
+    required this.nationalId,
+    required this.phone,
+    required this.reportType,
+    required this.reportDetails,
+    this.latitude,
+    this.longitude,
+    required this.reportDateTime,
+    this.mediaFile,
+  });
 }

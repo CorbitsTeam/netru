@@ -17,4 +17,20 @@ abstract class UserRepository {
   Future<Either<Failure, LoginUserEntity>> signUpUser(
     Map<String, dynamic> userData,
   );
+
+  /// Get user data by ID
+  Future<Either<Failure, LoginUserEntity>> getUserById(String userId);
+
+  /// Get user data by email
+  Future<Either<Failure, LoginUserEntity>> getUserByEmail(String email);
+
+  /// Get user data by national ID
+  Future<Either<Failure, LoginUserEntity>> getUserByNationalId(
+    String nationalId,
+  );
+
+  /// Get user data by passport number
+  Future<Either<Failure, LoginUserEntity>> getUserByPassport(
+    String passportNumber,
+  );
 }

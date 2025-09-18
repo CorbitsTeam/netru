@@ -8,6 +8,7 @@ import 'core/constants/app_constants.dart';
 import 'core/cubit/locale/locale_cubit.dart';
 import 'core/cubit/theme/theme_cubit.dart';
 import 'core/utils/app_shared_preferences.dart';
+import 'core/utils/user_data_helper.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/injection_container.dart';
 import 'app.dart';
@@ -47,6 +48,15 @@ void main() async {
   // Initialize SharedPreferences
   await AppPreferences().init();
   logger.logInfo('✅ SharedPreferences Initialized');
+
+  // Initialize user data (refresh from database if user is logged in)
+  try {
+    final userHelper = UserDataHelper();
+    await userHelper.initializeUserData();
+    logger.logInfo('✅ User Data Initialized');
+  } catch (e) {
+    logger.logError('⚠️ User Data Initialization Failed: $e');
+  }
 
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([

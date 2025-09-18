@@ -10,6 +10,10 @@ abstract class UserDataSource {
     UserType userType,
   );
   Future<LoginUserModel> signUpUser(Map<String, dynamic> userData);
+  Future<LoginUserModel> getUserById(String userId);
+  Future<LoginUserModel> getUserByEmail(String email);
+  Future<LoginUserModel> getUserByNationalId(String nationalId);
+  Future<LoginUserModel> getUserByPassport(String passportNumber);
 }
 
 class SupabaseUserDataSource implements UserDataSource {
@@ -224,6 +228,70 @@ class SupabaseUserDataSource implements UserDataSource {
       } else {
         throw Exception('فشل إنشاء الحساب: ${e.toString()}');
       }
+    }
+  }
+
+  @override
+  Future<LoginUserModel> getUserById(String userId) async {
+    try {
+      final response =
+          await _supabaseClient
+              .from('users')
+              .select('*')
+              .eq('id', userId)
+              .single();
+
+      return LoginUserModel.fromJson(response);
+    } catch (e) {
+      throw Exception('فشل في جلب بيانات المستخدم: $e');
+    }
+  }
+
+  @override
+  Future<LoginUserModel> getUserByEmail(String email) async {
+    try {
+      final response =
+          await _supabaseClient
+              .from('users')
+              .select('*')
+              .eq('email', email)
+              .single();
+
+      return LoginUserModel.fromJson(response);
+    } catch (e) {
+      throw Exception('فشل في جلب بيانات المستخدم بالبريد الإلكتروني: $e');
+    }
+  }
+
+  @override
+  Future<LoginUserModel> getUserByNationalId(String nationalId) async {
+    try {
+      final response =
+          await _supabaseClient
+              .from('users')
+              .select('*')
+              .eq('national_id', nationalId)
+              .single();
+
+      return LoginUserModel.fromJson(response);
+    } catch (e) {
+      throw Exception('فشل في جلب بيانات المستخدم بالرقم القومي: $e');
+    }
+  }
+
+  @override
+  Future<LoginUserModel> getUserByPassport(String passportNumber) async {
+    try {
+      final response =
+          await _supabaseClient
+              .from('users')
+              .select('*')
+              .eq('passport_number', passportNumber)
+              .single();
+
+      return LoginUserModel.fromJson(response);
+    } catch (e) {
+      throw Exception('فشل في جلب بيانات المستخدم برقم جواز السفر: $e');
     }
   }
 }
