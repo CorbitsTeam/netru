@@ -1,3 +1,6 @@
+import '../../data/models/news_model.dart';
+
 abstract class NewsdetailsRepository {
-  // TODO: Define repository methods
+  Future<List<NewsModel>> getNews();
+  Future<NewsModel?> getNewsById(int id);
 }

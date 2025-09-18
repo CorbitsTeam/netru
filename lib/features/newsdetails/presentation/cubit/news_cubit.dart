@@ -1,86 +1,38 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:netru_app/core/constants/app_assets.dart';
+import 'package:netru_app/features/newsdetails/domain/usecases/newsdetails_usecase.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
-
 class NewsCubit extends Cubit<NewsState> {
-  NewsCubit() : super(NewsInitial());
+  final NewsdetailsUseCase newsUseCase;
 
-  final List<NewsModel> _mockNews = [
-    NewsModel(
-      id: '1',
-      title: 'القبض على عنصر إرهابي شديد الخطورة',
-      date: '15 يوليو 2024',
-      image: AppAssets.newsImages,
-      category: 'أمن',
-      content:
-          '''تمكنت وزارة الداخلية من إلقاء القبض على عنصر إرهابي شديد الخطورة مطلوب في عدة قضايا أمنية خطيرة. وقد تمت العملية بناءً على معلومات استخبارية دقيقة وبتنسيق مع الأجهزة الأمنية المختلفة.
-وأشارت المصادر الأمنية إلى أن المتهم كان يخطط لتنفيذ عمليات إرهابية تستهدف المنشآت الحيوية والمدنيين الآمنين. وقد تم ضبط كمية من المواد المتفجرة والأسلحة في حوزته.
-وأكدت الداخلية أن هذه العملية تأتي في إطار الجهود المستمرة لمكافحة الإرهاب والحفاظ على أمن الوطن والمواطنين، مؤكدة أن الأجهزة الأمنية ستواصل ملاحقة العناصر الإرهابية بكل حزم وقوة.
-كما تم التأكيد على أهمية تعاون المواطنين مع الأجهزة الأمنية في الإبلاغ عن أي أنشطة مشبوهة، مما يساهم في الحفاظ على الأمن والاستقرار في البلاد.''',
-    ),
-    NewsModel(
-      id: '2',
-      title: 'الإستجابة لحالات التسول في الاسواق',
-      date: '20 يوليو 2024',
-      image: AppAssets.newsImage2,
-      category: 'اجتماعي',
-      content:
-          '''قامت وزارة الداخلية بحملة مكثفة للاستجابة لحالات التسول في الأسواق والميادين العامة، وذلك في إطار الجهود الرامية لمكافحة هذه الظاهرة السلبية وحماية المجتمع.
-وقالت المصادر الأمنية أن الحملة شملت عدة محافظات وتمكنت من ضبط عدد كبير من المتسولين، خاصة في المناطق التجارية المزدحمة والأسواق الشعبية.
-وتم تحويل الحالات المضبوطة إلى الجهات المختصة لاتخاذ الإجراءات القانونية اللازمة، مع توفير الرعاية الاجتماعية للحالات التي تحتاج إلى مساعدة.
-وأكدت الوزارة أن هذه الحملات ستستمر بصفة دورية للحد من انتشار ظاهرة التسول، مع التركيز على الجانب الإنساني في التعامل مع الحالات المختلفة.
-كما دعت المواطنين إلى عدم التعامل مع المتسولين وإبلاغ الجهات المختصة عند مواجهة مثل هذه الحالات.''',
-    ),
-    NewsModel(
-      id: '3',
-      title: 'الداخلية تقبض على شبكة احتيال إلكتروني',
-      date: '10 يوليو 2024',
-      image: AppAssets.newsImage3,
-      category: 'جرائم إلكترونية',
-      content:
-          '''تمكنت الأجهزة الأمنية بوزارة الداخلية من كشف وضبط شبكة احتيال إلكتروني كبيرة كانت تستهدف المواطنين من خلال وسائل التواصل الاجتماعي والمواقع الإلكترونية المزيفة.
-وأوضحت التحقيقات أن الشبكة كانت تعمل على خداع الضحايا من خلال عروض وهمية للاستثمار والتجارة الإلكترونية، مما أدى إلى سقوط عشرات الضحايا وخسائر مالية كبيرة.
-وقد تم ضبط المتهمين الرئيسيين في الشبكة، بالإضافة إلى مصادرة الأجهزة والمعدات المستخدمة في العمليات الاحتيالية، وتجميد الحسابات البنكية المرتبطة بالنشاط الإجرامي.
-وحذرت وزارة الداخلية المواطنين من التعامل مع العروض المشبوهة عبر الإنترنت، ونصحت بضرورة التأكد من مصداقية المواقع والشركات قبل التعامل معها.
-كما أكدت الوزارة أن الأجهزة الأمنية تواصل جهودها لمكافحة الجرائم الإلكترونية بجميع أشكالها.''',
-    ),
-  ];
+  NewsCubit(this.newsUseCase) : super(NewsInitial());
 
-  void loadNews() {
+  Future<void> loadNews() async {
     emit(NewsLoading());
     try {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        emit(NewsLoaded(newsList: _mockNews));
-      });
+      final newsList = await newsUseCase.getNews();
+      emit(NewsLoaded(newsList: newsList));
     } catch (e) {
-      emit(const NewsError(message: 'حدث خطأ في تحميل الأخبار'));
-      Future.delayed(
-        const Duration(milliseconds: 500),
-        () {
-          emit(NewsLoaded(newsList: _mockNews));
-        },
-      );
+      emit(NewsError(message: 'حدث خطأ في تحميل الأخبار: ${e.toString()}'));
     }
   }
 
-  void selectNews(String newsId) {
+  Future<void> selectNews(int newsId) async {
     final currentState = state;
     if (currentState is NewsLoaded) {
-      final selectedNews = currentState.newsList.firstWhere(
-        (news) => news.id == newsId,
-        orElse: () => currentState.newsList.first,
-      );
-      emit(currentState.copyWith(selectedNews: selectedNews));
-
-    
-      emit(
-        currentState.copyWith(
-          selectedNews: selectedNews,
-        ),
-      );
+      try {
+        final selectedNews = await newsUseCase.getNewsById(newsId);
+        if (selectedNews != null) {
+          emit(currentState.copyWith(selectedNews: selectedNews));
+        } else {
+          emit(const NewsError(message: 'لم يتم العثور على الخبر المطلوب'));
+        }
+      } catch (e) {
+        emit(
+          NewsError(message: 'حدث خطأ في تحميل تفاصيل الخبر: ${e.toString()}'),
+        );
+      }
     }
   }
 
@@ -89,28 +41,22 @@ class NewsCubit extends Cubit<NewsState> {
     final currentState = state;
     if (currentState is NewsLoaded) {
       if (query.isEmpty) {
-        emit(
-          NewsLoaded(
-            newsList: _mockNews,
-            selectedNews: currentState.selectedNews,
-          ),
-        );
+        // إعادة تحميل جميع الأخبار
+        loadNews();
       } else {
         final filteredNews =
-            _mockNews
+            currentState.newsList
                 .where(
                   (news) =>
                       news.title.contains(query) ||
-                      news.content.contains(query),
-                
-                 
+                      news.content.contains(query) ||
+                      news.summary.contains(query),
                 )
                 .toList();
         emit(
           NewsLoaded(
             newsList: filteredNews,
             selectedNews: currentState.selectedNews,
-    
           ),
         );
       }
@@ -119,31 +65,34 @@ class NewsCubit extends Cubit<NewsState> {
 
   // تصفية الأخبار بالتصنيف
   void filterByCategory(String category) {
-    if (category.isEmpty) {
-      emit(NewsLoaded(newsList: _mockNews));
-    } else {
-      final filteredNews =
-          _mockNews.where((news) => news.category == category).toList();
-
-          _mockNews
-              .where(
-                (news) =>
-                    news.category == category,
-              )
-              .toList();
-      emit(NewsLoaded(newsList: filteredNews));
+    final currentState = state;
+    if (currentState is NewsLoaded) {
+      if (category.isEmpty) {
+        loadNews();
+      } else {
+        final filteredNews =
+            currentState.newsList
+                .where((news) => news.category == category)
+                .toList();
+        emit(
+          NewsLoaded(
+            newsList: filteredNews,
+            selectedNews: currentState.selectedNews,
+          ),
+        );
+      }
     }
   }
 
   // الحصول على الأخبار للـ Carousel
-  List<Map<String, String>> getCarouselData() {
+  List<Map<String, dynamic>> getCarouselData() {
     final currentState = state;
     if (currentState is NewsLoaded) {
       return currentState.newsList
           .map(
             (news) => {
               'id': news.id,
-              'image': news.image,
+              'image': news.image ?? '',
               'title': news.title,
               'date': news.date,
             },
@@ -154,22 +103,37 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   // الحصول على خبر معين بالـ ID
-  NewsModel? getNewsById(String id) {
-    return _mockNews.firstWhere(
-      (news) => news.id == id,
-      orElse: () => _mockNews.first,
-    );
+  NewsModel? getNewsById(int id) {
+    final currentState = state;
+    if (currentState is NewsLoaded) {
+      try {
+        return currentState.newsList.firstWhere((news) => news.id == id);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   // الحصول على الأخبار بتصنيف معين
   List<NewsModel> getNewsByCategory(String category) {
-    return _mockNews.where((news) => news.category == category).toList();
+    final currentState = state;
+    if (currentState is NewsLoaded) {
+      return currentState.newsList
+          .where((news) => news.category == category)
+          .toList();
+    }
+    return [];
   }
 
   // الحصول على أحدث الأخبار
   List<NewsModel> getLatestNews({int limit = 3}) {
-    final sortedNews = List<NewsModel>.from(_mockNews);
-
-    return sortedNews.take(limit).toList();
+    final currentState = state;
+    if (currentState is NewsLoaded) {
+      final sortedNews = List<NewsModel>.from(currentState.newsList);
+      // يمكن إضافة منطق ترتيب بناء على التاريخ هنا
+      return sortedNews.take(limit).toList();
+    }
+    return [];
   }
 }

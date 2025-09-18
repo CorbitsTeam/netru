@@ -479,6 +479,7 @@ class ReviewSubmitStep extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSubmitButton() {
     return FadeInUp(
       duration: const Duration(milliseconds: 1300),
