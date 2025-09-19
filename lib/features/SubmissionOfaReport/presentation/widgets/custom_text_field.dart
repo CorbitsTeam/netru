@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String label;
   final String? hintText;
@@ -20,6 +20,9 @@ class CustomTextField extends StatelessWidget {
   final TextAlign textAlign;
   final int? maxLength;
   final bool showCounter;
+  final bool isPassword;
+  final void Function(String)? onChanged;
+  final bool enabled;
 
   const CustomTextField({
     super.key,
@@ -39,29 +42,95 @@ class CustomTextField extends StatelessWidget {
     this.textAlign = TextAlign.justify,
     this.maxLength,
     this.showCounter = false,
+    this.isPassword = false,
+    this.onChanged,
+    this.enabled = true,
   });
+
+  @override
+  State<CustomTextField> createState() =>
+      _CustomTextFieldState();
+}
+
+class _CustomTextFieldState
+    extends State<CustomTextField> {
+  bool _isPasswordVisible = false;
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Create label text with required indicator
-    String labelText = label;
-    if (isRequired) {
+    String labelText = widget.label;
+    if (widget.isRequired) {
       labelText += ' *';
     }
 
+    // Determine if text should be obscured
+    bool shouldObscureText =
+        widget.isPassword
+            ? !_isPasswordVisible
+            : widget.obscureText;
+
+    // Determine suffix icon
+    Widget? suffixIcon = widget.suffixIcon;
+    if (widget.isPassword) {
+      suffixIcon = IconButton(
+        icon: Icon(
+          _isPasswordVisible
+              ? Icons.visibility
+              : Icons.visibility_off,
+          color: Colors.grey[600],
+          size: 20.sp,
+        ),
+        onPressed: () {
+          setState(() {
+            _isPasswordVisible =
+                !_isPasswordVisible;
+          });
+        },
+      );
+    }
+
     return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      validator: isRequired ? validator : null,
-      maxLines: maxLines,
-      readOnly: readOnly,
-      onTap: onTap,
-      textAlign: textAlign,
-      obscureText: obscureText,
-      maxLength: showCounter ? maxLength : null,
+      controller: widget.controller,
+      focusNode: _focusNode,
+      keyboardType: widget.keyboardType,
+      inputFormatters: widget.inputFormatters,
+      validator:
+          widget.isRequired
+              ? widget.validator
+              : null,
+      maxLines: widget.maxLines,
+      readOnly: widget.readOnly,
+      enabled: widget.enabled,
+      onTap: widget.onTap,
+      onChanged: widget.onChanged,
+      textAlign: widget.textAlign,
+      obscureText: shouldObscureText,
+      maxLength:
+          widget.showCounter
+              ? widget.maxLength
+              : null,
       buildCounter:
-          showCounter
+          widget.showCounter
               ? null
               : (
                 context, {
@@ -86,21 +155,23 @@ class CustomTextField extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
         hintText:
-            hintText ??
-            (readOnly ? 'اضغط للاختيار' : null),
+            widget.hintText ??
+            (widget.readOnly
+                ? 'اضغط للاختيار'
+                : null),
         hintStyle: TextStyle(
           color: Colors.grey[500],
           fontSize: 12.sp,
         ),
         suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon,
+        prefixIcon: widget.prefixIcon,
         filled: true,
         fillColor: Colors.grey[100],
 
         // Default border
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            8.r,
+            4.r,
           ),
           borderSide: BorderSide(
             color: Colors.grey[300]!,
@@ -110,7 +181,7 @@ class CustomTextField extends StatelessWidget {
         // Enabled border
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            8.r,
+            4.r,
           ),
           borderSide: BorderSide(
             color: Colors.grey[300]!,
@@ -120,7 +191,7 @@ class CustomTextField extends StatelessWidget {
         // Focused border
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            8.r,
+            4.r,
           ),
           borderSide: const BorderSide(
             color: Color(0xFF1E3A8A),
@@ -130,7 +201,7 @@ class CustomTextField extends StatelessWidget {
         // Error border
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            8.r,
+            4.r,
           ),
           borderSide: const BorderSide(
             color: Colors.red,
@@ -140,7 +211,7 @@ class CustomTextField extends StatelessWidget {
         // Focused error border
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            8.r,
+            4.r,
           ),
           borderSide: const BorderSide(
             color: Colors.red,
@@ -149,7 +220,8 @@ class CustomTextField extends StatelessWidget {
 
         contentPadding: EdgeInsets.symmetric(
           horizontal: 10.w,
-          vertical: maxLines > 1 ? 12.h : 10.h,
+          vertical:
+              widget.maxLines > 1 ? 12.h : 10.h,
         ),
 
         // Error style
