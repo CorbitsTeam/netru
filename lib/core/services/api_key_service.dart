@@ -44,6 +44,13 @@ class ApiKeyService {
       // Fallback to environment config
       final envKey = _envConfig.groqApiKey;
       if (envKey.isNotEmpty) {
+        // Validate API key format before storing
+        if (!_isValidGroqApiKey(envKey)) {
+          throw Exception(
+            'Invalid Groq API key format. Expected format: gsk_...',
+          );
+        }
+        
         // Store it securely for future use
         await _storeGroqApiKey(envKey);
         _logger.logInfo(
@@ -53,7 +60,8 @@ class ApiKeyService {
       }
 
       throw Exception(
-        'Groq API key not found in secure storage or environment',
+        'Groq API key not found in secure storage or environment. '
+        'Please set GROQ_API_KEY environment variable or use --dart-define GROQ_API_KEY=your_key',
       );
     } catch (e) {
       _logger.logError('❌ Failed to get Groq API key: $e');
@@ -65,6 +73,13 @@ class ApiKeyService {
   Future<void> setGroqApiKey(String apiKey) async {
     if (apiKey.isEmpty) {
       throw ArgumentError('API key cannot be empty');
+    }
+
+    // Validate API key format
+    if (!_isValidGroqApiKey(apiKey)) {
+      throw ArgumentError(
+        'Invalid Groq API key format. Expected format: gsk_...',
+      );
     }
 
     try {
@@ -118,6 +133,15 @@ class ApiKeyService {
         accessibility: KeychainAccessibility.first_unlock_this_device,
       ),
     );
+  }
+
+  /// Validate Groq API key format
+  bool _isValidGroqApiKey(String apiKey) {
+    // Groq API keys start with 'gsk_' and are typically 56-60 characters long
+    return apiKey.startsWith('gsk_') && 
+           apiKey.length >= 50 && 
+           apiKey.length <= 80 &&
+           RegExp(r'^gsk_[a-zA-Z0-9]+$').hasMatch(apiKey);
   }
 
   /// Ensure API key is available during initialization
