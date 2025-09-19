@@ -48,6 +48,12 @@ class ReportsRepositoryImpl implements ReportsRepository {
     File? mediaFile,
     String? submittedBy,
   }) async {
+    print('🏭 Repository: Starting createReport...');
+    print('📄 Report Type: $reportType (ID: $reportTypeId)');
+    print('📍 Location: $latitude, $longitude');
+    print('📷 Media File Path: ${mediaFile?.path}');
+    print('👤 Submitted By: $submittedBy');
+
     try {
       // Create the report first
       final reportModel = ReportModel(
@@ -69,19 +75,28 @@ class ReportsRepositoryImpl implements ReportsRepository {
         updatedAt: DateTime.now(),
       );
 
+      print('📝 Creating report in database...');
       final createdReport = await remoteDataSource.createReport(reportModel);
+      print('✅ Report created with ID: ${createdReport.id}');
 
       // Upload media if provided and attach to report
       if (mediaFile != null) {
         try {
+          print(
+            'Starting media upload process for report: ${createdReport.id}',
+          );
+
           final fileName =
               'report_${createdReport.id}_${DateTime.now().millisecondsSinceEpoch}';
+
           final mediaUrl = await remoteDataSource.uploadMedia(
             mediaFile,
             fileName,
           );
 
-          if (mediaUrl != null) {
+          if (mediaUrl != null && mediaUrl.isNotEmpty) {
+            print('Media uploaded successfully. URL: $mediaUrl');
+
             // Determine media type
             final extension = mediaFile.path.split('.').last.toLowerCase();
             String mediaType;
@@ -106,11 +121,15 @@ class ReportsRepositoryImpl implements ReportsRepository {
               mediaType = 'document';
             }
 
+            print('Determined media type: $mediaType');
+
             await remoteDataSource.attachMediaToReport(
               createdReport.id,
               mediaUrl,
               mediaType,
             );
+
+            print('Media attached to report successfully');
 
             // Return updated report with media info
             return Right(
@@ -135,6 +154,8 @@ class ReportsRepositoryImpl implements ReportsRepository {
                 updatedAt: createdReport.updatedAt,
               ),
             );
+          } else {
+            print('Warning: Media upload returned empty URL');
           }
         } catch (mediaError) {
           // Log media upload error but don't fail the report creation
@@ -143,7 +164,19 @@ class ReportsRepositoryImpl implements ReportsRepository {
             'Warning: Failed to upload media for report ${createdReport.id}: $mediaError',
             wrapWidth: 1024,
           );
-          // Continue with report creation without media
+
+          print('Media upload failed, but report was created successfully');
+
+          // Check if it's a critical error that should be reported to user
+          if (mediaError.toString().contains('Storage access denied') ||
+              mediaError.toString().contains('Bucket not found')) {
+            // These are configuration issues that should be reported
+            return Left(
+              'Report created successfully but media upload failed: ${mediaError.toString()}',
+            );
+          }
+
+          // For other errors, continue with report creation without media
         }
       }
 

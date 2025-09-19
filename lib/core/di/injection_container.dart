@@ -1,5 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/features/notifications/data/datasources/firebase_notification_service.dart';
+import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:netru_app/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:netru_app/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:netru_app/features/notifications/domain/usecases/get_unread_notifications_count.dart';
+import 'package:netru_app/features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'package:netru_app/features/notifications/domain/usecases/register_fcm_token.dart';
+import 'package:netru_app/features/notifications/domain/usecases/send_notification.dart';
+import 'package:netru_app/features/notifications/presentation/cubit/notification_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -17,8 +27,11 @@ import '../../features/auth/domain/usecases/check_user_exists.dart';
 import '../../features/auth/domain/usecases/get_user_by_id.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
 import '../../features/auth/domain/usecases/login_with_email.dart';
+import '../../features/auth/domain/usecases/logout_user.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/domain/usecases/signup_user.dart';
+import '../../features/auth/domain/usecases/update_user_profile.dart';
+import '../../features/auth/domain/usecases/upload_profile_image.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
@@ -38,11 +51,11 @@ import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 // ===========================
 // News Feature
 // ===========================
-import '../../features/newsdetails/data/datasources/news_local_datasource.dart';
-import '../../features/newsdetails/data/repositories/newsdetails_repository_impl.dart';
-import '../../features/newsdetails/domain/repositories/newsdetails_repository.dart';
-import '../../features/newsdetails/domain/usecases/newsdetails_usecase.dart';
-import '../../features/newsdetails/presentation/cubit/news_cubit.dart';
+import '../../features/news/data/datasources/newsdetails_remote_datasource.dart';
+import '../../features/news/data/repositories/newsdetails_repository_impl.dart';
+import '../../features/news/domain/repositories/newsdetails_repository.dart';
+import '../../features/news/domain/usecases/newsdetails_usecase.dart';
+import '../../features/news/presentation/cubit/news_cubit.dart';
 // ===========================
 // Reports Feature
 // ===========================
@@ -52,10 +65,25 @@ import '../../features/reports/domain/repositories/reports_repository.dart';
 import '../../features/reports/domain/usecases/reports_usecase.dart';
 import '../../features/reports/presentation/cubit/reports_cubit.dart';
 import '../../features/reports/presentation/cubit/report_form_cubit.dart';
+// ===========================
+// Cases Feature
+// ===========================
+import '../../features/cases/data/datasources/cases_remote_datasource.dart';
+import '../../features/cases/data/repositories/cases_repository_impl.dart';
+import '../../features/cases/domain/repositories/cases_repository.dart';
+import '../../features/cases/domain/usecases/cases_usecase.dart';
+import '../../features/cases/presentation/cubit/cases_cubit.dart';
 // Core Services
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
+
+// ===========================
+// External Dependencies
+// ===========================
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// ===========================
 
 final sl = GetIt.instance;
 
@@ -88,6 +116,8 @@ Future<void> initializeDependencies() async {
   await _initChatbotDependencies();
   await _initNewsDependencies();
   await _initReportsDependencies();
+  await _initCasesDependencies();
+  await initNotificationDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -119,9 +149,12 @@ Future<void> _initAuthDependencies() async {
   sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUserUseCase(sl()));
   sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
   sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
+  sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UploadProfileImageUseCase(sl()));
 
   sl.registerFactory(
     () => SignupCubit(
@@ -146,7 +179,7 @@ Future<void> _initChatbotDependencies() async {
     () => ChatbotRemoteDataSourceImpl(
       dio: sl(),
       groqApiKey:
-          'gsk_replace_with_actual_key', // ⚠️ Replace with your actual key
+          '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', // ⚠️ Replace with your actual key
     ),
   );
 
@@ -177,7 +210,7 @@ Future<void> _initChatbotDependencies() async {
       getUserSessionsUseCase: sl(),
       getHelpMenuUseCase: sl(),
       getLawInfoUseCase: sl(),
-      authRepository: sl(),
+
       uuid: sl(),
     ),
   );
@@ -189,16 +222,17 @@ Future<void> _initChatbotDependencies() async {
 /// News
 /// ===========================
 Future<void> _initNewsDependencies() async {
-  sl.registerLazySingleton<NewsLocalDataSource>(
-    () => NewsLocalDataSourceImpl(),
+  sl.registerLazySingleton<NewsdetailsRemoteDataSource>(
+    () => NewsdetailsRemoteDataSourceImpl(supabaseClient: sl()),
   );
 
   sl.registerLazySingleton<NewsdetailsRepository>(
-    () => NewsdetailsRepositoryImpl(sl()),
+    () => NewsdetailsRepositoryImpl(sl<NewsdetailsRemoteDataSource>()),
   );
 
   sl.registerLazySingleton(() => NewsdetailsUseCase(sl()));
-  sl.registerFactory(() => NewsCubit(sl()));
+  // Register NewsCubit as a lazy singleton so it remains available app-wide
+  sl.registerLazySingleton<NewsCubit>(() => NewsCubit(sl()));
 
   sl.get<LoggerService>().logInfo('✅ News dependencies initialized');
 }
@@ -241,6 +275,90 @@ Future<void> _initReportsDependencies() async {
   );
 
   sl.get<LoggerService>().logInfo('✅ Reports dependencies initialized');
+}
+
+/// ===========================
+/// Cases
+/// ===========================
+Future<void> _initCasesDependencies() async {
+  sl.registerLazySingleton<CasesRemoteDataSource>(
+    () => CasesRemoteDataSourceImpl(supabaseClient: sl()),
+  );
+
+  sl.registerLazySingleton<CasesRepository>(() => CasesRepositoryImpl(sl()));
+
+  sl.registerLazySingleton(() => CasesUseCase(sl()));
+
+  sl.registerFactory(() => CasesCubit(sl()));
+
+  sl.get<LoggerService>().logInfo('✅ Cases dependencies initialized');
+}
+
+Future<void> initNotificationDependencies() async {
+  // External dependencies (should be registered in main DI)
+  if (!sl.isRegistered<SupabaseClient>()) {
+    sl.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+  }
+
+  if (!sl.isRegistered<Dio>()) {
+    sl.registerLazySingleton<Dio>(() => Dio());
+  }
+
+  if (!sl.isRegistered<FirebaseMessaging>()) {
+    sl.registerLazySingleton<FirebaseMessaging>(
+      () => FirebaseMessaging.instance,
+    );
+  }
+
+  // Data Sources
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () =>
+        NotificationRemoteDataSourceImpl(supabaseClient: sl<SupabaseClient>()),
+  );
+
+  sl.registerLazySingleton<FirebaseNotificationService>(
+    () => FirebaseNotificationServiceImpl(
+      firebaseMessaging: sl<FirebaseMessaging>(),
+      dio: sl<Dio>(),
+      serverKey: '', // Add your Firebase server key here
+    ),
+  );
+
+  // Repository
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl<NotificationRemoteDataSource>(),
+      firebaseService: sl<FirebaseNotificationService>(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+    () => GetNotificationsUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetUnreadNotificationsCountUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkNotificationAsReadUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => SendNotificationUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RegisterFcmTokenUseCase(sl<NotificationRepository>()),
+  );
+
+  // Presentation (Cubit)
+  sl.registerFactory(
+    () => NotificationCubit(
+      getNotificationsUseCase: sl<GetNotificationsUseCase>(),
+      getUnreadCountUseCase: sl<GetUnreadNotificationsCountUseCase>(),
+      markAsReadUseCase: sl<MarkNotificationAsReadUseCase>(),
+      sendNotificationUseCase: sl<SendNotificationUseCase>(),
+      notificationRepository: sl<NotificationRepository>(),
+    ),
+  );
 }
 
 /// ===========================

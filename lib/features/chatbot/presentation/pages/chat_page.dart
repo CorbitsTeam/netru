@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
-import '../widgets/chat_message_bubble.dart';
 import '../widgets/chat_input_field.dart';
+import '../widgets/chat_message_bubble.dart';
 
 class ChatPage extends StatefulWidget {
   final String? sessionId;
@@ -131,16 +132,6 @@ class _ChatPageState extends State<ChatPage> {
           );
         },
       ),
-      actions: [
-        IconButton(
-          onPressed: () => _showOptionsMenu(),
-          icon: Icon(
-            Icons.more_vert,
-            color: AppColors.textPrimary,
-            size: 24.sp,
-          ),
-        ),
-      ],
     );
   }
 
@@ -304,55 +295,6 @@ class _ChatPageState extends State<ChatPage> {
           isEnabled
               ? 'اسأل عن تطبيق نترو أو القوانين المصرية...'
               : 'انتظر حتى ينتهي المساعد من الكتابة...',
-    );
-  }
-
-  void _showOptionsMenu() {
-    showModalBottomSheet(
-      context: context,
-      builder:
-          (context) => Container(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'خيارات المحادثة',
-                  style: AppTextStyles.titleLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                ListTile(
-                  leading: const Icon(Icons.help_outline, color: AppColors.primary),
-                  title: Text('عرض المساعدة', style: AppTextStyles.bodyMedium),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _chatCubit.showHelp();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.refresh, color: AppColors.primary),
-                  title: Text('محادثة جديدة', style: AppTextStyles.bodyMedium),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _chatCubit.createNewSession();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.history, color: AppColors.primary),
-                  title: Text(
-                    'المحادثات السابقة',
-                    style: AppTextStyles.bodyMedium,
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/chat-sessions');
-                  },
-                ),
-              ],
-            ),
-          ),
     );
   }
 

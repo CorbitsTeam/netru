@@ -9,6 +9,9 @@ class ChatMessageModel extends ChatMessageEntity {
     required super.timestamp,
     super.metadata,
     super.isLoading,
+    super.isStreaming,
+    super.summary,
+    super.streamingProgress,
   });
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +25,9 @@ class ChatMessageModel extends ChatMessageEntity {
       ),
       metadata: json['metadata'] as Map<String, dynamic>?,
       isLoading: json['isLoading'] ?? false,
+      isStreaming: json['isStreaming'] ?? false,
+      summary: json['summary'],
+      streamingProgress: json['streamingProgress']?.toDouble(),
     );
   }
 
@@ -34,6 +40,9 @@ class ChatMessageModel extends ChatMessageEntity {
       'timestamp': timestamp.toIso8601String(),
       'metadata': metadata,
       'isLoading': isLoading,
+      'isStreaming': isStreaming,
+      'summary': summary,
+      'streamingProgress': streamingProgress,
     };
   }
 
@@ -86,6 +95,9 @@ class ChatMessageModel extends ChatMessageEntity {
       timestamp: entity.timestamp,
       metadata: entity.metadata,
       isLoading: entity.isLoading,
+      isStreaming: entity.isStreaming,
+      summary: entity.summary,
+      streamingProgress: entity.streamingProgress,
     );
   }
 
@@ -145,6 +157,49 @@ class ChatMessageModel extends ChatMessageEntity {
       type: MessageType.error,
       category: MessageCategory.error,
       timestamp: DateTime.now(),
+    );
+  }
+
+  // Factory for creating streaming messages
+  factory ChatMessageModel.streamingMessage({
+    required String id,
+    required String content,
+    required MessageCategory category,
+    String? summary,
+    double? progress,
+    Map<String, dynamic>? metadata,
+  }) {
+    return ChatMessageModel(
+      id: id,
+      content: content,
+      type: MessageType.assistant,
+      category: category,
+      timestamp: DateTime.now(),
+      isStreaming: true,
+      summary: summary,
+      streamingProgress: progress,
+      metadata: metadata,
+    );
+  }
+
+  // Create a copy with streaming updates
+  ChatMessageModel updateStreaming({
+    String? content,
+    String? summary,
+    double? progress,
+    bool? isStreaming,
+  }) {
+    return ChatMessageModel(
+      id: id,
+      content: content ?? this.content,
+      type: type,
+      category: category,
+      timestamp: timestamp,
+      metadata: metadata,
+      isLoading: isLoading,
+      isStreaming: isStreaming ?? this.isStreaming,
+      summary: summary ?? this.summary,
+      streamingProgress: progress ?? streamingProgress,
     );
   }
 }

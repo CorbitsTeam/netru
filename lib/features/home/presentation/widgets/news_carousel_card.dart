@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_cubit.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
-import 'package:netru_app/features/newsdetails/presentation/pages/newsdetails_page.dart';
-import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_cubit.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_state.dart';
+import 'package:netru_app/features/news/presentation/pages/newsdetails_page.dart';
+import 'package:netru_app/features/news/data/models/news_model.dart';
 
 class NewsCarouselCard extends StatefulWidget {
   const NewsCarouselCard({super.key});
@@ -41,9 +43,9 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
     _slideController.forward();
     _dotController.forward();
 
-    // تحميل الأخبار
+    // تحميل الأخبار المميزة
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NewsCubit>().loadNews();
+      context.read<NewsCubit>().loadFeaturedNews();
     });
   }
 
@@ -185,77 +187,84 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
   }
 
   Widget _buildNewsCarousel(List<NewsModel> newsList) {
-    return Container(
-      width: double.infinity,
-      height: 180.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: Stack(
-          children: [
-            // الصور الخلفية مع الـ slide animation
-            ...List.generate(newsList.length, (index) {
-              final news = newsList[index];
-              return Positioned.fill(
-                child: AnimatedOpacity(
-                  opacity: index == _currentIndex ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: GestureDetector(
-                    onTap: () => _navigateToNewsDetails(news),
-                    child: _buildNewsImage(news),
+    return InkWell(
+      onTap: () => _navigateToNewsDetails(newsList[_currentIndex]),
+      child: Container(
+        width: double.infinity,
+        height: 190.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.r),
+          child: Stack(
+            children: [
+              // الصورة الخلفية مع الـ slide animation
+              ...List.generate(newsList.length, (index) {
+                return Positioned.fill(
+                  child: AnimatedOpacity(
+                    opacity: index == _currentIndex ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: CachedNetworkImage(
+                      imageUrl: newsList[index].imageUrl!,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
 
-            // طبقة شفافة سوداء للنص
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+              // طبقة شفافة سوداء للنص
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // المحتوى النصي والنقط
-            Positioned(
-              bottom: 16.h,
-              left: 16.w,
-              right: 16.w,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // التاريخ مع النقط في نفس الصف
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // التاريخ
-                      Text(
-                        newsList[_currentIndex].date,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
+              // المحتوى النصي والنقط
+              Positioned(
+                bottom: 16.h,
+                left: 16.w,
+                right: 16.w,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // التاريخ مع النقط في نفس الصف
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // التاريخ
+                        Text(
+                          DateFormat.yMMMd('ar').format(
+                            DateTime.parse(
+                              newsList[_currentIndex].date,
+                            ).toLocal(),
+                          ),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textDirection: TextDirection.rtl,
                         ),
-                        textDirection: TextDirection.rtl,
-                      ),
 
-                      // النقط المتحركة
-                      if (newsList.length > 1)
+                        // النقط المتحركة
                         Row(
                           children: List.generate(
                             newsList.length,
@@ -284,28 +293,29 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                             ),
                           ),
                         ),
-                    ],
-                  ),
-
-                  SizedBox(height: 8.h),
-
-                  // العنوان
-                  Text(
-                    newsList[_currentIndex].title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
+                      ],
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textDirection: TextDirection.rtl,
-                  ),
-                ],
+
+                    SizedBox(height: 8.h),
+
+                    // العنوان
+                    Text(
+                      newsList[_currentIndex].title!,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

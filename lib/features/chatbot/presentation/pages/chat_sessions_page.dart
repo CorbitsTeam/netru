@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/routing/routes.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 import '../widgets/chat_session_tile.dart';
@@ -68,16 +69,6 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
           color: AppColors.textPrimary,
         ),
       ),
-      actions: [
-        IconButton(
-          onPressed: () => _showOptionsMenu(),
-          icon: Icon(
-            Icons.more_vert,
-            color: AppColors.textPrimary,
-            size: 24.sp,
-          ),
-        ),
-      ],
     );
   }
 
@@ -231,77 +222,5 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
     _chatCubit.loadUserSessions(); // Refresh list
   }
 
-  void _showOptionsMenu() {
-    showModalBottomSheet(
-      context: context,
-      builder:
-          (context) => Container(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'خيارات المحادثات',
-                  style: AppTextStyles.titleLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                ListTile(
-                  leading: const Icon(Icons.refresh, color: AppColors.primary),
-                  title: Text('تحديث', style: AppTextStyles.bodyMedium),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _chatCubit.loadUserSessions();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.help_outline, color: AppColors.primary),
-                  title: Text('المساعدة', style: AppTextStyles.bodyMedium),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _chatCubit.showHelp();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline, color: AppColors.primary),
-                  title: Text(
-                    'حول المساعد الذكي',
-                    style: AppTextStyles.bodyMedium,
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showAboutDialog();
-                  },
-                ),
-              ],
-            ),
-          ),
-    );
-  }
 
-  void _showAboutDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('المساعد الذكي سوبيك', style: AppTextStyles.titleLarge),
-            content: Text(
-              'سوبيك هو المساعد الذكي لتطبيق نترو. يساعدك في معرفة المزيد عن التطبيق والقوانين المصرية المتعلقة بالأمان والبلاغات.',
-              style: AppTextStyles.bodyMedium,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'حسناً',
-                  style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
 }

@@ -10,6 +10,7 @@ dependencies:
   animate_do: ^4.2.0
   animator: null
   cached_network_image: ^3.4.1
+  characters: ^1.3.1
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.0
@@ -75,8 +76,6 @@ flutter:
     - assets/icons/
     - assets/lottie/
     - assets/translations/
-    - assets/news/
-
 
   fonts:
     - family: Almarai

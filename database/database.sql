@@ -24,6 +24,64 @@ CREATE TABLE public.identity_documents (
   CONSTRAINT identity_documents_pkey PRIMARY KEY (id),
   CONSTRAINT identity_documents_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.news_articles (
+  id character varying NOT NULL,
+  title character varying NOT NULL,
+  title_ar character varying,
+  content_text text,
+  content_text_ar text,
+  summary text,
+  summary_en text,
+  image_url character varying,
+  external_id character varying,
+  external_url character varying,
+  source_url character varying,
+  source_name character varying,
+  category_id integer,
+  status character varying DEFAULT 'draft'::character varying,
+  is_published boolean DEFAULT false,
+  is_featured boolean DEFAULT false,
+  view_count integer DEFAULT 0,
+  published_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT news_articles_pkey PRIMARY KEY (id),
+  CONSTRAINT news_articles_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.news_categories(id)
+);
+CREATE TABLE public.news_categories (
+  id integer NOT NULL,
+  name character varying NOT NULL,
+  name_ar character varying,
+  description text,
+  icon character varying,
+  color character varying,
+  is_active boolean DEFAULT true,
+  display_order integer DEFAULT 0,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT news_categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.notifications (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  title text NOT NULL,
+  title_ar text,
+  body text NOT NULL,
+  body_ar text,
+  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['news'::text, 'report_update'::text, 'report_comment'::text, 'system'::text, 'general'::text])),
+  reference_id uuid,
+  reference_type text CHECK (reference_type = ANY (ARRAY['news_article'::text, 'report'::text, 'system'::text])),
+  data jsonb,
+  is_read boolean DEFAULT false,
+  is_sent boolean DEFAULT false,
+  priority text DEFAULT 'normal'::text CHECK (priority = ANY (ARRAY['low'::text, 'normal'::text, 'high'::text, 'urgent'::text])),
+  fcm_message_id text,
+  created_at timestamp without time zone DEFAULT now(),
+  read_at timestamp without time zone,
+  sent_at timestamp without time zone,
+  CONSTRAINT notifications_pkey PRIMARY KEY (id),
+  CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
   created_at timestamp without time zone DEFAULT now(),
@@ -125,6 +183,19 @@ CREATE TABLE public.reports (
   CONSTRAINT reports_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
   CONSTRAINT reports_report_type_id_fkey FOREIGN KEY (report_type_id) REFERENCES public.report_types(id),
   CONSTRAINT reports_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id)
+);
+CREATE TABLE public.user_fcm_tokens (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  fcm_token text NOT NULL,
+  device_type text CHECK (device_type = ANY (ARRAY['android'::text, 'ios'::text, 'web'::text])),
+  device_id text,
+  app_version text,
+  is_active boolean DEFAULT true,
+  last_used timestamp without time zone DEFAULT now(),
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT user_fcm_tokens_pkey PRIMARY KEY (id),
+  CONSTRAINT user_fcm_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.user_logs (
   id bigint NOT NULL DEFAULT nextval('user_logs_id_seq'::regclass),

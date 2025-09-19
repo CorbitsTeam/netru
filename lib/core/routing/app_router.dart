@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
+import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
+import 'package:netru_app/features/profile/presentation/page/enhanced_profile_page.dart';
 import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
@@ -26,6 +29,9 @@ import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 import '../../features/chatbot/presentation/pages/chat_page.dart';
 import '../../features/chatbot/presentation/pages/chat_sessions_page.dart';
 
+// News imports
+import '../../features/news/presentation/pages/all_news_page.dart';
+
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -34,9 +40,14 @@ class AppRouter {
       case Routes.onboardingScreen:
         return _createRoute(const OnboardingPage());
       case Routes.profileScreen:
-        return _createRoute(const ProfilePage());
+        return _createRoute(const EnhancedProfilePage());
       case Routes.submissionOfaReportPage:
         return _createRoute(const CreateReportPage());
+      case Routes.notificationsPage:
+        {
+          final userId = UserDataHelper().getUserId() ?? '';
+          return _createRoute(NotificationsScreen(userId: userId));
+        }
       case Routes.loginScreen:
         return _createRoute(
           BlocProvider<LoginCubit>(
@@ -87,6 +98,10 @@ class AppRouter {
       case '/admin-dashboard':
         return _createRoute(const AdminDashboardPage());
 
+      // // Debug Test route
+      // case '/debug-test':
+      //   return _createRoute(const DebugTestPage());
+
       // Chatbot routes
       case Routes.chatPage:
         final args = settings.arguments as Map<String, dynamic>?;
@@ -104,6 +119,10 @@ class AppRouter {
             child: const ChatSessionsPage(),
           ),
         );
+
+      // News routes
+      case Routes.allNewsPage:
+        return _createRoute(const AllNewsPage());
 
       default:
         return null;

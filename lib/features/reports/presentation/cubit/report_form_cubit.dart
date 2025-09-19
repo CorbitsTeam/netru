@@ -71,11 +71,18 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     required String phone,
     required String reportDetails,
   }) async {
+    print('🚀 Starting report submission...');
+    print('📄 Report Details: $reportDetails');
+    print('📍 Location: ${state.latitude}, ${state.longitude}');
+    print('📷 Media File: ${state.selectedMedia?.path}');
+    print('🗂️ Report Type: ${state.selectedReportType?.nameAr}');
+
     emit(state.copyWith(isLoading: true, errorMessage: ''));
 
     try {
       // Validate that a report type is selected
       if (state.selectedReportType == null) {
+        print('❌ No report type selected');
         emit(
           state.copyWith(
             isLoading: false,
@@ -88,6 +95,7 @@ class ReportFormCubit extends Cubit<ReportFormState> {
       // Get current user ID
       final userHelper = UserDataHelper();
       final userId = userHelper.getUserId();
+      print('👤 User ID: $userId');
 
       final params = CreateReportParams(
         firstName: firstName,
@@ -105,10 +113,12 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         submittedBy: userId, // Link report to current user
       );
 
+      print('📤 Calling createReportUseCase...');
       final result = await createReportUseCase.call(params);
 
       result.fold(
         (error) {
+          print('❌ Report submission failed: $error');
           String userFriendlyError;
           if (error.contains('Failed to upload media')) {
             userFriendlyError =
@@ -119,6 +129,12 @@ class ReportFormCubit extends Cubit<ReportFormState> {
                 'فشل في الوصول إلى الملف المحدد. يرجى اختيار ملف آخر.';
           } else if (error.contains('file is empty')) {
             userFriendlyError = 'الملف المحدد فارغ. يرجى اختيار ملف صالح.';
+          } else if (error.contains('Storage access denied')) {
+            userFriendlyError =
+                'فشل في رفع الملف. يرجى التحقق من إعدادات التخزين.';
+          } else if (error.contains('Bucket not found')) {
+            userFriendlyError =
+                'فشل في رفع الملف. يرجى التحقق من إعدادات التخزين.';
           } else {
             userFriendlyError = 'حدث خطأ أثناء إرسال البلاغ: $error';
           }
@@ -128,6 +144,8 @@ class ReportFormCubit extends Cubit<ReportFormState> {
           );
         },
         (report) {
+          print('✅ Report submitted successfully! ID: ${report.id}');
+          print('📷 Media URL: ${report.mediaUrl}');
           emit(
             state.copyWith(
               isLoading: false,
@@ -138,6 +156,7 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         },
       );
     } catch (e) {
+      print('💥 Exception during report submission: $e');
       emit(
         state.copyWith(
           isLoading: false,
