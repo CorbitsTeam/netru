@@ -27,8 +27,11 @@ import '../../features/auth/domain/usecases/check_user_exists.dart';
 import '../../features/auth/domain/usecases/get_user_by_id.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
 import '../../features/auth/domain/usecases/login_with_email.dart';
+import '../../features/auth/domain/usecases/logout_user.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/domain/usecases/signup_user.dart';
+import '../../features/auth/domain/usecases/update_user_profile.dart';
+import '../../features/auth/domain/usecases/upload_profile_image.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
@@ -48,11 +51,11 @@ import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 // ===========================
 // News Feature
 // ===========================
-import '../../features/newsdetails/data/datasources/newsdetails_remote_datasource.dart';
-import '../../features/newsdetails/data/repositories/newsdetails_repository_impl.dart';
-import '../../features/newsdetails/domain/repositories/newsdetails_repository.dart';
-import '../../features/newsdetails/domain/usecases/newsdetails_usecase.dart';
-import '../../features/newsdetails/presentation/cubit/news_cubit.dart';
+import '../../features/news/data/datasources/newsdetails_remote_datasource.dart';
+import '../../features/news/data/repositories/newsdetails_repository_impl.dart';
+import '../../features/news/domain/repositories/newsdetails_repository.dart';
+import '../../features/news/domain/usecases/newsdetails_usecase.dart';
+import '../../features/news/presentation/cubit/news_cubit.dart';
 // ===========================
 // Reports Feature
 // ===========================
@@ -146,9 +149,12 @@ Future<void> _initAuthDependencies() async {
   sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUserUseCase(sl()));
   sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
   sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
+  sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UploadProfileImageUseCase(sl()));
 
   sl.registerFactory(
     () => SignupCubit(

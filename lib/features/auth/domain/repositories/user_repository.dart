@@ -33,4 +33,10 @@ abstract class UserRepository {
   Future<Either<Failure, LoginUserEntity>> getUserByPassport(
     String passportNumber,
   );
+
+  /// Update user profile
+  Future<Either<Failure, LoginUserEntity>> updateUserProfile(
+    String userId,
+    Map<String, dynamic> userData,
+  );
 }

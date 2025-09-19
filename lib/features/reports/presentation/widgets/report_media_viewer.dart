@@ -369,8 +369,17 @@ class ReportMediaViewer extends StatelessWidget {
   }
 
   bool _isImage() {
-    if (mediaType == null) return false;
-    return mediaType!.toLowerCase().startsWith('image/');
+    print('🖼️ MediaViewer Debug - mediaType: "$mediaType"');
+    if (mediaType == null) {
+      print('❌ mediaType is null');
+      return false;
+    }
+
+    final isImage = mediaType!.toLowerCase().startsWith('image');
+    print(
+      '✅ Is Image: $isImage (checking if "$mediaType" starts with "image")',
+    );
+    return isImage;
   }
 
   IconData _getMediaIcon() {
@@ -577,8 +586,17 @@ class _FullScreenMediaViewer extends StatelessWidget {
   }
 
   bool _isImage() {
-    if (mediaType == null) return false;
-    return mediaType!.toLowerCase().startsWith('image/');
+    print('🖼️ FullScreenViewer Debug - mediaType: "$mediaType"');
+    if (mediaType == null) {
+      print('❌ mediaType is null');
+      return false;
+    }
+
+    final isImage = mediaType!.toLowerCase().startsWith('image');
+    print(
+      '✅ Is Image: $isImage (checking if "$mediaType" starts with "image")',
+    );
+    return isImage;
   }
 
   IconData _getMediaIcon() {
@@ -643,7 +661,10 @@ class _FullScreenMediaViewer extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('إغلاق', style: TextStyle(color: Colors.white)),
+                child: const Text(
+                  'إغلاق',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

@@ -5,6 +5,7 @@ import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.
 import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
+import 'package:netru_app/features/profile/presentation/page/enhanced_profile_page.dart';
 import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
@@ -39,7 +40,7 @@ class AppRouter {
       case Routes.onboardingScreen:
         return _createRoute(const OnboardingPage());
       case Routes.profileScreen:
-        return _createRoute(const ProfilePage());
+        return _createRoute(const EnhancedProfilePage());
       case Routes.submissionOfaReportPage:
         return _createRoute(const CreateReportPage());
       case Routes.notificationsPage:

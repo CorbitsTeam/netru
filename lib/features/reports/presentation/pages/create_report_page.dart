@@ -79,8 +79,7 @@ class _ReportFormViewState extends State<ReportFormView> {
       body: BlocListener<ReportFormCubit, ReportFormState>(
         listener: (context, state) {
           if (state.isSubmitted && !state.isLoading) {
-            // Clear UI fields and reset cubit state, then show success dialog
-            _resetForm();
+            // Don't reset form immediately - let user see success dialog first
             _showSuccessDialog(context);
           } else if (state.errorMessage.isNotEmpty && !state.isLoading) {
             _showErrorSnackBar(context, state.errorMessage);
@@ -356,9 +355,7 @@ class _ReportFormViewState extends State<ReportFormView> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop(); // Close dialog
-                            Navigator.of(
-                              context,
-                            ).pop(); // Go back to previous page
+                            _resetForm(); // Reset form for new report
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue[800],

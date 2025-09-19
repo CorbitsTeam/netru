@@ -9,7 +9,7 @@ import 'package:netru_app/features/home/presentation/widgets/user_header_widget.
 import 'package:netru_app/features/home/presentation/widgets/latest_cases_card.dart';
 import 'package:netru_app/features/home/presentation/widgets/statistics_cards.dart';
 import 'package:netru_app/features/home/presentation/widgets/trending_cases_card.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_cubit.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_cubit.dart';
 import '../../../../core/routing/routes.dart';
 
 import '../../../../core/theme/app_colors.dart';

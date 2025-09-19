@@ -4,10 +4,10 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_cubit.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
-import 'package:netru_app/features/newsdetails/presentation/pages/newsdetails_page.dart';
-import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_cubit.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_state.dart';
+import 'package:netru_app/features/news/presentation/pages/newsdetails_page.dart';
+import 'package:netru_app/features/news/data/models/news_model.dart';
 
 class NewsCarouselCard extends StatefulWidget {
   const NewsCarouselCard({super.key});

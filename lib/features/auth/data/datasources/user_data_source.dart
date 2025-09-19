@@ -14,6 +14,10 @@ abstract class UserDataSource {
   Future<LoginUserModel> getUserByEmail(String email);
   Future<LoginUserModel> getUserByNationalId(String nationalId);
   Future<LoginUserModel> getUserByPassport(String passportNumber);
+  Future<LoginUserModel> updateUserProfile(
+    String userId,
+    Map<String, dynamic> userData,
+  );
 }
 
 class SupabaseUserDataSource implements UserDataSource {
@@ -292,6 +296,49 @@ class SupabaseUserDataSource implements UserDataSource {
       return LoginUserModel.fromJson(response);
     } catch (e) {
       throw Exception('فشل في جلب بيانات المستخدم برقم جواز السفر: $e');
+    }
+  }
+
+  @override
+  Future<LoginUserModel> updateUserProfile(
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
+    try {
+      // Remove any fields that shouldn't be updated
+      final allowedFields = {
+        'full_name',
+        'phone',
+        'location',
+        'address',
+        'profile_image',
+      };
+
+      final updateData = <String, dynamic>{};
+      for (final key in userData.keys) {
+        if (allowedFields.contains(key)) {
+          updateData[key] = userData[key];
+        }
+      }
+
+      if (updateData.isEmpty) {
+        throw Exception('لا توجد بيانات صالحة للتحديث');
+      }
+
+      // Add updated_at timestamp
+      updateData['updated_at'] = DateTime.now().toIso8601String();
+
+      final response =
+          await _supabaseClient
+              .from('users')
+              .update(updateData)
+              .eq('id', userId)
+              .select()
+              .single();
+
+      return LoginUserModel.fromJson(response);
+    } catch (e) {
+      throw Exception('فشل في تحديث بيانات المستخدم: $e');
     }
   }
 }

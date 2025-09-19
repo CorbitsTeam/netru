@@ -4,7 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
-import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
+import 'package:netru_app/features/profile/presentation/page/settings_page.dart';
+import 'package:netru_app/features/profile/presentation/page/simple_settings_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/reports_page.dart';
 
@@ -23,7 +24,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     const CrimeHeatMapPage(),
     const CreateReportPage(),
     const ReportsPage(),
-    const ProfilePage(),
+    const SettingsPage(),
   ];
 
   void _onItemTapped(int index) {

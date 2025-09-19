@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:netru_app/features/newsdetails/domain/usecases/newsdetails_usecase.dart';
-import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
-import 'package:netru_app/features/newsdetails/data/models/news_category_model.dart';
-import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
+import 'package:netru_app/features/news/domain/usecases/newsdetails_usecase.dart';
+import 'package:netru_app/features/news/data/models/news_model.dart';
+import 'package:netru_app/features/news/data/models/news_category_model.dart';
+import 'package:netru_app/features/news/presentation/cubit/news_state.dart';
 
 class NewsCubit extends Cubit<NewsState> {
   final NewsdetailsUseCase newsUseCase;

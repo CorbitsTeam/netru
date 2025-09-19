@@ -23,6 +23,10 @@ class ReportModel extends ReportEntity {
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
+    print('📄 ReportModel.fromJson Debug:');
+    print('   media_url: ${json['media_url']}');
+    print('   media_type: ${json['media_type']}');
+
     return ReportModel(
       id: json['id'] as String,
       firstName: json['reporter_first_name'] as String,
