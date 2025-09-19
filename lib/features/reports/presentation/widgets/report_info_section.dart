@@ -403,7 +403,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                               itemBuilder: (context, index) {
                                 final item = _filteredItems[index];
                                 return AnimatedContainer(
-                                  duration: Duration(milliseconds: 200),
+                                  duration: const Duration(milliseconds: 200),
                                   margin: EdgeInsets.only(bottom: 8.h),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -412,7 +412,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                                       BoxShadow(
                                         color: Colors.black.withOpacity(0.05),
                                         blurRadius: 4,
-                                        offset: Offset(0, 2),
+                                        offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
@@ -460,7 +460,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(color: Colors.grey[300]!),
         ),
-        child: Center(
+        child: const Center(
           child: CircularProgressIndicator(color: AppColors.primaryColor),
         ),
       );
@@ -471,7 +471,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.selectedReportType?.nameAr ?? widget.hintText,
-        suffixIcon: Icon(Icons.arrow_drop_down, color: AppColors.primaryColor),
+        suffixIcon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey[300]!),
@@ -482,7 +482,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.primaryColor),
+          borderSide: const BorderSide(color: AppColors.primaryColor),
         ),
         filled: true,
         fillColor: Colors.grey[50],

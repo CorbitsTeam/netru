@@ -71,7 +71,7 @@ class ReportCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 12.w,

@@ -100,7 +100,7 @@ class _NewsListWidgetState extends State<NewsListWidget> {
   }
 
   Widget _buildLoadingState() {
-    return Container(
+    return SizedBox(
       height: 200.h,
       child: Center(
         child: CircularProgressIndicator(

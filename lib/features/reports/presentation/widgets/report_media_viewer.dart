@@ -153,7 +153,7 @@ class ReportMediaViewer extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      side: BorderSide(
+                      side: const BorderSide(
                         color: AppColors.primaryColor,
                         width: 1.5,
                       ),
@@ -190,7 +190,7 @@ class ReportMediaViewer extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(
+                    const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppColors.primaryColor,
                       ),
@@ -413,9 +413,9 @@ class ReportMediaViewer extends StatelessWidget {
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
+                const Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12.w),
-                Text('تم مشاركة الوسائط بنجاح'),
+                const Text('تم مشاركة الوسائط بنجاح'),
               ],
             ),
             backgroundColor: Colors.green,
@@ -484,7 +484,7 @@ class _FullScreenMediaViewer extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(
+                            const CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 Colors.white,
                               ),
@@ -643,7 +643,7 @@ class _FullScreenMediaViewer extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('إغلاق', style: TextStyle(color: Colors.white)),
+                child: const Text('إغلاق', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

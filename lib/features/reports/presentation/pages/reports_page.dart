@@ -122,7 +122,7 @@ class ReportsListView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primaryColor,
                     ),

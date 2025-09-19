@@ -464,7 +464,7 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
           children: [
             CircularProgressIndicator.adaptive(
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              valueColor: AlwaysStoppedAnimation(AppColors.primary),
+              valueColor: const AlwaysStoppedAnimation(AppColors.primary),
               strokeWidth: 3,
               value:
                   loadingProgress.expectedTotalBytes != null

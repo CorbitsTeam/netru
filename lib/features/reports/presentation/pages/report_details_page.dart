@@ -1,17 +1,18 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../widgets/enhanced_status_tracker.dart';
 import '../widgets/location_info_card.dart';
 import '../widgets/report_media_viewer.dart';
-import '../services/ultra_premium_pdf_generator_service.dart';
+import '../services/professional_egyptian_pdf_service.dart';
 import '../../domain/entities/reports_entity.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart';
 
 class ReportDetailsPage extends StatelessWidget {
   final ReportEntity? report;
@@ -570,7 +571,7 @@ class ReportDetailsPage extends StatelessWidget {
                         icon: Icons.picture_as_pdf,
                         title: 'تحميل كـ PDF',
                         subtitle: 'تنزيل ملف PDF بتفاصيل البلاغ',
-                        onTap: () => _downloadPDF(context),
+                        onTap: () => _downloadPDF(context, report!),
                       ),
                       Divider(height: 1.h, color: Colors.grey[200]),
                       _buildActionItem(
@@ -735,7 +736,7 @@ class ReportDetailsPage extends StatelessWidget {
 
       messenger.showSnackBar(
         SnackBar(
-          content: Text('تم مشاركة البلاغ بنجاح'),
+          content: const Text('تم مشاركة البلاغ بنجاح'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -828,267 +829,6 @@ ${report!.reportDetails}
     );
   }
 
-  Future<void> _shareAsPDF(BuildContext context) async {
-    // Show loading dialog
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text('جاري إعداد ملف PDF...'),
-                ],
-              ),
-            ),
-      );
-    }
-
-    try {
-      // استخدام الطريقة المحسنة الجديدة - نسخة مطورة 100% عربي
-      final doc =
-          await UltraPremiumPdfGeneratorService.generateFullArabicReport(
-            report!,
-          );
-      final bytes = await doc.save();
-
-      await _safePopDialog(context);
-
-      await Share.shareXFiles(
-        [
-          XFile.fromData(
-            bytes,
-            name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}.pdf',
-            mimeType: 'application/pdf',
-          ),
-        ],
-        subject: 'تقرير البلاغ رقم #${report!.id.substring(0, 8)}',
-        text: 'تقرير رسمي للبلاغ المقدم عبر تطبيق نترو',
-      );
-    } catch (e) {
-      await _safePopDialog(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذر إنشاء ملف PDF. سيتم مشاركة النص بدلاً منه.'),
-        ),
-      );
-      await _shareAsText();
-    }
-  }
-
-  void _downloadPDF(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-
-    if (!context.mounted) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    AppColors.primaryColor,
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'جاري إنشاء التقرير...',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'يرجى الانتظار بينما يتم إعداد المستند',
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-          ),
-    );
-
-    try {
-      final doc =
-          await UltraPremiumPdfGeneratorService.generateFullArabicReport(
-            report!,
-          );
-      final bytes = await doc.save();
-
-      await _safePopDialog(context);
-
-      if (context.mounted) {
-        await Printing.sharePdf(
-          bytes: bytes,
-          filename: 'تقرير_البلاغ_${report!.id.substring(0, 8)}.pdf',
-        );
-
-        messenger.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Text(
-                    'تم إنشاء وحفظ التقرير بنجاح',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            duration: Duration(seconds: 4),
-          ),
-        );
-      }
-    } catch (e) {
-      await _safePopDialog(context);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('فشل في إنشاء التقرير - سيتم المحاولة مع نسخة مبسطة'),
-        ),
-      );
-      log(e.toString());
-      try {
-        await _createSimplePDFFallback(context);
-      } catch (e) {
-        messenger.showSnackBar(
-          SnackBar(content: Text('فشل في إنشاء نسخة مبسطة: $e')),
-        );
-        log(e.toString());
-      }
-    }
-  }
-
-  Future<void> _createSimplePDFFallback(BuildContext context) async {
-    // استخدام الطريقة المحسنة الجديدة
-    final doc = await UltraPremiumPdfGeneratorService.generateFullArabicReport(
-      report!,
-    );
-    final bytes = await doc.save();
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: 'تقرير_رسمي_${report!.id.substring(0, 8)}.pdf',
-    );
-  }
-
-  void _printReport(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-
-    if (!context.mounted) return;
-
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.primaryColor,
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'جاري إعداد المستند للطباعة...',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-          ),
-    );
-
-    try {
-      // استخدام الطريقة المحسنة الجديدة للطباعة
-      final doc =
-          await UltraPremiumPdfGeneratorService.generateFullArabicReport(
-            report!,
-          );
-      final bytes = await doc.save();
-
-      await _safePopDialog(context);
-
-      if (context.mounted) {
-        await Printing.layoutPdf(
-          onLayout: (format) async => bytes,
-          name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}',
-        );
-
-        messenger.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.print, color: Colors.white, size: 20.sp),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Text(
-                    'تم فتح نافذة الطباعة بنجاح',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      await _safePopDialog(context);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('فشل في تحضير الملف للطباعة - يرجى المحاولة لاحقاً'),
-        ),
-      );
-      try {
-        await _createSimplePDFFallback(context);
-      } catch (e) {
-        messenger.showSnackBar(
-          SnackBar(content: Text('فشل في إنشاء نسخة مبسطة للطباعة: $e')),
-        );
-      }
-    }
-  }
-
   void _refreshStatus(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
 
@@ -1102,7 +842,7 @@ ${report!.reportDetails}
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(
+                  const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primaryColor,
                     ),
@@ -1124,7 +864,7 @@ ${report!.reportDetails}
       );
 
       // Simulate refresh delay (replace with actual API call)
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
       // Close loading dialog
       Navigator.pop(context);
@@ -1188,6 +928,351 @@ ${report!.reportDetails}
           ),
         ),
       );
+    }
+  }
+
+  // استبدل دالة _downloadPDF في report_details_page.dart بهذه الدالة المحسنة
+
+  void _downloadPDF(BuildContext context, ReportEntity? report) async {
+    if (report == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('خطأ: بيانات البلاغ غير متوفرة'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // عرض Dialog احترافي
+    showDialog(
+      context: context,
+      // barrierDismissible: false,
+      builder:
+          (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            content: Container(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryColor,
+                    ),
+                    strokeWidth: 3.0,
+                  ),
+                  SizedBox(height: 20.h),
+                  Text(
+                    'جاري إنشاء التقرير...',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'يرجى الانتظار',
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+
+    try {
+      // إنشاء PDF
+      final pdfBytes =
+          await ProfessionalEgyptianPdfService.generateProfessionalReportPdf(
+            report,
+          );
+
+      // إغلاق Dialog التحميل فوراً
+      if (context.mounted) {
+        await _safePopDialog(context);
+      }
+
+      // حفظ الملف مؤقتاً
+      final tempDir = await getTemporaryDirectory();
+      final fileName = 'تقرير_البلاغ_${report.id.substring(0, 8)}.pdf';
+      final file = File('${tempDir.path}/$fileName');
+      await file.writeAsBytes(pdfBytes);
+
+      // محاولة فتح الملف
+      final result = await OpenFile.open(file.path);
+
+      if (context.mounted) {
+        if (result.type == ResultType.done) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+                  SizedBox(width: 12.w),
+                  Text('تم إنشاء التقرير وفتحه بنجاح ✅'),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(16.w),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
+        } else {
+          // في حالة الفشل في الفتح → مشاركة الملف
+          await Share.shareXFiles([XFile(file.path)], subject: 'تقرير البلاغ');
+        }
+      }
+    } catch (e) {
+      // إغلاق Dialog التحميل في حالة الخطأ
+      if (context.mounted) {
+        await _safePopDialog(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white, size: 20.sp),
+                SizedBox(width: 12.w),
+                Expanded(child: Text('حدث خطأ أثناء إنشاء التقرير')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+      }
+      print('خطأ في إنشاء PDF: $e');
+    }
+  }
+
+  // دالة مبسطة للطباعة
+  void _printReport(BuildContext context) async {
+    if (report == null) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (dialogContext) => WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              content: Container(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primaryColor,
+                      ),
+                      strokeWidth: 3.0,
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      'جاري إعداد الطباعة...',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'يرجى الانتظار',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+    );
+
+    try {
+      final pdfBytes =
+          await ProfessionalEgyptianPdfService.generateProfessionalReportPdf(
+            report!,
+          );
+
+      if (context.mounted) {
+        await _safePopDialog(context);
+
+        await Printing.layoutPdf(
+          onLayout: (format) async => pdfBytes,
+          name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}',
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.print, color: Colors.white, size: 20.sp),
+                SizedBox(width: 12.w),
+                Text('تم فتح نافذة الطباعة'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        await _safePopDialog(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white, size: 20.sp),
+                SizedBox(width: 12.w),
+                Expanded(child: Text('فشلت الطباعة')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // دالة مبسطة للمشاركة كـ PDF
+  Future<void> _shareAsPDF(BuildContext context) async {
+    if (report == null) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (dialogContext) => WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              content: Container(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primaryColor,
+                      ),
+                      strokeWidth: 3.0,
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      'جاري إعداد PDF...',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'يرجى الانتظار',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+    );
+
+    try {
+      final pdfBytes =
+          await ProfessionalEgyptianPdfService.generateProfessionalReportPdf(
+            report!,
+          );
+
+      if (context.mounted) {
+        await _safePopDialog(context);
+
+        await Share.shareXFiles([
+          XFile.fromData(
+            pdfBytes,
+            name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}.pdf',
+            mimeType: 'application/pdf',
+          ),
+        ], subject: 'تقرير البلاغ رقم #${report!.id.substring(0, 8)}');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.share, color: Colors.white, size: 20.sp),
+                SizedBox(width: 12.w),
+                Text('تم مشاركة التقرير بنجاح'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        await _safePopDialog(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.warning, color: Colors.white, size: 20.sp),
+                SizedBox(width: 12.w),
+                Text('فشلت المشاركة - سيتم مشاركة النص'),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+        await _shareAsText();
+      }
     }
   }
 }

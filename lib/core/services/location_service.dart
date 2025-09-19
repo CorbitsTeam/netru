@@ -62,7 +62,7 @@ class LocationService {
 
       if (isEmulator) {
         // إحداثيات مدينة نصر الحقيقية
-        _currentLocation = LatLng(30.0626, 31.3219); // مدينة نصر، القاهرة، مصر
+        _currentLocation = const LatLng(30.0626, 31.3219); // مدينة نصر، القاهرة، مصر
         print('تم اكتشاف المحاكي - استخدام إحداثيات مدينة نصر');
       } else {
         _currentLocation = LatLng(position.latitude, position.longitude);
@@ -71,7 +71,7 @@ class LocationService {
       return _currentLocation;
     } catch (e) {
       // في حالة الخطأ، استخدم إحداثيات مدينة نصر كاحتياطي
-      _currentLocation = LatLng(30.0626, 31.3219);
+      _currentLocation = const LatLng(30.0626, 31.3219);
       return _currentLocation;
     }
   }
