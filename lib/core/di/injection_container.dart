@@ -1,5 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/features/notifications/data/datasources/firebase_notification_service.dart';
+import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:netru_app/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:netru_app/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:netru_app/features/notifications/domain/usecases/get_unread_notifications_count.dart';
+import 'package:netru_app/features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'package:netru_app/features/notifications/domain/usecases/register_fcm_token.dart';
+import 'package:netru_app/features/notifications/domain/usecases/send_notification.dart';
+import 'package:netru_app/features/notifications/presentation/cubit/notification_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -65,6 +75,13 @@ import '../services/location_service.dart';
 import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
 
+// ===========================
+// External Dependencies
+// ===========================
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// ===========================
+
 final sl = GetIt.instance;
 
 /// Main dependency injection setup function
@@ -97,6 +114,7 @@ Future<void> initializeDependencies() async {
   await _initNewsDependencies();
   await _initReportsDependencies();
   await _initCasesDependencies();
+  await initNotificationDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -154,7 +172,8 @@ Future<void> _initChatbotDependencies() async {
   sl.registerLazySingleton<ChatbotRemoteDataSource>(
     () => ChatbotRemoteDataSourceImpl(
       dio: sl(),
-      groqApiKey: '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', // ⚠️ Replace with your actual key
+      groqApiKey:
+          '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', // ⚠️ Replace with your actual key
     ),
   );
 
@@ -185,7 +204,7 @@ Future<void> _initChatbotDependencies() async {
       getUserSessionsUseCase: sl(),
       getHelpMenuUseCase: sl(),
       getLawInfoUseCase: sl(),
-      
+
       uuid: sl(),
     ),
   );
@@ -267,6 +286,73 @@ Future<void> _initCasesDependencies() async {
   sl.registerFactory(() => CasesCubit(sl()));
 
   sl.get<LoggerService>().logInfo('✅ Cases dependencies initialized');
+}
+
+Future<void> initNotificationDependencies() async {
+  // External dependencies (should be registered in main DI)
+  if (!sl.isRegistered<SupabaseClient>()) {
+    sl.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+  }
+
+  if (!sl.isRegistered<Dio>()) {
+    sl.registerLazySingleton<Dio>(() => Dio());
+  }
+
+  if (!sl.isRegistered<FirebaseMessaging>()) {
+    sl.registerLazySingleton<FirebaseMessaging>(
+      () => FirebaseMessaging.instance,
+    );
+  }
+
+  // Data Sources
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () =>
+        NotificationRemoteDataSourceImpl(supabaseClient: sl<SupabaseClient>()),
+  );
+
+  sl.registerLazySingleton<FirebaseNotificationService>(
+    () => FirebaseNotificationServiceImpl(
+      firebaseMessaging: sl<FirebaseMessaging>(),
+      dio: sl<Dio>(),
+      serverKey: '', // Add your Firebase server key here
+    ),
+  );
+
+  // Repository
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl<NotificationRemoteDataSource>(),
+      firebaseService: sl<FirebaseNotificationService>(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+    () => GetNotificationsUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetUnreadNotificationsCountUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkNotificationAsReadUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => SendNotificationUseCase(sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RegisterFcmTokenUseCase(sl<NotificationRepository>()),
+  );
+
+  // Presentation (Cubit)
+  sl.registerFactory(
+    () => NotificationCubit(
+      getNotificationsUseCase: sl<GetNotificationsUseCase>(),
+      getUnreadCountUseCase: sl<GetUnreadNotificationsCountUseCase>(),
+      markAsReadUseCase: sl<MarkNotificationAsReadUseCase>(),
+      sendNotificationUseCase: sl<SendNotificationUseCase>(),
+      notificationRepository: sl<NotificationRepository>(),
+    ),
+  );
 }
 
 /// ===========================
