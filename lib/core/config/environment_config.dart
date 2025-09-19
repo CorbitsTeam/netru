@@ -47,29 +47,22 @@ class EnvironmentConfig {
       return compileTimeKey;
     }
 
-    // Development fallback - REMOVE THIS IN PRODUCTION!
-    // This is only for development convenience
-    if (isDebug) {
-      const devKey = 'your_api_key_here';
-      print(
-        '⚠️  WARNING: Using development API key. Set GROQ_API_KEY environment variable for production!',
-      );
-      return devKey;
-    }
+    // No hardcoded fallback for security reasons
+    // API key must be provided via environment variable or compile-time constant
 
-    // Last resort - this should be removed in production
-    throw Exception(
-      'GROQ_API_KEY not found. Please set it as an environment variable '
-      'or compile-time constant using --dart-define GROQ_API_KEY=your_key',
-    );
+    // Return empty string and let validation handle the error
+    return '';
   }
 
   /// Validate that all required environment variables are set
   void validateEnvironment() {
-    try {
-      groqApiKey; // This will throw if not found
-    } catch (e) {
-      throw Exception('Environment validation failed: $e');
+    final apiKey = groqApiKey;
+    if (apiKey.isEmpty) {
+      throw Exception(
+        'GROQ_API_KEY not found. Please set it as an environment variable '
+        'or compile-time constant using --dart-define GROQ_API_KEY=your_key. '
+        'See API_KEY_SETUP.md for detailed instructions.',
+      );
     }
   }
 }
