@@ -52,6 +52,14 @@ import '../../features/reports/domain/repositories/reports_repository.dart';
 import '../../features/reports/domain/usecases/reports_usecase.dart';
 import '../../features/reports/presentation/cubit/reports_cubit.dart';
 import '../../features/reports/presentation/cubit/report_form_cubit.dart';
+// ===========================
+// Cases Feature
+// ===========================
+import '../../features/cases/data/datasources/cases_remote_datasource.dart';
+import '../../features/cases/data/repositories/cases_repository_impl.dart';
+import '../../features/cases/domain/repositories/cases_repository.dart';
+import '../../features/cases/domain/usecases/cases_usecase.dart';
+import '../../features/cases/presentation/cubit/cases_cubit.dart';
 // Core Services
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
@@ -88,6 +96,7 @@ Future<void> initializeDependencies() async {
   await _initChatbotDependencies();
   await _initNewsDependencies();
   await _initReportsDependencies();
+  await _initCasesDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -145,8 +154,7 @@ Future<void> _initChatbotDependencies() async {
   sl.registerLazySingleton<ChatbotRemoteDataSource>(
     () => ChatbotRemoteDataSourceImpl(
       dio: sl(),
-      groqApiKey:
-          'gsk_replace_with_actual_key', // ⚠️ Replace with your actual key
+      groqApiKey: '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', // ⚠️ Replace with your actual key
     ),
   );
 
@@ -177,7 +185,7 @@ Future<void> _initChatbotDependencies() async {
       getUserSessionsUseCase: sl(),
       getHelpMenuUseCase: sl(),
       getLawInfoUseCase: sl(),
-      authRepository: sl(),
+      
       uuid: sl(),
     ),
   );
@@ -198,7 +206,8 @@ Future<void> _initNewsDependencies() async {
   );
 
   sl.registerLazySingleton(() => NewsdetailsUseCase(sl()));
-  sl.registerFactory(() => NewsCubit(sl()));
+  // Register NewsCubit as a lazy singleton so it remains available app-wide
+  sl.registerLazySingleton<NewsCubit>(() => NewsCubit(sl()));
 
   sl.get<LoggerService>().logInfo('✅ News dependencies initialized');
 }
@@ -241,6 +250,23 @@ Future<void> _initReportsDependencies() async {
   );
 
   sl.get<LoggerService>().logInfo('✅ Reports dependencies initialized');
+}
+
+/// ===========================
+/// Cases
+/// ===========================
+Future<void> _initCasesDependencies() async {
+  sl.registerLazySingleton<CasesRemoteDataSource>(
+    () => CasesRemoteDataSourceImpl(supabaseClient: sl()),
+  );
+
+  sl.registerLazySingleton<CasesRepository>(() => CasesRepositoryImpl(sl()));
+
+  sl.registerLazySingleton(() => CasesUseCase(sl()));
+
+  sl.registerFactory(() => CasesCubit(sl()));
+
+  sl.get<LoggerService>().logInfo('✅ Cases dependencies initialized');
 }
 
 /// ===========================

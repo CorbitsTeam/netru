@@ -28,7 +28,7 @@ class ChatSessionTile extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isSelected
-                ? AppColors.primaryLight.withOpacity(0.1)
+                ? AppColors.primaryLight.withValues(alpha: 0.1)
                 : AppColors.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
@@ -130,7 +130,7 @@ class ChatSessionTile extends StatelessWidget {
         color:
             isSelected
                 ? AppColors.primary
-                : AppColors.primaryLight.withOpacity(0.1),
+                : AppColors.primaryLight.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Icon(

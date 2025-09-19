@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:dartz/dartz.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/errors/failures.dart';
@@ -27,9 +28,15 @@ class ChatRepositoryImpl implements ChatRepository {
     Map<String, dynamic>? context,
   }) async {
     try {
+      log('🚀 ChatRepository: إرسال رسالة: $message');
+
       // First check if message context is allowed
+      log('🔍 فحص السياق...');
       final isAllowed = await remoteDataSource.isContextAllowed(message);
+      log('✅ نتيجة فحص السياق: $isAllowed');
+
       if (!isAllowed) {
+        log('❌ الرسالة خارج السياق المسموح');
         final outOfContextMessage = ChatMessageModel.assistantMessage(
           id: uuid.v4(),
           content:
@@ -50,18 +57,22 @@ class ChatRepositoryImpl implements ChatRepository {
         return Right(outOfContextMessage);
       }
 
+      log('📡 إرسال الرسالة إلى Remote API...');
       // Send message to remote API
       final response = await remoteDataSource.sendMessage(
         message: message,
         sessionId: sessionId,
         context: context,
       );
+      log('✅ تم الحصول على الاستجابة من Remote API');
 
       // Save response locally
       await localDataSource.saveMessage(sessionId, response);
+      log('💾 تم حفظ الاستجابة محلياً');
 
       return Right(response);
     } catch (e) {
+      log('💥 خطأ في ChatRepository.sendMessage: $e');
       return Left(ServerFailure('خطأ في إرسال الرسالة: $e'));
     }
   }
@@ -86,7 +97,7 @@ class ChatRepositoryImpl implements ChatRepository {
       // Save session locally
       await localDataSource.saveSession(session);
 
-      // Add welcome message
+      // Add welcome message WITHOUT streaming animation (displayed immediately)
       final welcomeMessage = ChatMessageModel.assistantMessage(
         id: uuid.v4(),
         content: '''مرحباً! أنا المساعد الذكي لتطبيق نترو 🚨

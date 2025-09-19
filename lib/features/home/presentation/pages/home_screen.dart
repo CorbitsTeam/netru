@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<NewsCubit>(),
+    return BlocProvider.value(
+      value: sl<NewsCubit>(),
       child: Scaffold(
         body: Stack(
           children: [
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const StatisticsCards(),
                       SizedBox(height: 15.h),
                       const NewsListWidget(
-                        maxItems: 5,
+                        maxItems: 3,
                         headerTitle: "أحدث الأخبار",
                       ),
                       SizedBox(height: 15.h),

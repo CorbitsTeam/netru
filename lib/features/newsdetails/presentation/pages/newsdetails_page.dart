@@ -292,11 +292,8 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.primary, // أخضر داكن
-                  Colors.red, // أخضر متوسط
-                ],
+              gradient: LinearGradient(
+                colors: [AppColors.primary.withOpacity(0.8), AppColors.primary],
               ),
               borderRadius: BorderRadius.circular(16.r),
               boxShadow: [
@@ -355,12 +352,12 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
     return Text(
       news.title,
       style: TextStyle(
-        fontSize: 22.sp,
+        fontSize: 18.sp,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
         height: 1.4,
       ),
-      textAlign: TextAlign.right,
+      textAlign: TextAlign.justify,
     );
   }
 
@@ -643,7 +640,7 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
                   height: 1.5,
                   fontWeight: FontWeight.w500,
                 ),
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.justify,
               ),
             ),
           ],
@@ -705,7 +702,7 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
                 height: 1.6,
                 fontWeight: FontWeight.w400,
               ),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.justify,
             ),
           ],
         ),

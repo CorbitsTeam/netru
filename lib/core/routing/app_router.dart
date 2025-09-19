@@ -26,6 +26,9 @@ import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 import '../../features/chatbot/presentation/pages/chat_page.dart';
 import '../../features/chatbot/presentation/pages/chat_sessions_page.dart';
 
+// News imports
+import '../../features/news/presentation/pages/all_news_page.dart';
+
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -108,6 +111,10 @@ class AppRouter {
             child: const ChatSessionsPage(),
           ),
         );
+
+      // News routes
+      case Routes.allNewsPage:
+        return _createRoute(const AllNewsPage());
 
       default:
         return null;

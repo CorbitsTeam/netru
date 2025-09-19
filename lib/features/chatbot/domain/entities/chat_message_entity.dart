@@ -20,6 +20,9 @@ class ChatMessageEntity extends Equatable {
   final DateTime timestamp;
   final Map<String, dynamic>? metadata;
   final bool isLoading;
+  final bool isStreaming;
+  final String? summary;
+  final double? streamingProgress;
 
   const ChatMessageEntity({
     required this.id,
@@ -29,6 +32,9 @@ class ChatMessageEntity extends Equatable {
     required this.timestamp,
     this.metadata,
     this.isLoading = false,
+    this.isStreaming = false,
+    this.summary,
+    this.streamingProgress,
   });
 
   @override
@@ -40,6 +46,9 @@ class ChatMessageEntity extends Equatable {
     timestamp,
     metadata,
     isLoading,
+    isStreaming,
+    summary,
+    streamingProgress,
   ];
 
   ChatMessageEntity copyWith({
@@ -50,6 +59,9 @@ class ChatMessageEntity extends Equatable {
     DateTime? timestamp,
     Map<String, dynamic>? metadata,
     bool? isLoading,
+    bool? isStreaming,
+    String? summary,
+    double? streamingProgress,
   }) {
     return ChatMessageEntity(
       id: id ?? this.id,
@@ -59,6 +71,9 @@ class ChatMessageEntity extends Equatable {
       timestamp: timestamp ?? this.timestamp,
       metadata: metadata ?? this.metadata,
       isLoading: isLoading ?? this.isLoading,
+      isStreaming: isStreaming ?? this.isStreaming,
+      summary: summary ?? this.summary,
+      streamingProgress: streamingProgress ?? this.streamingProgress,
     );
   }
 }

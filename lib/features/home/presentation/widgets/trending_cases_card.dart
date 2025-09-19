@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/di/injection_container.dart';
+import 'package:netru_app/features/cases/presentation/cubit/cases_cubit.dart';
+import 'package:netru_app/features/cases/presentation/cubit/cases_state.dart';
+import 'package:netru_app/features/cases/data/models/case_model.dart';
+import 'package:netru_app/core/services/logger_service.dart';
 
-import '../../../../core/constants/app_assets.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class TrendingCasesCard extends StatefulWidget {
   const TrendingCasesCard({super.key});
@@ -10,234 +16,340 @@ class TrendingCasesCard extends StatefulWidget {
   State<TrendingCasesCard> createState() => _TrendingCasesCardState();
 }
 
-class _TrendingCasesCardState extends State<TrendingCasesCard>
-    with TickerProviderStateMixin {
-  int _currentIndex = 0;
-  late AnimationController _slideController;
-
-  // بيانات الصور والنصوص
-  final List<Map<String, String>> _carouselData = [
-    {
-      'image': AppAssets.newsImages,
-      'title': 'القبض على عنصر إرهابي شديد الخطورة',
-      'date': '15 رمضان 2024',
-    },
-    {
-      'image': AppAssets.newsImage2,
-      'title': 'الإستجابة لحالات التسول في الاسواق',
-      'date': '20 شوال 2024',
-    },
-    {
-      'image': AppAssets.newsImages,
-      'title': 'الداخلية تقبض على شبكة احتيال إلكتروني',
-      'date': '10 ذي الحجة 2024',
-    },
-  ];
-
+class _TrendingCasesCardState extends State<TrendingCasesCard> {
   @override
   void initState() {
     super.initState();
-    // إعداد animation controller للـ slide
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    // بدء الـ animation الأولى
-    _slideController.forward();
-  }
-
-  void _nextSlide() async {
-    if (_currentIndex < _carouselData.length - 1) {
-      // slide out للصورة الحالية
-      await _slideController.reverse();
-      setState(() {
-        _currentIndex = _currentIndex + 1;
-      });
-      // slide in للصورة الجديدة
-      _slideController.forward();
-    }
-  }
-
-  void _previousSlide() async {
-    if (_currentIndex > 0) {
-      // slide out للصورة الحالية
-      await _slideController.reverse();
-      setState(() {
-        _currentIndex = _currentIndex - 1;
-      });
-      // slide in للصورة الجديدة
-      _slideController.forward();
-    }
-  }
-
-  @override
-  void dispose() {
-    _slideController.dispose();
-    super.dispose();
+    // تحميل القضايا الرائجة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isDependencyRegistered<CasesCubit>()) {
+        try {
+          context.read<CasesCubit>().loadTrendingCases(limit: 3);
+        } catch (_) {}
+      } else {
+        sl.get<LoggerService>().logInfo(
+          '⚠️ CasesCubit غير مسجل في GetIt — قد تحتاج لإعادة تشغيل التطبيق (full restart) بعد تغييرات DI.',
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!isDependencyRegistered<CasesCubit>()) {
+      return Container(
+        height: 200.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          color: Colors.yellow[50],
+          border: Border.all(color: Colors.yellow.withOpacity(0.6)),
+        ),
+        child: Center(
+          child: Text('تبعيات القضايا غير جاهزة — قم بعمل Restart للتطبيق.'),
+        ),
+      );
+    }
+
+    return BlocProvider(
+      create: (_) => sl<CasesCubit>(),
+      child: BlocBuilder<CasesCubit, CasesState>(
+        builder: (context, state) {
+          if (state is CasesLoading) {
+            return _buildLoadingCard();
+          }
+
+          if (state is CasesError) {
+            return _buildErrorCard(state.message);
+          }
+
+          if (state is TrendingCasesLoaded) {
+            if (state.cases.isEmpty) {
+              return _buildEmptyCard();
+            }
+
+            return _buildTrendingCasesList(state.cases);
+          }
+
+          return _buildEmptyCard();
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
     return Container(
-      width: double.infinity,
-      height: 180.h,
+      height: 200.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: Colors.grey[100],
       ),
-      child: ClipRRect(
+      child: Center(
+        child: CircularProgressIndicator(
+          color: AppColors.primary,
+          strokeWidth: 2.w,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(String message) {
+    return Container(
+      height: 200.h,
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        child: Stack(
+        color: Colors.red.withOpacity(0.1),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // الصورة الخلفية مع الـ slide animation
-            ...List.generate(_carouselData.length, (index) {
-              return Positioned.fill(
-                child: AnimatedOpacity(
-                  opacity: index == _currentIndex ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: Image.asset(
-                    _carouselData[index]['image']!,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            }),
-            // طبقة شفافة سوداء للنص
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                  ),
-                ),
-              ),
+            Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
+            SizedBox(height: 8.h),
+            Text(
+              'خطأ في تحميل القضايا الرائجة',
+              style: TextStyle(fontSize: 14.sp, color: Colors.red[700]),
             ),
-            // السهم الأيسر
-            if (_currentIndex > 0)
-              Positioned(
-                left: 12.w,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: _previousSlide,
-                    child: Container(
-                      width: 36.w,
-                      height: 36.h,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
-                        size: 18.sp,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            // السهم الأيمن
-            if (_currentIndex < _carouselData.length - 1)
-              Positioned(
-                right: 12.w,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: _nextSlide,
-                    child: Container(
-                      width: 36.w,
-                      height: 36.h,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 18.sp,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            // المحتوى النصي والنقط
-            Positioned(
-              bottom: 16.h,
-              left: 16.w,
-              right: 16.w,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // التاريخ مع النقط في نفس الصف
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // التاريخ
-                      Text(
-                        _carouselData[_currentIndex]['date']!,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-
-                      // النقط المتحركة
-                      Row(
-                        children: List.generate(
-                          _carouselData.length,
-                          (index) => Container(
-                            margin: EdgeInsets.only(left: 6.w),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: index == _currentIndex ? 16.w : 6.w,
-                              height: 6.h,
-                              decoration: BoxDecoration(
-                                color:
-                                    index == _currentIndex
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(3.r),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 8.h),
-
-                  // العنوان
-                  Text(
-                    _carouselData[_currentIndex]['title']!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
+            SizedBox(height: 4.h),
+            Text(
+              message.length > 50 ? '${message.substring(0, 50)}...' : message,
+              style: TextStyle(fontSize: 12.sp, color: Colors.red[600]),
+              textAlign: TextAlign.center,
+              maxLines: 2,
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildEmptyCard() {
+    return Container(
+      height: 200.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        color: Colors.grey[100],
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.trending_up, color: Colors.grey[600], size: 32.sp),
+            SizedBox(height: 8.h),
+            Text(
+              'لا توجد قضايا رائجة',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrendingCasesList(List<CaseModel> cases) {
+    return Column(
+      children:
+          cases.map((caseModel) => _buildTrendingCaseCard(caseModel)).toList(),
+    );
+  }
+
+  Widget _buildTrendingCaseCard(CaseModel caseModel) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with trending badge and priority
+          Row(
+            children: [
+              // Trending badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.trending_up, color: Colors.white, size: 14.sp),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'رائج',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 8.w),
+              // Priority badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: _getPriorityColor(caseModel.priority),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  caseModel.priorityText,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Date
+              Text(
+                _formatDate(caseModel.incidentDate),
+                style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+
+          // Title
+          Text(
+            caseModel.displayTitle,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 8.h),
+
+          // Description
+          Text(
+            caseModel.displayDescription,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 12.h),
+
+          // Footer with location and status
+          Row(
+            children: [
+              // Location
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: AppColors.primary,
+                      size: 16.sp,
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        caseModel.displayLocation,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey[600],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              // Status
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(caseModel.status).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: _getStatusColor(caseModel.status).withOpacity(0.3),
+                  ),
+                ),
+                child: Text(
+                  caseModel.statusText,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: _getStatusColor(caseModel.status),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getPriorityColor(String priority) {
+    switch (priority) {
+      case 'urgent':
+        return Colors.red;
+      case 'high':
+        return Colors.orange;
+      case 'medium':
+        return Colors.blue;
+      case 'low':
+        return Colors.green;
+      default:
+        return Colors.blue;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'pending':
+        return Colors.orange;
+      case 'under_investigation':
+        return Colors.blue;
+      case 'resolved':
+        return Colors.green;
+      case 'closed':
+        return Colors.grey;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return Colors.orange;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 7) {
+      return '${date.day}/${date.month}/${date.year}';
+    } else if (difference.inDays > 0) {
+      return 'منذ ${difference.inDays} يوم';
+    } else if (difference.inHours > 0) {
+      return 'منذ ${difference.inHours} ساعة';
+    } else if (difference.inMinutes > 0) {
+      return 'منذ ${difference.inMinutes} دقيقة';
+    } else {
+      return 'الآن';
+    }
   }
 }

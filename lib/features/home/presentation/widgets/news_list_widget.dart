@@ -7,6 +7,7 @@ import 'package:netru_app/features/newsdetails/presentation/pages/newsdetails_pa
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/routing/routes.dart';
 
 class NewsListWidget extends StatefulWidget {
   final int maxItems;
@@ -57,7 +58,7 @@ class _NewsListWidgetState extends State<NewsListWidget> {
                       state.newsList.length > widget.maxItems)
                     TextButton(
                       onPressed: () {
-                        // يمكن إضافة صفحة لعرض جميع الأخبار
+                        Navigator.pushNamed(context, Routes.allNewsPage);
                       },
                       child: Text(
                         'عرض الكل',

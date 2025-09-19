@@ -23,4 +23,7 @@ class Routes {
   // Chatbot routes
   static const String chatPage = '/chatPage';
   static const String chatSessions = '/chatSessions';
+
+  // News routes
+  static const String allNewsPage = '/allNewsPage';
 }

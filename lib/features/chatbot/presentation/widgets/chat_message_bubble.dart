@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import 'typing_animation_widget.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
 class ChatMessageBubble extends StatelessWidget {
@@ -88,50 +89,87 @@ class ChatMessageBubble extends StatelessWidget {
   }
 
   Widget _buildMessageContent(bool isUser, bool isError) {
-    return SelectableText(
-      message.content,
-      style: AppTextStyles.bodyMedium.copyWith(
-        color:
-            isUser
-                ? Colors.white
-                : isError
-                ? AppColors.error
-                : AppColors.textPrimary,
-      ),
-    );
-  }
+    // For assistant messages with streaming enabled
+    if (!isUser && message.isStreaming) {
+      return TypingAnimationWithSummary(
+        text: message.content,
+        summary: message.summary,
+        textStyle: AppTextStyles.bodyMedium.copyWith(
+          color: isError ? AppColors.error : AppColors.textPrimary,
+        ),
+        typingSpeed: const Duration(milliseconds: 20),
+        autoStart: true,
+        showCursor: true,
+      );
+    }
 
-  Widget _buildTypingIndicator() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    // For regular messages (user messages or completed assistant messages)
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDot(0),
-        SizedBox(width: 4.w),
-        _buildDot(1),
-        SizedBox(width: 4.w),
-        _buildDot(2),
+        SelectableText(
+          message.content,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color:
+                isUser
+                    ? Colors.white
+                    : isError
+                    ? AppColors.error
+                    : AppColors.textPrimary,
+          ),
+        ),
+        if (!isUser &&
+            message.summary != null &&
+            message.summary!.isNotEmpty) ...[
+          SizedBox(height: 12.h),
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(
+                color: AppColors.primaryLight.withValues(alpha: 0.3),
+                width: 1.w,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.summarize_outlined,
+                      size: 16.sp,
+                      color: AppColors.primary,
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      'الملخص',
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  message.summary!,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildDot(int index) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.4, end: 1.0),
-      duration: const Duration(milliseconds: 600),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            width: 8.w,
-            height: 8.w,
-            decoration: const BoxDecoration(
-              color: AppColors.secondary,
-              shape: BoxShape.circle,
-            ),
-          ),
-        );
-      },
-    );
+  Widget _buildTypingIndicator() {
+    return TypingIndicator(size: 8.0, color: AppColors.secondary);
   }
 
   Widget _buildMessageTime(bool isUser) {
@@ -144,7 +182,7 @@ class ChatMessageBubble extends StatelessWidget {
   }
 
   Color _getBubbleColor(bool isUser, bool isError) {
-    if (isError) return AppColors.errorLight.withOpacity(0.1);
+    if (isError) return AppColors.errorLight.withValues(alpha: 0.1);
     if (isUser) return AppColors.primary;
     return AppColors.surface;
   }
