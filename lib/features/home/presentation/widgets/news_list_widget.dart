@@ -100,7 +100,7 @@ class _NewsListWidgetState extends State<NewsListWidget> {
   }
 
   Widget _buildLoadingState() {
-    return SizedBox(
+    return Container(
       height: 200.h,
       child: Center(
         child: CircularProgressIndicator(
@@ -113,33 +113,44 @@ class _NewsListWidgetState extends State<NewsListWidget> {
 
   Widget _buildErrorState(String message) {
     return Container(
-      height: 150.h,
+      height: 200.h, // Increased height to accommodate longer error messages
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.red.withOpacity(0.3)),
       ),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
-            SizedBox(height: 8.h),
-            Text(
-              'خطأ في تحميل الأخبار',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.red[700],
-              ),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: SingleChildScrollView(
+            // Added scrollable container
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, // Don't expand to full height
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
+                SizedBox(height: 8.h),
+                Text(
+                  'خطأ في تحميل الأخبار',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red[700],
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  message.length > 150
+                      ? '${message.substring(0, 150)}...'
+                      : message, // Truncate long messages
+                  style: TextStyle(fontSize: 12.sp, color: Colors.red[600]),
+                  textAlign: TextAlign.center,
+                  maxLines: 3, // Limit to 3 lines
+                  overflow: TextOverflow.ellipsis, // Handle overflow gracefully
+                ),
+              ],
             ),
-            SizedBox(height: 4.h),
-            Text(
-              message,
-              style: TextStyle(fontSize: 12.sp, color: Colors.red[600]),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );

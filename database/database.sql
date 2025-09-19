@@ -24,6 +24,35 @@ CREATE TABLE public.identity_documents (
   CONSTRAINT identity_documents_pkey PRIMARY KEY (id),
   CONSTRAINT identity_documents_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.news_articles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  title_ar text,
+  content_text text NOT NULL,
+  content_text_ar text,
+  image_url text,
+  author_name text,
+  category_id bigint,
+  status text DEFAULT 'published'::text CHECK (status = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  is_featured boolean DEFAULT false,
+  published_at timestamp without time zone DEFAULT now(),
+  views_count bigint DEFAULT 0,
+  external_id text,
+  created_at timestamp without time zone DEFAULT now(),
+  is_published boolean DEFAULT true,
+  CONSTRAINT news_articles_pkey PRIMARY KEY (id),
+  CONSTRAINT news_articles_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.news_categories(id)
+);
+CREATE TABLE public.news_categories (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name text NOT NULL UNIQUE,
+  name_ar text NOT NULL UNIQUE,
+  icon text,
+  color text DEFAULT '#2196F3'::text,
+  is_active boolean DEFAULT true,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT news_categories_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
   created_at timestamp without time zone DEFAULT now(),

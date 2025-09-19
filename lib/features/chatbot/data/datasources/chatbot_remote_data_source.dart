@@ -1,8 +1,9 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import '../models/chat_message_model.dart';
+
 import '../../domain/entities/chat_message_entity.dart';
+import '../models/chat_message_model.dart';
 
 abstract class ChatbotRemoteDataSource {
   /// Send message to chatbot API and get response
@@ -105,8 +106,14 @@ class ChatbotRemoteDataSourceImpl implements ChatbotRemoteDataSource {
     cleanText = cleanText.replaceAll(RegExp(r'`([^`]+)`'), r'$1');
 
     // Remove bullet points and list formatting
-    cleanText = cleanText.replaceAll(RegExp(r'^\s*[-*+•]\s*', multiLine: true), '');
-    cleanText = cleanText.replaceAll(RegExp(r'^\s*\d+\.\s*', multiLine: true), '');
+    cleanText = cleanText.replaceAll(
+      RegExp(r'^\s*[-*+•]\s*', multiLine: true),
+      '',
+    );
+    cleanText = cleanText.replaceAll(
+      RegExp(r'^\s*\d+\.\s*', multiLine: true),
+      '',
+    );
 
     // Remove $1, $2, etc. placeholders (regex replacement artifacts)
     cleanText = cleanText.replaceAll(RegExp(r'\$\d+'), '');

@@ -573,14 +573,14 @@ class ReportDetailsPage extends StatelessWidget {
                         subtitle: 'تنزيل ملف PDF بتفاصيل البلاغ',
                         onTap: () => _downloadPDF(context, report!),
                       ),
-                      Divider(height: 1.h, color: Colors.grey[200]),
-                      _buildActionItem(
-                        context,
-                        icon: Icons.print,
-                        title: 'طباعة البلاغ',
-                        subtitle: 'طباعة تفاصيل البلاغ',
-                        onTap: () => _printReport(context),
-                      ),
+                      // Divider(height: 1.h, color: Colors.grey[200]),
+                      // _buildActionItem(
+                      //   context,
+                      //   icon: Icons.print,
+                      //   title: 'طباعة البلاغ',
+                      //   subtitle: 'طباعة تفاصيل البلاغ',
+                      //   onTap: () => _printReport(context),
+                      // ),
                       Divider(height: 1.h, color: Colors.grey[200]),
                       _buildActionItem(
                         context,

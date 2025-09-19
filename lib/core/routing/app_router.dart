@@ -87,6 +87,10 @@ class AppRouter {
       case '/admin-dashboard':
         return _createRoute(const AdminDashboardPage());
 
+      // // Debug Test route
+      // case '/debug-test':
+      //   return _createRoute(const DebugTestPage());
+
       // Chatbot routes
       case Routes.chatPage:
         final args = settings.arguments as Map<String, dynamic>?;

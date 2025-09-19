@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
+import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/reports_page.dart';
 
 class CustomBottomBar extends StatefulWidget {
@@ -32,37 +32,12 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     });
   }
 
-  Widget _buildChatFab(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/chatPage');
-        },
-        backgroundColor: AppColors.primaryColor,
-        child: Icon(
-          Icons.chat_bubble_outline,
-          color: Colors.white,
-          size: 24.sp,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      floatingActionButton: _selectedIndex == 0 ? _buildChatFab(context) : null,
+      floatingActionButton:
+          _selectedIndex == 0 ? const SizedBox.shrink() : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
         // height: 100.h,

@@ -38,7 +38,7 @@ import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 // ===========================
 // News Feature
 // ===========================
-import '../../features/newsdetails/data/datasources/news_local_datasource.dart';
+import '../../features/newsdetails/data/datasources/newsdetails_remote_datasource.dart';
 import '../../features/newsdetails/data/repositories/newsdetails_repository_impl.dart';
 import '../../features/newsdetails/domain/repositories/newsdetails_repository.dart';
 import '../../features/newsdetails/domain/usecases/newsdetails_usecase.dart';
@@ -189,12 +189,12 @@ Future<void> _initChatbotDependencies() async {
 /// News
 /// ===========================
 Future<void> _initNewsDependencies() async {
-  sl.registerLazySingleton<NewsLocalDataSource>(
-    () => NewsLocalDataSourceImpl(),
+  sl.registerLazySingleton<NewsdetailsRemoteDataSource>(
+    () => NewsdetailsRemoteDataSourceImpl(supabaseClient: sl()),
   );
 
   sl.registerLazySingleton<NewsdetailsRepository>(
-    () => NewsdetailsRepositoryImpl(sl()),
+    () => NewsdetailsRepositoryImpl(sl<NewsdetailsRemoteDataSource>()),
   );
 
   sl.registerLazySingleton(() => NewsdetailsUseCase(sl()));

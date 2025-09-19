@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/features/newsdetails/domain/usecases/newsdetails_usecase.dart';
 import 'package:netru_app/features/newsdetails/data/models/news_model.dart';
+import 'package:netru_app/features/newsdetails/data/models/news_category_model.dart';
 import 'package:netru_app/features/newsdetails/presentation/cubit/news_state.dart';
 
 class NewsCubit extends Cubit<NewsState> {
@@ -18,7 +19,7 @@ class NewsCubit extends Cubit<NewsState> {
     }
   }
 
-  Future<void> selectNews(int newsId) async {
+  Future<void> selectNews(String newsId) async {
     final currentState = state;
     if (currentState is NewsLoaded) {
       try {
@@ -103,7 +104,7 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   // الحصول على خبر معين بالـ ID
-  NewsModel? getNewsById(int id) {
+  NewsModel? getNewsById(String id) {
     final currentState = state;
     if (currentState is NewsLoaded) {
       try {
@@ -135,5 +136,42 @@ class NewsCubit extends Cubit<NewsState> {
       return sortedNews.take(limit).toList();
     }
     return [];
+  }
+
+  // الحصول على الأخبار المميزة للـ Carousel
+  Future<void> loadFeaturedNews() async {
+    emit(NewsLoading());
+    try {
+      final featuredNews = await newsUseCase.getFeaturedNews();
+      emit(NewsLoaded(newsList: featuredNews));
+    } catch (e) {
+      emit(
+        NewsError(message: 'حدث خطأ في تحميل الأخبار المميزة: ${e.toString()}'),
+      );
+    }
+  }
+
+  // الحصول على أخبار بتصنيف معين
+  Future<void> loadNewsByCategory(int categoryId) async {
+    emit(NewsLoading());
+    try {
+      final categoryNews = await newsUseCase.getNewsByCategory(categoryId);
+      emit(NewsLoaded(newsList: categoryNews));
+    } catch (e) {
+      emit(
+        NewsError(message: 'حدث خطأ في تحميل أخبار التصنيف: ${e.toString()}'),
+      );
+    }
+  }
+
+  // الحصول على تصنيفات الأخبار
+  Future<List<NewsCategoryModel>> getNewsCategories() async {
+    try {
+      final categories = await newsUseCase.getNewsCategories();
+      return categories;
+    } catch (e) {
+      print('❌ Error getting categories: $e');
+      return [];
+    }
   }
 }

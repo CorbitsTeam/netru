@@ -75,8 +75,6 @@ flutter:
     - assets/icons/
     - assets/lottie/
     - assets/translations/
-    - assets/news/
-
 
   fonts:
     - family: Almarai
