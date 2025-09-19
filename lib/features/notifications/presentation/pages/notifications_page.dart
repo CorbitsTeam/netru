@@ -6,6 +6,7 @@ import 'package:netru_app/features/notifications/presentation/cubit/notification
 import '../widgets/notification_item.dart';
 import '../widgets/notification_app_bar.dart';
 
+// New notifications page with BlocProvider
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
