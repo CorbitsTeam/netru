@@ -231,8 +231,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryColor,
           side: const BorderSide(color: AppColors.primaryColor, width: 1.5),
-          textStyle:
-              textStyle(16.sp, FontWeight.w600, AppColors.primaryColor),
+          textStyle: textStyle(16.sp, FontWeight.w600, AppColors.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -242,8 +241,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryColor,
-          textStyle:
-              textStyle(14.sp, FontWeight.w600, AppColors.primaryColor),
+          textStyle: textStyle(14.sp, FontWeight.w600, AppColors.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.r),
           ),
