@@ -69,7 +69,7 @@ class _CrimeHeatMapPageState extends State<CrimeHeatMapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: SafeArea(
         child: Column(
@@ -88,7 +88,7 @@ class _CrimeHeatMapPageState extends State<CrimeHeatMapPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       automaticallyImplyLeading: false,
       centerTitle: true,
@@ -124,7 +124,13 @@ class _CrimeHeatMapPageState extends State<CrimeHeatMapPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.location_off, size: 64, color: Colors.grey[400]),
+            Icon(
+              Icons.location_off,
+              size: 64,
+              color: Theme.of(
+                context,
+              ).scaffoldBackgroundColor.withValues(alpha: .4),
+            ),
             const SizedBox(height: 16),
             Text(
               _locationError!,

@@ -169,7 +169,7 @@ class ChatMessageBubble extends StatelessWidget {
   }
 
   Widget _buildTypingIndicator() {
-    return TypingIndicator(size: 8.0, color: AppColors.secondary);
+    return const TypingIndicator(size: 8.0, color: AppColors.secondary);
   }
 
   Widget _buildMessageTime(bool isUser) {

@@ -12,7 +12,9 @@ class CrimeLegendWidget extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(20.w),
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,6 +36,7 @@ class CrimeLegendWidget extends StatelessWidget {
               title: 'وسط القاهرة',
               subtitle: 'تم الكشف عن نشاط سرقة مرتفع',
               time: 'آخر تحديث: منذ ساعتين',
+              context: context,
             ),
             SizedBox(height: 12.h),
             // عنصر المنطقة متوسطة الخطورة (برتقالي)
@@ -42,6 +45,7 @@ class CrimeLegendWidget extends StatelessWidget {
               title: 'حي الجيزة',
               subtitle: 'حوادث سرقة معتدلة',
               time: 'آخر تحديث: منذ 4 ساعات',
+              context: context,
             ),
             SizedBox(height: 12.h),
             // عنصر المنطقة الآمنة (أخضر)
@@ -50,6 +54,7 @@ class CrimeLegendWidget extends StatelessWidget {
               title: 'ميناء الإسكندرية',
               subtitle: 'حالات الاعتداء المُبلّغ عنها',
               time: 'آخر تحديث: منذ 6 ساعات',
+              context: context,
             ),
           ],
         ),
@@ -62,13 +67,14 @@ class CrimeLegendWidget extends StatelessWidget {
     required String title,
     required String subtitle,
     required String time,
+    required BuildContext context,
   }) {
     return Container(
       width: double.infinity,
       height: 80.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         border: Border.all(color: Colors.grey[300]!),
       ),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),

@@ -377,7 +377,7 @@ class _AllNewsPageState extends State<AllNewsPage> {
                 topLeft: Radius.circular(15.r),
                 topRight: Radius.circular(15.r),
               ),
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 height: 200.h,
                 child:

@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import 'package:netru_app/core/cubit/locale/locale_cubit.dart';
+import 'package:netru_app/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:netru_app/features/settings/presentation/domain/settings.dart';
 
 class LanguageSection extends StatelessWidget {
   const LanguageSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LocaleCubit, LocaleState>(
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      buildWhen: (previous, current) {
+        // Only rebuild when language actually changes
+        if (previous is SettingsLoaded && current is SettingsLoaded) {
+          return previous.settings.language != current.settings.language;
+        }
+        return true;
+      },
       builder: (context, state) {
-        final isArabic = state.locale.languageCode == 'ar';
+        final isArabic =
+            state is SettingsLoaded
+                ? state.settings.language == Language.arabic
+                : true;
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -41,14 +51,13 @@ class LanguageSection extends StatelessWidget {
               children: [
                 // Arabic Button
                 GestureDetector(
+                  key: const ValueKey('arabic_language_button'),
                   onTap: () async {
                     if (!isArabic) {
-                      await context.setLocale(const Locale('ar'));
-                      if (context.mounted) {
-                        context.read<LocaleCubit>().changeLocale(
-                          const Locale('ar'),
-                        );
-                      }
+                      final settingsBloc = context.read<SettingsBloc>();
+                      settingsBloc.add(
+                        const SettingsLanguageChanged(Language.arabic),
+                      );
                     }
                   },
                   child: AnimatedContainer(
@@ -88,14 +97,13 @@ class LanguageSection extends StatelessWidget {
                 SizedBox(width: 10.w),
                 // English Button
                 GestureDetector(
+                  key: const ValueKey('english_language_button'),
                   onTap: () async {
                     if (isArabic) {
-                      await context.setLocale(const Locale('en'));
-                      if (context.mounted) {
-                        context.read<LocaleCubit>().changeLocale(
-                          const Locale('en'),
-                        );
-                      }
+                      final settingsBloc = context.read<SettingsBloc>();
+                      settingsBloc.add(
+                        const SettingsLanguageChanged(Language.english),
+                      );
                     }
                   },
                   child: AnimatedContainer(

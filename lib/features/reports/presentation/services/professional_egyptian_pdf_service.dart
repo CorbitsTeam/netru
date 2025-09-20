@@ -28,8 +28,9 @@ class ProfessionalEgyptianPdfService {
     if (_arabicFont != null &&
         _arabicBoldFont != null &&
         _egyptLogo != null &&
-        _netruLogo != null)
+        _netruLogo != null) {
       return;
+    }
 
     try {
       // تحميل الخطوط العربية

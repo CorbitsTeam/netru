@@ -19,7 +19,7 @@ class ReportCard extends StatelessWidget {
         width: double.infinity,
         margin: EdgeInsets.only(bottom: 16.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(

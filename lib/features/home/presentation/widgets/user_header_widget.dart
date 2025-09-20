@@ -134,8 +134,8 @@ class UserHeaderWidget extends StatelessWidget {
   }
 
   Widget _buildDefaultAvatar(UserDataHelper userHelper) {
-    final isLoggedIn = userHelper.isUserLoggedIn();
-    final firstName = userHelper.getUserFirstName();
+    // final isLoggedIn = userHelper.isUserLoggedIn();
+    // final firstName = userHelper.getUserFirstName();
 
     return Center(
       child: Icon(

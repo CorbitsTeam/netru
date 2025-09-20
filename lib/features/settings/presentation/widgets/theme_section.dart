@@ -2,16 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import 'package:netru_app/core/cubit/theme/theme_cubit.dart';
+import 'package:netru_app/features/settings/presentation/bloc/settings_bloc.dart';
 
 class ThemeSection extends StatelessWidget {
   const ThemeSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeState>(
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      buildWhen: (previous, current) {
+        // Only rebuild when theme mode actually changes
+        if (previous is SettingsLoaded && current is SettingsLoaded) {
+          return previous.settings.themeMode != current.settings.themeMode;
+        }
+        return true;
+      },
       builder: (context, state) {
-        final isDarkMode = state.themeMode == ThemeMode.dark;
+        final isDarkMode =
+            state is SettingsLoaded
+                ? state.settings.themeMode == ThemeMode.dark
+                : false;
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -40,7 +50,9 @@ class ThemeSection extends StatelessWidget {
             // Custom Toggle Switch
             GestureDetector(
               onTap: () {
-                context.read<ThemeCubit>().toggleTheme();
+                final settingsBloc = context.read<SettingsBloc>();
+                final newTheme = isDarkMode ? ThemeMode.light : ThemeMode.dark;
+                settingsBloc.add(SettingsThemeChanged(newTheme));
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -63,7 +75,7 @@ class ThemeSection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),

@@ -101,7 +101,7 @@ class _NewsListWidgetState extends State<NewsListWidget> {
   }
 
   Widget _buildLoadingState() {
-    return Container(
+    return SizedBox(
       height: 200.h,
       child: Center(
         child: CircularProgressIndicator(
@@ -195,7 +195,7 @@ class _NewsListWidgetState extends State<NewsListWidget> {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(

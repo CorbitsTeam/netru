@@ -15,19 +15,15 @@ class ReportsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => di.sl<ReportsCubit>()..loadReports(),
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           centerTitle: true,
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [AppColors.primaryColor.withOpacity(0.1), Colors.white],
-              ),
+              color: Theme.of(context).scaffoldBackgroundColor,
             ),
           ),
           title: Row(
@@ -81,7 +77,12 @@ class ReportsPage extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.grey[50]!, Colors.white],
+              colors: [
+                Theme.of(
+                  context,
+                ).scaffoldBackgroundColor.withValues(alpha: 0.2),
+                Theme.of(context).scaffoldBackgroundColor,
+              ],
             ),
           ),
           child: const SafeArea(
@@ -111,7 +112,7 @@ class ReportsListView extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(20.r),
                     boxShadow: [
                       BoxShadow(
@@ -149,7 +150,7 @@ class ReportsListView extends StatelessWidget {
               margin: EdgeInsets.all(20.w),
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(

@@ -44,7 +44,7 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
           color: Colors.yellow[50],
           border: Border.all(color: Colors.yellow.withOpacity(0.6)),
         ),
-        child: Center(
+        child: const Center(
           child: Text('تبعيات القضايا غير جاهزة — قم بعمل Restart للتطبيق.'),
         ),
       );
@@ -128,7 +128,7 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
       height: 200.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.grey[100],
+        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.2),
       ),
       child: Center(
         child: Column(

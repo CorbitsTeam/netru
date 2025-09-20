@@ -72,6 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             // Profile Header Section
             Container(
+              key: const ValueKey('profile_header_container'),
               width: double.infinity,
               margin: EdgeInsets.all(16.w),
               padding: EdgeInsets.all(20.w),
@@ -138,6 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
+                      key: const ValueKey('edit_profile_button'),
                       onPressed: () {
                         Navigator.push(
                           context,

@@ -12,7 +12,6 @@ import '../../domain/entities/reports_entity.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:printing/printing.dart';
 
 class ReportDetailsPage extends StatelessWidget {
   final ReportEntity? report;
@@ -34,13 +33,13 @@ class ReportDetailsPage extends StatelessWidget {
     // If no report is passed, show error
     if (report == null) {
       return Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             'تفاصيل البلاغ',
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           centerTitle: true,
         ),
@@ -49,7 +48,7 @@ class ReportDetailsPage extends StatelessWidget {
             margin: EdgeInsets.all(20.w),
             padding: EdgeInsets.all(24.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
@@ -958,7 +957,7 @@ ${report!.reportDetails}
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(
+                  const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primaryColor,
                     ),
@@ -1015,7 +1014,7 @@ ${report!.reportDetails}
                 children: [
                   Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
                   SizedBox(width: 12.w),
-                  Text('تم إنشاء التقرير وفتحه بنجاح ✅'),
+                  const Text('تم إنشاء التقرير وفتحه بنجاح ✅'),
                 ],
               ),
               backgroundColor: Colors.green,
@@ -1042,7 +1041,7 @@ ${report!.reportDetails}
               children: [
                 Icon(Icons.error, color: Colors.white, size: 20.sp),
                 SizedBox(width: 12.w),
-                Expanded(child: Text('حدث خطأ أثناء إنشاء التقرير')),
+                const Expanded(child: Text('حدث خطأ أثناء إنشاء التقرير')),
               ],
             ),
             backgroundColor: Colors.red,
@@ -1054,116 +1053,115 @@ ${report!.reportDetails}
           ),
         );
       }
-      print('خطأ في إنشاء PDF: $e');
     }
   }
 
   // دالة مبسطة للطباعة
-  void _printReport(BuildContext context) async {
-    if (report == null) return;
+  // void _printReport(BuildContext context) async {
+  //   if (report == null) return;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (dialogContext) => WillPopScope(
-            onWillPop: () async => false,
-            child: AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              content: Container(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryColor,
-                      ),
-                      strokeWidth: 3.0,
-                    ),
-                    SizedBox(height: 20.h),
-                    Text(
-                      'جاري إعداد الطباعة...',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'يرجى الانتظار',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.grey[600],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-    );
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder:
+  //         (dialogContext) => WillPopScope(
+  //           onWillPop: () async => false,
+  //           child: AlertDialog(
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(20.r),
+  //             ),
+  //             content: Container(
+  //               padding: EdgeInsets.all(16.w),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   CircularProgressIndicator(
+  //                     valueColor: AlwaysStoppedAnimation<Color>(
+  //                       AppColors.primaryColor,
+  //                     ),
+  //                     strokeWidth: 3.0,
+  //                   ),
+  //                   SizedBox(height: 20.h),
+  //                   Text(
+  //                     'جاري إعداد الطباعة...',
+  //                     style: TextStyle(
+  //                       fontSize: 16.sp,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: Colors.black87,
+  //                     ),
+  //                     textAlign: TextAlign.center,
+  //                   ),
+  //                   SizedBox(height: 8.h),
+  //                   Text(
+  //                     'يرجى الانتظار',
+  //                     style: TextStyle(
+  //                       fontSize: 12.sp,
+  //                       color: Colors.grey[600],
+  //                     ),
+  //                     textAlign: TextAlign.center,
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //   );
 
-    try {
-      final pdfBytes =
-          await ProfessionalEgyptianPdfService.generateProfessionalReportPdf(
-            report!,
-          );
+  //   try {
+  //     final pdfBytes =
+  //         await ProfessionalEgyptianPdfService.generateProfessionalReportPdf(
+  //           report!,
+  //         );
 
-      if (context.mounted) {
-        await _safePopDialog(context);
+  //     if (context.mounted) {
+  //       await _safePopDialog(context);
 
-        await Printing.layoutPdf(
-          onLayout: (format) async => pdfBytes,
-          name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}',
-        );
+  //       await Printing.layoutPdf(
+  //         onLayout: (format) async => pdfBytes,
+  //         name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}',
+  //       );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.print, color: Colors.white, size: 20.sp),
-                SizedBox(width: 12.w),
-                Text('تم فتح نافذة الطباعة'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(16.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        await _safePopDialog(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.error, color: Colors.white, size: 20.sp),
-                SizedBox(width: 12.w),
-                Expanded(child: Text('فشلت الطباعة')),
-              ],
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(16.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
-        );
-      }
-    }
-  }
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Row(
+  //             children: [
+  //               Icon(Icons.print, color: Colors.white, size: 20.sp),
+  //               SizedBox(width: 12.w),
+  //               Text('تم فتح نافذة الطباعة'),
+  //             ],
+  //           ),
+  //           backgroundColor: Colors.green,
+  //           behavior: SnackBarBehavior.floating,
+  //           margin: EdgeInsets.all(16.w),
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(10.r),
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (context.mounted) {
+  //       await _safePopDialog(context);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Row(
+  //             children: [
+  //               Icon(Icons.error, color: Colors.white, size: 20.sp),
+  //               SizedBox(width: 12.w),
+  //               Expanded(child: Text('فشلت الطباعة')),
+  //             ],
+  //           ),
+  //           backgroundColor: Colors.red,
+  //           behavior: SnackBarBehavior.floating,
+  //           margin: EdgeInsets.all(16.w),
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(10.r),
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   // دالة مبسطة للمشاركة كـ PDF
   Future<void> _shareAsPDF(BuildContext context) async {
@@ -1184,7 +1182,7 @@ ${report!.reportDetails}
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(
+                    const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppColors.primaryColor,
                       ),
@@ -1239,7 +1237,7 @@ ${report!.reportDetails}
               children: [
                 Icon(Icons.share, color: Colors.white, size: 20.sp),
                 SizedBox(width: 12.w),
-                Text('تم مشاركة التقرير بنجاح'),
+                const Text('تم مشاركة التقرير بنجاح'),
               ],
             ),
             backgroundColor: Colors.green,
@@ -1260,7 +1258,7 @@ ${report!.reportDetails}
               children: [
                 Icon(Icons.warning, color: Colors.white, size: 20.sp),
                 SizedBox(width: 12.w),
-                Text('فشلت المشاركة - سيتم مشاركة النص'),
+                const Text('فشلت المشاركة - سيتم مشاركة النص'),
               ],
             ),
             backgroundColor: Colors.orange,

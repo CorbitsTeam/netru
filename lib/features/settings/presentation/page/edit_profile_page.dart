@@ -80,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ? SizedBox(
                       width: 20.w,
                       height: 20.h,
-                      child: CircularProgressIndicator(
+                      child: const CircularProgressIndicator(
                         strokeWidth: 2,
                         color: AppColors.primaryColor,
                       ),
@@ -158,7 +158,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         ? SizedBox(
                                           width: 16.w,
                                           height: 16.h,
-                                          child: CircularProgressIndicator(
+                                          child: const CircularProgressIndicator(
                                             strokeWidth: 2,
                                             color: Colors.white,
                                           ),
@@ -330,7 +330,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),

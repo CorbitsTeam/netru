@@ -31,7 +31,6 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
   final ScrollController _scrollController = ScrollController();
   late AnimationController _fabAnimationController;
   late AnimationController _contentAnimationController;
-  late Animation<double> _fabAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
 
@@ -53,12 +52,6 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
       vsync: this,
     );
 
-    _fabAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _fabAnimationController,
-        curve: Curves.elasticOut,
-      ),
-    );
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
@@ -115,7 +108,6 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
           SliverToBoxAdapter(child: _buildContent(news)),
         ],
       ),
-      floatingActionButton: _buildFloatingActionButton(news),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -189,16 +181,7 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
               ),
             ],
           ),
-          child: IconButton(
-            icon: Icon(
-              Icons.share_rounded,
-              color: AppColors.primary,
-              size: 20.sp,
-            ),
-            onPressed: () => _shareNews(widget.news),
-          ),
         ),
-        SizedBox(width: 12.w),
       ],
       title:
           _isScrolled
@@ -950,29 +933,6 @@ class _NewsDetailsViewState extends State<NewsDetailsView>
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButton(NewsModel news) {
-    return ScaleTransition(
-      scale: _fabAnimation,
-      child: FloatingActionButton.extended(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          _shareNews(news);
-        },
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        icon: Icon(Icons.share_rounded, size: 16.sp),
-        label: Text(
-          'مشاركة',
-          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
         ),
       ),
     );

@@ -171,7 +171,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
       height: 180.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.grey[200],
+        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.2),
       ),
       child: Center(
         child: Column(

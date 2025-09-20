@@ -300,7 +300,7 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
 
                     // العنوان
                     Text(
-                      newsList[_currentIndex].title!,
+                      newsList[_currentIndex].title,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp,
@@ -321,37 +321,37 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
     );
   }
 
-  Widget _buildNewsImage(NewsModel news) {
-    if (news.image != null && news.image!.isNotEmpty) {
-      return Image.network(
-        news.image!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildFallbackImage();
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 2.w,
-            ),
-          );
-        },
-      );
-    } else {
-      return _buildFallbackImage();
-    }
-  }
+  // Widget _buildNewsImage(NewsModel news) {
+  //   if (news.image != null && news.image!.isNotEmpty) {
+  //     return Image.network(
+  //       news.image!,
+  //       fit: BoxFit.cover,
+  //       errorBuilder: (context, error, stackTrace) {
+  //         return _buildFallbackImage();
+  //       },
+  //       loadingBuilder: (context, child, loadingProgress) {
+  //         if (loadingProgress == null) return child;
+  //         return Center(
+  //           child: CircularProgressIndicator(
+  //             color: Colors.white,
+  //             strokeWidth: 2.w,
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     return _buildFallbackImage();
+  //   }
+  // }
 
-  Widget _buildFallbackImage() {
-    return Container(
-      color: Colors.grey[400],
-      child: Center(
-        child: Icon(Icons.article_outlined, size: 48.sp, color: Colors.white),
-      ),
-    );
-  }
+  // Widget _buildFallbackImage() {
+  //   return Container(
+  //     color: Colors.grey[400],
+  //     child: Center(
+  //       child: Icon(Icons.article_outlined, size: 48.sp, color: Colors.white),
+  //     ),
+  //   );
+  // }
 
   void _navigateToNewsDetails(NewsModel news) {
     // الانتقال إلى صفحة التفاصيل

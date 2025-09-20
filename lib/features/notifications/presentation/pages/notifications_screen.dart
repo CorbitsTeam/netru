@@ -63,7 +63,7 @@ class _NotificationsViewState extends State<NotificationsView> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: BlocBuilder<NotificationCubit, NotificationState>(
           builder: (context, state) {
             final unreadCount =

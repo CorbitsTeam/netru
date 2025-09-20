@@ -181,7 +181,9 @@ class _AccountInfoState extends State<AccountInfo> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SettingsPage()),
+              MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              ),
             );
           },
         ),
@@ -228,44 +230,43 @@ class _AccountInfoState extends State<AccountInfo> {
 
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('المعلومات الشخصية'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildInfoRow('الاسم الكامل:', user?.fullName ?? 'غير محدد'),
-                  SizedBox(height: 10.h),
-                  _buildInfoRow(
-                    'البريد الإلكتروني:',
-                    user?.email ?? 'غير محدد',
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildInfoRow('رقم الهاتف:', user?.phone ?? 'غير محدد'),
-                  SizedBox(height: 10.h),
-                  _buildInfoRow('الموقع:', user?.location ?? 'غير محدد'),
-                  SizedBox(height: 10.h),
-                  _buildInfoRow(
-                    'الرقم القومي:',
-                    user?.nationalId ?? 'غير محدد',
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildInfoRow(
-                    'رقم الجواز:',
-                    user?.passportNumber ?? 'غير محدد',
-                  ),
-                ],
+      builder: (context) => AlertDialog(
+        title: const Text('المعلومات الشخصية'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildInfoRow('الاسم الكامل:', user?.fullName ?? 'غير محدد'),
+              SizedBox(height: 10.h),
+              _buildInfoRow(
+                'البريد الإلكتروني:',
+                user?.email ?? 'غير محدد',
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('إغلاق'),
+              SizedBox(height: 10.h),
+              _buildInfoRow('رقم الهاتف:', user?.phone ?? 'غير محدد'),
+              SizedBox(height: 10.h),
+              _buildInfoRow('الموقع:', user?.location ?? 'غير محدد'),
+              SizedBox(height: 10.h),
+              _buildInfoRow(
+                'الرقم القومي:',
+                user?.nationalId ?? 'غير محدد',
+              ),
+              SizedBox(height: 10.h),
+              _buildInfoRow(
+                'رقم الجواز:',
+                user?.passportNumber ?? 'غير محدد',
               ),
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('إغلاق'),
+          ),
+        ],
+      ),
     );
   }
 }

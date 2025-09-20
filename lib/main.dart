@@ -15,6 +15,7 @@ import 'app.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logger_service.dart';
 import 'firebase_options.dart';
+import 'features/settings/integration/settings_integration.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +32,6 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inllc2p0bGdjaXl3bXdyZHBqcXNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTA0MDMsImV4cCI6MjA3MzE2NjQwM30.0CNthKQ6Ok2L-9JjReCAUoqEeRHSidxTMLmCl2eEPhw',
   );
   logger.logInfo('✅ Supabase Initialized');
-
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -80,8 +80,13 @@ void main() async {
           // Core Cubits
           BlocProvider(create: (_) => LocaleCubit()),
           BlocProvider(create: (_) => ThemeCubit()),
+
+          // Settings Bloc - Main controller for theme and language
+          SettingsIntegration.createProvider(),
         ],
-        child: MyApp(appRouter: AppRouter()),
+        child: SettingsIntegration.wrapWithSync(
+          child: MyApp(appRouter: AppRouter()),
+        ),
       ),
     ),
   );

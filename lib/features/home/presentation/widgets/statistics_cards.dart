@@ -56,7 +56,7 @@ class StatisticsCards extends StatelessWidget {
               left: index == _cardsData.length - 1 ? 0 : 12.w,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
             ),

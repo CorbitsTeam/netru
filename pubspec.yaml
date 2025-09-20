@@ -58,6 +58,7 @@ dependencies:
   firebase_messaging: ^15.2.5
   url_launcher: ^6.3.0  # For opening URLs
   share_plus: ^10.1.2  # For sharing content
+  package_info_plus: ^8.0.2  # For app version info
   pdf: ^3.10.1
   printing: ^5.11.0
   open_file: ^3.5.10

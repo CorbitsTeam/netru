@@ -5,7 +5,6 @@ import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.
 import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
 import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
-import 'package:netru_app/features/profile/presentation/page/enhanced_profile_page.dart';
 import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
@@ -15,7 +14,6 @@ import 'package:netru_app/features/reports/presentation/pages/create_report_page
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
-import 'package:netru_app/features/profile/presentation/page/profile_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
 import '../../features/reports/domain/entities/reports_entity.dart';
 import '../../features/splash/presentation/splash_screen.dart';
@@ -39,8 +37,6 @@ class AppRouter {
         return _createRoute(const SplashScreen());
       case Routes.onboardingScreen:
         return _createRoute(const OnboardingPage());
-      case Routes.profileScreen:
-        return _createRoute(const EnhancedProfilePage());
       case Routes.submissionOfaReportPage:
         return _createRoute(const CreateReportPage());
       case Routes.notificationsPage:
