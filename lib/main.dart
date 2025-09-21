@@ -11,6 +11,7 @@ import 'core/utils/app_shared_preferences.dart';
 import 'core/utils/user_data_helper.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/injection_container.dart';
+import 'core/services/notification_service.dart';
 import 'app.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logger_service.dart';
@@ -34,10 +35,20 @@ void main() async {
   logger.logInfo('✅ Supabase Initialized');
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  logger.logInfo('✅ Firebase Initialized');
 
   // Initialize dependency injection
   await initializeDependencies();
   logger.logInfo('✅ All Dependencies Initialized');
+
+  // Initialize Notification Service
+  try {
+    final notificationService = NotificationService();
+    await notificationService.init();
+    logger.logInfo('✅ NotificationService Initialized');
+  } catch (e) {
+    logger.logError('⚠️ NotificationService Initialization Failed: $e');
+  }
 
   // Initialize localization
   await EasyLocalization.ensureInitialized();

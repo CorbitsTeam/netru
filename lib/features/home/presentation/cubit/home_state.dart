@@ -9,6 +9,11 @@ class HomeSuccess extends HomeState {
   // Success(this.result);
 }
 
+class HomeFcmTokenSuccess extends HomeState {
+  final String fcmToken;
+  HomeFcmTokenSuccess(this.fcmToken);
+}
+
 class HomeFailure extends HomeState {
   final String error;
   HomeFailure(this.error);

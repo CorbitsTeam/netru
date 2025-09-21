@@ -100,33 +100,6 @@ class ReportDetailsPage extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-        actions: [
-          // Status indicator in app bar
-          Container(
-            margin: EdgeInsetsDirectional.only(end: 8.w),
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: _getStatusColor(report!.status),
-              borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                BoxShadow(
-                  color: _getStatusColor(report!.status).withOpacity(0.3),
-                  spreadRadius: 0,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              report!.status.arabicName,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Container(
         decoration: BoxDecoration(

@@ -275,7 +275,7 @@ class SupportOptionsDialog extends StatelessWidget {
             SizedBox(height: 8.h),
             SelectableText(
               email,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryColor,
               ),
@@ -305,7 +305,7 @@ class SupportOptionsDialog extends StatelessWidget {
             SizedBox(height: 8.h),
             SelectableText(
               phoneNumber,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryColor,
               ),

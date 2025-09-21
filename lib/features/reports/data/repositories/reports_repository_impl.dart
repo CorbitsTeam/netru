@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dartz/dartz.dart';
 import 'package:uuid/uuid.dart';
+import 'package:netru_app/core/utils/user_data_helper.dart';
 import '../../domain/entities/reports_entity.dart';
 import '../../domain/repositories/reports_repository.dart';
 import '../datasources/reports_remote_datasource.dart';
@@ -55,12 +56,23 @@ class ReportsRepositoryImpl implements ReportsRepository {
     print('👤 Submitted By: $submittedBy');
 
     try {
+      // Get current user to ensure proper data consistency
+      final userHelper = UserDataHelper();
+      final currentUser = userHelper.getCurrentUser();
+
+      // Use the reporter_national_id from current user if available, otherwise use provided nationalId
+      final reporterNationalId = currentUser?.identifier ?? nationalId;
+      final userIdForReport = currentUser?.id ?? submittedBy;
+
+      print('📝 Using reporter_national_id: $reporterNationalId');
+      print('📝 Using user_id: $userIdForReport');
+
       // Create the report first
       final reportModel = ReportModel(
         id: const Uuid().v4(),
         firstName: firstName,
         lastName: lastName,
-        nationalId: nationalId,
+        nationalId: reporterNationalId, // Use current user's national ID
         phone: phone,
         reportType: reportType,
         reportTypeId: reportTypeId,
@@ -70,7 +82,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
         locationName: locationName,
         reportDateTime: reportDateTime,
         status: ReportStatus.received,
-        submittedBy: submittedBy,
+        submittedBy: userIdForReport, // Ensure user_id is set
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

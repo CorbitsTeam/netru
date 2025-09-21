@@ -1,278 +1,473 @@
-// import 'dart:convert';
-// import 'dart:io';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import '../../app.dart';
-//
-// @pragma('vm:entry-point')
-// Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   print("🔥 Background message: ${message.messageId}");
-// }
-//
-// class NotificationService {
-//   static final NotificationService _notificationService = NotificationService._internal();
-//   factory NotificationService() => _notificationService;
-//   NotificationService._internal();
-//
-//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-//   bool _isInitialized = false;
-//   bool get isInitialized => _isInitialized;
-//
-//   Future<void> init() async {
-//     try {
-//       // ✅ تهيئة Local Notifications
-//       const AndroidInitializationSettings initializationSettingsAndroid =
-//       AndroidInitializationSettings('@mipmap/ic_launcher');
-//
-//       final DarwinInitializationSettings initializationSettingsIOS =
-//       DarwinInitializationSettings(
-//         requestSoundPermission: true,
-//         requestBadgePermission: true,
-//         requestAlertPermission: true,
-//       );
-//
-//       final InitializationSettings initializationSettings = InitializationSettings(
-//         android: initializationSettingsAndroid,
-//         iOS: initializationSettingsIOS,
-//       );
-//
-//       await flutterLocalNotificationsPlugin.initialize(
-//         initializationSettings,
-//         onDidReceiveNotificationResponse: _onSelectNotification,
-//       );
-//
-//       print("✅ Local notifications initialized");
-//
-//       // ✅ إعداد Firebase
-//       await _setupFirebaseMessaging();
-//
-//       _isInitialized = true;
-//       print("✅ NotificationService completed");
-//
-//     } catch (e) {
-//       print("❌ NotificationService init error: $e");
-//     }
-//   }
-//
-//   Future<void> _setupFirebaseMessaging() async {
-//     try {
-//       if (!Platform.isIOS) return;
-//
-//       final messaging = FirebaseMessaging.instance;
-//       print("🔧 Setting up Firebase Messaging...");
-//
-//       // ✅ طلب الصلاحيات أولاً
-//       final settings = await messaging.requestPermission(
-//         alert: true,
-//         badge: true,
-//         sound: true,
-//         provisional: false,
-//       );
-//
-//       print("📱 Permission: ${settings.authorizationStatus}");
-//
-//       if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-//           settings.authorizationStatus != AuthorizationStatus.provisional) {
-//         print("❌ Push notifications not authorized");
-//         return;
-//       }
-//
-//       print("✅ Push notifications authorized!");
-//
-//       // ✅ إعداد Handlers
-//       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-//       FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
-//       FirebaseMessaging.onMessageOpenedApp.listen(_firebaseMessagingOpenedHandler);
-//
-//       // ✅ معالجة initial message
-//       final initialMessage = await messaging.getInitialMessage();
-//       if (initialMessage != null) {
-//         _firebaseMessagingOpenedHandler(initialMessage);
-//       }
-//
-//       // ✅ محاولة الحصول على Token بطريقة محسنة
-//       await _getTokensWithProperSetup(messaging);
-//
-//       print("✅ Firebase Messaging setup completed");
-//
-//     } catch (e) {
-//       print("❌ Firebase setup error: $e");
-//     }
-//   }
-//
-//   Future<void> _getTokensWithProperSetup(FirebaseMessaging messaging) async {
-//     try {
-//       print("🔄 Starting token acquisition...");
-//
-//       // ✅ انتظار قصير للتهيئة
-//       await Future.delayed(Duration(seconds: 1));
-//
-//       // ✅ محاولة الحصول على APNs Token أولاً
-//       String? apnsToken;
-//       for (int i = 0; i < 10; i++) {
-//         try {
-//           apnsToken = await messaging.getAPNSToken().timeout(Duration(seconds: 2));
-//           if (apnsToken != null) {
-//             print("✅ APNs Token: ${apnsToken.substring(0, 30)}...");
-//             break;
-//           }
-//         } catch (e) {
-//           if (i == 9) {
-//             print("⚠️ APNs token not available after 10 attempts");
-//             print("🔧 This might be due to:");
-//             print("   - APNs Certificate expired in Firebase");
-//             print("   - Missing push notification entitlements");
-//             print("   - Network connectivity issues");
-//           }
-//         }
-//
-//         await Future.delayed(Duration(seconds: 1));
-//         print("⏳ APNs attempt ${i + 1}/10...");
-//       }
-//
-//       // ✅ محاولة الحصول على FCM Token
-//       if (apnsToken != null) {
-//         // انتظار إضافي بعد الحصول على APNs token
-//         await Future.delayed(Duration(seconds: 2));
-//
-//         for (int i = 0; i < 5; i++) {
-//           try {
-//             final fcmToken = await messaging.getToken().timeout(Duration(seconds: 10));
-//             if (fcmToken != null && fcmToken.isNotEmpty) {
-//               print("");
-//               print("🎉🎉🎉 SUCCESS! FCM TOKEN RECEIVED! 🎉🎉🎉");
-//               print("📱 Your iPhone is ready for push notifications!");
-//               print("");
-//               print("🔔 FCM Token:");
-//               print("=" * 80);
-//               print(fcmToken);
-//               print("=" * 80);
-//               print("");
-//               print("🧪 TEST STEPS:");
-//               print("1. Copy the token above");
-//               print("2. Go to: https://console.firebase.google.com/");
-//               print("3. Select your project: quickwash-a4b06");
-//               print("4. Go to Cloud Messaging → Send your first message");
-//               print("5. Choose 'Send test message'");
-//               print("6. Paste the FCM token");
-//               print("7. Add title and body");
-//               print("8. Click 'Test' button");
-//               print("9. Check your iPhone for the notification! 📱");
-//               print("");
-//
-//               // ✅ Token refresh listener
-//               FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-//                 print("🔄 FCM Token refreshed: ${newToken.substring(0, 30)}...");
-//               });
-//
-//               return;
-//             }
-//           } catch (e) {
-//             print("⚠️ FCM attempt ${i + 1}/5 failed: $e");
-//           }
-//
-//           if (i < 4) {
-//             await Future.delayed(Duration(seconds: 3));
-//           }
-//         }
-//       } else {
-//         print("❌ Cannot get FCM token without APNs token");
-//         print("");
-//         print("🔧 TROUBLESHOOTING STEPS:");
-//         print("1. Check Firebase Console → Project Settings → Cloud Messaging");
-//         print("2. Verify APNs Authentication Key or Certificate is valid");
-//         print("3. Ensure Bundle ID matches: sa.quickwash.app");
-//         print("4. Check if APNs certificate expired (your cert expires Aug 23, 2026)");
-//         print("5. Try uploading a new APNs Authentication Key (.p8 file)");
-//         print("");
-//         print("📋 Firebase Project Details:");
-//         print("   Project ID: quickwash-a4b06");
-//         print("   Bundle ID: sa.quickwash.app");
-//         print("   App ID: 1:683030921634:ios:d378888c892ab058b072fb");
-//         print("");
-//       }
-//
-//       print("❌ Failed to get FCM token");
-//
-//     } catch (e) {
-//       print("❌ Token acquisition error: $e");
-//     }
-//   }
-//
-//   void _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-//     print("");
-//     print("🎉🎉 PUSH NOTIFICATION RECEIVED! 🎉🎉");
-//     print("📱 Title: ${message.notification?.title}");
-//     print("📱 Body: ${message.notification?.body}");
-//     print("📱 Data: ${message.data}");
-//     print("");
-//
-//     final notification = message.notification;
-//     if (notification != null) {
-//       await _showNotification(
-//         message.hashCode,
-//         notification.title ?? 'إشعار',
-//         notification.body ?? '',
-//         null,
-//         jsonEncode(message.data),
-//       );
-//     }
-//   }
-//
-//   void _firebaseMessagingOpenedHandler(RemoteMessage message) {
-//     print("📲 Notification tapped: ${message.data}");
-//     _handlePayloadNavigation(message.data);
-//   }
-//
-//   Future<void> _showNotification(int id, String title, String body, String? imagePath, String? payload) async {
-//     try {
-//       final androidDetails = AndroidNotificationDetails(
-//         'high_importance_channel',
-//         'High Importance Notifications',
-//         importance: Importance.max,
-//         priority: Priority.high,
-//       );
-//
-//       final iOSDetails = DarwinNotificationDetails(
-//         presentAlert: true,
-//         presentBadge: true,
-//         presentSound: true,
-//       );
-//
-//       await flutterLocalNotificationsPlugin.show(
-//         id, title, body,
-//         NotificationDetails(android: androidDetails, iOS: iOSDetails),
-//         payload: payload,
-//       );
-//     } catch (e) {
-//       print("❌ Show notification error: $e");
-//     }
-//   }
-//
-//   void _onSelectNotification(NotificationResponse response) {
-//     if (response.payload != null) {
-//       try {
-//         final data = jsonDecode(response.payload!);
-//         _handlePayloadNavigation(data);
-//       } catch (e) {
-//         print("❌ Payload parse error: $e");
-//       }
-//     }
-//   }
-//
-//   void _handlePayloadNavigation(Map<String, dynamic> data) {
-//     final screen = data['screen'];
-//     final id = data['id'];
-//
-//     switch (screen) {
-//       case 'order':
-//         navigatorKey.currentState?.pushNamed('/orderDetails', arguments: id);
-//         break;
-//       case 'chat':
-//         navigatorKey.currentState?.pushNamed('/chat', arguments: data);
-//         break;
-//     }
-//   }
-//
-//
-// }
+import 'dart:convert';
+import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../di/injection_container.dart';
+import '../../features/notifications/domain/entities/fcm_token_entity.dart';
+import '../../features/notifications/domain/usecases/register_fcm_token.dart';
+import '../../features/auth/domain/entities/login_user_entity.dart';
+import '../utils/user_data_helper.dart';
+import 'logger_service.dart';
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  final logger = LoggerService();
+  logger.logInfo("🔥 Background message received: ${message.messageId}");
+  logger.logInfo("📱 Title: ${message.notification?.title}");
+  logger.logInfo("📱 Body: ${message.notification?.body}");
+}
+
+class NotificationService {
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
+
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final LoggerService _logger = LoggerService();
+
+  bool _isInitialized = false;
+  String? _cachedFcmToken;
+
+  bool get isInitialized => _isInitialized;
+  String? get cachedFcmToken => _cachedFcmToken;
+
+  /// Initialize the notification service
+  Future<void> init() async {
+    if (_isInitialized) {
+      _logger.logInfo('📱 NotificationService already initialized');
+      return;
+    }
+
+    try {
+      _logger.logInfo('🚀 Initializing NotificationService...');
+
+      // Initialize Local Notifications
+      await _initializeLocalNotifications();
+
+      // Setup Firebase Messaging
+      await _setupFirebaseMessaging();
+
+      // Get initial FCM token
+      await _initializeFcmToken();
+
+      _isInitialized = true;
+      _logger.logInfo('✅ NotificationService initialization completed');
+    } catch (e) {
+      _logger.logError('❌ NotificationService initialization failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Initialize local notifications
+  Future<void> _initializeLocalNotifications() async {
+    try {
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
+
+      const iosSettings = DarwinInitializationSettings(
+        requestSoundPermission: true,
+        requestBadgePermission: true,
+        requestAlertPermission: true,
+      );
+
+      const initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+
+      await _localNotifications.initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: _onSelectNotification,
+      );
+
+      _logger.logInfo('✅ Local notifications initialized');
+    } catch (e) {
+      _logger.logError('❌ Local notifications initialization failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Setup Firebase Messaging with cross-platform support
+  Future<void> _setupFirebaseMessaging() async {
+    try {
+      _logger.logInfo('🔧 Setting up Firebase Messaging...');
+
+      // Request permissions
+      final isAuthorized = await _requestNotificationPermissions();
+      if (!isAuthorized) {
+        _logger.logWarning('❌ Push notifications not authorized');
+        return;
+      }
+
+      // Setup message handlers
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
+
+      // Handle initial message (app opened from terminated state)
+      final initialMessage = await _firebaseMessaging.getInitialMessage();
+      if (initialMessage != null) {
+        _logger.logInfo('📲 App opened from notification');
+        _handleMessageOpenedApp(initialMessage);
+      }
+
+      // Setup token refresh listener
+      _setupTokenRefreshListener();
+
+      _logger.logInfo('✅ Firebase Messaging setup completed');
+    } catch (e) {
+      _logger.logError('❌ Firebase Messaging setup failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Request notification permissions
+  Future<bool> _requestNotificationPermissions() async {
+    try {
+      final settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+
+      final isAuthorized =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+
+      _logger.logInfo(
+        '📱 Notification permission: ${settings.authorizationStatus}',
+      );
+      return isAuthorized;
+    } catch (e) {
+      _logger.logError('❌ Permission request failed: $e');
+      return false;
+    }
+  }
+
+  /// Initialize and get FCM token
+  Future<void> _initializeFcmToken() async {
+    try {
+      _logger.logInfo('🔄 Getting FCM token...');
+
+      final token = await getFcmToken();
+      if (token != null) {
+        _logger.logInfo('✅ FCM token obtained successfully');
+      } else {
+        _logger.logWarning('⚠️ FCM token is null');
+      }
+    } catch (e) {
+      _logger.logError('❌ FCM token initialization failed: $e');
+    }
+  }
+
+  /// Get FCM token for push notifications
+  Future<String?> getFcmToken() async {
+    try {
+      // Get the token
+      final token = await _firebaseMessaging.getToken();
+
+      if (token != null) {
+        _cachedFcmToken = token;
+        _logger.logInfo('✅ FCM Token received: ${token.substring(0, 20)}...');
+
+        // Register token with backend
+        await _registerTokenWithBackend(token);
+      } else {
+        _logger.logWarning('⚠️ FCM Token is null');
+      }
+
+      return token;
+    } catch (e) {
+      _logger.logError('❌ Error getting FCM token: $e');
+      return null;
+    }
+  }
+
+  /// Register FCM token with backend
+  Future<void> _registerTokenWithBackend(String token) async {
+    try {
+      // Get current user
+      final userHelper = UserDataHelper();
+      final currentUser = userHelper.getCurrentUser();
+
+      if (currentUser == null) {
+        _logger.logWarning('⚠️ No user logged in, skipping token registration');
+        return;
+      }
+
+      _logger.logInfo('🔍 Debug - Current user for FCM token:');
+      _logger.logInfo('   User ID: ${currentUser.id}');
+      _logger.logInfo('   User Type: ${currentUser.userType}');
+      _logger.logInfo('   Identifier: ${currentUser.identifier}');
+
+      // Check Supabase session
+      await _ensureSupabaseSession(currentUser);
+
+      // Get device info
+      final deviceInfo = await _getDeviceInfo();
+      final packageInfo = await PackageInfo.fromPlatform();
+
+      // Create FCM token entity
+      final fcmTokenEntity = FcmTokenEntity(
+        id: '', // Will be generated by backend
+        userId: currentUser.id,
+        fcmToken: token,
+        deviceType: _getDeviceType(),
+        deviceId: deviceInfo,
+        appVersion: packageInfo.version,
+        isActive: true,
+        lastUsed: DateTime.now(),
+        createdAt: DateTime.now(),
+      );
+
+      _logger.logInfo('🔍 Attempting to register FCM token...');
+      _logger.logInfo('   Token: ${token.substring(0, 20)}...');
+      _logger.logInfo('   User ID: ${currentUser.id}');
+      _logger.logInfo('   Device Type: ${_getDeviceType()}');
+
+      // Register with backend
+      final registerUseCase = sl<RegisterFcmTokenUseCase>();
+      final result = await registerUseCase(
+        RegisterFcmTokenParams(token: fcmTokenEntity),
+      );
+
+      result.fold(
+        (failure) {
+          _logger.logError(
+            '❌ Failed to register FCM token: ${failure.message}',
+          );
+          _logger.logError(
+            '💡 This might be a Row Level Security (RLS) policy issue',
+          );
+          _logger.logError(
+            '💡 Check if user authentication is properly set in Supabase context',
+          );
+        },
+        (success) {
+          _logger.logInfo('✅ FCM token registered successfully');
+          _logger.logInfo('   Token ID: ${success.id}');
+        },
+      );
+    } catch (e) {
+      _logger.logError('❌ Error registering FCM token: $e');
+      _logger.logError(
+        '💡 If this is a RLS policy error, check authentication context',
+      );
+    }
+  }
+
+  /// Ensure Supabase session is valid for the current user
+  Future<void> _ensureSupabaseSession(LoginUserEntity currentUser) async {
+    try {
+      final supabaseClient = Supabase.instance.client;
+      final currentSession = supabaseClient.auth.currentSession;
+
+      _logger.logInfo('🔍 Checking Supabase session...');
+
+      if (currentSession == null) {
+        _logger.logWarning('⚠️ No Supabase session found');
+        _logger.logInfo(
+          '💡 Custom authentication system doesn\'t create Supabase Auth sessions',
+        );
+        _logger.logInfo(
+          '💡 FCM token registration might fail due to RLS policies',
+        );
+        _logger.logInfo(
+          '💡 Consider creating a service account or disabling RLS for user_fcm_tokens table',
+        );
+        return;
+      }
+
+      if (currentSession.user.id != currentUser.id) {
+        _logger.logWarning('⚠️ Supabase session user ID mismatch');
+        _logger.logWarning('   Session User ID: ${currentSession.user.id}');
+        _logger.logWarning('   Current User ID: ${currentUser.id}');
+        _logger.logInfo('💡 This is expected with custom authentication');
+        return;
+      }
+
+      _logger.logInfo('✅ Valid Supabase session found');
+      _logger.logInfo('   User ID: ${currentSession.user.id}');
+      _logger.logInfo('   Session expires: ${currentSession.expiresAt}');
+
+      // Check if session is near expiry (less than 5 minutes)
+      if (currentSession.expiresAt != null) {
+        final expiresAt = DateTime.fromMillisecondsSinceEpoch(
+          currentSession.expiresAt! * 1000,
+        );
+        final timeUntilExpiry = expiresAt.difference(DateTime.now());
+
+        if (timeUntilExpiry.inMinutes < 5) {
+          _logger.logWarning(
+            '⚠️ Session expires soon: ${timeUntilExpiry.inMinutes} minutes',
+          );
+          _logger.logInfo('🔄 Attempting to refresh session...');
+
+          await supabaseClient.auth.refreshSession();
+          _logger.logInfo('✅ Session refreshed successfully');
+        }
+      }
+    } catch (e) {
+      _logger.logError('❌ Error checking Supabase session: $e');
+      _logger.logInfo('💡 If using custom authentication, consider:');
+      _logger.logInfo('   1. Creating service account for FCM operations');
+      _logger.logInfo('   2. Disabling RLS for user_fcm_tokens table');
+      _logger.logInfo(
+        '   3. Using custom RLS policies that work with your auth system',
+      );
+    }
+  }
+
+  /// Get device type based on platform
+  DeviceType _getDeviceType() {
+    if (kIsWeb) return DeviceType.web;
+    if (Platform.isAndroid) return DeviceType.android;
+    if (Platform.isIOS) return DeviceType.ios;
+    return DeviceType.android; // Default fallback
+  }
+
+  /// Get device ID/info
+  Future<String> _getDeviceInfo() async {
+    try {
+      if (Platform.isAndroid) {
+        return 'android_device_${DateTime.now().millisecondsSinceEpoch}';
+      } else if (Platform.isIOS) {
+        return 'ios_device_${DateTime.now().millisecondsSinceEpoch}';
+      }
+
+      return 'unknown_device_${DateTime.now().millisecondsSinceEpoch}';
+    } catch (e) {
+      _logger.logError('❌ Error getting device info: $e');
+      return 'unknown_device_${DateTime.now().millisecondsSinceEpoch}';
+    }
+  }
+
+  /// Setup token refresh listener
+  void _setupTokenRefreshListener() {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      _logger.logInfo(
+        '🔄 FCM Token refreshed: ${newToken.substring(0, 20)}...',
+      );
+      _cachedFcmToken = newToken;
+      _registerTokenWithBackend(newToken);
+    });
+  }
+
+  /// Handle foreground messages
+  void _handleForegroundMessage(RemoteMessage message) async {
+    _logger.logInfo('');
+    _logger.logInfo('🎉🎉 PUSH NOTIFICATION RECEIVED! 🎉🎉');
+    _logger.logInfo('📱 Title: ${message.notification?.title}');
+    _logger.logInfo('� Body: ${message.notification?.body}');
+    _logger.logInfo('📱 Data: ${message.data}');
+    _logger.logInfo('');
+
+    final notification = message.notification;
+    if (notification != null) {
+      await _showLocalNotification(
+        message.hashCode,
+        notification.title ?? 'إشعار',
+        notification.body ?? '',
+        payload: jsonEncode(message.data),
+      );
+    }
+  }
+
+  /// Handle messages when app is opened from notification
+  void _handleMessageOpenedApp(RemoteMessage message) {
+    _logger.logInfo('� Notification tapped: ${message.data}');
+    _handleNotificationNavigation(message.data);
+  }
+
+  /// Show local notification
+  Future<void> _showLocalNotification(
+    int id,
+    String title,
+    String body, {
+    String? payload,
+  }) async {
+    try {
+      const androidDetails = AndroidNotificationDetails(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: false,
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _localNotifications.show(
+        id,
+        title,
+        body,
+        notificationDetails,
+        payload: payload,
+      );
+
+      _logger.logInfo('✅ Local notification shown: $title');
+    } catch (e) {
+      _logger.logError('❌ Show notification error: $e');
+    }
+  }
+
+  /// Handle notification tap
+  void _onSelectNotification(NotificationResponse response) {
+    if (response.payload != null) {
+      try {
+        final data = jsonDecode(response.payload!) as Map<String, dynamic>;
+        _handleNotificationNavigation(data);
+      } catch (e) {
+        _logger.logError('❌ Payload parse error: $e');
+      }
+    }
+  }
+
+  /// Handle navigation when notification is tapped
+  void _handleNotificationNavigation(Map<String, dynamic> data) {
+    try {
+      final screen = data['screen'] as String?;
+      final id = data['id'];
+
+      _logger.logInfo('🧭 Navigating to: $screen with id: $id');
+
+      // You can implement your own navigation logic here
+      // For example, using a navigator key from your app:
+      switch (screen) {
+        case 'order':
+          // Navigate to order details
+          // AppNavigator.pushNamed('/orderDetails', arguments: id);
+          _logger.logInfo('📲 Navigate to order: $id');
+          break;
+        case 'chat':
+          // Navigate to chat
+          // AppNavigator.pushNamed('/chat', arguments: data);
+          _logger.logInfo('💬 Navigate to chat with data: $data');
+          break;
+        default:
+          _logger.logInfo('🏠 Navigate to home or default screen');
+      }
+    } catch (e) {
+      _logger.logError('❌ Navigation error: $e');
+    }
+  }
+}

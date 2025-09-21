@@ -148,109 +148,97 @@ class AppTheme {
   }
 
   // 🌙 الوضع الداكن
-  static ThemeData get darkTheme {
-    return ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: AppColors.primaryColor,
-      scaffoldBackgroundColor: Colors.grey[900]!,
-      fontFamily: GoogleFonts.almarai().fontFamily,
-      colorScheme: ColorScheme.dark(
-        primary: AppColors.primaryColor,
-        secondary: AppColors.green,
-        surface: Colors.grey[800]!,
-        error: AppColors.red,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: Colors.white,
-        onError: Colors.white,
+// 🌙 الوضع الداكن (معدل)
+static ThemeData get darkTheme {
+  return ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: AppColors.primaryColor,
+    scaffoldBackgroundColor: const Color(0xFF121212), // خلفية داكنة أنعم
+    fontFamily: GoogleFonts.almarai().fontFamily,
+    colorScheme: const ColorScheme.dark(
+      primary: AppColors.primaryColor,
+      secondary: AppColors.green,
+      surface: Color(0xFF1E1E1E), // أغمق من الخلفية بدرجة
+      error: AppColors.red,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: Colors.white70,
+      onError: Colors.white,
+    ),
+    appBarTheme: AppBarTheme(
+      elevation: 0,
+      centerTitle: true,
+      backgroundColor: const Color(0xFF1C1C1C),
+      iconTheme: const IconThemeData(color: Colors.white70),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+        fontFamily: GoogleFonts.almarai().fontFamily,
       ),
-      appBarTheme: AppBarTheme(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.grey[900],
-        iconTheme: const IconThemeData(color: Colors.white),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20.sp,
-          fontWeight: FontWeight.bold,
-          fontFamily: GoogleFonts.almarai().fontFamily,
-        ),
+    ),
+    textTheme: TextTheme(
+      displayLarge: textStyle(24.sp, FontWeight.bold, Colors.white),
+      displayMedium: textStyle(20.sp, FontWeight.w600, Colors.white70),
+      displaySmall: textStyle(18.sp, FontWeight.w500, Colors.white70),
+
+      headlineLarge: textStyle(22.sp, FontWeight.bold, AppColors.primaryLight),
+      headlineMedium: textStyle(18.sp, FontWeight.w600, AppColors.primaryLight),
+      headlineSmall: textStyle(16.sp, FontWeight.w500, AppColors.primaryLight),
+
+      titleLarge: textStyle(20.sp, FontWeight.w600, Colors.white),
+      titleMedium: textStyle(16.sp, FontWeight.w500, Colors.white70),
+      titleSmall: textStyle(14.sp, FontWeight.w500, Colors.white60),
+
+      bodyLarge: textStyle(16.sp, FontWeight.normal, Colors.white),
+      bodyMedium: textStyle(14.sp, FontWeight.normal, Colors.white70),
+      bodySmall: textStyle(12.sp, FontWeight.normal, Colors.white60),
+
+      labelLarge: textStyle(14.sp, FontWeight.w500, Colors.white),
+      labelMedium: textStyle(12.sp, FontWeight.w500, Colors.white70),
+      labelSmall: textStyle(10.sp, FontWeight.w500, Colors.white60),
+    ),
+    cardTheme: CardTheme(
+      color: const Color(0xFF1E1E1E), // خلفية كارت مختلفة
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.r),
       ),
-      textTheme: TextTheme(
-        displayLarge: textStyle(24.sp, FontWeight.bold, Colors.white),
-        displayMedium: textStyle(20.sp, FontWeight.w600, Colors.white),
-        displaySmall: textStyle(18.sp, FontWeight.w500, Colors.white),
-
-        headlineLarge: textStyle(
-          22.sp,
-          FontWeight.bold,
-          AppColors.primaryColor,
-        ),
-        headlineMedium: textStyle(
-          18.sp,
-          FontWeight.w600,
-          AppColors.primaryColor,
-        ),
-        headlineSmall: textStyle(
-          16.sp,
-          FontWeight.w500,
-          AppColors.primaryColor,
-        ),
-
-        titleLarge: textStyle(20.sp, FontWeight.w600, Colors.white),
-        titleMedium: textStyle(16.sp, FontWeight.w500, Colors.white),
-        titleSmall: textStyle(14.sp, FontWeight.w500, Colors.white),
-
-        bodyLarge: textStyle(16.sp, FontWeight.normal, Colors.white),
-        bodyMedium: textStyle(14.sp, FontWeight.normal, Colors.grey[300]!),
-        bodySmall: textStyle(12.sp, FontWeight.normal, Colors.grey[400]!),
-
-        labelLarge: textStyle(14.sp, FontWeight.w500, Colors.white),
-        labelMedium: textStyle(12.sp, FontWeight.w500, Colors.grey[300]!),
-        labelSmall: textStyle(10.sp, FontWeight.w500, Colors.grey[400]!),
-      ),
-      cardTheme: CardTheme(
-        color: Colors.grey[800],
-        elevation: 4,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primaryColor,
+        textStyle: textStyle(16.sp, FontWeight.bold, Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: AppColors.primaryColor,
-          textStyle: textStyle(16.sp, FontWeight.bold, Colors.white),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.primaryLight,
+        side: const BorderSide(color: AppColors.primaryLight, width: 1.5),
+        textStyle: textStyle(16.sp, FontWeight.w600, AppColors.primaryLight),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primaryLight,
+        textStyle: textStyle(14.sp, FontWeight.w600, AppColors.primaryLight),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.r),
         ),
       ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryColor,
-          side: const BorderSide(color: AppColors.primaryColor, width: 1.5),
-          textStyle: textStyle(16.sp, FontWeight.w600, AppColors.primaryColor),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primaryColor,
-          textStyle: textStyle(14.sp, FontWeight.w600, AppColors.primaryColor),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-        ),
-      ),
-      iconTheme: const IconThemeData(color: Colors.white),
-    );
-  }
-
+    ),
+    iconTheme: const IconThemeData(color: Colors.white70),
+  );
+}
   // 🎨 دالة لإنشاء TextStyle بسهولة
   static TextStyle textStyle(double size, FontWeight weight, Color color) {
     return TextStyle(

@@ -133,7 +133,7 @@ class OnboardingSlide extends StatelessWidget {
           child: Text(
             slideData.title,
             style: TextStyle(
-              fontSize: 28.sp,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
               height: 1.2,
@@ -153,7 +153,7 @@ class OnboardingSlide extends StatelessWidget {
             child: Text(
               slideData.subtitle,
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -163,7 +163,7 @@ class OnboardingSlide extends StatelessWidget {
           ),
         ),
 
-        SizedBox(height: 48.h),
+        SizedBox(height: 40.h),
       ],
     );
   }

@@ -49,6 +49,10 @@ import '../../features/chatbot/domain/usecases/get_user_sessions.dart';
 import '../../features/chatbot/domain/usecases/send_message.dart';
 import '../../features/chatbot/presentation/cubit/chat_cubit.dart';
 // ===========================
+// Home Feature
+// ===========================
+import '../../features/home/presentation/cubit/home_cubit.dart';
+// ===========================
 // News Feature
 // ===========================
 import '../../features/news/data/datasources/newsdetails_remote_datasource.dart';
@@ -73,6 +77,14 @@ import '../../features/cases/data/repositories/cases_repository_impl.dart';
 import '../../features/cases/domain/repositories/cases_repository.dart';
 import '../../features/cases/domain/usecases/cases_usecase.dart';
 import '../../features/cases/presentation/cubit/cases_cubit.dart';
+// ===========================
+// Heatmap Feature
+// ===========================
+import '../../features/heatmap/data/datasources/heatmap_remote_datasource.dart';
+import '../../features/heatmap/data/repositories/heatmap_repository_impl.dart';
+import '../../features/heatmap/domain/repositories/heatmap_repository.dart';
+import '../../features/heatmap/domain/usecases/heatmap_usecase.dart';
+import '../../features/heatmap/presentation/cubit/heatmap_cubit.dart';
 // Core Services
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
@@ -118,10 +130,30 @@ Future<void> initializeDependencies() async {
   await _initReportsDependencies();
   await _initCasesDependencies();
   await initNotificationDependencies();
+  await _initHeatmapDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
   );
+}
+
+/// ===========================
+/// Heatmap
+/// ===========================
+Future<void> _initHeatmapDependencies() async {
+  sl.registerLazySingleton<HeatmapRemoteDataSource>(
+    () => HeatmapRemoteDataSourceImpl(sl<SupabaseClient>()),
+  );
+
+  sl.registerLazySingleton<HeatmapRepository>(
+    () => HeatmapRepositoryImpl(sl<HeatmapRemoteDataSource>()),
+  );
+
+  sl.registerLazySingleton(() => HeatmapUseCase(sl<HeatmapRepository>()));
+
+  sl.registerFactory(() => HeatmapCubit(sl<HeatmapUseCase>()));
+
+  sl.get<LoggerService>().logInfo('✅ Heatmap dependencies initialized');
 }
 
 /// ===========================
@@ -359,6 +391,11 @@ Future<void> initNotificationDependencies() async {
       notificationRepository: sl<NotificationRepository>(),
     ),
   );
+
+  // ===========================
+  // Home Feature
+  // ===========================
+  sl.registerFactory(() => HomeCubit());
 }
 
 /// ===========================

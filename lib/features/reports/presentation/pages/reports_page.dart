@@ -165,63 +165,68 @@ class ReportsListView extends StatelessWidget {
                   width: 1,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(50.r),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(50.r),
+                      ),
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 48.sp,
+                        color: Colors.red[400],
+                      ),
                     ),
-                    child: Icon(
-                      Icons.error_outline,
-                      size: 48.sp,
-                      color: Colors.red[400],
+                    SizedBox(height: 20.h),
+                    Text(
+                      'حدث خطأ في التحميل',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red[700],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20.h),
-                  Text(
-                    'حدث خطأ في التحميل',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red[700],
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    state.errorMessage,
-                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20.h),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<ReportsCubit>().loadReports();
-                    },
-                    icon: Icon(Icons.refresh, size: 18.sp),
-                    label: Text(
-                      'إعادة المحاولة',
+                    SizedBox(height: 8.h),
+                    Text(
+                      state.errorMessage,
                       style: TextStyle(
                         fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20.h),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<ReportsCubit>().loadReports();
+                      },
+                      icon: Icon(Icons.refresh, size: 18.sp),
+                      label: Text(
+                        'إعادة المحاولة',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.w,
+                          vertical: 12.h,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        elevation: 2,
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 12.h,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      elevation: 2,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -231,7 +236,7 @@ class ReportsListView extends StatelessWidget {
           return Center(
             child: Container(
               margin: EdgeInsets.all(20.w),
-              padding: EdgeInsets.all(32.w),
+              padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20.r),
@@ -277,7 +282,7 @@ class ReportsListView extends StatelessWidget {
                   SizedBox(height: 24.h),
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
+                      horizontal: 12.w,
                       vertical: 12.h,
                     ),
                     decoration: BoxDecoration(

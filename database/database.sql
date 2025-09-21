@@ -168,7 +168,7 @@ CREATE TABLE public.reports (
   incident_location_longitude numeric,
   incident_location_address text,
   incident_datetime timestamp without time zone,
-  report_status text DEFAULT 'pending'::text CHECK (report_status = ANY (ARRAY['pending'::text, 'under_investigation'::text, 'resolved'::text, 'closed'::text, 'rejected'::text])),
+  report_status text DEFAULT 'pending'::text CHECK (report_status = ANY (ARRAY['pending'::text, 'under_investigation'::text, 'resolved'::text, 'closed'::text, 'rejected'::text, 'received'::text])),
   priority_level text DEFAULT 'medium'::text CHECK (priority_level = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'urgent'::text])),
   assigned_to uuid,
   case_number text UNIQUE,
@@ -226,5 +226,6 @@ CREATE TABLE public.users (
   profile_image text,
   verification_status text DEFAULT 'unverified'::text CHECK (verification_status = ANY (ARRAY['unverified'::text, 'pending'::text, 'verified'::text, 'rejected'::text])),
   verified_at timestamp without time zone,
+  updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );
