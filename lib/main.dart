@@ -17,6 +17,7 @@ import 'app_bloc_observer.dart';
 import 'core/services/logger_service.dart';
 import 'firebase_options.dart';
 import 'features/settings/integration/settings_integration.dart';
+// Don't forget Fcm Token For User Notifications
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
