@@ -83,7 +83,7 @@ class LoginCubit extends Cubit<LoginState> {
       case UserType.foreigner:
         return Routes.customBottomBar;
       case UserType.admin:
-        return Routes.customBottomBar;
+        return Routes.adminDashboard;
     }
   }
 

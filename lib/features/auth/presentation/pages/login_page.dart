@@ -144,7 +144,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         context.pushReplacementNamed(Routes.customBottomBar);
         break;
       case UserType.admin:
-        context.pushReplacementNamed(Routes.customBottomBar);
+        context.pushReplacementNamed(Routes.adminDashboard);
         break;
     }
   }

@@ -19,6 +19,9 @@ import 'firebase_options.dart';
 import 'features/settings/integration/settings_integration.dart';
 // Don't forget Fcm Token For User Notifications
 
+
+// Admin Account Email: admin@netru.com
+// Admin Account Password: Netru@12345
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

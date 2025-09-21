@@ -6,6 +6,7 @@ import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
 import '../../onboarding/utils/onboarding_prefs.dart';
+import '../../auth/domain/entities/login_user_entity.dart';
 
 import '../../../core/constants/app_assets.dart';
 
@@ -93,7 +94,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (mounted) {
       if (user != null) {
-        // If user is logged in, go to home
+        // If user is logged in, route based on role/userType
+        // If the stored user is an admin, navigate to admin dashboard
+        try {
+          final userType = user.userType;
+          if (userType == UserType.admin) {
+            context.pushReplacementNamed(Routes.adminDashboard);
+            return;
+          }
+        } catch (e) {
+          // If for any reason we can't read the user type, fall back to normal home
+        }
+
+        // Non-admin users go to the regular home (bottom bar)
         context.pushReplacementNamed(Routes.customBottomBar);
         return;
       }

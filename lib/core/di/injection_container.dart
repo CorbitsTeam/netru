@@ -89,6 +89,19 @@ import '../../features/heatmap/presentation/cubit/heatmap_cubit.dart';
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
+import '../services/supabase_edge_functions_service.dart';
+import '../network/api_client.dart';
+
+// Admin Feature
+import '../../features/admin/data/datasources/admin_dashboard_remote_data_source.dart';
+import '../../features/admin/data/datasources/admin_auth_manager_data_source.dart';
+import '../../features/admin/data/repositories/admin_dashboard_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_auth_manager_repository_impl.dart';
+import '../../features/admin/domain/repositories/admin_dashboard_repository.dart';
+import '../../features/admin/domain/usecases/get_dashboard_stats.dart';
+import '../../features/admin/domain/usecases/manage_auth_accounts.dart';
+import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
 
 // ===========================
 // External Dependencies
@@ -114,6 +127,7 @@ Future<void> initializeDependencies() async {
   });
 
   sl.registerLazySingleton<Dio>(() => Dio());
+  sl.registerLazySingleton<ApiClient>(() => ApiClient());
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
@@ -131,6 +145,7 @@ Future<void> initializeDependencies() async {
   await _initCasesDependencies();
   await initNotificationDependencies();
   await _initHeatmapDependencies();
+  await _initAdminDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -396,6 +411,68 @@ Future<void> initNotificationDependencies() async {
   // Home Feature
   // ===========================
   sl.registerFactory(() => HomeCubit());
+}
+
+/// ===========================
+/// Admin
+/// ===========================
+Future<void> _initAdminDependencies() async {
+  // Register Supabase Edge Functions Service
+  sl.registerLazySingleton<SupabaseEdgeFunctionsService>(
+    () => SupabaseEdgeFunctionsService(),
+  );
+
+  // Admin Dashboard data source
+  sl.registerLazySingleton<AdminDashboardRemoteDataSource>(
+    () => AdminDashboardRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  // Admin Auth Manager data source
+  sl.registerLazySingleton<AdminUserRemoteDataSource>(
+    () => AdminUserRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      apiClient: sl<ApiClient>(),
+    ),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<AdminDashboardRepository>(
+    () => AdminDashboardRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton<AdminAuthManagerRepository>(
+    () => AdminAuthManagerRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases - Dashboard
+  sl.registerLazySingleton(() => GetDashboardStats(sl()));
+  sl.registerLazySingleton(() => GetReportTrends(sl()));
+  sl.registerLazySingleton(() => GetReportsByGovernorate(sl()));
+  sl.registerLazySingleton(() => GetReportsByType(sl()));
+  sl.registerLazySingleton(() => GetReportsByStatus(sl()));
+
+  // Use cases - Auth Manager
+  sl.registerLazySingleton(() => GetUsersWithoutAuthAccount(sl()));
+  sl.registerLazySingleton(() => CreateAuthAccountForUser(sl()));
+  sl.registerLazySingleton(() => CreateAuthAccountsForAllUsers(sl()));
+  sl.registerLazySingleton(() => CheckUserHasAuthAccount(sl()));
+
+  // Cubits
+  sl.registerFactory(() => AdminDashboardCubit(getDashboardStats: sl()));
+
+  sl.registerFactory(
+    () => AdminAuthManagerCubit(
+      getUsersWithoutAuthAccount: sl(),
+      createAuthAccountForUser: sl(),
+      createAuthAccountsForAllUsers: sl(),
+      checkUserHasAuthAccount: sl(),
+    ),
+  );
+
+  sl.get<LoggerService>().logInfo('✅ Admin dependencies initialized');
 }
 
 /// ===========================
