@@ -26,32 +26,42 @@ class ImprovedSignupPage extends StatefulWidget {
   const ImprovedSignupPage({super.key});
 
   @override
-  State<ImprovedSignupPage> createState() => _ImprovedSignupPageState();
+  State<ImprovedSignupPage> createState() =>
+      _ImprovedSignupPageState();
 }
 
-class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
-  final PageController _pageController = PageController();
+class _ImprovedSignupPageState
+    extends State<ImprovedSignupPage> {
+  final PageController _pageController =
+      PageController();
   int _currentStep = 0;
   bool _isSubmitting = false;
 
   // Step 0: Username (email or phone) and Password
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _usernameController =
+      TextEditingController();
+  final _passwordController =
+      TextEditingController();
+  final _confirmPasswordController =
+      TextEditingController();
   bool _passwordObscured = true;
   bool _confirmPasswordObscured = true;
   late final VoidCallback _usernameListener;
   late final VoidCallback _passwordListener;
-  late final VoidCallback _confirmPasswordListener;
+  late final VoidCallback
+  _confirmPasswordListener;
   final _formKey = GlobalKey<FormState>();
-  bool _isEmailMode = true; // true for email, false for phone
+  bool _isEmailMode =
+      true; // true for email, false for phone
 
   // Step 1: OTP Verification (Email or SMS)
   bool _isVerified = false;
   bool _isCheckingVerification = false;
   String _otpCode = '';
-  final TextEditingController _otpController = TextEditingController();
-  StreamController<ErrorAnimationType>? _otpErrorController;
+  final TextEditingController _otpController =
+      TextEditingController();
+  StreamController<ErrorAnimationType>?
+  _otpErrorController;
   Timer? _resendTimer;
   int _resendCountdown = 0;
 
@@ -84,7 +94,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     super.initState();
 
     // Initialize OTP error controller
-    _otpErrorController = StreamController<ErrorAnimationType>();
+    _otpErrorController =
+        StreamController<ErrorAnimationType>();
 
     // Add listeners to text controllers to update UI when typing
     _usernameListener = () {
@@ -100,18 +111,30 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       setState(() {});
     };
 
-    _usernameController.addListener(_usernameListener);
-    _passwordController.addListener(_passwordListener);
-    _confirmPasswordController.addListener(_confirmPasswordListener);
+    _usernameController.addListener(
+      _usernameListener,
+    );
+    _passwordController.addListener(
+      _passwordListener,
+    );
+    _confirmPasswordController.addListener(
+      _confirmPasswordListener,
+    );
   }
 
   @override
   void dispose() {
     // Remove listeners first to avoid them firing after controllers are disposed
     try {
-      _usernameController.removeListener(_usernameListener);
-      _passwordController.removeListener(_passwordListener);
-      _confirmPasswordController.removeListener(_confirmPasswordListener);
+      _usernameController.removeListener(
+        _usernameListener,
+      );
+      _passwordController.removeListener(
+        _passwordListener,
+      );
+      _confirmPasswordController.removeListener(
+        _confirmPasswordListener,
+      );
     } catch (_) {
       // ignore: no-empty-block
     }
@@ -131,13 +154,18 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: BlocConsumer<SignupCubit, SignupState>(
+      body: BlocConsumer<
+        SignupCubit,
+        SignupState
+      >(
         listener: (context, state) {
-          if (state is SignupError || state is SignupFailure) {
+          if (state is SignupError ||
+              state is SignupFailure) {
             final message =
                 state is SignupError
                     ? state.message
-                    : (state as SignupFailure).message;
+                    : (state as SignupFailure)
+                        .message;
 
             // Use custom snackbar for error messages
             showModernSnackBar(
@@ -167,28 +195,38 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             );
 
             // Transition to OTP verification step
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                _proceedToNextStep();
-              }
-            });
+            Future.delayed(
+              const Duration(milliseconds: 500),
+              () {
+                if (mounted) {
+                  _proceedToNextStep();
+                }
+              },
+            );
           } else if (state is SignupLoading) {
             // Handle loading state
             setState(() {
               _isSubmitting = true;
             });
-          } else if (state is SignupCompleted || state is SignupSuccess) {
+          } else if (state is SignupCompleted ||
+              state is SignupSuccess) {
             showModernSnackBar(
               context,
-              message: 'تم إنشاء الحساب بنجاح! مرحباً بك',
+              message:
+                  'تم إنشاء الحساب بنجاح! مرحباً بك',
               type: SnackBarType.success,
             );
             // Navigate after a short delay to show the success message
-            Future.delayed(const Duration(seconds: 1), () {
-              Navigator.of(
-                context,
-              ).pushReplacementNamed(Routes.customBottomBar);
-            });
+            Future.delayed(
+              const Duration(seconds: 1),
+              () {
+                Navigator.of(
+                  context,
+                ).pushReplacementNamed(
+                  Routes.customBottomBar,
+                );
+              },
+            );
           } else if (state is SignupLoading) {
             setState(() {
               _isSubmitting = true;
@@ -244,10 +282,15 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             Navigator.pop(context);
           }
         },
-        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+        icon: const Icon(
+          Icons.arrow_back,
+          color: AppColors.textPrimary,
+        ),
       ),
       title: FadeInDown(
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(
+          milliseconds: 400,
+        ),
         child: Text(
           'إنشاء حساب جديد',
           style: TextStyle(
@@ -264,8 +307,12 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget _buildProgressIndicator() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
-      margin: EdgeInsets.symmetric(horizontal: 12.w),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.w,
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: 12.w,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
@@ -282,16 +329,21 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         children: [
           // Current step info
           FadeInDown(
-            duration: const Duration(milliseconds: 400),
+            duration: const Duration(
+              milliseconds: 400,
+            ),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 8.h),
+              padding: EdgeInsets.symmetric(
+                vertical: 8.h,
+              ),
               child: Column(
                 children: [
                   Text(
                     'خطوة ${_currentStep + 1} من ${_stepTitles.length}',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.textSecondary,
+                      color:
+                          AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -314,64 +366,98 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
           // Progress steps
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_stepTitles.length * 2 - 1, (index) {
+            mainAxisAlignment:
+                MainAxisAlignment.center,
+            children: List.generate(_stepTitles.length * 2 - 1, (
+              index,
+            ) {
               if (index.isOdd) {
                 // This is a connector line
                 final stepIndex = index ~/ 2;
                 return Container(
                   width: 4.w,
                   height: 3.h,
-                  margin: EdgeInsets.symmetric(horizontal: 2.w),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 2.w,
+                  ),
                   decoration: BoxDecoration(
                     color:
                         stepIndex < _currentStep
                             ? AppColors.success
-                            : AppColors.border.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2.r),
+                            : AppColors.border
+                                .withOpacity(0.3),
+                    borderRadius:
+                        BorderRadius.circular(
+                          2.r,
+                        ),
                   ),
                 );
               } else {
                 // This is a step circle
                 final stepIndex = index ~/ 2;
-                final isCompleted = stepIndex < _currentStep;
-                final isCurrent = stepIndex == _currentStep;
+                final isCompleted =
+                    stepIndex < _currentStep;
+                final isCurrent =
+                    stepIndex == _currentStep;
 
                 return Flexible(
                   child: SlideInUp(
-                    duration: Duration(milliseconds: 300 + (stepIndex * 100)),
+                    duration: Duration(
+                      milliseconds:
+                          300 + (stepIndex * 100),
+                    ),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
+                      duration: const Duration(
+                        milliseconds: 400,
+                      ),
                       width: 35.w,
                       height: 35.h,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color:
                             isCompleted
-                                ? AppColors.success
+                                ? AppColors
+                                    .success
                                 : isCurrent
-                                ? AppColors.primary
+                                ? AppColors
+                                    .primary
                                 : Colors.white,
                         border: Border.all(
                           color:
                               isCompleted
-                                  ? AppColors.success
+                                  ? AppColors
+                                      .success
                                   : isCurrent
-                                  ? AppColors.primary
-                                  : AppColors.border.withOpacity(0.5),
+                                  ? AppColors
+                                      .primary
+                                  : AppColors
+                                      .border
+                                      .withOpacity(
+                                        0.5,
+                                      ),
                           width: 2.5,
                         ),
                         boxShadow:
-                            isCurrent || isCompleted
+                            isCurrent ||
+                                    isCompleted
                                 ? [
                                   BoxShadow(
                                     color: (isCompleted
-                                            ? AppColors.success
-                                            : AppColors.primary)
-                                        .withOpacity(0.3),
-                                    spreadRadius: 2,
+                                            ? AppColors
+                                                .success
+                                            : AppColors
+                                                .primary)
+                                        .withOpacity(
+                                          0.3,
+                                        ),
+                                    spreadRadius:
+                                        2,
                                     blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                                    offset:
+                                        const Offset(
+                                          0,
+                                          2,
+                                        ),
                                   ),
                                 ]
                                 : null,
@@ -380,10 +466,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                         child:
                             isCompleted
                                 ? FadeIn(
-                                  duration: const Duration(milliseconds: 300),
+                                  duration:
+                                      const Duration(
+                                        milliseconds:
+                                            300,
+                                      ),
                                   child: Icon(
-                                    Icons.check_rounded,
-                                    color: Colors.white,
+                                    Icons
+                                        .check_rounded,
+                                    color:
+                                        Colors
+                                            .white,
                                     size: 22.sp,
                                   ),
                                 )
@@ -392,10 +485,15 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                                   style: TextStyle(
                                     color:
                                         isCurrent
-                                            ? Colors.white
-                                            : AppColors.textSecondary,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
+                                            ? Colors
+                                                .white
+                                            : AppColors
+                                                .textSecondary,
+                                    fontSize:
+                                        16.sp,
+                                    fontWeight:
+                                        FontWeight
+                                            .bold,
                                   ),
                                 ),
                       ),
@@ -410,24 +508,37 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
           // Progress bar
           FadeInUp(
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(
+              milliseconds: 500,
+            ),
             child: Container(
               width: double.infinity,
               height: 6.h,
               decoration: BoxDecoration(
-                color: AppColors.border.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(3.r),
+                color: AppColors.border
+                    .withOpacity(0.2),
+                borderRadius:
+                    BorderRadius.circular(3.r),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(3.r),
+                borderRadius:
+                    BorderRadius.circular(3.r),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 600),
+                  duration: const Duration(
+                    milliseconds: 600,
+                  ),
                   width:
-                      ((_currentStep + 1) / _stepTitles.length) *
-                      MediaQuery.of(context).size.width,
+                      ((_currentStep + 1) /
+                          _stepTitles.length) *
+                      MediaQuery.of(
+                        context,
+                      ).size.width,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.success],
+                      colors: [
+                        AppColors.primary,
+                        AppColors.success,
+                      ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
@@ -457,7 +568,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget _buildDocumentStep() {
     return SingleChildScrollView(
       child: DocumentUploadStep(
-        userType: _selectedUserType ?? UserType.citizen,
+        userType:
+            _selectedUserType ?? UserType.citizen,
         selectedDocuments: _selectedDocuments,
         onDocumentsChanged: (documents) {
           setState(() {
@@ -470,26 +582,37 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   Widget _buildDataEntryStep() {
     // Ensure password is in userData if not already there
-    final currentPassword = _passwordController.text.trim();
+    final currentPassword =
+        _passwordController.text.trim();
     if (currentPassword.isNotEmpty &&
-        (_userData['password']?.isEmpty ?? true)) {
+        (_userData['password']?.isEmpty ??
+            true)) {
       _userData['password'] = currentPassword;
-      print('🔐 تم تعيين كلمة المرور من الـ controller: $currentPassword');
+      print(
+        '🔐 تم تعيين كلمة المرور من الـ controller: $currentPassword',
+      );
     }
 
     // Pre-fill email/phone based on registration method
-    if (_isEmailMode && (_userData['email']?.isEmpty ?? true)) {
-      _userData['email'] = _usernameController.text.trim();
+    if (_isEmailMode &&
+        (_userData['email']?.isEmpty ?? true)) {
+      _userData['email'] =
+          _usernameController.text.trim();
     }
-    if (!_isEmailMode && (_userData['phone']?.isEmpty ?? true)) {
-      _userData['phone'] = _usernameController.text.trim();
+    if (!_isEmailMode &&
+        (_userData['phone']?.isEmpty ?? true)) {
+      _userData['phone'] =
+          _usernameController.text.trim();
     }
 
-    print('🔍 Before DataEntryStep - _userData: $_userData');
+    print(
+      '🔍 Before DataEntryStep - _userData: $_userData',
+    );
 
     return SingleChildScrollView(
       child: DataEntryStep(
-        userType: _selectedUserType ?? UserType.citizen,
+        userType:
+            _selectedUserType ?? UserType.citizen,
         extractedData: _extractedData,
         currentData: _userData,
         username:
@@ -497,23 +620,32 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 .trim(), // Pass the username from first step
         isEmailMode:
             _isEmailMode, // Pass the mode to know if it's email or phone
-        initialPassword: currentPassword, // Pass initial password
+        initialPassword:
+            currentPassword, // Pass initial password
         onDataChanged: (data) {
           setState(() {
             // Prefer the password from the original password controller (source of truth)
-            final currentPassword = _passwordController.text.trim();
+            final currentPassword =
+                _passwordController.text.trim();
 
             // Merge incoming data with existing _userData but preserve the controller password
-            final merged = Map<String, String>.from(_userData);
+            final merged =
+                Map<String, String>.from(
+                  _userData,
+                );
             // Add/overwrite with new fields from data
             data.forEach((k, v) {
               merged[k] = v.toString();
             });
 
             // Ensure password is the most complete candidate among controller, existing, and incoming
-            final incomingPassword = data['password']?.toString() ?? '';
-            final existingPassword = _userData['password'] ?? '';
-            final controllerPassword = currentPassword;
+            final incomingPassword =
+                data['password']?.toString() ??
+                '';
+            final existingPassword =
+                _userData['password'] ?? '';
+            final controllerPassword =
+                currentPassword;
 
             // Choose the non-empty password with the greatest length (best guess of completeness)
             String bestPassword = '';
@@ -522,21 +654,32 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
               existingPassword,
               incomingPassword,
             ]) {
-              if (p.isNotEmpty && p.length > bestPassword.length) {
+              if (p.isNotEmpty &&
+                  p.length >
+                      bestPassword.length) {
                 bestPassword = p;
               }
             }
-            if (bestPassword.isNotEmpty) merged['password'] = bestPassword;
+            if (bestPassword.isNotEmpty)
+              merged['password'] = bestPassword;
 
             _userData = merged;
 
             print('🔐 Password preservation:');
-            print('  - controller: $currentPassword');
-            print('  - merged password: ${_userData['password']}');
+            print(
+              '  - controller: $currentPassword',
+            );
+            print(
+              '  - merged password: ${_userData['password']}',
+            );
           });
           // Debug print to check data validity
-          print('🔍 البيانات المحدثة: $_userData');
-          print('📊 صحة البيانات: ${_isDataValid()}');
+          print(
+            '🔍 البيانات المحدثة: $_userData',
+          );
+          print(
+            '📊 صحة البيانات: ${_isDataValid()}',
+          );
         },
       ),
     );
@@ -564,17 +707,21 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Widget _buildReviewStep() {
     // Prepare location data
     Map<String, String> locationData = {
-      'governorate': _selectedGovernorate?.name ?? '',
+      'governorate':
+          _selectedGovernorate?.name ?? '',
       'city': _selectedCity?.name ?? '',
       'district': '', // Add district if available
     };
 
     // Prepare document paths
     List<String> documentPaths =
-        _selectedDocuments.map((file) => file.path).toList();
+        _selectedDocuments
+            .map((file) => file.path)
+            .toList();
 
     return ReviewSubmitStep(
-      userType: _selectedUserType ?? UserType.citizen,
+      userType:
+          _selectedUserType ?? UserType.citizen,
       userData: _userData,
       locationData: locationData,
       documentPaths: documentPaths,
@@ -587,15 +734,23 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     // Dynamic button text based on current step
     String buttonText = 'التالي';
     if (_currentStep == 0) {
-      buttonText = _isEmailMode ? 'إرسال رمز التحقق' : 'إرسال رمز SMS';
+      buttonText =
+          _isEmailMode
+              ? 'إرسال رمز التحقق'
+              : 'إرسال رمز SMS';
     } else if (_currentStep == 1) {
-      buttonText = _isVerified ? 'التالي' : 'تأكيد الرمز';
-    } else if (_currentStep == _stepTitles.length - 1) {
-      buttonText = _isSubmitting ? 'جاري الإنشاء...' : 'إنشاء الحساب';
+      buttonText =
+          _isVerified ? 'التالي' : 'تأكيد الرمز';
+    } else if (_currentStep ==
+        _stepTitles.length - 1) {
+      buttonText =
+          _isSubmitting
+              ? 'جاري الإنشاء...'
+              : 'إنشاء الحساب';
     }
 
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(18.w),
       child: Row(
         children: [
           if (_currentStep > 0)
@@ -605,10 +760,11 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                 onPressed: _previousStep,
                 backgroundColor: Colors.grey[300],
                 textColor: AppColors.textPrimary,
-                height: 48.h,
+                height: 38.h,
               ),
             ),
-          if (_currentStep > 0) SizedBox(width: 16.w),
+          if (_currentStep > 0)
+            SizedBox(width: 16.w),
           Expanded(
             flex: _currentStep > 0 ? 2 : 1,
             child: AnimatedButton(
@@ -619,12 +775,16 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                           !_isCheckingVerification
                       ? () {
                         // Prevent multiple rapid presses
-                        if (_isSubmitting || _isCheckingVerification) return;
+                        if (_isSubmitting ||
+                            _isCheckingVerification)
+                          return;
                         _nextStep();
                       }
                       : null,
-              isLoading: _isSubmitting || _isCheckingVerification,
-              height: 48.h,
+              isLoading:
+                  _isSubmitting ||
+                  _isCheckingVerification,
+              height: 38.h,
             ),
           ),
         ],
@@ -634,27 +794,40 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
   bool _canProceedToNext() {
     // Prevent navigation if currently processing
-    if (_isSubmitting || _isCheckingVerification) return false;
+    if (_isSubmitting || _isCheckingVerification)
+      return false;
 
     switch (_currentStep) {
       case 0: // Username and Password step
         // Allow button to be enabled if basic fields have content
         // Form validation will happen in _nextStep()
-        return _usernameController.text.trim().isNotEmpty &&
-            _passwordController.text.trim().isNotEmpty &&
-            _confirmPasswordController.text.trim().isNotEmpty;
+        return _usernameController.text
+                .trim()
+                .isNotEmpty &&
+            _passwordController.text
+                .trim()
+                .isNotEmpty &&
+            _confirmPasswordController.text
+                .trim()
+                .isNotEmpty;
       case 1: // OTP verification step
         // For step 1, allow if verified OR if OTP code is complete for verification
-        return _isVerified || _otpCode.length == 6;
+        return _isVerified ||
+            _otpCode.length == 6;
       case 2: // User type step
         return _selectedUserType != null;
       case 3: // Document upload step
-        final requiredDocs = _selectedUserType == UserType.citizen ? 2 : 1;
-        return _selectedDocuments.length >= requiredDocs;
+        final requiredDocs =
+            _selectedUserType == UserType.citizen
+                ? 2
+                : 1;
+        return _selectedDocuments.length >=
+            requiredDocs;
       case 4: // Data entry step
         return _isDataValid();
       case 5: // Location step
-        return _selectedGovernorate != null && _selectedCity != null;
+        return _selectedGovernorate != null &&
+            _selectedCity != null;
       case 6: // Review step
         return true; // Review step can always proceed to submit
       default:
@@ -670,7 +843,11 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     final requiredFields = ['fullName'];
 
     // Always require both email and phone (regardless of registration method)
-    requiredFields.addAll(['email', 'phone', 'password']);
+    requiredFields.addAll([
+      'email',
+      'phone',
+      'password',
+    ]);
 
     // Document-specific fields
     if (_selectedUserType == UserType.citizen) {
@@ -691,15 +868,27 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     }
 
     // Check password length - with fallback to original password controller
-    final password = _userData['password'] ?? _passwordController.text.trim();
+    final password =
+        _userData['password'] ??
+        _passwordController.text.trim();
     print('🔐 Password Debug in _isDataValid:');
-    print('  - _userData[password]: ${_userData['password']}');
-    print('  - _passwordController.text: ${_passwordController.text.trim()}');
-    print('  - Final password for validation: $password');
-    print('  - Password length: ${password.length}');
+    print(
+      '  - _userData[password]: ${_userData['password']}',
+    );
+    print(
+      '  - _passwordController.text: ${_passwordController.text.trim()}',
+    );
+    print(
+      '  - Final password for validation: $password',
+    );
+    print(
+      '  - Password length: ${password.length}',
+    );
 
     if (password.length < 6) {
-      print('❌ كلمة المرور قصيرة: ${password.length}');
+      print(
+        '❌ كلمة المرور قصيرة: ${password.length}',
+      );
       return false;
     }
 
@@ -710,7 +899,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
       ).hasMatch(email);
       if (!emailValid) {
-        print('❌ البريد الإلكتروني غير صحيح: $email');
+        print(
+          '❌ البريد الإلكتروني غير صحيح: $email',
+        );
         return false;
       }
     }
@@ -720,7 +911,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     if (phone.isNotEmpty) {
       final phoneValid = RegExp(
         r'^\+?[0-9]{10,15}$',
-      ).hasMatch(phone.replaceAll(RegExp(r'[\s-]'), ''));
+      ).hasMatch(
+        phone.replaceAll(RegExp(r'[\s-]'), ''),
+      );
       if (!phoneValid) {
         print('❌ رقم الهاتف غير صحيح: $phone');
         return false;
@@ -729,14 +922,20 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
     // Validate document-specific fields
     if (_selectedUserType == UserType.citizen) {
-      final nationalId = _userData['nationalId'] ?? '';
+      final nationalId =
+          _userData['nationalId'] ?? '';
       if (nationalId.length != 14 ||
-          !RegExp(r'^\d{14}$').hasMatch(nationalId)) {
-        print('❌ الرقم القومي غير صحيح: $nationalId');
+          !RegExp(
+            r'^\d{14}$',
+          ).hasMatch(nationalId)) {
+        print(
+          '❌ الرقم القومي غير صحيح: $nationalId',
+        );
         return false;
       }
     } else {
-      final passportNumber = _userData['passportNumber'] ?? '';
+      final passportNumber =
+          _userData['passportNumber'] ?? '';
       if (passportNumber.trim().isEmpty) {
         print('❌ رقم جواز السفر فارغ');
         return false;
@@ -765,7 +964,8 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       } else {
         await _verifyOTP();
       }
-    } else if (_currentStep < _stepTitles.length - 1) {
+    } else if (_currentStep <
+        _stepTitles.length - 1) {
       _proceedToNextStep();
     } else {
       _submitRegistration();
@@ -795,7 +995,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(
+          milliseconds: 300,
+        ),
         curve: Curves.easeInOut,
       );
     }
@@ -809,15 +1011,24 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     });
 
     // Get password from data entry step (where user confirmed it)
-    final password = _userData['password'] ?? _passwordController.text.trim();
-    final username = _usernameController.text.trim();
+    final password =
+        _userData['password'] ??
+        _passwordController.text.trim();
+    final username =
+        _usernameController.text.trim();
 
     // Debug password handling
     print('🔐 Password Debug:');
-    print('  - _userData[password]: ${_userData['password']}');
-    print('  - _passwordController.text: ${_passwordController.text.trim()}');
+    print(
+      '  - _userData[password]: ${_userData['password']}',
+    );
+    print(
+      '  - _passwordController.text: ${_passwordController.text.trim()}',
+    );
     print('  - Final password: $password');
-    print('  - Password length: ${password.length}');
+    print(
+      '  - Password length: ${password.length}',
+    );
 
     // Update cubit state manually first
     final cubit = context.read<SignupCubit>();
@@ -825,22 +1036,27 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     // Set the state manually to prepare for completion
     final extractedMap = <String, String?>{};
     if (_extractedData != null) {
-      extractedMap['fullName'] = _extractedData!.fullName;
-      extractedMap['nationalId'] = _extractedData!.nationalId;
-      extractedMap['passportNumber'] = _extractedData!.passportNumber;
+      extractedMap['fullName'] =
+          _extractedData!.fullName;
+      extractedMap['nationalId'] =
+          _extractedData!.nationalId;
+      extractedMap['passportNumber'] =
+          _extractedData!.passportNumber;
       // Add other fields as needed
     }
 
     // Directly call the register method with prepared data
     final registrationData = <String, dynamic>{
       'fullName': _userData['fullName'],
-      'username': username, // Use username from form (email or phone)
+      'username':
+          username, // Use username from form (email or phone)
       'phone': _userData['phone'],
       'userType': _selectedUserType?.name,
       'governorate': _selectedGovernorate?.name,
       'city': _selectedCity?.name,
       'address': _userData['address'],
-      'password': password, // Use password from data entry step
+      'password':
+          password, // Use password from data entry step
     };
 
     // Set email field based on what was entered
@@ -849,20 +1065,26 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     } else {
       registrationData['phone'] = username;
       // Ensure we have email from data entry step
-      registrationData['email'] = _userData['email'];
+      registrationData['email'] =
+          _userData['email'];
     }
 
     // Add document-specific fields
     if (_selectedUserType == UserType.citizen) {
-      registrationData['nationalId'] = _userData['nationalId'];
+      registrationData['nationalId'] =
+          _userData['nationalId'];
     } else {
-      registrationData['passportNumber'] = _userData['passportNumber'];
+      registrationData['passportNumber'] =
+          _userData['passportNumber'];
     }
 
     // Add document file paths to registration data
     final selectedDocumentPaths =
-        _selectedDocuments.map((file) => file.path).toList();
-    registrationData['documents'] = selectedDocumentPaths;
+        _selectedDocuments
+            .map((file) => file.path)
+            .toList();
+    registrationData['documents'] =
+        selectedDocumentPaths;
 
     // Final debug print before registration
     print('📋 Final Registration Data:');
@@ -880,74 +1102,99 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       child: Form(
         key: _formKey,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center,
           children: [
             // Header
-            FadeInDown(
-              duration: const Duration(milliseconds: 600),
-              child: Column(
-                children: [
-                  Text(
-                    'إنشاء حساب جديد',
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'أدخل بريدك الإلكتروني أو رقم هاتفك وكلمة مرور قوية',
-                    style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+            // FadeInDown(
+            //   duration: const Duration(milliseconds: 600),
+            //   child: Column(
+            //     children: [
+            //       Text(
+            //         'إنشاء حساب جديد',
+            //         style: TextStyle(
+            //           fontSize: 24.sp,
+            //           fontWeight: FontWeight.bold,
+            //           color: AppColors.textPrimary,
+            //         ),
+            //         textAlign: TextAlign.center,
+            //       ),
+            //       SizedBox(height: 8.h),
+            //       Text(
+            //         'أدخل بريدك الإلكتروني أو رقم هاتفك وكلمة مرور قوية',
+            //         style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+            //         textAlign: TextAlign.center,
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
-            SizedBox(height: 40.h),
+            // SizedBox(height: 40.h),
 
             // Mode Toggle (Email or Phone)
             FadeInUp(
-              duration: const Duration(milliseconds: 700),
+              duration: const Duration(
+                milliseconds: 700,
+              ),
               child: Container(
                 padding: EdgeInsets.all(4.w),
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius:
+                      BorderRadius.circular(12.r),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          setState(() => _isEmailMode = true);
+                          setState(
+                            () =>
+                                _isEmailMode =
+                                    true,
+                          );
                           // Clear form validation state when switching modes
-                          _formKey.currentState?.reset();
-                          _usernameController.clear();
+                          _formKey.currentState
+                              ?.reset();
+                          _usernameController
+                              .clear();
                         },
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          duration:
+                              const Duration(
+                                milliseconds: 300,
+                              ),
+                          padding:
+                              EdgeInsets.symmetric(
+                                vertical: 8.h,
+                              ),
                           decoration: BoxDecoration(
                             color:
                                 _isEmailMode
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.r),
+                                    ? AppColors
+                                        .primary
+                                    : Colors
+                                        .transparent,
+                            borderRadius:
+                                BorderRadius.circular(
+                                  8.r,
+                                ),
                           ),
                           child: Text(
                             'البريد الإلكتروني',
                             style: TextStyle(
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight:
+                                  FontWeight.w600,
                               color:
                                   _isEmailMode
-                                      ? Colors.white
-                                      : Colors.grey[600],
+                                      ? Colors
+                                          .white
+                                      : Colors
+                                          .grey[600],
                             ),
-                            textAlign: TextAlign.center,
+                            textAlign:
+                                TextAlign.center,
                           ),
                         ),
                       ),
@@ -955,32 +1202,53 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          setState(() => _isEmailMode = false);
+                          setState(
+                            () =>
+                                _isEmailMode =
+                                    false,
+                          );
                           // Clear form validation state when switching modes
-                          _formKey.currentState?.reset();
-                          _usernameController.clear();
+                          _formKey.currentState
+                              ?.reset();
+                          _usernameController
+                              .clear();
                         },
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          duration:
+                              const Duration(
+                                milliseconds: 300,
+                              ),
+                          padding:
+                              EdgeInsets.symmetric(
+                                vertical: 8.h,
+                              ),
                           decoration: BoxDecoration(
                             color:
                                 !_isEmailMode
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.r),
+                                    ? AppColors
+                                        .primary
+                                    : Colors
+                                        .transparent,
+                            borderRadius:
+                                BorderRadius.circular(
+                                  8.r,
+                                ),
                           ),
                           child: Text(
                             'رقم الهاتف',
                             style: TextStyle(
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight:
+                                  FontWeight.w600,
                               color:
                                   !_isEmailMode
-                                      ? Colors.white
-                                      : Colors.grey[600],
+                                      ? Colors
+                                          .white
+                                      : Colors
+                                          .grey[600],
                             ),
-                            textAlign: TextAlign.center,
+                            textAlign:
+                                TextAlign.center,
                           ),
                         ),
                       ),
@@ -994,20 +1262,32 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
             // Username Field (Email or Phone)
             FadeInUp(
-              duration: const Duration(milliseconds: 800),
+              duration: const Duration(
+                milliseconds: 800,
+              ),
               child: CustomTextField(
                 controller: _usernameController,
-                label: _isEmailMode ? 'البريد الإلكتروني' : 'رقم الهاتف',
-                hint: _isEmailMode ? 'أدخل بريدك الإلكتروني' : 'أدخل رقم هاتفك',
+                label:
+                    _isEmailMode
+                        ? 'البريد الإلكتروني'
+                        : 'رقم الهاتف',
+                hint:
+                    _isEmailMode
+                        ? 'أدخل بريدك الإلكتروني'
+                        : 'أدخل رقم هاتفك',
                 prefixIcon: Icon(
-                  _isEmailMode ? Icons.email_outlined : Icons.phone_outlined,
+                  _isEmailMode
+                      ? Icons.email_outlined
+                      : Icons.phone_outlined,
                 ),
                 keyboardType:
                     _isEmailMode
-                        ? TextInputType.emailAddress
+                        ? TextInputType
+                            .emailAddress
                         : TextInputType.phone,
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
+                  if (value == null ||
+                      value.trim().isEmpty) {
                     return _isEmailMode
                         ? 'البريد الإلكتروني مطلوب'
                         : 'رقم الهاتف مطلوب';
@@ -1021,7 +1301,12 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                   } else {
                     if (!RegExp(
                       r'^\+?[0-9]{10,15}$',
-                    ).hasMatch(value.replaceAll(RegExp(r'[\s-]'), ''))) {
+                    ).hasMatch(
+                      value.replaceAll(
+                        RegExp(r'[\s-]'),
+                        '',
+                      ),
+                    )) {
                       return 'أدخل رقم هاتف صحيح';
                     }
                   }
@@ -1030,29 +1315,38 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
               ),
             ),
 
-            SizedBox(height: 20.h),
+            SizedBox(height: 18.h),
 
             // Password Field
             FadeInUp(
-              duration: const Duration(milliseconds: 900),
+              duration: const Duration(
+                milliseconds: 900,
+              ),
               child: CustomTextField(
                 controller: _passwordController,
                 label: 'كلمة المرور',
                 hint: 'أدخل كلمة مرور قوية',
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const Icon(
+                  Icons.lock_outline,
+                ),
                 obscureText: _passwordObscured,
                 suffixIcon: IconButton(
                   onPressed:
                       () => setState(() {
-                        _passwordObscured = !_passwordObscured;
+                        _passwordObscured =
+                            !_passwordObscured;
                       }),
                   icon: Icon(
-                    _passwordObscured ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.textSecondary,
+                    _passwordObscured
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color:
+                        AppColors.textSecondary,
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
+                  if (value == null ||
+                      value.trim().isEmpty) {
                     return 'كلمة المرور مطلوبة';
                   }
                   if (value.length < 6) {
@@ -1063,34 +1357,44 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
               ),
             ),
 
-            SizedBox(height: 20.h),
+            SizedBox(height: 18.h),
 
             // Confirm Password Field
             FadeInUp(
-              duration: const Duration(milliseconds: 1000),
+              duration: const Duration(
+                milliseconds: 1000,
+              ),
               child: CustomTextField(
-                controller: _confirmPasswordController,
+                controller:
+                    _confirmPasswordController,
                 label: 'تأكيد كلمة المرور',
                 hint: 'أعد كتابة كلمة المرور',
-                prefixIcon: const Icon(Icons.lock_outline),
-                obscureText: _confirmPasswordObscured,
+                prefixIcon: const Icon(
+                  Icons.lock_outline,
+                ),
+                obscureText:
+                    _confirmPasswordObscured,
                 suffixIcon: IconButton(
                   onPressed:
                       () => setState(() {
-                        _confirmPasswordObscured = !_confirmPasswordObscured;
+                        _confirmPasswordObscured =
+                            !_confirmPasswordObscured;
                       }),
                   icon: Icon(
                     _confirmPasswordObscured
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: AppColors.textSecondary,
+                    color:
+                        AppColors.textSecondary,
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
+                  if (value == null ||
+                      value.trim().isEmpty) {
                     return 'تأكيد كلمة المرور مطلوب';
                   }
-                  if (value != _passwordController.text) {
+                  if (value !=
+                      _passwordController.text) {
                     return 'كلمات المرور غير متطابقة';
                   }
                   return null;
@@ -1112,53 +1416,66 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       child: Column(
         children: [
           // Verification Icon
-          FadeInUp(
-            duration: const Duration(milliseconds: 800),
-            child: Container(
-              width: 100.w,
-              height: 100.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _isVerified ? AppColors.success : AppColors.primary,
-                boxShadow: [
-                  BoxShadow(
-                    color: (_isVerified ? AppColors.success : AppColors.primary)
-                        .withOpacity(0.3),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
-              ),
-              child: Icon(
-                _isVerified
-                    ? Icons.check_circle
-                    : (_isEmailMode
-                        ? Icons.email_outlined
-                        : Icons.sms_outlined),
-                size: 48.sp,
-                color: Colors.white,
-              ),
-            ),
-          ),
-
-          SizedBox(height: 20.h),
+          // FadeInUp(
+          //   duration: const Duration(
+          //     milliseconds: 800,
+          //   ),
+          //   child: Container(
+          //     width: 100.w,
+          //     height: 100.h,
+          //     decoration: BoxDecoration(
+          //       shape: BoxShape.circle,
+          //       color:
+          //           _isVerified
+          //               ? AppColors.success
+          //               : AppColors.primary,
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: (_isVerified
+          //                   ? AppColors.success
+          //                   : AppColors.primary)
+          //               .withOpacity(0.3),
+          //           blurRadius: 20,
+          //           spreadRadius: 5,
+          //         ),
+          //       ],
+          //     ),
+          //     child: Icon(
+          //       _isVerified
+          //           ? Icons.check_circle
+          //           : (_isEmailMode
+          //               ? Icons.email_outlined
+          //               : Icons.sms_outlined),
+          //       size: 48.sp,
+          //       color: Colors.white,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 12.h),
 
           // Title and Description
           FadeInUp(
-            duration: const Duration(milliseconds: 1000),
+            duration: const Duration(
+              milliseconds: 1000,
+            ),
             child: Column(
               children: [
-                Text(
-                  _isVerified ? 'تم التأكيد بنجاح!' : 'تأكيد الهوية',
-                  style: TextStyle(
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
-                    color:
-                        _isVerified ? AppColors.success : AppColors.textPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16.h),
+                // Text(
+                //   _isVerified
+                //       ? 'تم التأكيد بنجاح!'
+                //       : 'تأكيد الهوية',
+                //   style: TextStyle(
+                //     fontSize: 24.sp,
+                //     fontWeight: FontWeight.bold,
+                //     color:
+                //         _isVerified
+                //             ? AppColors.success
+                //             : AppColors
+                //                 .textPrimary,
+                //   ),
+                //   textAlign: TextAlign.center,
+                // ),
+                // SizedBox(height: 16.h),
                 Text(
                   _isVerified
                       ? 'تم تأكيد هويتك بنجاح. يمكنك الآن المتابعة.'
@@ -1166,21 +1483,25 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                       ? 'تم إرسال رمز التأكيد إلى بريدك الإلكتروني\nيرجى إدخال الرمز المكون من 6 أرقام'
                       : 'تم إرسال رمز التأكيد إلى رقم هاتفك\nيرجى إدخال الرمز المكون من 6 أرقام',
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 14.sp,
                     color: Colors.grey[600],
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 16.h),
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.w,
                     vertical: 8.h,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
+                    color: AppColors.primary
+                        .withOpacity(0.1),
+                    borderRadius:
+                        BorderRadius.circular(
+                          8.r,
+                        ),
                   ),
                   child: Text(
                     _usernameController.text,
@@ -1200,31 +1521,40 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           if (!_isVerified) ...[
             // OTP Input Fields using pin_code_fields
             FadeInUp(
-              duration: const Duration(milliseconds: 600),
+              duration: const Duration(
+                milliseconds: 600,
+              ),
               child: Column(
                 children: [
                   Text(
                     'أدخل رمز التأكيد',
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color:
+                          AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 20.h),
                   Directionality(
-                    textDirection: TextDirection.ltr, // Force LTR for OTP
+                    textDirection:
+                        TextDirection
+                            .ltr, // Force LTR for OTP
                     child: PinCodeTextField(
                       appContext: context,
-                      pastedTextStyle: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      pastedTextStyle:
+                          const TextStyle(
+                            color:
+                                AppColors.primary,
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
                       length: 6,
                       obscureText: false,
                       obscuringCharacter: '*',
                       blinkWhenObscuring: true,
-                      animationType: AnimationType.fade,
+                      animationType:
+                          AnimationType.fade,
                       validator: (v) {
                         if (v!.length < 6) {
                           return "يجب إدخال الرمز كاملاً";
@@ -1233,25 +1563,42 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                         }
                       },
                       pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(12.r),
-                        fieldHeight: 60.h,
-                        fieldWidth: 50.w,
-                        activeFillColor: Colors.white,
-                        inactiveFillColor: Colors.white,
-                        selectedFillColor: Colors.white,
-                        activeColor: AppColors.primary,
-                        inactiveColor: Colors.grey.shade300,
-                        selectedColor: AppColors.primary,
+                        shape:
+                            PinCodeFieldShape.box,
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
+                        fieldHeight: 52.h,
+                        fieldWidth: 52.w,
+                        activeFillColor:
+                            Colors.white,
+                        inactiveFillColor:
+                            Colors.white,
+                        selectedFillColor:
+                            Colors.white,
+                        activeColor:
+                            AppColors.primary,
+                        inactiveColor:
+                            Colors.grey.shade300,
+                        selectedColor:
+                            AppColors.primary,
                         borderWidth: 2,
-                        errorBorderColor: AppColors.error,
+                        errorBorderColor:
+                            AppColors.error,
                       ),
-                      cursorColor: AppColors.primary,
-                      animationDuration: const Duration(milliseconds: 300),
+                      cursorColor:
+                          AppColors.primary,
+                      animationDuration:
+                          const Duration(
+                            milliseconds: 300,
+                          ),
                       enableActiveFill: true,
-                      errorAnimationController: _otpErrorController,
+                      errorAnimationController:
+                          _otpErrorController,
                       controller: _otpController,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          TextInputType.number,
                       boxShadows: const [
                         BoxShadow(
                           offset: Offset(0, 1),
@@ -1260,17 +1607,23 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                         ),
                       ],
                       onCompleted: (v) {
-                        print("OTP Completed: $v");
+                        print(
+                          "OTP Completed: $v",
+                        );
                         _verifyOTP();
                       },
                       onChanged: (value) {
-                        print("OTP Changed: $value");
+                        print(
+                          "OTP Changed: $value",
+                        );
                         setState(() {
                           _otpCode = value;
                         });
                       },
                       beforeTextPaste: (text) {
-                        print("Allowing to paste $text");
+                        print(
+                          "Allowing to paste $text",
+                        );
                         return true;
                       },
                     ),
@@ -1283,29 +1636,41 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
 
             // Resend Button
             FadeInUp(
-              duration: const Duration(milliseconds: 700),
+              duration: const Duration(
+                milliseconds: 700,
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment:
+                    MainAxisAlignment.center,
                 children: [
                   Text(
                     'لم تستلم الرمز؟ ',
-                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.grey[600],
+                    ),
                   ),
                   GestureDetector(
-                    onTap: _resendCountdown == 0 ? _resendOTP : null,
+                    onTap:
+                        _resendCountdown == 0
+                            ? _resendOTP
+                            : null,
                     child: Text(
                       _resendCountdown > 0
                           ? 'إعادة الإرسال بعد $_resendCountdown ثانية'
                           : (_isEmailMode
-                              ? 'إعادة إرسال رمز البريد الإلكتروني'
+                              ? 'إعادة إرسال الرمز'
                               : 'إعادة إرسال رمز SMS'),
                       style: TextStyle(
                         fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight:
+                            FontWeight.w600,
                         color:
                             _resendCountdown == 0
-                                ? AppColors.primary
-                                : Colors.grey[400],
+                                ? AppColors
+                                    .primary
+                                : Colors
+                                    .grey[400],
                       ),
                     ),
                   ),
@@ -1317,7 +1682,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           // Checking indicator
           if (_isCheckingVerification)
             FadeInUp(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(
+                milliseconds: 300,
+              ),
               child: Column(
                 children: [
                   SizedBox(
@@ -1325,15 +1692,19 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
                     height: 30.h,
                     child: const CircularProgressIndicator(
                       strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary,
-                      ),
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(AppColors.primary),
                     ),
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     'جاري التحقق من الرمز...',
-                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
@@ -1364,14 +1735,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
     });
 
     try {
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
+      final username =
+          _usernameController.text.trim();
+      final password =
+          _passwordController.text.trim();
 
       // Validate input before proceeding
       if (username.isEmpty || password.isEmpty) {
         showModernSnackBar(
           context,
-          message: 'يرجى ملء جميع الحقول المطلوبة',
+          message:
+              'يرجى ملء جميع الحقول المطلوبة',
           type: SnackBarType.error,
         );
         return;
@@ -1385,10 +1759,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
               SizedBox(
                 width: 16.w,
                 height: 16.w,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                child:
+                    const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(Colors.white),
+                    ),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -1405,17 +1783,21 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(16.w),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(
+              12.r,
+            ),
           ),
         ),
       );
 
       // Use the cubit to send OTP - state transitions will be handled by BlocListener
-      context.read<SignupCubit>().signUpWithUsernameAndPassword(
-        username,
-        password,
-        _isEmailMode,
-      );
+      context
+          .read<SignupCubit>()
+          .signUpWithUsernameAndPassword(
+            username,
+            password,
+            _isEmailMode,
+          );
     } catch (e) {
       setState(() {
         _isSubmitting = false;
@@ -1438,45 +1820,62 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   Future<void> _verifyOTP() async {
     if (_otpCode.length != 6) return;
 
-    setState(() => _isCheckingVerification = true);
+    setState(
+      () => _isCheckingVerification = true,
+    );
 
     try {
-      final username = _usernameController.text.trim();
+      final username =
+          _usernameController.text.trim();
       bool isValidOTP = false;
 
       if (_isEmailMode) {
         // Email OTP verification - Check with Supabase Auth
         try {
-          final response = await Supabase.instance.client.auth.verifyOTP(
-            type: OtpType.email,
-            token: _otpCode,
-            email: username,
-          );
+          final response = await Supabase
+              .instance
+              .client
+              .auth
+              .verifyOTP(
+                type: OtpType.email,
+                token: _otpCode,
+                email: username,
+              );
           isValidOTP = response.user != null;
           print(
             '📧 Email OTP verification result: ${isValidOTP ? "Success" : "Failed"}',
           );
         } catch (e) {
-          print('📧 Email OTP verification error: $e');
+          print(
+            '📧 Email OTP verification error: $e',
+          );
           isValidOTP = false;
         }
       } else {
         // Phone SMS OTP verification - Check with Supabase Auth
         try {
-          final response = await Supabase.instance.client.auth.verifyOTP(
-            type: OtpType.sms,
-            token: _otpCode,
-            phone: username,
-          );
+          final response = await Supabase
+              .instance
+              .client
+              .auth
+              .verifyOTP(
+                type: OtpType.sms,
+                token: _otpCode,
+                phone: username,
+              );
           isValidOTP = response.user != null;
           print(
             '📱 SMS OTP verification result: ${isValidOTP ? "Success" : "Failed"}',
           );
         } catch (e) {
-          print('📱 SMS OTP verification error: $e');
+          print(
+            '📱 SMS OTP verification error: $e',
+          );
           // For demo purposes, accept any 6-digit code if SMS verification fails
           isValidOTP = _otpCode.length == 6;
-          print('📱 Using fallback OTP validation: $isValidOTP');
+          print(
+            '📱 Using fallback OTP validation: $isValidOTP',
+          );
         }
       }
 
@@ -1487,11 +1886,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         });
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
@@ -1507,19 +1912,27 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
             ),
           ),
         );
 
         // Auto proceed to next step after a short delay
-        await Future.delayed(const Duration(milliseconds: 1500));
+        await Future.delayed(
+          const Duration(milliseconds: 1500),
+        );
         if (mounted) {
           _proceedToNextStep();
         }
       } else {
-        setState(() => _isCheckingVerification = false);
-        ScaffoldMessenger.of(context).showSnackBar(
+        setState(
+          () => _isCheckingVerification = false,
+        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Text(
               _isEmailMode
@@ -1534,7 +1947,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         _clearOTPFields();
       }
     } catch (e) {
-      setState(() => _isCheckingVerification = false);
+      setState(
+        () => _isCheckingVerification = false,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('خطأ في التحقق: $e'),
@@ -1554,7 +1969,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
       _otpCode = '';
     });
     // Trigger error animation
-    _otpErrorController?.add(ErrorAnimationType.shake);
+    _otpErrorController?.add(
+      ErrorAnimationType.shake,
+    );
   }
 
   // Resend OTP
@@ -1566,10 +1983,14 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
             SizedBox(
               width: 16.w,
               height: 16.w,
-              child: const CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+              child:
+                  const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<
+                          Color
+                        >(Colors.white),
+                  ),
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -1586,7 +2007,9 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16.w),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
       ),
     );
@@ -1599,14 +2022,17 @@ class _ImprovedSignupPageState extends State<ImprovedSignupPage> {
   void _startResendTimer() {
     setState(() => _resendCountdown = 60);
     _resendTimer?.cancel();
-    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_resendCountdown > 0) {
-          _resendCountdown--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
+    _resendTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        setState(() {
+          if (_resendCountdown > 0) {
+            _resendCountdown--;
+          } else {
+            timer.cancel();
+          }
+        });
+      },
+    );
   }
 }

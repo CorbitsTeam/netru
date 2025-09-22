@@ -8,7 +8,8 @@ import '../../../../core/routing/routes.dart';
 import '../widgets/animated_button.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-class EmailVerificationPage extends StatefulWidget {
+class EmailVerificationPage
+    extends StatefulWidget {
   final String email;
   final String password;
 
@@ -19,10 +20,12 @@ class EmailVerificationPage extends StatefulWidget {
   });
 
   @override
-  State<EmailVerificationPage> createState() => _EmailVerificationPageState();
+  State<EmailVerificationPage> createState() =>
+      _EmailVerificationPageState();
 }
 
-class _EmailVerificationPageState extends State<EmailVerificationPage>
+class _EmailVerificationPageState
+    extends State<EmailVerificationPage>
     with TickerProviderStateMixin {
   late AnimationController _emailIconController;
   late AnimationController _checkController;
@@ -37,14 +40,13 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
   Timer? _cooldownTimer;
 
   // OTP input fields
-  final List<TextEditingController> _otpControllers = List.generate(
+  final List<TextEditingController>
+  _otpControllers = List.generate(
     6,
     (index) => TextEditingController(),
   );
-  final List<FocusNode> _otpFocusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
+  final List<FocusNode> _otpFocusNodes =
+      List.generate(6, (index) => FocusNode());
   String _otpCode = '';
   bool _isVerifyingOTP = false;
 
@@ -58,39 +60,65 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
   void _setupAnimations() {
     _emailIconController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(
+        milliseconds: 2000,
+      ),
       vsync: this,
     );
     _checkController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(
+        milliseconds: 1000,
+      ),
       vsync: this,
     );
 
-    _emailIconAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _emailIconController, curve: Curves.elasticOut),
+    _emailIconAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _emailIconController,
+        curve: Curves.elasticOut,
+      ),
     );
-    _checkAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _checkController, curve: Curves.elasticOut),
+    _checkAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _checkController,
+        curve: Curves.elasticOut,
+      ),
     );
 
     _emailIconController.forward();
   }
 
   void _startPeriodicCheck() {
-    _checkTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (!_isVerified && mounted) {
-        _checkEmailVerification();
-      }
-    });
+    _checkTimer = Timer.periodic(
+      const Duration(seconds: 3),
+      (timer) {
+        if (!_isVerified && mounted) {
+          _checkEmailVerification();
+        }
+      },
+    );
   }
 
   void _listenToAuthChanges() {
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      final user = data.session?.user;
-      if (user != null && user.emailConfirmedAt != null && mounted) {
-        _onEmailVerified();
-      }
-    });
+    Supabase
+        .instance
+        .client
+        .auth
+        .onAuthStateChange
+        .listen((data) {
+          final user = data.session?.user;
+          if (user != null &&
+              user.emailConfirmedAt != null &&
+              mounted) {
+            _onEmailVerified();
+          }
+        });
   }
 
   Future<void> _checkEmailVerification() async {
@@ -99,14 +127,21 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     setState(() => _isChecking = true);
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user != null && user.emailConfirmedAt != null) {
+      final user =
+          Supabase
+              .instance
+              .client
+              .auth
+              .currentUser;
+      if (user != null &&
+          user.emailConfirmedAt != null) {
         _onEmailVerified();
       }
     } catch (e) {
       print('خطأ في فحص تأكيد البريد: $e');
     } finally {
-      if (mounted) setState(() => _isChecking = false);
+      if (mounted)
+        setState(() => _isChecking = false);
     }
   }
 
@@ -117,62 +152,95 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
     // Sign in automatically with email and password to get authenticated user
     try {
-      print('🔐 تسجيل دخول تلقائي بعد تأكيد الإيميل...');
-      final authResponse = await Supabase.instance.client.auth
-          .signInWithPassword(email: widget.email, password: widget.password);
+      print(
+        '🔐 تسجيل دخول تلقائي بعد تأكيد الإيميل...',
+      );
+      final authResponse = await Supabase
+          .instance
+          .client
+          .auth
+          .signInWithPassword(
+            email: widget.email,
+            password: widget.password,
+          );
 
-      if (authResponse.session != null && authResponse.user != null) {
+      if (authResponse.session != null &&
+          authResponse.user != null) {
         print('✅ تم تسجيل الدخول تلقائياً بنجاح');
 
         // Navigate to complete profile after a short delay
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              Routes.completeProfile,
-              arguments: {'email': widget.email, 'password': widget.password},
-            );
-          }
-        });
+        Future.delayed(
+          const Duration(seconds: 2),
+          () {
+            if (mounted) {
+              Navigator.pushReplacementNamed(
+                context,
+                Routes.completeProfile,
+                arguments: {
+                  'email': widget.email,
+                  'password': widget.password,
+                },
+              );
+            }
+          },
+        );
       } else {
         print('❌ فشل في تسجيل الدخول التلقائي');
         // Still navigate but show error
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           const SnackBar(
-            content: Text('تم تأكيد الإيميل لكن فشل في تسجيل الدخول التلقائي'),
+            content: Text(
+              'تم تأكيد الإيميل لكن فشل في تسجيل الدخول التلقائي',
+            ),
             backgroundColor: AppColors.warning,
           ),
         );
 
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              Routes.completeProfile,
-              arguments: {'email': widget.email, 'password': widget.password},
-            );
-          }
-        });
+        Future.delayed(
+          const Duration(seconds: 2),
+          () {
+            if (mounted) {
+              Navigator.pushReplacementNamed(
+                context,
+                Routes.completeProfile,
+                arguments: {
+                  'email': widget.email,
+                  'password': widget.password,
+                },
+              );
+            }
+          },
+        );
       }
     } catch (e) {
       print('❌ خطأ في تسجيل الدخول التلقائي: $e');
       // Still navigate but show error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تم تأكيد الإيميل لكن حدث خطأ في تسجيل الدخول'),
+          content: Text(
+            'تم تأكيد الإيميل لكن حدث خطأ في تسجيل الدخول',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
 
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          Navigator.pushReplacementNamed(
-            context,
-            Routes.completeProfile,
-            arguments: {'email': widget.email, 'password': widget.password},
-          );
-        }
-      });
+      Future.delayed(
+        const Duration(seconds: 2),
+        () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              Routes.completeProfile,
+              arguments: {
+                'email': widget.email,
+                'password': widget.password,
+              },
+            );
+          }
+        },
+      );
     }
   }
 
@@ -181,7 +249,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     if (_otpCode.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('يرجى إدخال رمز التحقق كاملاً (6 أرقام)'),
+          content: Text(
+            'يرجى إدخال رمز التحقق كاملاً (6 أرقام)',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -193,18 +263,25 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     try {
       print('🔍 التحقق من رمز OTP: $_otpCode');
 
-      final response = await Supabase.instance.client.auth.verifyOTP(
-        type: OtpType.email,
-        token: _otpCode,
-        email: widget.email,
-      );
+      final response = await Supabase
+          .instance
+          .client
+          .auth
+          .verifyOTP(
+            type: OtpType.email,
+            token: _otpCode,
+            email: widget.email,
+          );
 
-      if (response.session != null && response.user != null) {
+      if (response.session != null &&
+          response.user != null) {
         print('✅ تم التحقق من OTP بنجاح');
         _onEmailVerified();
       } else {
         print('❌ فشل في التحقق من OTP');
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           const SnackBar(
             content: Text('رمز التحقق غير صحيح'),
             backgroundColor: AppColors.error,
@@ -217,23 +294,34 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       String errorMessage = 'رمز التحقق غير صحيح';
 
       if (e.toString().contains('expired')) {
-        errorMessage = 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد';
-      } else if (e.toString().contains('invalid')) {
+        errorMessage =
+            'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد';
+      } else if (e.toString().contains(
+        'invalid',
+      )) {
         errorMessage = 'رمز التحقق غير صحيح';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: AppColors.error,
+        ),
       );
       _clearOTPFields();
     } finally {
-      if (mounted) setState(() => _isVerifyingOTP = false);
+      if (mounted)
+        setState(() => _isVerifyingOTP = false);
     }
   }
 
   // Clear OTP input fields
   void _clearOTPFields() {
-    for (int i = 0; i < _otpControllers.length; i++) {
+    for (
+      int i = 0;
+      i < _otpControllers.length;
+      i++
+    ) {
       _otpControllers[i].clear();
     }
     setState(() {
@@ -245,7 +333,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
   // Update OTP code from individual controllers
   void _updateOTPCode() {
-    final code = _otpControllers.map((controller) => controller.text).join();
+    final code =
+        _otpControllers
+            .map((controller) => controller.text)
+            .join();
     setState(() {
       _otpCode = code;
     });
@@ -257,7 +348,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
   }
 
   Future<void> _resendVerificationEmail() async {
-    if (_isResending || _resendCooldown > 0) return;
+    if (_isResending || _resendCooldown > 0)
+      return;
 
     setState(() => _isResending = true);
 
@@ -269,7 +361,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تم إعادة إرسال رسالة التأكيد'),
+          content: Text(
+            'تم إعادة إرسال رسالة التأكيد',
+          ),
           backgroundColor: AppColors.success,
         ),
       );
@@ -278,7 +372,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطأ في إعادة الإرسال: $e'),
+          content: Text(
+            'خطأ في إعادة الإرسال: $e',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -289,12 +385,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
   void _startCooldown() {
     setState(() => _resendCooldown = 60);
-    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() => _resendCooldown--);
-      if (_resendCooldown <= 0) {
-        timer.cancel();
-      }
-    });
+    _cooldownTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        setState(() => _resendCooldown--);
+        if (_resendCooldown <= 0) {
+          timer.cancel();
+        }
+      },
+    );
   }
 
   @override
@@ -327,7 +426,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
               _buildHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
+                  physics:
+                      const BouncingScrollPhysics(),
                   child: _buildContent(),
                 ),
               ),
@@ -344,10 +444,16 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       duration: const Duration(milliseconds: 600),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 20.h),
+        padding: EdgeInsets.symmetric(
+          vertical: 20.h,
+        ),
         child: Column(
           children: [
-            Icon(Icons.security, size: 40.sp, color: AppColors.primary),
+            Icon(
+              Icons.security,
+              size: 40.sp,
+              color: AppColors.primary,
+            ),
             SizedBox(height: 8.h),
             Text(
               'وزارة الداخلية',
@@ -359,7 +465,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
             ),
             Text(
               'جمهورية مصر العربية',
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -373,7 +482,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       children: [
         // Animated Email Icon
         FadeInUp(
-          duration: const Duration(milliseconds: 800),
+          duration: const Duration(
+            milliseconds: 800,
+          ),
           child: AnimatedBuilder(
             animation: _emailIconAnimation,
             builder: (context, child) {
@@ -384,12 +495,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                   height: 120.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _isVerified ? AppColors.success : AppColors.primary,
+                    color:
+                        _isVerified
+                            ? AppColors.success
+                            : AppColors.primary,
                     boxShadow: [
                       BoxShadow(
                         color: (_isVerified
-                                ? AppColors.success
-                                : AppColors.primary)
+                                ? AppColors
+                                    .success
+                                : AppColors
+                                    .primary)
                             .withOpacity(0.3),
                         blurRadius: 20,
                         spreadRadius: 5,
@@ -407,14 +523,22 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                         ),
                       if (_isVerified)
                         AnimatedBuilder(
-                          animation: _checkAnimation,
-                          builder: (context, child) {
+                          animation:
+                              _checkAnimation,
+                          builder: (
+                            context,
+                            child,
+                          ) {
                             return Transform.scale(
-                              scale: _checkAnimation.value,
+                              scale:
+                                  _checkAnimation
+                                      .value,
                               child: Icon(
-                                Icons.check_circle,
+                                Icons
+                                    .check_circle,
                                 size: 60.sp,
-                                color: Colors.white,
+                                color:
+                                    Colors.white,
                               ),
                             );
                           },
@@ -425,9 +549,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                           height: 80.h,
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white.withOpacity(0.7),
-                            ),
+                            valueColor:
+                                AlwaysStoppedAnimation<
+                                  Color
+                                >(
+                                  Colors.white
+                                      .withOpacity(
+                                        0.7,
+                                      ),
+                                ),
                           ),
                         ),
                     ],
@@ -442,17 +572,25 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
         // Title and Description
         FadeInUp(
-          duration: const Duration(milliseconds: 1000),
-          delay: const Duration(milliseconds: 200),
+          duration: const Duration(
+            milliseconds: 1000,
+          ),
+          delay: const Duration(
+            milliseconds: 200,
+          ),
           child: Column(
             children: [
               Text(
-                _isVerified ? 'تم التأكيد بنجاح!' : 'تأكيد البريد الإلكتروني',
+                _isVerified
+                    ? 'تم التأكيد بنجاح!'
+                    : 'تأكيد البريد الإلكتروني',
                 style: TextStyle(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                   color:
-                      _isVerified ? AppColors.success : AppColors.textPrimary,
+                      _isVerified
+                          ? AppColors.success
+                          : AppColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -470,10 +608,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
               ),
               SizedBox(height: 20.h),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 8.h,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: AppColors.primary
+                      .withOpacity(0.1),
+                  borderRadius:
+                      BorderRadius.circular(8.r),
                 ),
                 child: Text(
                   widget.email,
@@ -496,15 +639,24 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
         // Tips
         if (!_isVerified)
           FadeInUp(
-            duration: const Duration(milliseconds: 1200),
-            delay: const Duration(milliseconds: 400),
+            duration: const Duration(
+              milliseconds: 1200,
+            ),
+            delay: const Duration(
+              milliseconds: 400,
+            ),
             child: Container(
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12.r),
+                color: Colors.blue.withOpacity(
+                  0.1,
+                ),
+                borderRadius:
+                    BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: Colors.blue.withOpacity(
+                    0.3,
+                  ),
                   width: 1,
                 ),
               ),
@@ -512,22 +664,33 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.blue, size: 20.sp),
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.blue,
+                        size: 20.sp,
+                      ),
                       SizedBox(width: 8.w),
                       Text(
                         'نصائح مهمة',
                         style: TextStyle(
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                          fontWeight:
+                              FontWeight.w600,
                           color: Colors.blue,
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 12.h),
-                  _buildTip('تحقق من صندوق الرسائل الواردة'),
-                  _buildTip('تحقق من مجلد الرسائل المزعجة (Spam)'),
-                  _buildTip('قد تستغرق الرسالة دقائق قليلة للوصول'),
+                  _buildTip(
+                    'تحقق من صندوق الرسائل الواردة',
+                  ),
+                  _buildTip(
+                    'تحقق من مجلد الرسائل المزعجة (Spam)',
+                  ),
+                  _buildTip(
+                    'قد تستغرق الرسالة دقائق قليلة للوصول',
+                  ),
                 ],
               ),
             ),
@@ -540,7 +703,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     return Directionality(
       textDirection: TextDirection.ltr,
       child: FadeInUp(
-        duration: const Duration(milliseconds: 1000),
+        duration: const Duration(
+          milliseconds: 1000,
+        ),
         delay: const Duration(milliseconds: 300),
         child: Column(
           children: [
@@ -555,7 +720,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
             SizedBox(height: 16.h),
             Text(
               'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني',
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24.h),
@@ -563,22 +731,27 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
             SizedBox(height: 24.h),
             if (_isVerifyingOTP)
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment:
+                    MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: 20.w,
                     height: 20.h,
                     child: const CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary,
-                      ),
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(AppColors.primary),
                     ),
                   ),
                   SizedBox(width: 12.w),
                   Text(
                     'جاري التحقق...',
-                    style: TextStyle(fontSize: 14.sp, color: AppColors.primary),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
               ),
@@ -593,11 +766,13 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     return Directionality(
       textDirection: TextDirection.ltr,
       child: PinCodeTextField(
-        appContext: context, // Required by PinCodeTextField
+        appContext:
+            context, // Required by PinCodeTextField
         length: 6, // Number of OTP digits
         controller:
             TextEditingController(), // You can use a single controller or keep individual controllers
-        focusNode: FocusNode(), // Optional: Manage focus if needed
+        focusNode:
+            FocusNode(), // Optional: Manage focus if needed
         keyboardType: TextInputType.number,
         textStyle: TextStyle(
           fontSize:
@@ -605,23 +780,41 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
         pinTheme: PinTheme(
           shape: PinCodeFieldShape.box,
-          borderRadius: BorderRadius.circular(12.r),
-          fieldHeight: 55.h,
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          fieldHeight: 45.h,
           fieldWidth: 45.w,
-          activeColor: AppColors.primary, // Border color when focused or filled
-          inactiveColor: Colors.grey.shade300, // Border color when empty
-          selectedColor: AppColors.primary, // Border color when selected
-          activeFillColor: Colors.white, // Background color when active
-          inactiveFillColor: Colors.white, // Background color when inactive
-          selectedFillColor: Colors.white, // Background color when selected
+          activeColor:
+              AppColors
+                  .primary, // Border color when focused or filled
+          inactiveColor:
+              Colors
+                  .grey
+                  .shade300, // Border color when empty
+          selectedColor:
+              AppColors
+                  .primary, // Border color when selected
+          activeFillColor:
+              Colors
+                  .white, // Background color when active
+          inactiveFillColor:
+              Colors
+                  .white, // Background color when inactive
+          selectedFillColor:
+              Colors
+                  .white, // Background color when selected
           borderWidth: 2,
         ),
-        enableActiveFill: true, // Enables background fill for the boxes
+        enableActiveFill:
+            true, // Enables background fill for the boxes
         animationType:
-            AnimationType.none, // Disable animation for simplicity (optional)
+            AnimationType
+                .none, // Disable animation for simplicity (optional)
         onChanged: (value) {
           _updateOTPCode(); // Call your existing method to update the OTP code
         },
@@ -655,7 +848,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[700],
+              ),
             ),
           ),
         ],
@@ -666,19 +862,28 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
   Widget _buildActions() {
     if (_isVerified) {
       return FadeInUp(
-        duration: const Duration(milliseconds: 800),
+        duration: const Duration(
+          milliseconds: 800,
+        ),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 20.h),
+          padding: EdgeInsets.symmetric(
+            vertical: 20.h,
+          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment:
+                MainAxisAlignment.center,
             children: [
               SizedBox(
                 width: 30.w,
                 height: 30.h,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.success),
-                ),
+                child:
+                    const CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(AppColors.success),
+                    ),
               ),
               SizedBox(width: 16.w),
               Text(
@@ -696,7 +901,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
     }
 
     return FadeInUp(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(
+        milliseconds: 1000,
+      ),
       delay: const Duration(milliseconds: 600),
       child: Column(
         children: [
@@ -706,7 +913,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
                 _resendCooldown > 0
                     ? 'إعادة الإرسال خلال $_resendCooldown ثانية'
                     : 'إعادة إرسال رسالة التأكيد',
-            onPressed: _resendCooldown > 0 ? null : _resendVerificationEmail,
+            onPressed:
+                _resendCooldown > 0
+                    ? null
+                    : _resendVerificationEmail,
             isLoading: _isResending,
             isEnabled: _resendCooldown == 0,
             backgroundColor: AppColors.secondary,
@@ -718,10 +928,14 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
 
           // Back Button
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed:
+                () => Navigator.pop(context),
             child: Text(
               'العودة للصفحة السابقة',
-              style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 16.sp,
+                color: Colors.grey[600],
+              ),
             ),
           ),
         ],
