@@ -178,9 +178,7 @@ class _LoginPageState extends State<LoginPage>
         );
         break;
       case UserType.admin:
-        context.pushReplacementNamed(
-          Routes.customBottomBar,
-        );
+        context.pushReplacementNamed(Routes.adminDashboard);
         break;
     }
   }

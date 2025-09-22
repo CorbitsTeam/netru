@@ -89,6 +89,29 @@ import '../../features/heatmap/presentation/cubit/heatmap_cubit.dart';
 import '../services/location_service.dart';
 import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
+import '../services/supabase_edge_functions_service.dart';
+import '../network/api_client.dart';
+
+// Admin Feature
+import '../../features/admin/data/datasources/admin_dashboard_remote_data_source.dart';
+import '../../features/admin/data/datasources/admin_auth_manager_data_source.dart';
+import '../../features/admin/data/datasources/admin_user_remote_data_source.dart';
+import '../../features/admin/data/datasources/admin_report_remote_data_source.dart';
+import '../../features/admin/data/repositories/admin_dashboard_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_auth_manager_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_user_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_report_repository_impl.dart';
+import '../../features/admin/domain/repositories/admin_dashboard_repository.dart';
+import '../../features/admin/domain/repositories/admin_user_repository.dart';
+import '../../features/admin/domain/repositories/admin_report_repository.dart';
+import '../../features/admin/domain/usecases/get_dashboard_stats.dart';
+import '../../features/admin/domain/usecases/manage_auth_accounts.dart';
+import '../../features/admin/domain/usecases/manage_users.dart';
+import '../../features/admin/domain/usecases/manage_reports.dart';
+import '../../features/admin/presentation/cubit/admin_reports_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_users_cubit.dart';
 
 // ===========================
 // External Dependencies
@@ -114,6 +137,7 @@ Future<void> initializeDependencies() async {
   });
 
   sl.registerLazySingleton<Dio>(() => Dio());
+  sl.registerLazySingleton<ApiClient>(() => ApiClient());
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
@@ -131,6 +155,7 @@ Future<void> initializeDependencies() async {
   await _initCasesDependencies();
   await initNotificationDependencies();
   await _initHeatmapDependencies();
+  await _initAdminDependencies();
 
   sl.get<LoggerService>().logInfo(
     '✅ All dependencies have been initialized successfully',
@@ -396,6 +421,129 @@ Future<void> initNotificationDependencies() async {
   // Home Feature
   // ===========================
   sl.registerFactory(() => HomeCubit());
+}
+
+/// ===========================
+/// Admin
+/// ===========================
+Future<void> _initAdminDependencies() async {
+  // Register Supabase Edge Functions Service
+  sl.registerLazySingleton<SupabaseEdgeFunctionsService>(
+    () => SupabaseEdgeFunctionsService(),
+  );
+
+  // Admin Dashboard data source
+  sl.registerLazySingleton<AdminDashboardRemoteDataSource>(
+    () => AdminDashboardRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  // Admin Auth Manager data source
+  sl.registerLazySingleton<AdminAuthManagerRemoteDataSource>(
+    () => AdminAuthManagerRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      apiClient: sl<ApiClient>(),
+    ),
+  );
+
+  // Admin User data source
+  sl.registerLazySingleton<AdminUserRemoteDataSource>(
+    () => AdminUserRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<AdminDashboardRepository>(
+    () => AdminDashboardRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton<AdminUserRepository>(
+    () => AdminUserRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton<AdminAuthManagerRepository>(
+    () => AdminAuthManagerRepositoryImpl(
+      remoteDataSource: sl<AdminAuthManagerRemoteDataSource>(),
+    ),
+  );
+
+  // Use cases - Dashboard
+  sl.registerLazySingleton(() => GetDashboardStats(sl()));
+  sl.registerLazySingleton(() => GetReportTrends(sl()));
+  sl.registerLazySingleton(() => GetReportsByGovernorate(sl()));
+  sl.registerLazySingleton(() => GetReportsByType(sl()));
+  sl.registerLazySingleton(() => GetReportsByStatus(sl()));
+
+  // Admin Reports - data source & repository
+  sl.registerLazySingleton<AdminReportRemoteDataSource>(
+    () => AdminReportRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AdminReportRepository>(
+    () => AdminReportRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Admin Reports - Use cases
+  sl.registerLazySingleton(() => GetAllReports(sl()));
+  sl.registerLazySingleton(() => GetReportById(sl()));
+  sl.registerLazySingleton(() => UpdateReportStatus(sl()));
+  sl.registerLazySingleton(() => AssignReport(sl()));
+  sl.registerLazySingleton(() => VerifyReport(sl()));
+  sl.registerLazySingleton(() => AddReportComment(sl()));
+
+  // Use cases - Auth Manager
+  sl.registerLazySingleton(() => GetUsersWithoutAuthAccount(sl()));
+  sl.registerLazySingleton(() => CreateAuthAccountForUser(sl()));
+  sl.registerLazySingleton(() => CreateAuthAccountsForAllUsers(sl()));
+  sl.registerLazySingleton(() => CheckUserHasAuthAccount(sl()));
+
+  // Use cases - User Management
+  sl.registerLazySingleton(() => GetAllUsers(sl()));
+  sl.registerLazySingleton(() => GetUserById(sl()));
+  sl.registerLazySingleton(() => GetUserDetailedProfile(sl()));
+  sl.registerLazySingleton(() => VerifyUser(sl()));
+  sl.registerLazySingleton(() => SuspendUser(sl()));
+
+  // Cubits
+  sl.registerFactory(() => AdminDashboardCubit(getDashboardStats: sl()));
+
+  sl.registerFactory(
+    () => AdminReportsCubit(
+      getAllReports: sl(),
+      getReportById: sl(),
+      updateReportStatus: sl(),
+      assignReport: sl(),
+      verifyReport: sl(),
+      addReportComment: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AdminAuthManagerCubit(
+      getUsersWithoutAuthAccount: sl(),
+      createAuthAccountForUser: sl(),
+      createAuthAccountsForAllUsers: sl(),
+      checkUserHasAuthAccount: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AdminUsersCubit(
+      getAllUsers: sl(),
+      verifyUser: sl(),
+      suspendUser: sl(),
+      getUserDetailedProfile: sl(),
+    ),
+  );
+
+  sl.get<LoggerService>().logInfo('✅ Admin dependencies initialized');
 }
 
 /// ===========================

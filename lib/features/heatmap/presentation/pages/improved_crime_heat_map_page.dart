@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../widgets/heat_map_widget.dart';
-import '../widgets/crime_legend_widget.dart';
 import '../widgets/location_permission_dialog.dart';
 import '../cubit/heatmap_cubit.dart';
 import '../cubit/heatmap_state.dart';

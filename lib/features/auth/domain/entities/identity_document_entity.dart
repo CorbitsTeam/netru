@@ -2,6 +2,26 @@ import 'package:equatable/equatable.dart';
 
 enum DocumentType { nationalId, passport }
 
+extension DocumentTypeExtension on DocumentType {
+  String get arabicName {
+    switch (this) {
+      case DocumentType.nationalId:
+        return 'البطاقة الشخصية';
+      case DocumentType.passport:
+        return 'جواز السفر';
+    }
+  }
+
+  String get value {
+    switch (this) {
+      case DocumentType.nationalId:
+        return 'nationalId';
+      case DocumentType.passport:
+        return 'passport';
+    }
+  }
+}
+
 class IdentityDocumentEntity extends Equatable {
   final String? id;
   final String userId;

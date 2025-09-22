@@ -9,7 +9,15 @@ import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart';
+import '../../features/admin/presentation/pages/admin_reports_page.dart';
+import '../../features/admin/presentation/pages/admin_report_details_page.dart';
+import '../../features/admin/presentation/pages/admin_users_page.dart';
+import '../../features/admin/presentation/pages/admin_notifications_page.dart';
+import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
+import '../../features/admin/domain/entities/admin_report_entity.dart';
+import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
 import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
@@ -90,9 +98,33 @@ class AppRouter {
       case Routes.crimeHeatMapPage:
         return _createRoute(const CrimeHeatMapPage());
 
-      // Admin route
-      case '/admin-dashboard':
-        return _createRoute(const AdminDashboardPage());
+      // Admin routes
+      case Routes.adminDashboard:
+        return _createRoute(
+          BlocProvider<AdminDashboardCubit>(
+            create: (context) => sl<AdminDashboardCubit>(),
+            child: const MobileAdminDashboardPage(),
+          ),
+        );
+      case Routes.adminReports:
+        return _createRoute(const AdminReportsPage());
+      case Routes.adminReportDetails:
+        final report = settings.arguments as AdminReportEntity?;
+        if (report != null) {
+          return _createRoute(AdminReportDetailsPage(report: report));
+        }
+        return null;
+      case Routes.adminUsers:
+        return _createRoute(const AdminUsersPage());
+      case Routes.adminNotifications:
+        return _createRoute(const AdminNotificationsPage());
+      case Routes.adminAuthManager:
+        return _createRoute(
+          BlocProvider<AdminAuthManagerCubit>(
+            create: (context) => sl<AdminAuthManagerCubit>(),
+            child: const AdminAuthManagerPage(),
+          ),
+        );
 
       // // Debug Test route
       // case '/debug-test':

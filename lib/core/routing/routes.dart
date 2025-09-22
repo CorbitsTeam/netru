@@ -26,4 +26,12 @@ class Routes {
 
   // News routes
   static const String allNewsPage = '/allNewsPage';
+
+  // Admin routes
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminReports = '/admin/reports';
+  static const String adminReportDetails = '/admin/reports/details';
+  static const String adminUsers = '/admin/users';
+  static const String adminNotifications = '/admin/notifications';
+  static const String adminAuthManager = '/admin/auth-manager';
 }
