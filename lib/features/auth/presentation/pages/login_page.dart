@@ -750,7 +750,7 @@ class _LoginPageState extends State<LoginPage>
             'ليس لديك حساب؟ ',
             style: TextStyle(
               color: const Color(0xFF6B7280),
-              fontSize: 15.sp,
+              fontSize: 14.sp,
               fontFamily: 'Almarai',
             ),
           ),
@@ -760,7 +760,7 @@ class _LoginPageState extends State<LoginPage>
               'إنشاء حساب جديد',
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 15.sp,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Almarai',
               ),
