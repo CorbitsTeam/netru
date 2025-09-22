@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
@@ -190,9 +191,9 @@ class _SplashScreenState
                                       EdgeInsets.all(
                                         25.w,
                                       ),
-                                  child: Image.asset(
+                                  child: SvgPicture.asset(
                                     AppAssets
-                                        .mainLogo,
+                                        .mainLogoSvg,
                                     fit:
                                         BoxFit
                                             .contain,
