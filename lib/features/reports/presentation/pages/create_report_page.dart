@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/di/injection_container.dart' as di;
+import 'package:netru_app/core/di/injection_container.dart'
+    as di;
+import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
 import '../cubit/report_form_cubit.dart';
 import '../cubit/report_form_state.dart';
@@ -30,35 +32,50 @@ class ReportFormView extends StatefulWidget {
   const ReportFormView({super.key});
 
   @override
-  State<ReportFormView> createState() => _ReportFormViewState();
+  State<ReportFormView> createState() =>
+      _ReportFormViewState();
 }
 
-class _ReportFormViewState extends State<ReportFormView> {
+class _ReportFormViewState
+    extends State<ReportFormView> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _nationalIdController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _reportDetailsController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _dateTimeController = TextEditingController();
+  final _firstNameController =
+      TextEditingController();
+  final _lastNameController =
+      TextEditingController();
+  final _nationalIdController =
+      TextEditingController();
+  final _phoneController =
+      TextEditingController();
+  final _reportDetailsController =
+      TextEditingController();
+  final _locationController =
+      TextEditingController();
+  final _dateTimeController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
     // Load report types when the page initializes
-    context.read<ReportFormCubit>().loadReportTypes();
+    context
+        .read<ReportFormCubit>()
+        .loadReportTypes();
   }
 
   void _loadUserData() {
     // Pre-fill form with user data if available - using placeholder methods
     // You can uncomment and modify these lines once the methods are implemented
     final userHelper = UserDataHelper();
-    _firstNameController.text = userHelper.getUserFirstName();
-    _lastNameController.text = userHelper.getUserLastName();
-    _nationalIdController.text = userHelper.getUserNationalId() ?? '';
-    _phoneController.text = userHelper.getUserPhone() ?? '';
+    _firstNameController.text =
+        userHelper.getUserFirstName();
+    _lastNameController.text =
+        userHelper.getUserLastName();
+    _nationalIdController.text =
+        userHelper.getUserNationalId() ?? '';
+    _phoneController.text =
+        userHelper.getUserPhone() ?? '';
   }
 
   @override
@@ -76,20 +93,30 @@ class _ReportFormViewState extends State<ReportFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<ReportFormCubit, ReportFormState>(
+      body: BlocListener<
+        ReportFormCubit,
+        ReportFormState
+      >(
         listener: (context, state) {
-          if (state.isSubmitted && !state.isLoading) {
+          if (state.isSubmitted &&
+              !state.isLoading) {
             // Don't reset form immediately - let user see success dialog first
             _showSuccessDialog(context);
-          } else if (state.errorMessage.isNotEmpty && !state.isLoading) {
-            _showErrorSnackBar(context, state.errorMessage);
+          } else if (state
+                  .errorMessage
+                  .isNotEmpty &&
+              !state.isLoading) {
+            _showErrorSnackBar(
+              context,
+              state.errorMessage,
+            );
           }
         },
         child: CustomScrollView(
           slivers: [
             // App Bar
             SliverAppBar(
-              expandedHeight: 60.h,
+              expandedHeight: 40.h,
               floating: false,
               pinned: true,
               backgroundColor: Colors.white,
@@ -99,7 +126,7 @@ class _ReportFormViewState extends State<ReportFormView> {
                 title: Text(
                   'تقديم بلاغ',
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -112,8 +139,14 @@ class _ReportFormViewState extends State<ReportFormView> {
               // ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.help_outline, color: Colors.black),
-                  onPressed: () => _showHelpDialog(context),
+                  icon: const Icon(
+                    Icons.help_outline,
+                    color: Colors.black,
+                  ),
+                  onPressed:
+                      () => _showHelpDialog(
+                        context,
+                      ),
                 ),
               ],
             ),
@@ -126,27 +159,36 @@ class _ReportFormViewState extends State<ReportFormView> {
                   Form(
                     key: _formKey,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .stretch,
                       children: [
                         // Personal Information Section
                         PersonalInfoSection(
-                          firstNameController: _firstNameController,
-                          lastNameController: _lastNameController,
-                          nationalIdController: _nationalIdController,
-                          phoneController: _phoneController,
+                          firstNameController:
+                              _firstNameController,
+                          lastNameController:
+                              _lastNameController,
+                          nationalIdController:
+                              _nationalIdController,
+                          phoneController:
+                              _phoneController,
                         ),
                         SizedBox(height: 20.h),
 
                         // Report Information Section
                         ReportInfoSection(
-                          reportDetailsController: _reportDetailsController,
+                          reportDetailsController:
+                              _reportDetailsController,
                         ),
                         SizedBox(height: 20.h),
 
                         // Location and Date/Time Section
                         LocationDateTimeSection(
-                          locationController: _locationController,
-                          dateTimeController: _dateTimeController,
+                          locationController:
+                              _locationController,
+                          dateTimeController:
+                              _dateTimeController,
                         ),
                         SizedBox(height: 20.h),
 
@@ -155,16 +197,35 @@ class _ReportFormViewState extends State<ReportFormView> {
                         SizedBox(height: 40.h),
 
                         // Submit Button
-                        BlocBuilder<ReportFormCubit, ReportFormState>(
-                          builder: (context, state) {
+                        BlocBuilder<
+                          ReportFormCubit,
+                          ReportFormState
+                        >(
+                          builder: (
+                            context,
+                            state,
+                          ) {
                             return ElevatedButton(
-                              onPressed: state.isLoading ? null : _submitForm,
+                              onPressed:
+                                  state.isLoading
+                                      ? null
+                                      : _submitForm,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[800],
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                backgroundColor:
+                                    AppColors
+                                        .primaryColor,
+                                foregroundColor:
+                                    Colors.white,
+                                padding:
+                                    EdgeInsets.symmetric(
+                                      vertical:
+                                          12.h,
+                                    ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                        8.r,
+                                      ),
                                 ),
                                 elevation: 3,
                               ),
@@ -172,38 +233,58 @@ class _ReportFormViewState extends State<ReportFormView> {
                                   state.isLoading
                                       ? Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                            MainAxisAlignment
+                                                .center,
                                         children: [
                                           SizedBox(
-                                            width: 20.w,
-                                            height: 20.h,
-                                            child:
-                                                const CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                  strokeWidth: 2,
-                                                ),
+                                            width:
+                                                20.w,
+                                            height:
+                                                20.h,
+                                            child: const CircularProgressIndicator(
+                                              color:
+                                                  Colors.white,
+                                              strokeWidth:
+                                                  2,
+                                            ),
                                           ),
-                                          SizedBox(width: 12.w),
+                                          SizedBox(
+                                            width:
+                                                12.w,
+                                          ),
                                           Text(
                                             'جاري الإرسال...',
                                             style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold,
+                                              fontSize:
+                                                  16.sp,
+                                              fontWeight:
+                                                  FontWeight.bold,
                                             ),
                                           ),
                                         ],
                                       )
                                       : Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                            MainAxisAlignment
+                                                .center,
                                         children: [
-                                          Icon(Icons.send, size: 20.sp),
-                                          SizedBox(width: 8.w),
+                                          Icon(
+                                            Icons
+                                                .send,
+                                            size:
+                                                20.sp,
+                                          ),
+                                          SizedBox(
+                                            width:
+                                                8.w,
+                                          ),
                                           Text(
                                             'إرسال البلاغ',
                                             style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold,
+                                              fontSize:
+                                                  16.sp,
+                                              fontWeight:
+                                                  FontWeight.bold,
                                             ),
                                           ),
                                         ],
@@ -228,45 +309,70 @@ class _ReportFormViewState extends State<ReportFormView> {
     if (_formKey.currentState!.validate()) {
       // Check required fields that might not be validated by form
       if (_locationController.text.isEmpty) {
-        _showErrorSnackBar(context, 'يرجى تحديد الموقع الجغرافي');
+        _showErrorSnackBar(
+          context,
+          'يرجى تحديد الموقع الجغرافي',
+        );
         return;
       }
 
       if (_dateTimeController.text.isEmpty) {
-        _showErrorSnackBar(context, 'يرجى اختيار التاريخ والوقت');
+        _showErrorSnackBar(
+          context,
+          'يرجى اختيار التاريخ والوقت',
+        );
         return;
       }
 
-      context.read<ReportFormCubit>().submitReport(
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        nationalId: _nationalIdController.text,
-        phone: _phoneController.text,
-        reportDetails: _reportDetailsController.text,
-      );
+      context
+          .read<ReportFormCubit>()
+          .submitReport(
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            nationalId:
+                _nationalIdController.text,
+            phone: _phoneController.text,
+            reportDetails:
+                _reportDetailsController.text,
+          );
     } else {
-      _showErrorSnackBar(context, 'يرجى مراجعة البيانات المدخلة');
+      _showErrorSnackBar(
+        context,
+        'يرجى مراجعة البيانات المدخلة',
+      );
     }
   }
 
-  void _showErrorSnackBar(BuildContext context, String message) {
+  void _showErrorSnackBar(
+    BuildContext context,
+    String message,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }
@@ -278,12 +384,15 @@ class _ReportFormViewState extends State<ReportFormView> {
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(
+                20,
+              ),
             ),
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius:
+                    BorderRadius.circular(20),
                 color: Colors.white,
               ),
               child: Column(
@@ -320,7 +429,10 @@ class _ReportFormViewState extends State<ReportFormView> {
                   // Success Message
                   Text(
                     'شكراً لك على إرسال البلاغ. سيتم مراجعته من قبل فريقنا في أقرب وقت ممكن.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -331,21 +443,36 @@ class _ReportFormViewState extends State<ReportFormView> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).pop(); // Close dialog
+                            Navigator.of(
+                              context,
+                            ).pop(); // Close dialog
                             _resetForm(); // Reset form for new report
                           },
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius:
+                                  BorderRadius.circular(
+                                    8,
+                                  ),
                             ),
-                            side: BorderSide(color: Colors.blue[800]!),
+                            side: BorderSide(
+                              color:
+                                  Colors
+                                      .blue[800]!,
+                            ),
                           ),
                           child: Text(
                             'بلاغ جديد',
                             style: TextStyle(
-                              color: Colors.blue[800],
-                              fontWeight: FontWeight.bold,
+                              color:
+                                  Colors
+                                      .blue[800],
+                              fontWeight:
+                                  FontWeight.bold,
                             ),
                           ),
                         ),
@@ -354,21 +481,31 @@ class _ReportFormViewState extends State<ReportFormView> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop(); // Close dialog
+                            Navigator.of(
+                              context,
+                            ).pop(); // Close dialog
                             _resetForm(); // Reset form for new report
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[800],
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            backgroundColor:
+                                Colors.blue[800],
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius:
+                                  BorderRadius.circular(
+                                    8,
+                                  ),
                             ),
                           ),
                           child: const Text(
                             'العودة',
                             style: TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                              fontWeight:
+                                  FontWeight.bold,
                             ),
                           ),
                         ),
@@ -407,7 +544,9 @@ class _ReportFormViewState extends State<ReportFormView> {
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(
+                16,
+              ),
             ),
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -428,13 +567,19 @@ class _ReportFormViewState extends State<ReportFormView> {
                           'مساعدة إنشاء البلاغ',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight:
+                                FontWeight.bold,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.close,
+                        ),
+                        onPressed:
+                            () => Navigator.pop(
+                              context,
+                            ),
                       ),
                     ],
                   ),
@@ -443,7 +588,8 @@ class _ReportFormViewState extends State<ReportFormView> {
 
                   // Help Content
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       _buildHelpItem(
                         '📝 املأ جميع البيانات الشخصية المطلوبة',
@@ -474,19 +620,30 @@ class _ReportFormViewState extends State<ReportFormView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed:
+                          () => Navigator.pop(
+                            context,
+                          ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[800],
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        backgroundColor:
+                            Colors.blue[800],
+                        padding:
+                            const EdgeInsets.symmetric(
+                              vertical: 12,
+                            ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius:
+                              BorderRadius.circular(
+                                8,
+                              ),
                         ),
                       ),
                       child: const Text(
                         'فهمت',
                         style: TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                     ),
@@ -498,16 +655,23 @@ class _ReportFormViewState extends State<ReportFormView> {
     );
   }
 
-  Widget _buildHelpItem(String title, String description) {
+  Widget _buildHelpItem(
+    String title,
+    String description,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Container(
             width: 6,
             height: 6,
-            margin: const EdgeInsets.only(top: 6, left: 8),
+            margin: const EdgeInsets.only(
+              top: 6,
+              left: 8,
+            ),
             decoration: BoxDecoration(
               color: Colors.blue[800],
               shape: BoxShape.circle,
@@ -515,7 +679,8 @@ class _ReportFormViewState extends State<ReportFormView> {
           ),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -527,7 +692,10 @@ class _ReportFormViewState extends State<ReportFormView> {
                 const SizedBox(height: 2),
                 Text(
                   description,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
