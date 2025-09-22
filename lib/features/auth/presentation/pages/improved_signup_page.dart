@@ -504,49 +504,7 @@ class _ImprovedSignupPageState
             }),
           ),
 
-          SizedBox(height: 16.h),
-
-          // Progress bar
-          FadeInUp(
-            duration: const Duration(
-              milliseconds: 500,
-            ),
-            child: Container(
-              width: double.infinity,
-              height: 6.h,
-              decoration: BoxDecoration(
-                color: AppColors.border
-                    .withOpacity(0.2),
-                borderRadius:
-                    BorderRadius.circular(3.r),
-              ),
-              child: ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(3.r),
-                child: AnimatedContainer(
-                  duration: const Duration(
-                    milliseconds: 600,
-                  ),
-                  width:
-                      ((_currentStep + 1) /
-                          _stepTitles.length) *
-                      MediaQuery.of(
-                        context,
-                      ).size.width,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary,
-                        AppColors.success,
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          SizedBox(height: 10.h),
         ],
       ),
     );

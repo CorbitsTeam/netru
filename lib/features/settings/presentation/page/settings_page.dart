@@ -5,7 +5,8 @@ import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/usecases/usecase.dart';
-import 'package:netru_app/core/di/injection_container.dart' as di;
+import 'package:netru_app/core/di/injection_container.dart'
+    as di;
 import 'package:netru_app/features/auth/domain/usecases/logout_user.dart';
 import 'package:netru_app/features/settings/presentation/page/edit_profile_page.dart';
 import 'package:netru_app/features/settings/presentation/widgets/theme_section.dart';
@@ -20,10 +21,12 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsPage> createState() =>
+      _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState
+    extends State<SettingsPage> {
   PackageInfo? _packageInfo;
 
   @override
@@ -34,7 +37,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _getPackageInfo() async {
     try {
-      final info = await PackageInfo.fromPlatform();
+      final info =
+          await PackageInfo.fromPlatform();
       if (mounted) {
         setState(() {
           _packageInfo = info;
@@ -52,36 +56,54 @@ class _SettingsPageState extends State<SettingsPage> {
     final userName = userHelper.getUserFullName();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor:
+          Theme.of(
+            context,
+          ).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'الإعدادات',
           style: TextStyle(
-            color: Theme.of(context).appBarTheme.titleTextStyle?.color,
-            fontSize: 18.sp,
+            color:
+                Theme.of(context)
+                    .appBarTheme
+                    .titleTextStyle
+                    ?.color,
+            fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor:
+            Theme.of(
+              context,
+            ).appBarTheme.backgroundColor,
         elevation: 0,
-        iconTheme: Theme.of(context).appBarTheme.iconTheme,
+        iconTheme:
+            Theme.of(
+              context,
+            ).appBarTheme.iconTheme,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Profile Header Section
             Container(
-              key: const ValueKey('profile_header_container'),
+              key: const ValueKey(
+                'profile_header_container',
+              ),
               width: double.infinity,
               margin: EdgeInsets.all(16.w),
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(16.r),
+                color:
+                    Theme.of(context).cardColor,
+                borderRadius:
+                    BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black
+                        .withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -92,20 +114,30 @@ class _SettingsPageState extends State<SettingsPage> {
                   // Profile Image
                   CircleAvatar(
                     radius: 40.r,
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    backgroundColor: AppColors
+                        .primaryColor
+                        .withOpacity(0.1),
                     child:
-                        userHelper.getUserProfileImage() != null
+                        userHelper.getUserProfileImage() !=
+                                null
                             ? ClipOval(
                               child: Image.network(
-                                userHelper.getUserProfileImage()!,
+                                userHelper
+                                    .getUserProfileImage()!,
                                 width: 80.r,
                                 height: 80.r,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
+                                errorBuilder: (
+                                  context,
+                                  error,
+                                  stackTrace,
+                                ) {
                                   return Icon(
                                     Icons.person,
                                     size: 40.r,
-                                    color: AppColors.primaryColor,
+                                    color:
+                                        AppColors
+                                            .primaryColor,
                                   );
                                 },
                               ),
@@ -113,7 +145,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             : Icon(
                               Icons.person,
                               size: 40.r,
-                              color: AppColors.primaryColor,
+                              color:
+                                  AppColors
+                                      .primaryColor,
                             ),
                   ),
                   SizedBox(height: 12.h),
@@ -121,9 +155,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     userName,
                     style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.headlineSmall?.color,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.color,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -131,31 +169,59 @@ class _SettingsPageState extends State<SettingsPage> {
                     user?.email ?? '',
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                      color:
+                          Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color,
                     ),
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 12.h),
                   // Edit Profile Button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      key: const ValueKey('edit_profile_button'),
+                      key: const ValueKey(
+                        'edit_profile_button',
+                      ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const EditProfilePage(),
+                            builder:
+                                (context) =>
+                                    const EditProfilePage(),
                           ),
                         );
                       },
-                      icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text('تعديل الملف الشخصي'),
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                      ),
+                      label: Text(
+                        'تعديل الملف الشخصي',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                        ),
+                      ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primaryColor,
-                        side: const BorderSide(color: AppColors.primaryColor),
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        foregroundColor:
+                            AppColors
+                                .primaryColor,
+                        side: const BorderSide(
+                          color:
+                              AppColors
+                                  .primaryColor,
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(
+                              vertical: 8.h,
+                            ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius:
+                              BorderRadius.circular(
+                                8.r,
+                              ),
                         ),
                       ),
                     ),
@@ -165,25 +231,33 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             // General Settings Section
-            _buildSettingsSection('الإعدادات العامة', [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                child: const ThemeSection(),
-              ),
-              _buildDivider(),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                child: const LanguageSection(),
-              ),
-            ]),
-
-            SizedBox(height: 16.h),
+            _buildSettingsSection(
+              'الإعدادات العامة',
+              [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 14.h,
+                  ),
+                  child: const ThemeSection(),
+                ),
+                _buildDivider(),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 14.h,
+                  ),
+                  child: const LanguageSection(),
+                ),
+              ],
+            ),
 
             // Notifications Section
             _buildSettingsSection('الإشعارات', [
               Container(
-                padding: EdgeInsets.all(16.w),
-                child: const NotificationSettingsWidget(),
+                padding: EdgeInsets.all(14.w),
+                child:
+                    const NotificationSettingsWidget(),
               ),
             ]),
 
@@ -192,13 +266,17 @@ class _SettingsPageState extends State<SettingsPage> {
             // App Settings Section
             _buildSettingsSection('إعدادات التطبيق', [
               _buildActionTile(
-                icon: Icons.support_agent_outlined,
+                icon:
+                    Icons.support_agent_outlined,
                 title: 'الدعم الفني',
-                subtitle: 'تواصل معنا للحصول على المساعدة',
+                subtitle:
+                    'تواصل معنا للحصول على المساعدة',
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => const SupportOptionsDialog(),
+                    builder:
+                        (context) =>
+                            const SupportOptionsDialog(),
                   );
                 },
               ),
@@ -213,14 +291,16 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildActionTile(
                 icon: Icons.share_outlined,
                 title: 'مشاركة التطبيق',
-                subtitle: 'شارك التطبيق مع الآخرين',
+                subtitle:
+                    'شارك التطبيق مع الآخرين',
                 onTap: _shareApp,
               ),
               _buildDivider(),
               _buildActionTile(
                 icon: Icons.info_outline,
                 title: 'حول التطبيق',
-                subtitle: 'معلومات عن التطبيق والإصدار',
+                subtitle:
+                    'معلومات عن التطبيق والإصدار',
                 onTap: _showAppInfo,
               ),
             ]),
@@ -247,7 +327,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 'الإصدار ${_packageInfo!.version} (${_packageInfo!.buildNumber})',
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
+                  color:
+                      Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color,
                 ),
               ),
 
@@ -258,25 +342,25 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSettingsSection(String title, List<Widget> items) {
+  Widget _buildSettingsSection(
+    String title,
+    List<Widget> items,
+  ) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+            padding: EdgeInsets.fromLTRB(
+              16.w,
+              16.h,
+              16.w,
+              8.h,
+            ),
             child: Text(
               title,
               style: TextStyle(
@@ -294,8 +378,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildDivider() {
     return Divider(
-      height: 1,
-      color: Theme.of(context).dividerColor.withOpacity(0.5),
+      height: 0.5,
+      color: Theme.of(
+        context,
+      ).dividerColor.withValues(alpha: 0.3),
       indent: 16.w,
       endIndent: 16.w,
     );
@@ -312,42 +398,48 @@ class _SettingsPageState extends State<SettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 14.w,
+          vertical: 12.h,
+        ),
         child: Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: (titleColor ?? AppColors.primaryColor).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Icon(
-                icon,
-                color: titleColor ?? AppColors.primaryColor,
-                size: 20.sp,
-              ),
+            Icon(
+              icon,
+              color:
+                  titleColor ??
+                  AppColors.primaryColor,
+              size: 20.sp,
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
                       color:
                           titleColor ??
-                          Theme.of(context).textTheme.bodyLarge?.color,
+                          Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.color,
                     ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                      fontSize: 12.sp,
+                      color:
+                          Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color,
                     ),
                   ),
                 ],
@@ -356,7 +448,10 @@ class _SettingsPageState extends State<SettingsPage> {
             if (showArrow)
               Icon(
                 Icons.arrow_forward_ios,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
+                color:
+                    Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color,
                 size: 16.sp,
               ),
           ],
@@ -366,7 +461,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _rateApp() async {
-    const String appStoreUrl = 'https://apps.apple.com/app/netru-app';
+    const String appStoreUrl =
+        'https://apps.apple.com/app/netru-app';
     const String playStoreUrl =
         'https://play.google.com/store/apps/details?id=com.netru.app';
 
@@ -380,7 +476,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed:
+                    () =>
+                        Navigator.of(
+                          context,
+                        ).pop(),
                 child: const Text('ليس الآن'),
               ),
               TextButton(
@@ -388,18 +488,27 @@ class _SettingsPageState extends State<SettingsPage> {
                   Navigator.of(context).pop();
                   try {
                     final url =
-                        Theme.of(context).platform == TargetPlatform.iOS
+                        Theme.of(
+                                  context,
+                                ).platform ==
+                                TargetPlatform.iOS
                             ? appStoreUrl
                             : playStoreUrl;
 
-                    if (await canLaunchUrl(Uri.parse(url))) {
+                    if (await canLaunchUrl(
+                      Uri.parse(url),
+                    )) {
                       await launchUrl(
                         Uri.parse(url),
-                        mode: LaunchMode.externalApplication,
+                        mode:
+                            LaunchMode
+                                .externalApplication,
                       );
                     } else {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
                           const SnackBar(
                             content: Text(
                               'شكراً لك! سنعمل على إضافة رابط المتجر قريباً',
@@ -410,10 +519,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   } catch (e) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
                         const SnackBar(
-                          content: Text('حدث خطأ في فتح المتجر'),
-                          backgroundColor: Colors.red,
+                          content: Text(
+                            'حدث خطأ في فتح المتجر',
+                          ),
+                          backgroundColor:
+                              Colors.red,
                         ),
                       );
                     }
@@ -443,12 +557,19 @@ $appDescription
 #نترو #الأمان #التطبيقات_المفيدة
       ''';
 
-      await Share.share(shareText, subject: 'شارك تطبيق $appName');
+      await Share.share(
+        shareText,
+        subject: 'شارك تطبيق $appName',
+      );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           const SnackBar(
-            content: Text('حدث خطأ في مشاركة التطبيق'),
+            content: Text(
+              'حدث خطأ في مشاركة التطبيق',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -474,9 +595,13 @@ $appDescription
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
-                _buildInfoRow('اسم التطبيق:', 'نترو'),
+                _buildInfoRow(
+                  'اسم التطبيق:',
+                  'نترو',
+                ),
                 SizedBox(height: 8.h),
                 _buildInfoRow(
                   'الإصدار:',
@@ -485,15 +610,25 @@ $appDescription
                       : '1.0.0',
                 ),
                 SizedBox(height: 8.h),
-                _buildInfoRow('المطور:', 'Netru Team'),
+                _buildInfoRow(
+                  'المطور:',
+                  'Netru Team',
+                ),
                 SizedBox(height: 8.h),
-                _buildInfoRow('التاريخ:', 'سبتمبر 2025'),
+                _buildInfoRow(
+                  'التاريخ:',
+                  'سبتمبر 2025',
+                ),
                 SizedBox(height: 16.h),
                 Text(
                   'تطبيق نترو هو منصة شاملة للتبليغ عن الجرائم والحصول على آخر الأخبار الأمنية والمعلومات المفيدة للمجتمع.',
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    color:
+                        Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.color,
                     height: 1.4,
                   ),
                 ),
@@ -501,7 +636,11 @@ $appDescription
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed:
+                    () =>
+                        Navigator.of(
+                          context,
+                        ).pop(),
                 child: const Text('إغلاق'),
               ),
             ],
@@ -509,9 +648,13 @@ $appDescription
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+  ) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: 80.w,
@@ -520,7 +663,10 @@ $appDescription
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color:
+                  Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color,
             ),
           ),
         ),
@@ -529,7 +675,10 @@ $appDescription
             value,
             style: TextStyle(
               fontSize: 14.sp,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
+              color:
+                  Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.color,
             ),
           ),
         ),
@@ -544,15 +693,25 @@ $appDescription
           (context) => AlertDialog(
             title: Row(
               children: [
-                Icon(Icons.logout, color: AppColors.error, size: 24.sp),
+                Icon(
+                  Icons.logout,
+                  color: AppColors.error,
+                  size: 24.sp,
+                ),
                 SizedBox(width: 8.w),
                 const Text('تسجيل الخروج'),
               ],
             ),
-            content: const Text('هل أنت متأكد من تسجيل الخروج؟'),
+            content: const Text(
+              'هل أنت متأكد من تسجيل الخروج؟',
+            ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed:
+                    () =>
+                        Navigator.of(
+                          context,
+                        ).pop(),
                 child: const Text('إلغاء'),
               ),
               TextButton(
@@ -560,7 +719,10 @@ $appDescription
                   Navigator.of(context).pop();
                   _handleLogout();
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(
+                  foregroundColor:
+                      AppColors.error,
+                ),
                 child: const Text('تسجيل الخروج'),
               ),
             ],
@@ -574,21 +736,30 @@ $appDescription
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        builder:
+            (context) => const Center(
+              child: CircularProgressIndicator(),
+            ),
       );
 
       // Use logout usecase to logout from Supabase
-      final logoutUseCase = di.sl<LogoutUserUseCase>();
-      final result = await logoutUseCase(const NoParams());
+      final logoutUseCase =
+          di.sl<LogoutUserUseCase>();
+      final result = await logoutUseCase(
+        const NoParams(),
+      );
 
       result.fold(
         (failure) {
           // Hide loading
-          if (mounted) Navigator.of(context).pop();
+          if (mounted)
+            Navigator.of(context).pop();
 
           // Show error message
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(
               SnackBar(
                 content: Text(failure.message),
                 backgroundColor: Colors.red,
@@ -598,14 +769,18 @@ $appDescription
         },
         (_) async {
           // Clear user data from SharedPreferences
-          await UserDataHelper().clearCurrentUser();
+          await UserDataHelper()
+              .clearCurrentUser();
 
           // Hide loading
-          if (mounted) Navigator.of(context).pop();
+          if (mounted)
+            Navigator.of(context).pop();
 
           // Navigate to login screen
           if (mounted) {
-            context.pushReplacementNamed(Routes.loginScreen);
+            context.pushReplacementNamed(
+              Routes.loginScreen,
+            );
           }
         },
       );
@@ -615,9 +790,13 @@ $appDescription
 
       // Show error message if logout fails
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           const SnackBar(
-            content: Text('حدث خطأ أثناء تسجيل الخروج'),
+            content: Text(
+              'حدث خطأ أثناء تسجيل الخروج',
+            ),
             backgroundColor: Colors.red,
           ),
         );

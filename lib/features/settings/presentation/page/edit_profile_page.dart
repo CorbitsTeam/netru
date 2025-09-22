@@ -5,7 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/core/di/injection_container.dart' as di;
+import 'package:netru_app/core/di/injection_container.dart'
+    as di;
 import 'package:netru_app/features/auth/domain/usecases/update_user_profile.dart';
 import 'package:netru_app/features/auth/domain/usecases/upload_profile_image.dart';
 
@@ -13,15 +14,21 @@ class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  State<EditProfilePage> createState() =>
+      _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilePageState
+    extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _fullNameController =
+      TextEditingController();
+  final _phoneController =
+      TextEditingController();
+  final _locationController =
+      TextEditingController();
+  final _addressController =
+      TextEditingController();
 
   File? _selectedImage;
   String? _currentImageUrl;
@@ -42,7 +49,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _fullNameController.text = user.fullName;
       _phoneController.text = user.phone ?? '';
       _locationController.text = user.location;
-      _addressController.text = user.address ?? '';
+      _addressController.text =
+          user.address ?? '';
       _currentImageUrl = user.profileImage;
     }
   }
@@ -65,7 +73,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'تعديل الملف الشخصي',
           style: TextStyle(
             color: Colors.black87,
-            fontSize: 18.sp,
+            fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -74,23 +82,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: _isLoading ? null : _saveProfile,
+            onPressed:
+                _isLoading ? null : _saveProfile,
             child:
                 _isLoading
                     ? SizedBox(
                       width: 20.w,
                       height: 20.h,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.primaryColor,
-                      ),
+                      child:
+                          const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color:
+                                AppColors
+                                    .primaryColor,
+                          ),
                     )
                     : Text(
                       'حفظ',
                       style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                        color:
+                            AppColors
+                                .primaryColor,
+                        fontSize: 13.sp,
+                        fontWeight:
+                            FontWeight.w600,
                       ),
                     ),
           ),
@@ -109,12 +124,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black
+                            .withValues(
+                              alpha: 0.05,
+                            ),
                         blurRadius: 10,
-                        offset: const Offset(0, 2),
+                        offset: const Offset(
+                          0,
+                          2,
+                        ),
                       ),
                     ],
                   ),
@@ -123,50 +147,72 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       Text(
                         'صورة الملف الشخصي',
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                          fontWeight:
+                              FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 15.h),
                       Stack(
-                        alignment: Alignment.bottomRight,
+                        alignment:
+                            Alignment.bottomRight,
                         children: [
                           CircleAvatar(
                             radius: 50.r,
-                            backgroundColor: Colors.grey[200],
-                            child: _buildProfileImage(),
+                            backgroundColor:
+                                Colors.grey[200],
+                            child:
+                                _buildProfileImage(),
                           ),
                           Positioned(
                             bottom: 0,
                             right: 0,
                             child: GestureDetector(
                               onTap:
-                                  _isImageUploading ? null : _showImagePicker,
+                                  _isImageUploading
+                                      ? null
+                                      : _showImagePicker,
                               child: Container(
-                                padding: EdgeInsets.all(8.w),
+                                padding:
+                                    EdgeInsets.all(
+                                      8.w,
+                                    ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  shape: BoxShape.circle,
+                                  color:
+                                      AppColors
+                                          .primaryColor,
+                                  shape:
+                                      BoxShape
+                                          .circle,
                                   border: Border.all(
-                                    color: Colors.white,
+                                    color:
+                                        Colors
+                                            .white,
                                     width: 2,
                                   ),
                                 ),
                                 child:
                                     _isImageUploading
                                         ? SizedBox(
-                                          width: 16.w,
-                                          height: 16.h,
+                                          width:
+                                              16.w,
+                                          height:
+                                              16.h,
                                           child: const CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
+                                            strokeWidth:
+                                                2,
+                                            color:
+                                                Colors.white,
                                           ),
                                         )
                                         : Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.white,
-                                          size: 16.sp,
+                                          Icons
+                                              .camera_alt,
+                                          color:
+                                              Colors.white,
+                                          size:
+                                              16.sp,
                                         ),
                               ),
                             ),
@@ -184,30 +230,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 15.h),
 
                 // Personal Information Section
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black
+                            .withValues(
+                              alpha: 0.05,
+                            ),
                         blurRadius: 10,
-                        offset: const Offset(0, 2),
+                        offset: const Offset(
+                          0,
+                          2,
+                        ),
                       ),
                     ],
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       Text(
                         'المعلومات الشخصية',
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                          fontWeight:
+                              FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
@@ -215,26 +272,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                       // Full Name Field
                       _buildTextField(
-                        controller: _fullNameController,
+                        controller:
+                            _fullNameController,
                         label: 'الاسم الكامل',
                         icon: Icons.person,
                         validator: (value) {
-                          if (value?.isEmpty == true) {
+                          if (value?.isEmpty ==
+                              true) {
                             return 'يرجى إدخال الاسم الكامل';
                           }
                           return null;
                         },
                       ),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 15.h),
 
                       // Phone Field
                       _buildTextField(
-                        controller: _phoneController,
+                        controller:
+                            _phoneController,
                         label: 'رقم الهاتف',
                         icon: Icons.phone,
-                        keyboardType: TextInputType.phone,
+                        keyboardType:
+                            TextInputType.phone,
                         validator: (value) {
-                          if (value?.isEmpty == true) {
+                          if (value?.isEmpty ==
+                              true) {
                             return 'يرجى إدخال رقم الهاتف';
                           }
                           return null;
@@ -244,7 +306,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                       // Location Field
                       _buildTextField(
-                        controller: _locationController,
+                        controller:
+                            _locationController,
                         label: 'الموقع',
                         icon: Icons.location_on,
                       ),
@@ -252,7 +315,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                       // Address Field
                       _buildTextField(
-                        controller: _addressController,
+                        controller:
+                            _addressController,
                         label: 'العنوان',
                         icon: Icons.home,
                         maxLines: 3,
@@ -279,24 +343,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
           fit: BoxFit.cover,
         ),
       );
-    } else if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
+    } else if (_currentImageUrl != null &&
+        _currentImageUrl!.isNotEmpty) {
       return ClipOval(
         child: Image.network(
           _currentImageUrl!,
           width: 100.r,
           height: 100.r,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Icon(Icons.person, size: 50.r, color: Colors.grey[600]);
+          errorBuilder: (
+            context,
+            error,
+            stackTrace,
+          ) {
+            return Icon(
+              Icons.person,
+              size: 50.r,
+              color: Colors.grey[600],
+            );
           },
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
+          loadingBuilder: (
+            context,
+            child,
+            loadingProgress,
+          ) {
+            if (loadingProgress == null)
+              return child;
             return Center(
               child: CircularProgressIndicator(
                 value:
-                    loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
+                    loadingProgress
+                                .expectedTotalBytes !=
+                            null
+                        ? loadingProgress
+                                .cumulativeBytesLoaded /
+                            loadingProgress
+                                .expectedTotalBytes!
                         : null,
               ),
             );
@@ -304,7 +386,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       );
     } else {
-      return Icon(Icons.person, size: 50.r, color: Colors.grey[600]);
+      return Icon(
+        Icons.person,
+        size: 50.r,
+        color: Colors.grey[600],
+      );
     }
   }
 
@@ -322,23 +408,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
       maxLines: maxLines,
       validator: validator,
       decoration: InputDecoration(
+        contentPadding: EdgeInsets.all(8.w),
         labelText: label,
-        prefixIcon: Icon(icon, color: AppColors.primaryColor),
+        prefixIcon: Icon(
+          icon,
+          color: AppColors.primaryColor,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(
+            8.r,
+          ),
+          borderSide: BorderSide(
+            color: Colors.grey[300]!,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
+          borderRadius: BorderRadius.circular(
+            8.r,
+          ),
+          borderSide: const BorderSide(
+            color: AppColors.primaryColor,
+            width: 2,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(
+            8.r,
+          ),
+          borderSide: BorderSide(
+            color: Colors.grey[300]!,
+          ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(
+            8.r,
+          ),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 2,
+          ),
         ),
         filled: true,
         fillColor: Colors.grey[50],
@@ -350,7 +458,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.r),
+        ),
       ),
       builder:
           (context) => Container(
@@ -368,17 +478,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 SizedBox(height: 20.h),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment:
+                      MainAxisAlignment
+                          .spaceEvenly,
                   children: [
                     _buildImageSourceOption(
                       icon: Icons.camera_alt,
                       label: 'الكاميرا',
-                      onTap: () => _pickImage(ImageSource.camera),
+                      onTap:
+                          () => _pickImage(
+                            ImageSource.camera,
+                          ),
                     ),
                     _buildImageSourceOption(
                       icon: Icons.photo_library,
                       label: 'المعرض',
-                      onTap: () => _pickImage(ImageSource.gallery),
+                      onTap:
+                          () => _pickImage(
+                            ImageSource.gallery,
+                          ),
                     ),
                   ],
                 ),
@@ -399,12 +517,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Container(
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12.r),
+          color: AppColors.primaryColor
+              .withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 40.sp, color: AppColors.primaryColor),
+            Icon(
+              icon,
+              size: 40.sp,
+              color: AppColors.primaryColor,
+            ),
             SizedBox(height: 8.h),
             Text(
               label,
@@ -420,8 +545,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    Navigator.of(context).pop(); // Close bottom sheet
+  Future<void> _pickImage(
+    ImageSource source,
+  ) async {
+    Navigator.of(
+      context,
+    ).pop(); // Close bottom sheet
 
     try {
       final picker = ImagePicker();
@@ -442,9 +571,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
-            content: Text('حدث خطأ أثناء اختيار الصورة: $e'),
+            content: Text(
+              'حدث خطأ أثناء اختيار الصورة: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -464,14 +597,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = userHelper.getCurrentUser();
 
       if (user?.id == null) {
-        throw Exception('لا يمكن العثور على معرف المستخدم');
+        throw Exception(
+          'لا يمكن العثور على معرف المستخدم',
+        );
       }
 
       // Generate unique filename
       final fileName =
           'profile_${user!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final uploadUseCase = di.sl<UploadProfileImageUseCase>();
+      final uploadUseCase =
+          di.sl<UploadProfileImageUseCase>();
       final result = await uploadUseCase(
         UploadProfileImageParams(
           imageFile: _selectedImage!,
@@ -488,9 +624,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _currentImageUrl = imageUrl;
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(
             const SnackBar(
-              content: Text('تم رفع الصورة بنجاح'),
+              content: Text(
+                'تم رفع الصورة بنجاح',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -498,9 +638,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
-            content: Text('فشل في رفع الصورة: $e'),
+            content: Text(
+              'فشل في رفع الصورة: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -513,7 +657,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate())
+      return;
 
     setState(() {
       _isLoading = true;
@@ -524,24 +669,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = userHelper.getCurrentUser();
 
       if (user?.id == null) {
-        throw Exception('لا يمكن العثور على معرف المستخدم');
+        throw Exception(
+          'لا يمكن العثور على معرف المستخدم',
+        );
       }
 
       final updateData = {
-        'full_name': _fullNameController.text.trim(),
+        'full_name':
+            _fullNameController.text.trim(),
         'phone': _phoneController.text.trim(),
         // 'location': _locationController.text.trim(),
         'address': _addressController.text.trim(),
       };
 
       // Add profile image URL if it was updated
-      if (_currentImageUrl != null && _currentImageUrl != user!.profileImage) {
-        updateData['profile_image'] = _currentImageUrl!;
+      if (_currentImageUrl != null &&
+          _currentImageUrl !=
+              user!.profileImage) {
+        updateData['profile_image'] =
+            _currentImageUrl!;
       }
 
-      final updateUseCase = di.sl<UpdateUserProfileUseCase>();
+      final updateUseCase =
+          di.sl<UpdateUserProfileUseCase>();
       final result = await updateUseCase(
-        UpdateUserProfileParams(userId: user!.id, userData: updateData),
+        UpdateUserProfileParams(
+          userId: user!.id,
+          userData: updateData,
+        ),
       );
 
       result.fold(
@@ -550,24 +705,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
         },
         (updatedUser) async {
           // Update local user data
-          await userHelper.saveCurrentUser(updatedUser);
+          await userHelper.saveCurrentUser(
+            updatedUser,
+          );
 
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(
               const SnackBar(
-                content: Text('تم حفظ التغييرات بنجاح'),
+                content: Text(
+                  'تم حفظ التغييرات بنجاح',
+                ),
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.of(context).pop(true); // Return true to indicate success
+            Navigator.of(context).pop(
+              true,
+            ); // Return true to indicate success
           }
         },
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
-            content: Text('فشل في حفظ التغييرات: $e'),
+            content: Text(
+              'فشل في حفظ التغييرات: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );

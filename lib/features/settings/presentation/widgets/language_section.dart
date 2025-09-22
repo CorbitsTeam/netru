@@ -10,22 +10,29 @@ class LanguageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SettingsBloc, SettingsState>(
+    return BlocBuilder<
+      SettingsBloc,
+      SettingsState
+    >(
       buildWhen: (previous, current) {
         // Only rebuild when language actually changes
-        if (previous is SettingsLoaded && current is SettingsLoaded) {
-          return previous.settings.language != current.settings.language;
+        if (previous is SettingsLoaded &&
+            current is SettingsLoaded) {
+          return previous.settings.language !=
+              current.settings.language;
         }
         return true;
       },
       builder: (context, state) {
         final isArabic =
             state is SettingsLoaded
-                ? state.settings.language == Language.arabic
+                ? state.settings.language ==
+                    Language.arabic
                 : true;
 
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment:
+              MainAxisAlignment.spaceBetween,
           children: [
             // Language Text and Icon
             Row(
@@ -40,8 +47,12 @@ class LanguageSection extends StatelessWidget {
                   'اللغة',
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color,
                   ),
                 ),
               ],
@@ -51,17 +62,27 @@ class LanguageSection extends StatelessWidget {
               children: [
                 // Arabic Button
                 GestureDetector(
-                  key: const ValueKey('arabic_language_button'),
+                  key: const ValueKey(
+                    'arabic_language_button',
+                  ),
                   onTap: () async {
                     if (!isArabic) {
-                      final settingsBloc = context.read<SettingsBloc>();
+                      final settingsBloc =
+                          context
+                              .read<
+                                SettingsBloc
+                              >();
                       settingsBloc.add(
-                        const SettingsLanguageChanged(Language.arabic),
+                        const SettingsLanguageChanged(
+                          Language.arabic,
+                        ),
                       );
                     }
                   },
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(
+                      milliseconds: 200,
+                    ),
                     padding: EdgeInsets.symmetric(
                       horizontal: 8.w,
                       vertical: 2.h,
@@ -69,18 +90,32 @@ class LanguageSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isArabic
-                              ? AppColors.primaryColor
-                              : Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(4.r),
+                              ? AppColors
+                                  .primaryColor
+                              : Theme.of(
+                                context,
+                              ).cardColor,
+                      borderRadius:
+                          BorderRadius.circular(
+                            4.r,
+                          ),
                       border: Border.all(
-                        color: AppColors.primaryColor,
+                        color:
+                            AppColors
+                                .primaryColor,
                         width: isArabic ? 2 : 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: Colors.black
+                              .withValues(
+                                alpha: 0.05,
+                              ),
                           blurRadius: 4,
-                          offset: const Offset(0, 1),
+                          offset: const Offset(
+                            0,
+                            1,
+                          ),
                         ),
                       ],
                     ),
@@ -88,8 +123,13 @@ class LanguageSection extends StatelessWidget {
                       'العربية',
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isArabic ? Colors.white : AppColors.primaryColor,
+                        fontWeight:
+                            FontWeight.w500,
+                        color:
+                            isArabic
+                                ? Colors.white
+                                : AppColors
+                                    .primaryColor,
                       ),
                     ),
                   ),
@@ -97,17 +137,27 @@ class LanguageSection extends StatelessWidget {
                 SizedBox(width: 10.w),
                 // English Button
                 GestureDetector(
-                  key: const ValueKey('english_language_button'),
+                  key: const ValueKey(
+                    'english_language_button',
+                  ),
                   onTap: () async {
                     if (isArabic) {
-                      final settingsBloc = context.read<SettingsBloc>();
+                      final settingsBloc =
+                          context
+                              .read<
+                                SettingsBloc
+                              >();
                       settingsBloc.add(
-                        const SettingsLanguageChanged(Language.english),
+                        const SettingsLanguageChanged(
+                          Language.english,
+                        ),
                       );
                     }
                   },
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(
+                      milliseconds: 200,
+                    ),
                     padding: EdgeInsets.symmetric(
                       horizontal: 8.w,
                       vertical: 2.h,
@@ -115,18 +165,32 @@ class LanguageSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           !isArabic
-                              ? AppColors.primaryColor
-                              : Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(4.r),
+                              ? AppColors
+                                  .primaryColor
+                              : Theme.of(
+                                context,
+                              ).cardColor,
+                      borderRadius:
+                          BorderRadius.circular(
+                            4.r,
+                          ),
                       border: Border.all(
-                        color: AppColors.primaryColor,
+                        color:
+                            AppColors
+                                .primaryColor,
                         width: !isArabic ? 2 : 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: Colors.black
+                              .withValues(
+                                alpha: 0.05,
+                              ),
                           blurRadius: 4,
-                          offset: const Offset(0, 1),
+                          offset: const Offset(
+                            0,
+                            1,
+                          ),
                         ),
                       ],
                     ),
@@ -134,9 +198,13 @@ class LanguageSection extends StatelessWidget {
                       'English',
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontWeight:
+                            FontWeight.w500,
                         color:
-                            !isArabic ? Colors.white : AppColors.primaryColor,
+                            !isArabic
+                                ? Colors.white
+                                : AppColors
+                                    .primaryColor,
                       ),
                     ),
                   ),

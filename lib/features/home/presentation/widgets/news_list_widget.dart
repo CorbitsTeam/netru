@@ -22,15 +22,19 @@ class NewsListWidget extends StatefulWidget {
   });
 
   @override
-  State<NewsListWidget> createState() => _NewsListWidgetState();
+  State<NewsListWidget> createState() =>
+      _NewsListWidgetState();
 }
 
-class _NewsListWidgetState extends State<NewsListWidget> {
+class _NewsListWidgetState
+    extends State<NewsListWidget> {
   @override
   void initState() {
     super.initState();
     // تحميل الأخبار عند إنشاء الويدجت
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((
+      _,
+    ) {
       context.read<NewsCubit>().loadNews();
     });
   }
@@ -40,31 +44,41 @@ class _NewsListWidgetState extends State<NewsListWidget> {
     return BlocBuilder<NewsCubit, NewsState>(
       builder: (context, state) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
             if (widget.showHeader) ...[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween,
                 children: [
                   Text(
                     widget.headerTitle,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.sp,
-                      color: AppColors.primaryColor,
+                      color:
+                          AppColors.primaryColor,
                     ),
                   ),
                   if (state is NewsLoaded &&
-                      state.newsList.length > widget.maxItems)
+                      state.newsList.length >
+                          widget.maxItems)
                     TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, Routes.allNewsPage);
+                        Navigator.pushNamed(
+                          context,
+                          Routes.allNewsPage,
+                        );
                       },
                       child: Text(
                         'عرض الكل',
                         style: TextStyle(
-                          fontSize: 14.sp,
-                          color: AppColors.primaryColor,
+                          fontSize: 12.sp,
+                          color:
+                              AppColors
+                                  .primaryColor,
                         ),
                       ),
                     ),
@@ -93,7 +107,10 @@ class _NewsListWidgetState extends State<NewsListWidget> {
         return _buildEmptyState();
       }
 
-      final newsToShow = state.newsList.take(widget.maxItems).toList();
+      final newsToShow =
+          state.newsList
+              .take(widget.maxItems)
+              .toList();
       return _buildNewsList(newsToShow);
     }
 
@@ -114,11 +131,14 @@ class _NewsListWidgetState extends State<NewsListWidget> {
 
   Widget _buildErrorState(String message) {
     return Container(
-      height: 200.h, // Increased height to accommodate longer error messages
+      height:
+          200.h, // Increased height to accommodate longer error messages
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(
+          color: Colors.red.withOpacity(0.3),
+        ),
       ),
       child: Center(
         child: Padding(
@@ -126,10 +146,17 @@ class _NewsListWidgetState extends State<NewsListWidget> {
           child: SingleChildScrollView(
             // Added scrollable container
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min, // Don't expand to full height
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
+              mainAxisSize:
+                  MainAxisSize
+                      .min, // Don't expand to full height
               children: [
-                Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 32.sp,
+                ),
                 SizedBox(height: 8.h),
                 Text(
                   'خطأ في تحميل الأخبار',
@@ -144,10 +171,15 @@ class _NewsListWidgetState extends State<NewsListWidget> {
                   message.length > 150
                       ? '${message.substring(0, 150)}...'
                       : message, // Truncate long messages
-                  style: TextStyle(fontSize: 12.sp, color: Colors.red[600]),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.red[600],
+                  ),
                   textAlign: TextAlign.center,
                   maxLines: 3, // Limit to 3 lines
-                  overflow: TextOverflow.ellipsis, // Handle overflow gracefully
+                  overflow:
+                      TextOverflow
+                          .ellipsis, // Handle overflow gracefully
                 ),
               ],
             ),
@@ -163,13 +195,20 @@ class _NewsListWidgetState extends State<NewsListWidget> {
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.3),
+        ),
       ),
       child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
-            Icon(Icons.article_outlined, color: Colors.grey[600], size: 32.sp),
+            Icon(
+              Icons.article_outlined,
+              color: Colors.grey[600],
+              size: 32.sp,
+            ),
             SizedBox(height: 8.h),
             Text(
               'لا توجد أخبار',
@@ -185,17 +224,25 @@ class _NewsListWidgetState extends State<NewsListWidget> {
     );
   }
 
-  Widget _buildNewsList(List<NewsModel> newsList) {
+  Widget _buildNewsList(
+    List<NewsModel> newsList,
+  ) {
     return Column(
-      children: newsList.map((news) => _buildNewsCard(news)).toList(),
+      children:
+          newsList
+              .map((news) => _buildNewsCard(news))
+              .toList(),
     );
   }
 
   Widget _buildNewsCard(NewsModel news) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 10.h),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color:
+            Theme.of(
+              context,
+            ).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
@@ -211,24 +258,34 @@ class _NewsListWidgetState extends State<NewsListWidget> {
         child: Padding(
           padding: EdgeInsets.all(12.w),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               // صورة الخبر أو placeholder
               Container(
                 width: 80.w,
                 height: 80.h,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius:
+                      BorderRadius.circular(8.r),
                   color: Colors.grey[200],
                 ),
                 child:
-                    news.image != null && news.image!.isNotEmpty
+                    news.image != null &&
+                            news.image!.isNotEmpty
                         ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius:
+                              BorderRadius.circular(
+                                8.r,
+                              ),
                           child: Image.network(
                             news.image!,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
+                            errorBuilder: (
+                              context,
+                              error,
+                              stackTrace,
+                            ) {
                               return _buildPlaceholderImage();
                             },
                           ),
@@ -239,15 +296,17 @@ class _NewsListWidgetState extends State<NewsListWidget> {
               // محتوى الخبر
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     // التاريخ
                     Text(
                       news.date,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 11.sp,
                         color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                        fontWeight:
+                            FontWeight.w500,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -255,25 +314,28 @@ class _NewsListWidgetState extends State<NewsListWidget> {
                     Text(
                       news.title,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 13.sp,
+                        fontWeight:
+                            FontWeight.bold,
                         color: Colors.black87,
                         height: 1.3,
                       ),
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      overflow:
+                          TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 6.h),
                     // الملخص
                     Text(
                       news.summary,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 11.sp,
                         color: Colors.grey[700],
                         height: 1.3,
                       ),
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      overflow:
+                          TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -291,14 +353,22 @@ class _NewsListWidgetState extends State<NewsListWidget> {
         color: Colors.grey[300],
         borderRadius: BorderRadius.circular(8.r),
       ),
-      child: Icon(Icons.article_outlined, color: Colors.grey[600], size: 24.sp),
+      child: Icon(
+        Icons.article_outlined,
+        color: Colors.grey[600],
+        size: 24.sp,
+      ),
     );
   }
 
   void _navigateToNewsDetails(NewsModel news) {
     // الانتقال إلى صفحة التفاصيل
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => NewsDetailsScreen(news: news)),
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                NewsDetailsScreen(news: news),
+      ),
     );
   }
 }

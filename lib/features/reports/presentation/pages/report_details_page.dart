@@ -16,13 +16,19 @@ import 'package:share_plus/share_plus.dart';
 class ReportDetailsPage extends StatelessWidget {
   final ReportEntity? report;
 
-  const ReportDetailsPage({super.key, this.report});
+  const ReportDetailsPage({
+    super.key,
+    this.report,
+  });
 
   // Safely pop a dialog if it's still mounted and can pop.
-  Future<void> _safePopDialog(BuildContext context) async {
+  Future<void> _safePopDialog(
+    BuildContext context,
+  ) async {
     if (!context.mounted) return;
     try {
-      if (Navigator.canPop(context)) Navigator.pop(context);
+      if (Navigator.canPop(context))
+        Navigator.pop(context);
     } catch (_) {
       // ignore any pop errors
     }
@@ -33,26 +39,42 @@ class ReportDetailsPage extends StatelessWidget {
     // If no report is passed, show error
     if (report == null) {
       return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor:
+            Theme.of(
+              context,
+            ).scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             'تفاصيل البلاغ',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor:
+              Theme.of(
+                context,
+              ).scaffoldBackgroundColor,
           elevation: 0,
           centerTitle: true,
         ),
         body: Center(
           child: Container(
-            margin: EdgeInsets.all(20.w),
-            padding: EdgeInsets.all(24.w),
+            margin: EdgeInsets.all(14.w),
+            padding: EdgeInsets.all(14.w),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20.r),
+              color:
+                  Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(
+                20.r,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withOpacity(
+                    0.1,
+                  ),
                   spreadRadius: 0,
                   blurRadius: 10,
                   offset: const Offset(0, 4),
@@ -62,7 +84,11 @@ class ReportDetailsPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline, size: 64.sp, color: Colors.red[400]),
+                Icon(
+                  Icons.error_outline,
+                  size: 64.sp,
+                  color: Colors.red[400],
+                ),
                 SizedBox(height: 16.h),
                 Text(
                   'خطأ في البيانات',
@@ -75,7 +101,10 @@ class ReportDetailsPage extends StatelessWidget {
                 SizedBox(height: 8.h),
                 Text(
                   'لم يتم العثور على تفاصيل البلاغ',
-                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.grey[600],
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -106,14 +135,18 @@ class ReportDetailsPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[50]!, Colors.white],
+            colors: [
+              Colors.grey[50]!,
+              Colors.white,
+            ],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16.w),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 // Report header card
                 _buildReportHeaderCard(),
@@ -131,24 +164,29 @@ class ReportDetailsPage extends StatelessWidget {
                 SizedBox(height: 20.h),
 
                 // Location information
-                if (report!.latitude != null && report!.longitude != null)
+                if (report!.latitude != null &&
+                    report!.longitude != null)
                   LocationInfoCard(
                     latitude: report!.latitude!,
                     longitude: report!.longitude!,
-                    locationName: report!.locationName,
+                    locationName:
+                        report!.locationName,
                   ),
 
-                if (report!.latitude != null && report!.longitude != null)
+                if (report!.latitude != null &&
+                    report!.longitude != null)
                   SizedBox(height: 20.h),
 
                 // Media viewer
-                if (report!.mediaUrl != null && report!.mediaUrl!.isNotEmpty)
+                if (report!.mediaUrl != null &&
+                    report!.mediaUrl!.isNotEmpty)
                   ReportMediaViewer(
                     mediaUrl: report!.mediaUrl,
                     mediaType: report!.mediaType,
                   ),
 
-                if (report!.mediaUrl != null && report!.mediaUrl!.isNotEmpty)
+                if (report!.mediaUrl != null &&
+                    report!.mediaUrl!.isNotEmpty)
                   SizedBox(height: 20.h),
 
                 // Enhanced status tracker
@@ -158,31 +196,37 @@ class ReportDetailsPage extends StatelessWidget {
                   reportId: report!.id,
                 ),
 
-                SizedBox(height: 100.h), // Extra space for floating button
+                SizedBox(
+                  height: 100.h,
+                ), // Extra space for floating button
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: _buildFloatingActionMenu(context),
+      floatingActionButton:
+          _buildFloatingActionMenu(context),
     );
   }
 
   Widget _buildReportHeaderCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             AppColors.primaryColor,
-            AppColors.primaryColor.withOpacity(0.8),
+            AppColors.primaryColor.withOpacity(
+              0.8,
+            ),
           ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
+            color: AppColors.primaryColor
+                .withOpacity(0.3),
             spreadRadius: 0,
             blurRadius: 15,
             offset: const Offset(0, 6),
@@ -196,22 +240,32 @@ class ReportDetailsPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16.r),
+                  color: Colors.white.withOpacity(
+                    0.2,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(16.r),
                 ),
-                child: Icon(Icons.assignment, color: Colors.white, size: 28.sp),
+                child: Icon(
+                  Icons.assignment,
+                  color: Colors.white,
+                  size: 24.sp,
+                ),
               ),
               SizedBox(width: 16.w),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       'رقم البلاغ',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
+                        color: Colors.white
+                            .withOpacity(0.9),
+                        fontSize: 16.sp,
+                        fontWeight:
+                            FontWeight.w500,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -219,8 +273,9 @@ class ReportDetailsPage extends StatelessWidget {
                       '#${report!.id.substring(0, 8)}',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
                   ],
@@ -229,32 +284,41 @@ class ReportDetailsPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12.r),
+                  color: Colors.white.withOpacity(
+                    0.2,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(12.r),
                 ),
                 child: Icon(
                   _getReportTypeIcon(),
                   color: Colors.white,
-                  size: 24.sp,
+                  size: 22.sp,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16.r),
+              color: Colors.white.withOpacity(
+                0.15,
+              ),
+              borderRadius: BorderRadius.circular(
+                16.r,
+              ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   'نوع البلاغ',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white
+                        .withOpacity(0.9),
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -273,19 +337,24 @@ class ReportDetailsPage extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.access_time,
-                      color: Colors.white.withOpacity(0.9),
-                      size: 16.sp,
+                      color: Colors.white
+                          .withOpacity(0.9),
+                      size: 12.sp,
                     ),
                     SizedBox(width: 6.w),
                     Text(
                       DateFormat(
                         'dd/MM/yyyy - HH:mm',
                         'ar',
-                      ).format(report!.reportDateTime),
+                      ).format(
+                        report!.reportDateTime,
+                      ),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
+                        color: Colors.white
+                            .withOpacity(0.9),
+                        fontSize: 12.sp,
+                        fontWeight:
+                            FontWeight.w500,
                       ),
                     ),
                   ],
@@ -301,7 +370,7 @@ class ReportDetailsPage extends StatelessWidget {
   Widget _buildReporterInfoCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
@@ -315,27 +384,21 @@ class ReportDetailsPage extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.person,
-                  color: AppColors.primaryColor,
-                  size: 24.sp,
-                ),
+              Icon(
+                Icons.person,
+                color: AppColors.primaryColor,
+                size: 22.sp,
               ),
               SizedBox(width: 12.w),
               Text(
                 'بيانات مقدم البلاغ',
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
@@ -343,13 +406,29 @@ class ReportDetailsPage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-          _buildInfoRow('الاسم الأول', report!.firstName, Icons.person_outline),
+          _buildInfoRow(
+            'الاسم الأول',
+            report!.firstName,
+            Icons.person_outline,
+          ),
           SizedBox(height: 16.h),
-          _buildInfoRow('الاسم الأخير', report!.lastName, Icons.person_outline),
+          _buildInfoRow(
+            'الاسم الأخير',
+            report!.lastName,
+            Icons.person_outline,
+          ),
           SizedBox(height: 16.h),
-          _buildInfoRow('رقم الهوية', report!.nationalId, Icons.credit_card),
+          _buildInfoRow(
+            'رقم الهوية',
+            report!.nationalId,
+            Icons.credit_card,
+          ),
           SizedBox(height: 16.h),
-          _buildInfoRow('رقم الهاتف', report!.phone, Icons.phone),
+          _buildInfoRow(
+            'رقم الهاتف',
+            report!.phone,
+            Icons.phone,
+          ),
         ],
       ),
     );
@@ -358,7 +437,7 @@ class ReportDetailsPage extends StatelessWidget {
   Widget _buildReportDetailsCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
@@ -372,27 +451,21 @@ class ReportDetailsPage extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.description,
-                  color: AppColors.primaryColor,
-                  size: 24.sp,
-                ),
+              Icon(
+                Icons.description,
+                color: AppColors.primaryColor,
+                size: 22.sp,
               ),
               SizedBox(width: 12.w),
               Text(
                 'تفاصيل البلاغ',
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
@@ -402,11 +475,15 @@ class ReportDetailsPage extends StatelessWidget {
           SizedBox(height: 20.h),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              border: Border.all(
+                color: Colors.grey[200]!,
+              ),
             ),
             child: Text(
               report!.reportDetails,
@@ -420,7 +497,11 @@ class ReportDetailsPage extends StatelessWidget {
           SizedBox(height: 16.h),
           Row(
             children: [
-              Icon(Icons.update, color: Colors.grey[600], size: 16.sp),
+              Icon(
+                Icons.update,
+                color: Colors.grey[600],
+                size: 16.sp,
+              ),
               SizedBox(width: 6.w),
               Text(
                 'آخر تحديث: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(report!.updatedAt)}',
@@ -437,26 +518,28 @@ class ReportDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    IconData icon,
+  ) {
     return Row(
       children: [
-        Container(
-          padding: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-          child: Icon(icon, size: 18.sp, color: AppColors.primaryColor),
+        Icon(
+          icon,
+          size: 18.sp,
+          color: AppColors.primaryColor,
         ),
         SizedBox(width: 12.w),
         Expanded(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 11.sp,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
                 ),
@@ -465,7 +548,7 @@ class ReportDetailsPage extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
@@ -477,15 +560,19 @@ class ReportDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFloatingActionMenu(BuildContext context) {
+  Widget _buildFloatingActionMenu(
+    BuildContext context,
+  ) {
     return FloatingActionButton.extended(
       onPressed: () => _showActionMenu(context),
       backgroundColor: AppColors.primaryColor,
       foregroundColor: Colors.white,
-      icon: Icon(Icons.more_horiz, size: 20.sp),
       label: Text(
         'الإجراءات',
-        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       elevation: 6,
     );
@@ -508,24 +595,31 @@ class ReportDetailsPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 12.h),
+                  margin: EdgeInsets.only(
+                    top: 12.h,
+                  ),
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2.r),
+                    borderRadius:
+                        BorderRadius.circular(
+                          2.r,
+                        ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20.w),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       Text(
                         'الإجراءات المتاحة',
                         style: TextStyle(
                           fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
@@ -534,16 +628,29 @@ class ReportDetailsPage extends StatelessWidget {
                         context,
                         icon: Icons.share,
                         title: 'مشاركة البلاغ',
-                        subtitle: 'مشاركة تفاصيل البلاغ مع الآخرين',
-                        onTap: () => _shareReport(context),
+                        subtitle:
+                            'مشاركة تفاصيل البلاغ مع الآخرين',
+                        onTap:
+                            () => _shareReport(
+                              context,
+                            ),
                       ),
-                      Divider(height: 1.h, color: Colors.grey[200]),
+                      Divider(
+                        height: 1.h,
+                        color: Colors.grey[200],
+                      ),
                       _buildActionItem(
                         context,
-                        icon: Icons.picture_as_pdf,
+                        icon:
+                            Icons.picture_as_pdf,
                         title: 'تحميل كـ PDF',
-                        subtitle: 'تنزيل ملف PDF بتفاصيل البلاغ',
-                        onTap: () => _downloadPDF(context, report!),
+                        subtitle:
+                            'تنزيل ملف PDF بتفاصيل البلاغ',
+                        onTap:
+                            () => _downloadPDF(
+                              context,
+                              report!,
+                            ),
                       ),
                       // Divider(height: 1.h, color: Colors.grey[200]),
                       // _buildActionItem(
@@ -553,13 +660,20 @@ class ReportDetailsPage extends StatelessWidget {
                       //   subtitle: 'طباعة تفاصيل البلاغ',
                       //   onTap: () => _printReport(context),
                       // ),
-                      Divider(height: 1.h, color: Colors.grey[200]),
+                      Divider(
+                        height: 1.h,
+                        color: Colors.grey[200],
+                      ),
                       _buildActionItem(
                         context,
                         icon: Icons.refresh,
                         title: 'تحديث الحالة',
-                        subtitle: 'التحقق من آخر تحديثات البلاغ',
-                        onTap: () => _refreshStatus(context),
+                        subtitle:
+                            'التحقق من آخر تحديثات البلاغ',
+                        onTap:
+                            () => _refreshStatus(
+                              context,
+                            ),
                       ),
                       SizedBox(height: 20.h),
                     ],
@@ -582,18 +696,31 @@ class ReportDetailsPage extends StatelessWidget {
       leading: Container(
         padding: EdgeInsets.all(10.w),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12.r),
+          color: AppColors.primaryColor
+              .withOpacity(0.1),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
-        child: Icon(icon, color: AppColors.primaryColor, size: 22.sp),
+        child: Icon(
+          icon,
+          color: AppColors.primaryColor,
+          size: 22.sp,
+        ),
       ),
       title: Text(
         title,
-        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Colors.grey[600],
+        ),
       ),
       onTap: () {
         Navigator.pop(context);
@@ -622,7 +749,8 @@ class ReportDetailsPage extends StatelessWidget {
 
   IconData _getReportTypeIcon() {
     final type = report!.reportType.toLowerCase();
-    if (type.contains('حريق') || type.contains('fire')) {
+    if (type.contains('حريق') ||
+        type.contains('fire')) {
       return Icons.local_fire_department;
     } else if (type.contains('طبي') ||
         type.contains('إسعاف') ||
@@ -636,11 +764,14 @@ class ReportDetailsPage extends StatelessWidget {
         type.contains('مرور') ||
         type.contains('traffic')) {
       return Icons.car_crash;
-    } else if (type.contains('كهرباء') || type.contains('electric')) {
+    } else if (type.contains('كهرباء') ||
+        type.contains('electric')) {
       return Icons.electrical_services;
-    } else if (type.contains('مياه') || type.contains('water')) {
+    } else if (type.contains('مياه') ||
+        type.contains('water')) {
       return Icons.water_drop;
-    } else if (type.contains('طريق') || type.contains('infrastructure')) {
+    } else if (type.contains('طريق') ||
+        type.contains('infrastructure')) {
       return Icons.construction;
     } else {
       return Icons.report_problem;
@@ -649,7 +780,9 @@ class ReportDetailsPage extends StatelessWidget {
 
   // Action methods with proper implementation
   void _shareReport(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.of(
+      context,
+    );
 
     try {
       // Show options dialog for sharing
@@ -659,7 +792,10 @@ class ReportDetailsPage extends StatelessWidget {
             (context) => AlertDialog(
               title: Text(
                 'مشاركة البلاغ',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               content: Column(
@@ -667,12 +803,16 @@ class ReportDetailsPage extends StatelessWidget {
                 children: [
                   Text(
                     'اختر طريقة المشاركة:',
-                    style: TextStyle(fontSize: 14.sp),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20.h),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .spaceEvenly,
                     children: [
                       _buildShareOption(
                         context,
@@ -693,7 +833,8 @@ class ReportDetailsPage extends StatelessWidget {
                 ],
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius:
+                    BorderRadius.circular(16.r),
               ),
             ),
       );
@@ -708,22 +849,30 @@ class ReportDetailsPage extends StatelessWidget {
 
       messenger.showSnackBar(
         SnackBar(
-          content: const Text('تم مشاركة البلاغ بنجاح'),
+          content: const Text(
+            'تم مشاركة البلاغ بنجاح',
+          ),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(
+              10.r,
+            ),
           ),
         ),
       );
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('فشل في مشاركة البلاغ: $e'),
+          content: Text(
+            'فشل في مشاركة البلاغ: $e',
+          ),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(
+              10.r,
+            ),
           ),
         ),
       );
@@ -744,8 +893,12 @@ class ReportDetailsPage extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: color.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+          ),
         ),
         child: Column(
           children: [
@@ -797,12 +950,17 @@ ${report!.reportDetails}
 
     await Share.share(
       reportText,
-      subject: 'تقرير البلاغ رقم #${report!.id.substring(0, 8)}',
+      subject:
+          'تقرير البلاغ رقم #${report!.id.substring(0, 8)}',
     );
   }
 
-  void _refreshStatus(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+  void _refreshStatus(
+    BuildContext context,
+  ) async {
+    final messenger = ScaffoldMessenger.of(
+      context,
+    );
 
     try {
       // Show loading indicator
@@ -815,9 +973,10 @@ ${report!.reportDetails}
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryColor,
-                    ),
+                    valueColor:
+                        AlwaysStoppedAnimation<
+                          Color
+                        >(AppColors.primaryColor),
                   ),
                   SizedBox(height: 16.h),
                   Text(
@@ -830,13 +989,16 @@ ${report!.reportDetails}
                 ],
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius:
+                    BorderRadius.circular(16.r),
               ),
             ),
       );
 
       // Simulate refresh delay (replace with actual API call)
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(
+        const Duration(seconds: 2),
+      );
 
       // Close loading dialog
       Navigator.pop(context);
@@ -845,7 +1007,10 @@ ${report!.reportDetails}
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ReportDetailsPage(report: report),
+          builder:
+              (context) => ReportDetailsPage(
+                report: report,
+              ),
         ),
       );
 
@@ -853,7 +1018,11 @@ ${report!.reportDetails}
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+              Icon(
+                Icons.check_circle,
+                color: Colors.white,
+                size: 20.sp,
+              ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
@@ -869,7 +1038,9 @@ ${report!.reportDetails}
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(
+              10.r,
+            ),
           ),
         ),
       );
@@ -883,12 +1054,18 @@ ${report!.reportDetails}
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.error, color: Colors.white, size: 20.sp),
+              Icon(
+                Icons.error,
+                color: Colors.white,
+                size: 20.sp,
+              ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   'فشل في تحديث حالة البلاغ: $e',
-                  style: TextStyle(fontSize: 14.sp),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                  ),
                 ),
               ),
             ],
@@ -896,7 +1073,9 @@ ${report!.reportDetails}
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(
+              10.r,
+            ),
           ),
         ),
       );
@@ -905,11 +1084,16 @@ ${report!.reportDetails}
 
   // استبدل دالة _downloadPDF في report_details_page.dart بهذه الدالة المحسنة
 
-  void _downloadPDF(BuildContext context, ReportEntity? report) async {
+  void _downloadPDF(
+    BuildContext context,
+    ReportEntity? report,
+  ) async {
     if (report == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('خطأ: بيانات البلاغ غير متوفرة'),
+          content: Text(
+            'خطأ: بيانات البلاغ غير متوفرة',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -923,7 +1107,9 @@ ${report!.reportDetails}
       builder:
           (dialogContext) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: BorderRadius.circular(
+                20.r,
+              ),
             ),
             content: Container(
               padding: EdgeInsets.all(16.w),
@@ -931,9 +1117,10 @@ ${report!.reportDetails}
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryColor,
-                    ),
+                    valueColor:
+                        AlwaysStoppedAnimation<
+                          Color
+                        >(AppColors.primaryColor),
                     strokeWidth: 3.0,
                   ),
                   SizedBox(height: 20.h),
@@ -949,7 +1136,10 @@ ${report!.reportDetails}
                   SizedBox(height: 8.h),
                   Text(
                     'يرجى الانتظار',
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.grey[600],
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -971,36 +1161,53 @@ ${report!.reportDetails}
       }
 
       // حفظ الملف مؤقتاً
-      final tempDir = await getTemporaryDirectory();
-      final fileName = 'تقرير_البلاغ_${report.id.substring(0, 8)}.pdf';
-      final file = File('${tempDir.path}/$fileName');
+      final tempDir =
+          await getTemporaryDirectory();
+      final fileName =
+          'تقرير_البلاغ_${report.id.substring(0, 8)}.pdf';
+      final file = File(
+        '${tempDir.path}/$fileName',
+      );
       await file.writeAsBytes(pdfBytes);
 
       // محاولة فتح الملف
-      final result = await OpenFile.open(file.path);
+      final result = await OpenFile.open(
+        file.path,
+      );
 
       if (context.mounted) {
         if (result.type == ResultType.done) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                    size: 20.sp,
+                  ),
                   SizedBox(width: 12.w),
-                  const Text('تم إنشاء التقرير وفتحه بنجاح ✅'),
+                  const Text(
+                    'تم إنشاء التقرير وفتحه بنجاح ✅',
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
               margin: EdgeInsets.all(16.w),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius:
+                    BorderRadius.circular(10.r),
               ),
             ),
           );
         } else {
           // في حالة الفشل في الفتح → مشاركة الملف
-          await Share.shareXFiles([XFile(file.path)], subject: 'تقرير البلاغ');
+          await Share.shareXFiles([
+            XFile(file.path),
+          ], subject: 'تقرير البلاغ');
         }
       }
     } catch (e) {
@@ -1008,20 +1215,32 @@ ${report!.reportDetails}
       if (context.mounted) {
         await _safePopDialog(context);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.error, color: Colors.white, size: 20.sp),
+                Icon(
+                  Icons.error,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
                 SizedBox(width: 12.w),
-                const Expanded(child: Text('حدث خطأ أثناء إنشاء التقرير')),
+                const Expanded(
+                  child: Text(
+                    'حدث خطأ أثناء إنشاء التقرير',
+                  ),
+                ),
               ],
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(
+                10.r,
+              ),
             ),
           ),
         );
@@ -1137,7 +1356,9 @@ ${report!.reportDetails}
   // }
 
   // دالة مبسطة للمشاركة كـ PDF
-  Future<void> _shareAsPDF(BuildContext context) async {
+  Future<void> _shareAsPDF(
+    BuildContext context,
+  ) async {
     if (report == null) return;
 
     showDialog(
@@ -1148,7 +1369,8 @@ ${report!.reportDetails}
             onWillPop: () async => false,
             child: AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.r),
+                borderRadius:
+                    BorderRadius.circular(20.r),
               ),
               content: Container(
                 padding: EdgeInsets.all(16.w),
@@ -1156,9 +1378,13 @@ ${report!.reportDetails}
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryColor,
-                      ),
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(
+                            AppColors
+                                .primaryColor,
+                          ),
                       strokeWidth: 3.0,
                     ),
                     SizedBox(height: 20.h),
@@ -1166,7 +1392,8 @@ ${report!.reportDetails}
                       'جاري إعداد PDF...',
                       style: TextStyle(
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight:
+                            FontWeight.w600,
                         color: Colors.black87,
                       ),
                       textAlign: TextAlign.center,
@@ -1196,28 +1423,43 @@ ${report!.reportDetails}
       if (context.mounted) {
         await _safePopDialog(context);
 
-        await Share.shareXFiles([
-          XFile.fromData(
-            pdfBytes,
-            name: 'تقرير_البلاغ_${report!.id.substring(0, 8)}.pdf',
-            mimeType: 'application/pdf',
-          ),
-        ], subject: 'تقرير البلاغ رقم #${report!.id.substring(0, 8)}');
+        await Share.shareXFiles(
+          [
+            XFile.fromData(
+              pdfBytes,
+              name:
+                  'تقرير_البلاغ_${report!.id.substring(0, 8)}.pdf',
+              mimeType: 'application/pdf',
+            ),
+          ],
+          subject:
+              'تقرير البلاغ رقم #${report!.id.substring(0, 8)}',
+        );
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.share, color: Colors.white, size: 20.sp),
+                Icon(
+                  Icons.share,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
                 SizedBox(width: 12.w),
-                const Text('تم مشاركة التقرير بنجاح'),
+                const Text(
+                  'تم مشاركة التقرير بنجاح',
+                ),
               ],
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(
+                10.r,
+              ),
             ),
           ),
         );
@@ -1225,20 +1467,30 @@ ${report!.reportDetails}
     } catch (e) {
       if (context.mounted) {
         await _safePopDialog(context);
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.warning, color: Colors.white, size: 20.sp),
+                Icon(
+                  Icons.warning,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
                 SizedBox(width: 12.w),
-                const Text('فشلت المشاركة - سيتم مشاركة النص'),
+                const Text(
+                  'فشلت المشاركة - سيتم مشاركة النص',
+                ),
               ],
             ),
             backgroundColor: Colors.orange,
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(
+                10.r,
+              ),
             ),
           ),
         );

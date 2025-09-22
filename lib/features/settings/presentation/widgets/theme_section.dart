@@ -9,22 +9,29 @@ class ThemeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SettingsBloc, SettingsState>(
+    return BlocBuilder<
+      SettingsBloc,
+      SettingsState
+    >(
       buildWhen: (previous, current) {
         // Only rebuild when theme mode actually changes
-        if (previous is SettingsLoaded && current is SettingsLoaded) {
-          return previous.settings.themeMode != current.settings.themeMode;
+        if (previous is SettingsLoaded &&
+            current is SettingsLoaded) {
+          return previous.settings.themeMode !=
+              current.settings.themeMode;
         }
         return true;
       },
       builder: (context, state) {
         final isDarkMode =
             state is SettingsLoaded
-                ? state.settings.themeMode == ThemeMode.dark
+                ? state.settings.themeMode ==
+                    ThemeMode.dark
                 : false;
 
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment:
+              MainAxisAlignment.spaceBetween,
           children: [
             // Dark Mode Text and Icon
             Row(
@@ -41,8 +48,12 @@ class ThemeSection extends StatelessWidget {
                   'ثيم التطبيق',
                   style: TextStyle(
                     fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color,
                   ),
                 ),
               ],
@@ -50,34 +61,59 @@ class ThemeSection extends StatelessWidget {
             // Custom Toggle Switch
             GestureDetector(
               onTap: () {
-                final settingsBloc = context.read<SettingsBloc>();
-                final newTheme = isDarkMode ? ThemeMode.light : ThemeMode.dark;
-                settingsBloc.add(SettingsThemeChanged(newTheme));
+                final settingsBloc =
+                    context.read<SettingsBloc>();
+                final newTheme =
+                    isDarkMode
+                        ? ThemeMode.light
+                        : ThemeMode.dark;
+                settingsBloc.add(
+                  SettingsThemeChanged(newTheme),
+                );
               },
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(
+                  milliseconds: 200,
+                ),
                 width: 35.w,
                 height: 20.h,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15.r),
-                  color: isDarkMode ? AppColors.primaryColor : Colors.grey[300],
+                  borderRadius:
+                      BorderRadius.circular(15.r),
+                  color:
+                      isDarkMode
+                          ? AppColors.primaryColor
+                          : Colors.grey[300],
                 ),
                 child: AnimatedAlign(
-                  duration: const Duration(milliseconds: 200),
+                  duration: const Duration(
+                    milliseconds: 200,
+                  ),
                   alignment:
-                      isDarkMode ? Alignment.centerRight : Alignment.centerLeft,
+                      isDarkMode
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                   child: Container(
                     width: 16.w,
                     height: 20.h,
-                    margin: const EdgeInsets.all(2),
+                    margin: const EdgeInsets.all(
+                      2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(14.r),
+                      borderRadius:
+                          BorderRadius.circular(
+                            14.r,
+                          ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black
+                              .withOpacity(0.1),
                           blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          offset: const Offset(
+                            0,
+                            2,
+                          ),
                         ),
                       ],
                     ),

@@ -4,7 +4,8 @@ import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/reports_entity.dart';
 
-class EnhancedStatusTracker extends StatelessWidget {
+class EnhancedStatusTracker
+    extends StatelessWidget {
   final ReportStatus currentStatus;
   final DateTime? createdAt;
   final String reportId;
@@ -32,7 +33,8 @@ class EnhancedStatusTracker extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           // Header Section
           Container(
@@ -44,7 +46,8 @@ class EnhancedStatusTracker extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   AppColors.primaryColor,
-                  AppColors.primaryColor.withOpacity(0.8),
+                  AppColors.primaryColor
+                      .withOpacity(0.8),
                 ],
               ),
               borderRadius: BorderRadius.only(
@@ -53,32 +56,29 @@ class EnhancedStatusTracker extends StatelessWidget {
               ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Icon(
-                        Icons.track_changes,
-                        color: Colors.white,
-                        size: 20.sp,
-                      ),
+                    Icon(
+                      Icons.track_changes,
+                      color: Colors.white,
+                      size: 20.sp,
                     ),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
                         children: [
                           Text(
                             'تتبع حالة البلاغ',
                             style: TextStyle(
                               fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight:
+                                  FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
@@ -87,7 +87,10 @@ class EnhancedStatusTracker extends StatelessWidget {
                             'الحالة الحالية: ${currentStatus.arabicName}',
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white
+                                  .withOpacity(
+                                    0.9,
+                                  ),
                             ),
                           ),
                         ],
@@ -103,11 +106,16 @@ class EnhancedStatusTracker extends StatelessWidget {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(16.r),
+                      color: Colors.white
+                          .withOpacity(0.15),
+                      borderRadius:
+                          BorderRadius.circular(
+                            16.r,
+                          ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize:
+                          MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.access_time,
@@ -134,7 +142,8 @@ class EnhancedStatusTracker extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(16.w),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   'مراحل معالجة البلاغ',
@@ -159,25 +168,29 @@ class EnhancedStatusTracker extends StatelessWidget {
       {
         'status': ReportStatus.received,
         'title': 'استلام البلاغ',
-        'description': 'تم استلام البلاغ وتسجيله في النظام',
+        'description':
+            'تم استلام البلاغ وتسجيله في النظام',
         'icon': Icons.receipt_long,
       },
       {
         'status': ReportStatus.underReview,
         'title': 'مراجعة البلاغ',
-        'description': 'يتم مراجعة البلاغ من قبل الفريق المختص',
+        'description':
+            'يتم مراجعة البلاغ من قبل الفريق المختص',
         'icon': Icons.search,
       },
       {
         'status': ReportStatus.dataVerification,
         'title': 'التحقق من البيانات',
-        'description': 'التحقق من صحة البيانات المرسلة',
+        'description':
+            'التحقق من صحة البيانات المرسلة',
         'icon': Icons.fact_check,
       },
       {
         'status': ReportStatus.actionTaken,
         'title': 'اتخاذ الإجراء',
-        'description': 'اتخاذ الإجراء المناسب حسب نوع البلاغ',
+        'description':
+            'اتخاذ الإجراء المناسب حسب نوع البلاغ',
         'icon': Icons.engineering,
       },
       {
@@ -193,12 +206,20 @@ class EnhancedStatusTracker extends StatelessWidget {
           statuses.asMap().entries.map((entry) {
             final index = entry.key;
             final statusData = entry.value;
-            final status = statusData['status'] as ReportStatus;
-            final isCompleted = _isStepCompleted(status);
-            final isActive = status == currentStatus;
-            final isLast = index == statuses.length - 1;
+            final status =
+                statusData['status']
+                    as ReportStatus;
+            final isCompleted = _isStepCompleted(
+              status,
+            );
+            final isActive =
+                status == currentStatus;
+            final isLast =
+                index == statuses.length - 1;
             final isRejected =
-                currentStatus == ReportStatus.rejected && !isCompleted;
+                currentStatus ==
+                    ReportStatus.rejected &&
+                !isCompleted;
 
             return _buildCustomStep(
               statusData: statusData,
@@ -223,13 +244,18 @@ class EnhancedStatusTracker extends StatelessWidget {
 
     if (isRejected) {
       stepColor = Colors.red;
-      backgroundColor = Colors.red.withOpacity(0.1);
+      backgroundColor = Colors.red.withOpacity(
+        0.1,
+      );
     } else if (isCompleted) {
       stepColor = Colors.green;
-      backgroundColor = Colors.green.withOpacity(0.1);
+      backgroundColor = Colors.green.withOpacity(
+        0.1,
+      );
     } else if (isActive) {
       stepColor = AppColors.primaryColor;
-      backgroundColor = AppColors.primaryColor.withOpacity(0.1);
+      backgroundColor = AppColors.primaryColor
+          .withOpacity(0.1);
     } else {
       stepColor = Colors.grey[400]!;
       backgroundColor = Colors.grey[100]!;
@@ -237,7 +263,8 @@ class EnhancedStatusTracker extends StatelessWidget {
 
     return IntrinsicHeight(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           // Step Indicator Column
           Column(
@@ -249,14 +276,24 @@ class EnhancedStatusTracker extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: stepColor, width: 2.w),
+                  border: Border.all(
+                    color: stepColor,
+                    width: 2.w,
+                  ),
                   boxShadow:
                       isActive || isCompleted
                           ? [
                             BoxShadow(
-                              color: stepColor.withOpacity(0.3),
+                              color: stepColor
+                                  .withOpacity(
+                                    0.3,
+                                  ),
                               blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              offset:
+                                  const Offset(
+                                    0,
+                                    2,
+                                  ),
                             ),
                           ]
                           : [],
@@ -264,9 +301,14 @@ class EnhancedStatusTracker extends StatelessWidget {
                 child: Center(
                   child:
                       isCompleted
-                          ? Icon(Icons.check, color: stepColor, size: 20.sp)
+                          ? Icon(
+                            Icons.check,
+                            color: stepColor,
+                            size: 20.sp,
+                          )
                           : Icon(
-                            statusData['icon'] as IconData,
+                            statusData['icon']
+                                as IconData,
                             color: stepColor,
                             size: 18.sp,
                           ),
@@ -277,11 +319,18 @@ class EnhancedStatusTracker extends StatelessWidget {
                 Container(
                   width: 2.w,
                   height: 50.h,
-                  margin: EdgeInsets.symmetric(vertical: 8.h),
+                  margin: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     color:
-                        isCompleted || isActive ? stepColor : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(1.r),
+                        isCompleted || isActive
+                            ? stepColor
+                            : Colors.grey[300],
+                    borderRadius:
+                        BorderRadius.circular(
+                          1.r,
+                        ),
                   ),
                 ),
             ],
@@ -292,9 +341,12 @@ class EnhancedStatusTracker extends StatelessWidget {
           // Content Column
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(bottom: isLast ? 0 : 20.h),
+              margin: EdgeInsets.only(
+                bottom: isLast ? 0 : 20.h,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   // Title
                   Text(
@@ -313,7 +365,8 @@ class EnhancedStatusTracker extends StatelessWidget {
 
                   // Description
                   Text(
-                    statusData['description'] as String,
+                    statusData['description']
+                        as String,
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.grey[600],
@@ -325,35 +378,47 @@ class EnhancedStatusTracker extends StatelessWidget {
                   if (isActive) ...[
                     SizedBox(height: 8.h),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
+                      padding:
+                          EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 4.h,
+                          ),
                       decoration: BoxDecoration(
-                        color: stepColor.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12.r),
+                        color: stepColor
+                            .withOpacity(0.15),
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
                         border: Border.all(
-                          color: stepColor.withOpacity(0.3),
+                          color: stepColor
+                              .withOpacity(0.3),
                           width: 1,
                         ),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize:
+                            MainAxisSize.min,
                         children: [
                           Container(
                             width: 6.w,
                             height: 6.h,
-                            decoration: BoxDecoration(
-                              color: stepColor,
-                              shape: BoxShape.circle,
-                            ),
+                            decoration:
+                                BoxDecoration(
+                                  color:
+                                      stepColor,
+                                  shape:
+                                      BoxShape
+                                          .circle,
+                                ),
                           ),
                           SizedBox(width: 6.w),
                           Text(
                             'المرحلة الحالية',
                             style: TextStyle(
                               fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight:
+                                  FontWeight.w600,
                               color: stepColor,
                             ),
                           ),
@@ -363,23 +428,31 @@ class EnhancedStatusTracker extends StatelessWidget {
                   ],
 
                   // Completed Status Badge
-                  if (isCompleted && !isActive) ...[
+                  if (isCompleted &&
+                      !isActive) ...[
                     SizedBox(height: 8.h),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
+                      padding:
+                          EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 4.h,
+                          ),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
+                        color: Colors.green
+                            .withOpacity(0.1),
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
                         border: Border.all(
-                          color: Colors.green.withOpacity(0.3),
+                          color: Colors.green
+                              .withOpacity(0.3),
                           width: 1,
                         ),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize:
+                            MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.check_circle,
@@ -391,7 +464,8 @@ class EnhancedStatusTracker extends StatelessWidget {
                             'مكتمل',
                             style: TextStyle(
                               fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight:
+                                  FontWeight.w600,
                               color: Colors.green,
                             ),
                           ),
@@ -417,7 +491,9 @@ class EnhancedStatusTracker extends StatelessWidget {
       ReportStatus.completed,
     ];
 
-    final currentIndex = statusOrder.indexOf(currentStatus);
+    final currentIndex = statusOrder.indexOf(
+      currentStatus,
+    );
     final stepIndex = statusOrder.indexOf(status);
 
     if (currentStatus == ReportStatus.completed) {
@@ -425,7 +501,8 @@ class EnhancedStatusTracker extends StatelessWidget {
     }
 
     if (currentStatus == ReportStatus.rejected) {
-      return stepIndex == 0; // Only first step completed if rejected
+      return stepIndex ==
+          0; // Only first step completed if rejected
     }
 
     return stepIndex <= currentIndex;
