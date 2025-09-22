@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -273,8 +274,8 @@ class _LoginPageState extends State<LoginPage>
           // اللوغو بدون إطار - واضح وبسيط
           GestureDetector(
             onDoubleTap: _onLogoDoubleTap,
-            child: Image.asset(
-              AppAssets.mainLogo,
+            child: SvgPicture.asset(
+              AppAssets.mainLogoSvg,
               width: 120.w,
               height: 120.h,
               fit: BoxFit.contain,
