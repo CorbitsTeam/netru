@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/routing/routes.dart';
 
 class QuickActionsWidget extends StatelessWidget {
-  const QuickActionsWidget({Key? key}) : super(key: key);
+  const QuickActionsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      margin: EdgeInsets.all(8.w),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'إجراءات سريعة',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
+            SizedBox(height: 16.h),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              childAspectRatio: 1.1,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
               children: [
                 _buildActionButton(
                   context,
@@ -42,8 +52,8 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildActionButton(
                   context,
-                  title: 'إرسال الإشعارات',
-                  subtitle: 'إرسال إشعارات للمستخدمين',
+                  title: 'الإشعارات',
+                  subtitle: 'إرسال إشعارات',
                   icon: Icons.notifications,
                   color: Colors.orange,
                   onTap:
@@ -54,8 +64,8 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildActionButton(
                   context,
-                  title: 'إدارة حسابات المصادقة',
-                  subtitle: 'إدارة صلاحيات المديرين',
+                  title: 'حسابات المدراء',
+                  subtitle: 'إدارة المصادقة',
                   icon: Icons.admin_panel_settings,
                   color: Colors.purple,
                   onTap:
@@ -65,7 +75,7 @@ class QuickActionsWidget extends StatelessWidget {
                 _buildActionButton(
                   context,
                   title: 'تقارير مفصلة',
-                  subtitle: 'عرض التقارير والإحصائيات',
+                  subtitle: 'إحصائيات شاملة',
                   icon: Icons.analytics,
                   color: Colors.teal,
                   onTap: () => _showComingSoonDialog(context, 'تقارير مفصلة'),
@@ -73,7 +83,7 @@ class QuickActionsWidget extends StatelessWidget {
                 _buildActionButton(
                   context,
                   title: 'إعدادات النظام',
-                  subtitle: 'تكوين إعدادات النظام',
+                  subtitle: 'تكوين التطبيق',
                   icon: Icons.settings,
                   color: Colors.grey,
                   onTap: () => _showComingSoonDialog(context, 'إعدادات النظام'),
@@ -94,55 +104,58 @@ class QuickActionsWidget extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return SizedBox(
-      width: 200,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[200]!),
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.grey[50],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: color, size: 24),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[200]!),
+          borderRadius: BorderRadius.circular(12.r),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(icon, size: 24.sp, color: color),
+            ),
+            SizedBox(height: 12.h),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Colors.grey[400],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-              ),
-            ],
-          ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

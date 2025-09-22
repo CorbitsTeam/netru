@@ -340,7 +340,7 @@ class _AdminAuthManagerPageState extends State<AdminAuthManagerPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('هل تريد إنشاء حساب مصادقة للمستخدم:'),
+                const Text('هل تريد إنشاء حساب مصادقة للمستخدم:'),
                 SizedBox(height: 8.h),
                 Text(
                   '${user['full_name']}\n${user['email']}',
@@ -423,7 +423,7 @@ class _AdminAuthManagerPageState extends State<AdminAuthManagerPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('تم إنشاء حساب مصادقة للإيميل:'),
+                const Text('تم إنشاء حساب مصادقة للإيميل:'),
                 SizedBox(height: 8.h),
                 Container(
                   padding: EdgeInsets.all(12.w),

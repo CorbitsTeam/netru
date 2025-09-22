@@ -1,4 +1,4 @@
-import '../../../../core/network/api_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_edge_functions_service.dart';
 import '../models/admin_report_model.dart';
 
@@ -47,11 +47,11 @@ abstract class AdminReportRemoteDataSource {
 }
 
 class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
-  final ApiClient apiClient;
+  final SupabaseClient supabaseClient;
   final SupabaseEdgeFunctionsService edgeFunctionsService;
 
   AdminReportRemoteDataSourceImpl({
-    required this.apiClient,
+    required this.supabaseClient,
     required this.edgeFunctionsService,
   });
 
@@ -67,57 +67,55 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
     DateTime? endDate,
   }) async {
     try {
-      final queryParams = <String, dynamic>{
-        'select': '''
-          id, user_id, report_type, title, description, 
-          governorate, city, district, address, latitude, longitude,
-          report_status, priority, assigned_to, media_attachments,
-          created_at, updated_at, investigation_notes
-        ''',
-        'order': 'created_at.desc',
-      };
+      PostgrestFilterBuilder<PostgrestList> query = supabaseClient
+          .from('reports')
+          .select('''
+            *,
+            report_types(name)
+          ''');
 
-      if (page != null && limit != null) {
-        queryParams['offset'] = page * limit;
-        queryParams['limit'] = limit;
-      }
-
+      // Apply filters
       if (status != null) {
-        queryParams['report_status'] = 'eq.$status';
+        query = query.eq('report_status', status);
       }
 
       if (governorate != null) {
-        queryParams['governorate'] = 'eq.$governorate';
+        query = query.eq('incident_location_address', governorate);
       }
 
       if (reportType != null) {
-        queryParams['report_type'] = 'eq.$reportType';
+        query = query.eq('report_type_id', reportType);
       }
 
       if (search != null && search.isNotEmpty) {
-        queryParams['or'] =
-            'title.ilike.*$search*,description.ilike.*$search*,address.ilike.*$search*';
+        query = query.or(
+          'report_details.ilike.%$search%,reporter_first_name.ilike.%$search%,reporter_last_name.ilike.%$search%',
+        );
       }
 
       if (startDate != null) {
-        queryParams['created_at'] = 'gte.${startDate.toIso8601String()}';
+        query = query.gte('submitted_at', startDate.toIso8601String());
       }
 
       if (endDate != null) {
-        if (queryParams.containsKey('created_at')) {
-          queryParams['created_at'] =
-              '${queryParams['created_at']}&lte.${endDate.toIso8601String()}';
-        } else {
-          queryParams['created_at'] = 'lte.${endDate.toIso8601String()}';
-        }
+        query = query.lte('submitted_at', endDate.toIso8601String());
       }
 
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: queryParams,
+      // Apply order and pagination
+      PostgrestTransformBuilder<PostgrestList> finalQuery = query.order(
+        'submitted_at',
+        ascending: false,
       );
 
-      return (response.data as List)
+      if (page != null && limit != null) {
+        final start = page * limit;
+        final end = start + limit - 1;
+        finalQuery = finalQuery.range(start, end);
+      }
+
+      final response = await finalQuery;
+
+      return (response as List)
           .map((json) => AdminReportModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -128,25 +126,20 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
   @override
   Future<AdminReportModel> getReportById(String reportId) async {
     try {
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {
-          'id': 'eq.$reportId',
-          'select': '''
-            id, user_id, report_type, title, description, 
-            governorate, city, district, address, latitude, longitude,
-            report_status, priority, assigned_to, media_attachments,
-            created_at, updated_at, investigation_notes
-          ''',
-        },
-      );
+      final response =
+          await supabaseClient
+              .from('reports')
+              .select('''
+            *,
+            report_types(name),
+            report_media(*),
+            report_comments(*),
+            report_status_history(*)
+          ''')
+              .eq('id', reportId)
+              .single();
 
-      final reports = response.data as List;
-      if (reports.isEmpty) {
-        throw Exception('Report not found');
-      }
-
-      return AdminReportModel.fromJson(reports.first);
+      return AdminReportModel.fromJson(response);
     } catch (e) {
       throw Exception('Failed to fetch report: $e');
     }
@@ -165,25 +158,21 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
       };
 
       if (notes != null && notes.isNotEmpty) {
-        updateData['investigation_notes'] = notes;
+        updateData['admin_notes'] = notes;
       }
 
-      await apiClient.dio.patch(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {'id': 'eq.$reportId'},
-        data: updateData,
-      );
+      await supabaseClient
+          .from('reports')
+          .update(updateData)
+          .eq('id', reportId);
 
       // Log the status change
-      await apiClient.dio.post(
-        '${ApiEndpoints.rest}/report_logs',
-        data: {
-          'report_id': reportId,
-          'action':
-              'Status changed to $status${notes != null ? " - $notes" : ""}',
-          'created_at': DateTime.now().toIso8601String(),
-        },
-      );
+      await supabaseClient.from('report_status_history').insert({
+        'report_id': reportId,
+        'new_status': status,
+        'changed_at': DateTime.now().toIso8601String(),
+        'notes': notes,
+      });
 
       // Return updated report
       return await getReportById(reportId);
@@ -199,16 +188,21 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
     String? notes,
   }) async {
     try {
-      // Use Edge Function for assignment
-      final result = await edgeFunctionsService.assignReport(
-        reportId: reportId,
-        investigatorId: investigatorId,
-        notes: notes,
-      );
+      await supabaseClient
+          .from('reports')
+          .update({
+            'assigned_to': investigatorId,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', reportId);
 
-      if (result['success'] != true) {
-        throw Exception(result['error'] ?? 'Assignment failed');
-      }
+      // Log the assignment
+      await supabaseClient.from('report_assignments').insert({
+        'report_id': reportId,
+        'assigned_to': investigatorId,
+        'assigned_at': DateTime.now().toIso8601String(),
+        'assignment_notes': notes,
+      });
 
       // Return updated report
       return await getReportById(reportId);
@@ -220,10 +214,7 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
   @override
   Future<void> deleteReport(String reportId) async {
     try {
-      await apiClient.dio.delete(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {'id': 'eq.$reportId'},
-      );
+      await supabaseClient.from('reports').delete().eq('id', reportId);
     } catch (e) {
       throw Exception('Failed to delete report: $e');
     }
@@ -234,21 +225,16 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
     String investigatorId,
   ) async {
     try {
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {
-          'assigned_to': 'eq.$investigatorId',
-          'select': '''
-            id, user_id, report_type, title, description, 
-            governorate, city, district, address, latitude, longitude,
-            report_status, priority, assigned_to, media_attachments,
-            created_at, updated_at, investigation_notes
-          ''',
-          'order': 'created_at.desc',
-        },
-      );
+      final response = await supabaseClient
+          .from('reports')
+          .select('''
+            *,
+            report_types(name)
+          ''')
+          .eq('assigned_to', investigatorId)
+          .order('submitted_at', ascending: false);
 
-      return (response.data as List)
+      return (response as List)
           .map((json) => AdminReportModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -259,21 +245,16 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
   @override
   Future<List<AdminReportModel>> getPendingReports() async {
     try {
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {
-          'report_status': 'eq.pending',
-          'select': '''
-            id, user_id, report_type, title, description, 
-            governorate, city, district, address, latitude, longitude,
-            report_status, priority, assigned_to, media_attachments,
-            created_at, updated_at, investigation_notes
-          ''',
-          'order': 'created_at.desc',
-        },
-      );
+      final response = await supabaseClient
+          .from('reports')
+          .select('''
+            *,
+            report_types(name)
+          ''')
+          .eq('report_status', 'pending')
+          .order('submitted_at', ascending: false);
 
-      return (response.data as List)
+      return (response as List)
           .map((json) => AdminReportModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -284,32 +265,29 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
   @override
   Future<Map<String, dynamic>> getReportStatistics() async {
     try {
-      // Get total reports
-      final totalResponse = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/reports',
-        queryParameters: {'select': 'count()'},
-      );
+      // Get total reports count using simple query and count length
+      final totalResponse = await supabaseClient.from('reports').select('id');
 
-      // Get reports by status
-      final statusResponse = await apiClient.dio.post(
-        '${ApiEndpoints.rest}/rpc/get_reports_by_status',
-      );
+      final pendingResponse = await supabaseClient
+          .from('reports')
+          .select('id')
+          .eq('report_status', 'pending');
 
-      // Get reports by type
-      final typeResponse = await apiClient.dio.post(
-        '${ApiEndpoints.rest}/rpc/get_reports_by_type',
-      );
+      final underInvestigationResponse = await supabaseClient
+          .from('reports')
+          .select('id')
+          .eq('report_status', 'under_investigation');
 
-      // Get reports by governorate
-      final governorateResponse = await apiClient.dio.post(
-        '${ApiEndpoints.rest}/rpc/get_reports_by_governorate',
-      );
+      final resolvedResponse = await supabaseClient
+          .from('reports')
+          .select('id')
+          .eq('report_status', 'resolved');
 
       return {
-        'total_reports': totalResponse.data?.length ?? 0,
-        'by_status': statusResponse.data ?? {},
-        'by_type': typeResponse.data ?? {},
-        'by_governorate': governorateResponse.data ?? {},
+        'total': (totalResponse as List).length,
+        'pending': (pendingResponse as List).length,
+        'under_investigation': (underInvestigationResponse as List).length,
+        'resolved': (resolvedResponse as List).length,
       };
     } catch (e) {
       throw Exception('Failed to get report statistics: $e');
@@ -328,7 +306,7 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
         userIds: [userId],
         title: title,
         body: body,
-        data: {'report_id': reportId, 'type': 'report_update'},
+        data: {'report_id': reportId},
         type: 'report_notification',
       );
     } catch (e) {

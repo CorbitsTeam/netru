@@ -5,95 +5,70 @@ import '../../domain/entities/dashboard_stats_entity.dart';
 class DashboardStatsCards extends StatelessWidget {
   final DashboardStatsEntity stats;
 
-  const DashboardStatsCards({Key? key, required this.stats}) : super(key: key);
+  const DashboardStatsCards({super.key, required this.stats});
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 16.w,
-      runSpacing: 16.h,
-      children: [
-        _buildStatsCard(
-          context,
-          title: 'إجمالي البلاغات',
-          value: stats.totalReports.toString(),
-          icon: Icons.report,
-          color: Colors.blue,
-          subtitle: 'جميع البلاغات المسجلة',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'البلاغات المعلقة',
-          value: stats.pendingReports.toString(),
-          icon: Icons.pending,
-          color: Colors.orange,
-          subtitle: 'في انتظار المراجعة',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'قيد التحقيق',
-          value: stats.underInvestigationReports.toString(),
-          icon: Icons.search,
-          color: Colors.purple,
-          subtitle: 'قيد التحقيق حالياً',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'البلاغات المحلولة',
-          value: stats.resolvedReports.toString(),
-          icon: Icons.check_circle,
-          color: Colors.green,
-          subtitle: 'تم حلها بنجاح',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'البلاغات المرفوضة',
-          value: stats.rejectedReports.toString(),
-          icon: Icons.cancel,
-          color: Colors.red,
-          subtitle: 'تم رفضها',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'إجمالي المستخدمين',
-          value: stats.totalUsers.toString(),
-          icon: Icons.people,
-          color: Colors.indigo,
-          subtitle: 'جميع المستخدمين',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'المصريين',
-          value: stats.citizenUsers.toString(),
-          icon: Icons.person,
-          color: Colors.teal,
-          subtitle: 'مستخدمين مصريين',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'الأجانب',
-          value: stats.foreignerUsers.toString(),
-          icon: Icons.person_outline,
-          color: Colors.cyan,
-          subtitle: 'مستخدمين أجانب',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'طلبات التحقق',
-          value: stats.pendingVerifications.toString(),
-          icon: Icons.verified_user,
-          color: Colors.amber,
-          subtitle: 'في انتظار التحقق',
-        ),
-        _buildStatsCard(
-          context,
-          title: 'الأخبار المنشورة',
-          value: stats.publishedNewsArticles.toString(),
-          icon: Icons.article,
-          color: Colors.deepPurple,
-          subtitle: 'مقالات منشورة',
-        ),
-      ],
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        childAspectRatio: 1.2,
+        crossAxisSpacing: 12.w,
+        mainAxisSpacing: 12.h,
+        children: [
+          _buildStatsCard(
+            context,
+            title: 'إجمالي البلاغات',
+            value: stats.totalReports.toString(),
+            icon: Icons.report,
+            color: Colors.blue,
+            subtitle: 'جميع البلاغات المسجلة',
+          ),
+          _buildStatsCard(
+            context,
+            title: 'البلاغات المعلقة',
+            value: stats.pendingReports.toString(),
+            icon: Icons.pending,
+            color: Colors.orange,
+            subtitle: 'في انتظار المراجعة',
+          ),
+          _buildStatsCard(
+            context,
+            title: 'قيد التحقيق',
+            value: stats.underInvestigationReports.toString(),
+            icon: Icons.search,
+            color: Colors.purple,
+            subtitle: 'قيد التحقيق حالياً',
+          ),
+          _buildStatsCard(
+            context,
+            title: 'البلاغات المحلولة',
+            value: stats.resolvedReports.toString(),
+            icon: Icons.check_circle,
+            color: Colors.green,
+            subtitle: 'تم حلها بنجاح',
+          ),
+          _buildStatsCard(
+            context,
+            title: 'البلاغات المرفوضة',
+            value: stats.rejectedReports.toString(),
+            icon: Icons.cancel,
+            color: Colors.red,
+            subtitle: 'تم رفضها',
+          ),
+          _buildStatsCard(
+            context,
+            title: 'إجمالي المستخدمين',
+            value: stats.totalUsers.toString(),
+            icon: Icons.people,
+            color: Colors.indigo,
+            subtitle: 'جميع المستخدمين',
+          ),
+        ],
+      ),
     );
   }
 
@@ -105,68 +80,48 @@ class DashboardStatsCards extends StatelessWidget {
     required Color color,
     required String subtitle,
   }) {
-    return SizedBox(
-      width: 280.w,
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[700],
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          value,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: color,
-                            fontSize: 24.sp,
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          subtitle,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Icon(icon, size: 32.sp, color: color),
-                  ),
-                ],
-              ),
-            ],
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, size: 28.sp, color: color),
+            SizedBox(height: 8.h),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 10.sp, color: Colors.grey[500]),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
@@ -176,7 +131,7 @@ class DashboardStatsCards extends StatelessWidget {
 class QuickStatsRow extends StatelessWidget {
   final DashboardStatsEntity stats;
 
-  const QuickStatsRow({Key? key, required this.stats}) : super(key: key);
+  const QuickStatsRow({super.key, required this.stats});
 
   @override
   Widget build(BuildContext context) {

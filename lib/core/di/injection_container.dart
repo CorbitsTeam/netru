@@ -95,13 +95,23 @@ import '../network/api_client.dart';
 // Admin Feature
 import '../../features/admin/data/datasources/admin_dashboard_remote_data_source.dart';
 import '../../features/admin/data/datasources/admin_auth_manager_data_source.dart';
+import '../../features/admin/data/datasources/admin_user_remote_data_source.dart';
+import '../../features/admin/data/datasources/admin_report_remote_data_source.dart';
 import '../../features/admin/data/repositories/admin_dashboard_repository_impl.dart';
 import '../../features/admin/data/repositories/admin_auth_manager_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_user_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_report_repository_impl.dart';
 import '../../features/admin/domain/repositories/admin_dashboard_repository.dart';
+import '../../features/admin/domain/repositories/admin_user_repository.dart';
+import '../../features/admin/domain/repositories/admin_report_repository.dart';
 import '../../features/admin/domain/usecases/get_dashboard_stats.dart';
 import '../../features/admin/domain/usecases/manage_auth_accounts.dart';
+import '../../features/admin/domain/usecases/manage_users.dart';
+import '../../features/admin/domain/usecases/manage_reports.dart';
+import '../../features/admin/presentation/cubit/admin_reports_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_users_cubit.dart';
 
 // ===========================
 // External Dependencies
@@ -431,10 +441,18 @@ Future<void> _initAdminDependencies() async {
   );
 
   // Admin Auth Manager data source
+  sl.registerLazySingleton<AdminAuthManagerRemoteDataSource>(
+    () => AdminAuthManagerRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      apiClient: sl<ApiClient>(),
+    ),
+  );
+
+  // Admin User data source
   sl.registerLazySingleton<AdminUserRemoteDataSource>(
     () => AdminUserRemoteDataSourceImpl(
       supabaseClient: sl<SupabaseClient>(),
-      apiClient: sl<ApiClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
     ),
   );
 
@@ -443,8 +461,14 @@ Future<void> _initAdminDependencies() async {
     () => AdminDashboardRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<AdminUserRepository>(
+    () => AdminUserRepositoryImpl(remoteDataSource: sl()),
+  );
+
   sl.registerLazySingleton<AdminAuthManagerRepository>(
-    () => AdminAuthManagerRepositoryImpl(remoteDataSource: sl()),
+    () => AdminAuthManagerRepositoryImpl(
+      remoteDataSource: sl<AdminAuthManagerRemoteDataSource>(),
+    ),
   );
 
   // Use cases - Dashboard
@@ -454,14 +478,52 @@ Future<void> _initAdminDependencies() async {
   sl.registerLazySingleton(() => GetReportsByType(sl()));
   sl.registerLazySingleton(() => GetReportsByStatus(sl()));
 
+  // Admin Reports - data source & repository
+  sl.registerLazySingleton<AdminReportRemoteDataSource>(
+    () => AdminReportRemoteDataSourceImpl(
+      supabaseClient: sl<SupabaseClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AdminReportRepository>(
+    () => AdminReportRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Admin Reports - Use cases
+  sl.registerLazySingleton(() => GetAllReports(sl()));
+  sl.registerLazySingleton(() => GetReportById(sl()));
+  sl.registerLazySingleton(() => UpdateReportStatus(sl()));
+  sl.registerLazySingleton(() => AssignReport(sl()));
+  sl.registerLazySingleton(() => VerifyReport(sl()));
+  sl.registerLazySingleton(() => AddReportComment(sl()));
+
   // Use cases - Auth Manager
   sl.registerLazySingleton(() => GetUsersWithoutAuthAccount(sl()));
   sl.registerLazySingleton(() => CreateAuthAccountForUser(sl()));
   sl.registerLazySingleton(() => CreateAuthAccountsForAllUsers(sl()));
   sl.registerLazySingleton(() => CheckUserHasAuthAccount(sl()));
 
+  // Use cases - User Management
+  sl.registerLazySingleton(() => GetAllUsers(sl()));
+  sl.registerLazySingleton(() => GetUserById(sl()));
+  sl.registerLazySingleton(() => GetUserDetailedProfile(sl()));
+  sl.registerLazySingleton(() => VerifyUser(sl()));
+  sl.registerLazySingleton(() => SuspendUser(sl()));
+
   // Cubits
   sl.registerFactory(() => AdminDashboardCubit(getDashboardStats: sl()));
+
+  sl.registerFactory(
+    () => AdminReportsCubit(
+      getAllReports: sl(),
+      getReportById: sl(),
+      updateReportStatus: sl(),
+      assignReport: sl(),
+      verifyReport: sl(),
+      addReportComment: sl(),
+    ),
+  );
 
   sl.registerFactory(
     () => AdminAuthManagerCubit(
@@ -469,6 +531,15 @@ Future<void> _initAdminDependencies() async {
       createAuthAccountForUser: sl(),
       createAuthAccountsForAllUsers: sl(),
       checkUserHasAuthAccount: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AdminUsersCubit(
+      getAllUsers: sl(),
+      verifyUser: sl(),
+      suspendUser: sl(),
+      getUserDetailedProfile: sl(),
     ),
   );
 

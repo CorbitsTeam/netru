@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RecentActivityWidget extends StatelessWidget {
   final List<ActivityItem> activities;
 
-  const RecentActivityWidget({Key? key, required this.activities})
-    : super(key: key);
+  const RecentActivityWidget({super.key, required this.activities});
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      margin: EdgeInsets.all(8.w),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -19,26 +22,37 @@ class RecentActivityWidget extends StatelessWidget {
               children: [
                 Text(
                   'النشاط الأخير',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     // Navigate to full activity log
                   },
-                  child: const Text('عرض الكل'),
+                  child: Text('عرض الكل', style: TextStyle(fontSize: 14.sp)),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             if (activities.isEmpty)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text(
-                    'لا توجد أنشطة حديثة',
-                    style: TextStyle(color: Colors.grey),
+              Container(
+                padding: EdgeInsets.all(20.w),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.history, size: 48.sp, color: Colors.grey[400]),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'لا يوجد نشاط حديث',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -47,7 +61,7 @@ class RecentActivityWidget extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: activities.length > 5 ? 5 : activities.length,
-                separatorBuilder: (context, index) => const Divider(),
+                separatorBuilder: (context, index) => Divider(height: 1.h),
                 itemBuilder: (context, index) {
                   final activity = activities[index];
                   return _buildActivityItem(context, activity);
@@ -60,51 +74,53 @@ class RecentActivityWidget extends StatelessWidget {
   }
 
   Widget _buildActivityItem(BuildContext context, ActivityItem activity) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: activity.type.color.withOpacity(0.1),
-        child: Icon(activity.type.icon, color: activity.type.color, size: 20),
-      ),
-      title: Text(
-        activity.title,
-        style: Theme.of(
-          context,
-        ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
         children: [
-          if (activity.description != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              activity.description!,
-              style: Theme.of(context).textTheme.bodySmall,
+          CircleAvatar(
+            radius: 20.r,
+            backgroundColor: activity.type.color.withOpacity(0.1),
+            child: Icon(
+              activity.type.icon,
+              color: activity.type.color,
+              size: 18.sp,
             ),
-          ],
-          const SizedBox(height: 4),
-          Text(
-            _formatTimeAgo(activity.timestamp),
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
           ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.title,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                if (activity.description != null) ...[
+                  SizedBox(height: 4.h),
+                  Text(
+                    activity.description!,
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                SizedBox(height: 4.h),
+                Text(
+                  _formatTimeAgo(activity.timestamp),
+                  style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          ),
+          if (activity.hasAction)
+            Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.grey[400]),
         ],
       ),
-      trailing:
-          activity.hasAction
-              ? IconButton(
-                icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                onPressed: () {
-                  // Handle activity action
-                },
-              )
-              : null,
-      onTap:
-          activity.hasAction
-              ? () {
-                // Handle activity tap
-              }
-              : null,
     );
   }
 
@@ -246,10 +262,10 @@ class ActivityFilter extends StatefulWidget {
   final Function(List<ActivityType>) onFilterChanged;
 
   const ActivityFilter({
-    Key? key,
+    super.key,
     required this.selectedTypes,
     required this.onFilterChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<ActivityFilter> createState() => _ActivityFilterState();

@@ -19,7 +19,6 @@ class AdminUserEntity extends Equatable {
   final DateTime? verifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final bool isActive;
   final DateTime? lastLoginAt;
   final int reportCount;
   final List<String> permissions;
@@ -43,7 +42,6 @@ class AdminUserEntity extends Equatable {
     this.verifiedAt,
     required this.createdAt,
     required this.updatedAt,
-    this.isActive = true,
     this.lastLoginAt,
     this.reportCount = 0,
     this.permissions = const [],
@@ -69,7 +67,6 @@ class AdminUserEntity extends Equatable {
     verifiedAt,
     createdAt,
     updatedAt,
-    isActive,
     lastLoginAt,
     reportCount,
     permissions,
@@ -94,7 +91,6 @@ class AdminUserEntity extends Equatable {
     DateTime? verifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
-    bool? isActive,
     DateTime? lastLoginAt,
     int? reportCount,
     List<String>? permissions,
@@ -118,7 +114,6 @@ class AdminUserEntity extends Equatable {
       verifiedAt: verifiedAt ?? this.verifiedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      isActive: isActive ?? this.isActive,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       reportCount: reportCount ?? this.reportCount,
       permissions: permissions ?? this.permissions,

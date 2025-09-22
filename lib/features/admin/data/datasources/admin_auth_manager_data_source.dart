@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/network/api_client.dart';
 
-abstract class AdminUserRemoteDataSource {
+abstract class AdminAuthManagerRemoteDataSource {
   Future<List<Map<String, dynamic>>> getUsersWithoutAuthAccount();
   Future<bool> createAuthAccountForUser({
     required String email,
@@ -12,11 +12,12 @@ abstract class AdminUserRemoteDataSource {
   Future<Map<String, dynamic>> getUserByEmail(String email);
 }
 
-class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
+class AdminAuthManagerRemoteDataSourceImpl
+    implements AdminAuthManagerRemoteDataSource {
   final SupabaseClient supabaseClient;
   final ApiClient apiClient;
 
-  AdminUserRemoteDataSourceImpl({
+  AdminAuthManagerRemoteDataSourceImpl({
     required this.supabaseClient,
     required this.apiClient,
   });
@@ -161,17 +162,6 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
   }
 
   /// إنشاء كلمة مرور افتراضية للمستخدم
-  String _generateDefaultPassword(String email, String fullName) {
-    // إنشاء كلمة مرور من أول 3 أحرف من الاسم + @ + أول 3 أحرف من الإيميل + 123
-    final namePrefix =
-        fullName.length >= 3 ? fullName.substring(0, 3) : fullName;
-    final emailPrefix = email.split('@')[0];
-    final emailPart =
-        emailPrefix.length >= 3 ? emailPrefix.substring(0, 3) : emailPrefix;
-
-    return '${namePrefix}@${emailPart}123';
-  }
-
   /// إرسال كلمة مرور افتراضية للمستخدم عبر إشعار أو إيميل
   Future<void> sendDefaultPasswordToUser({
     required String email,

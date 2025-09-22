@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/admin_user_entity.dart';
+import '../entities/user_profile_detail_entity.dart';
 import '../repositories/admin_user_repository.dart';
 
 class GetAllUsers implements UseCase<List<AdminUserEntity>, GetUsersParams> {
@@ -135,6 +136,20 @@ class GetUserLogs
   }
 }
 
+class GetUserDetailedProfile
+    implements UseCase<UserProfileDetailEntity, GetUserDetailedProfileParams> {
+  final AdminUserRepository repository;
+
+  GetUserDetailedProfile(this.repository);
+
+  @override
+  Future<Either<Failure, UserProfileDetailEntity>> call(
+    GetUserDetailedProfileParams params,
+  ) async {
+    return await repository.getUserDetailedProfile(params.userId);
+  }
+}
+
 // Parameters classes
 class GetUsersParams extends Equatable {
   final int? page;
@@ -259,4 +274,13 @@ class GetUserLogsParams extends Equatable {
 
   @override
   List<Object?> get props => [userId, startDate, endDate, limit];
+}
+
+class GetUserDetailedProfileParams extends Equatable {
+  final String userId;
+
+  const GetUserDetailedProfileParams({required this.userId});
+
+  @override
+  List<Object> get props => [userId];
 }

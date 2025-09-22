@@ -99,7 +99,7 @@ class AdminAuthManagerCubit extends Cubit<AdminAuthManagerState> {
     final emailPart =
         emailPrefix.length >= 3 ? emailPrefix.substring(0, 3) : emailPrefix;
 
-    return '${namePrefix}@${emailPart}123';
+    return '$namePrefix@${emailPart}123';
   }
 
   void resetState() {

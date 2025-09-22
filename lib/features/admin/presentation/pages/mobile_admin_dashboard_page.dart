@@ -128,12 +128,6 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-          onPressed: () {
-            // Navigate to notifications
-          },
-        ),
-        IconButton(
           icon: const Icon(Icons.refresh, color: Colors.white),
           onPressed: () {
             context.read<AdminDashboardCubit>().refreshDashboard();
@@ -310,7 +304,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
         ),
         SizedBox(height: 12.h),
         Container(
-          height: 300.h,
+          constraints: BoxConstraints(maxHeight: 600.h, minHeight: 250.h),
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,

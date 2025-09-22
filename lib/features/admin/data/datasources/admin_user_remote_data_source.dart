@@ -1,6 +1,7 @@
-import '../../../../core/network/api_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_edge_functions_service.dart';
 import '../models/admin_user_model.dart';
+import '../models/user_profile_detail_model.dart';
 
 abstract class AdminUserRemoteDataSource {
   Future<List<AdminUserModel>> getAllUsers({
@@ -43,14 +44,16 @@ abstract class AdminUserRemoteDataSource {
     String? governorate,
     String? city,
   });
+
+  Future<UserProfileDetailModel> getUserDetailedProfile(String userId);
 }
 
 class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
-  final ApiClient apiClient;
+  final SupabaseClient supabaseClient;
   final SupabaseEdgeFunctionsService edgeFunctionsService;
 
   AdminUserRemoteDataSourceImpl({
-    required this.apiClient,
+    required this.supabaseClient,
     required this.edgeFunctionsService,
   });
 
@@ -63,38 +66,44 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
     String? verificationStatus,
   }) async {
     try {
-      final queryParams = <String, dynamic>{
-        'select': '''
-          id, email, full_name, national_id, passport_number, user_type, role, 
-          phone, governorate, city, district, address, nationality, profile_image,
-          verification_status, verified_at, created_at, updated_at
-        ''',
-      };
+      PostgrestFilterBuilder<PostgrestList> query = supabaseClient
+          .from('users')
+          .select('''
+            id, email, full_name, national_id, passport_number, user_type, role, 
+            phone, governorate, city, district, address, nationality, profile_image,
+            verification_status, verified_at, created_at, updated_at
+          ''');
 
-      if (page != null && limit != null) {
-        queryParams['offset'] = page * limit;
-        queryParams['limit'] = limit;
-      }
-
+      // Apply filters
       if (userType != null) {
-        queryParams['user_type'] = 'eq.$userType';
+        query = query.eq('user_type', userType);
       }
 
       if (verificationStatus != null) {
-        queryParams['verification_status'] = 'eq.$verificationStatus';
+        query = query.eq('verification_status', verificationStatus);
       }
 
       if (search != null && search.isNotEmpty) {
-        queryParams['or'] =
-            'full_name.ilike.*$search*,email.ilike.*$search*,national_id.ilike.*$search*';
+        query = query.or(
+          'full_name.ilike.%$search%,email.ilike.%$search%,national_id.ilike.%$search%',
+        );
       }
 
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: queryParams,
+      // Apply order and pagination correctly
+      PostgrestTransformBuilder<PostgrestList> finalQuery = query.order(
+        'created_at',
+        ascending: false,
       );
 
-      return (response.data as List)
+      if (page != null && limit != null) {
+        final start = page * limit;
+        final end = start + limit - 1;
+        finalQuery = finalQuery.range(start, end);
+      }
+
+      final response = await finalQuery;
+
+      return (response as List)
           .map((json) => AdminUserModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -105,24 +114,18 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
   @override
   Future<AdminUserModel> getUserById(String userId) async {
     try {
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: {
-          'id': 'eq.$userId',
-          'select': '''
+      final response =
+          await supabaseClient
+              .from('users')
+              .select('''
             id, email, full_name, national_id, passport_number, user_type, role, 
             phone, governorate, city, district, address, nationality, profile_image,
             verification_status, verified_at, created_at, updated_at
-          ''',
-        },
-      );
+          ''')
+              .eq('id', userId)
+              .single();
 
-      final users = response.data as List;
-      if (users.isEmpty) {
-        throw Exception('User not found');
-      }
-
-      return AdminUserModel.fromJson(users.first);
+      return AdminUserModel.fromJson(response);
     } catch (e) {
       throw Exception('Failed to fetch user: $e');
     }
@@ -137,18 +140,10 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
       final updateData = Map<String, dynamic>.from(updates);
       updateData['updated_at'] = DateTime.now().toIso8601String();
 
-      final response = await apiClient.dio.patch(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: {'id': 'eq.$userId'},
-        data: updateData,
-      );
+      await supabaseClient.from('users').update(updateData).eq('id', userId);
 
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        // Fetch updated user
-        return await getUserById(userId);
-      } else {
-        throw Exception('Failed to update user');
-      }
+      // Return updated user
+      return await getUserById(userId);
     } catch (e) {
       throw Exception('Failed to update user: $e');
     }
@@ -157,14 +152,7 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
   @override
   Future<void> deleteUser(String userId) async {
     try {
-      final response = await apiClient.dio.delete(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: {'id': 'eq.$userId'},
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 204) {
-        throw Exception('Failed to delete user');
-      }
+      await supabaseClient.from('users').delete().eq('id', userId);
     } catch (e) {
       throw Exception('Failed to delete user: $e');
     }
@@ -186,22 +174,15 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
         updateData['verified_at'] = DateTime.now().toIso8601String();
       }
 
-      await apiClient.dio.patch(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: {'id': 'eq.$userId'},
-        data: updateData,
-      );
+      await supabaseClient.from('users').update(updateData).eq('id', userId);
 
       // Log the verification action
-      await apiClient.dio.post(
-        '${ApiEndpoints.rest}/user_logs',
-        data: {
-          'user_id': userId,
-          'action':
-              'User verification status changed to ${approved ? "verified" : "rejected"}${notes != null ? " - $notes" : ""}',
-          'created_at': DateTime.now().toIso8601String(),
-        },
-      );
+      await supabaseClient.from('user_logs').insert({
+        'user_id': userId,
+        'action':
+            'User verification status changed to ${approved ? "verified" : "rejected"}${notes != null ? " - $notes" : ""}',
+        'created_at': DateTime.now().toIso8601String(),
+      });
 
       // Return updated user
       return await getUserById(userId);
@@ -213,20 +194,17 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
   @override
   Future<List<AdminUserModel>> getPendingVerifications() async {
     try {
-      final response = await apiClient.dio.get(
-        '${ApiEndpoints.rest}/users',
-        queryParameters: {
-          'verification_status': 'eq.pending',
-          'select': '''
+      final response = await supabaseClient
+          .from('users')
+          .select('''
             id, email, full_name, national_id, passport_number, user_type, role, 
             phone, governorate, city, district, address, nationality, profile_image,
             verification_status, verified_at, created_at, updated_at
-          ''',
-          'order': 'created_at.desc',
-        },
-      );
+          ''')
+          .eq('verification_status', 'pending')
+          .order('created_at', ascending: false);
 
-      return (response.data as List)
+      return (response as List)
           .map((json) => AdminUserModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -275,6 +253,119 @@ class AdminUserRemoteDataSourceImpl implements AdminUserRemoteDataSource {
       );
     } catch (e) {
       throw Exception('Failed to send notification to user group: $e');
+    }
+  }
+
+  @override
+  Future<UserProfileDetailModel> getUserDetailedProfile(String userId) async {
+    try {
+      // Get user basic data
+      final userResponse =
+          await supabaseClient
+              .from('users')
+              .select('''
+            id, email, full_name, national_id, passport_number, user_type, role, 
+            phone, governorate, city, district, address, nationality, profile_image,
+            verification_status, verified_at, created_at, updated_at
+          ''')
+              .eq('id', userId)
+              .single();
+
+      // Get identity documents
+      final documentsResponse = await supabaseClient
+          .from('identity_documents')
+          .select('*')
+          .eq('user_id', userId);
+
+      // Get reports summary with counts
+      final reportsResponse = await supabaseClient
+          .from('reports')
+          .select('''
+            id, report_details, report_status, priority_level, submitted_at, updated_at,
+            report_types(name),
+            assigned_to:users!reports_assigned_to_fkey(full_name)
+          ''')
+          .eq('user_id', userId)
+          .order('submitted_at', ascending: false)
+          .limit(10);
+
+      // Get reports counts
+      final totalReportsCountResponse =
+          await supabaseClient
+              .from('reports')
+              .select('id')
+              .eq('user_id', userId)
+              .count();
+
+      final pendingReportsCountResponse =
+          await supabaseClient
+              .from('reports')
+              .select('id')
+              .eq('user_id', userId)
+              .inFilter('report_status', [
+                'pending',
+                'under_investigation',
+                'received',
+              ])
+              .count();
+
+      final resolvedReportsCountResponse =
+          await supabaseClient
+              .from('reports')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('report_status', 'resolved')
+              .count();
+
+      final totalReportsCount = totalReportsCountResponse.count;
+      final pendingReportsCount = pendingReportsCountResponse.count;
+      final resolvedReportsCount = resolvedReportsCountResponse.count;
+
+      // Build the detailed profile
+      final Map<String, dynamic> profileData = Map<String, dynamic>.from(
+        userResponse,
+      );
+
+      profileData['identity_documents'] = documentsResponse;
+      profileData['reports'] =
+          (reportsResponse as List).map((report) {
+            final reportDetails = report['report_details']?.toString() ?? '';
+            return {
+              'id': report['id'],
+              'title':
+                  reportDetails.length > 50
+                      ? '${reportDetails.substring(0, 50)}...'
+                      : reportDetails.isEmpty
+                      ? 'بلاغ'
+                      : reportDetails,
+              'description': reportDetails,
+              'status': report['report_status'] ?? 'pending',
+              'priority': report['priority_level'] ?? 'medium',
+              'category_name': report['report_types']?['name'],
+              'governorate': null, // Remove governorate from reports
+              'city': null, // Remove city from reports
+              'created_at': report['submitted_at'],
+              'updated_at': report['updated_at'],
+              'assigned_to_name': report['assigned_to']?['full_name'],
+              'media_count': 0, // You might want to count media separately
+              'comments_count':
+                  0, // You might want to count comments separately
+            };
+          }).toList();
+
+      profileData['total_reports_count'] = totalReportsCount;
+      profileData['pending_reports_count'] = pendingReportsCount;
+      profileData['resolved_reports_count'] = resolvedReportsCount;
+      profileData['permissions'] = []; // Add logic to get permissions if needed
+      profileData['activity_stats'] = {
+        'total_reports': totalReportsCount,
+        'pending_reports': pendingReportsCount,
+        'resolved_reports': resolvedReportsCount,
+      };
+
+      return UserProfileDetailModel.fromJson(profileData);
+    } catch (e) {
+      throw Exception('Failed to get user detailed profile: $e');
     }
   }
 }

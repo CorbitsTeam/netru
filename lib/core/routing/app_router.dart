@@ -9,12 +9,13 @@ import '../di/injection_container.dart';
 import '../../features/auth/presentation/cubit/signup_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
+import '../../features/admin/presentation/pages/admin_report_details_page.dart';
 import '../../features/admin/presentation/pages/admin_users_page.dart';
 import '../../features/admin/presentation/pages/admin_notifications_page.dart';
 import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
+import '../../features/admin/domain/entities/admin_report_entity.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
 import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
@@ -107,6 +108,12 @@ class AppRouter {
         );
       case Routes.adminReports:
         return _createRoute(const AdminReportsPage());
+      case Routes.adminReportDetails:
+        final report = settings.arguments as AdminReportEntity?;
+        if (report != null) {
+          return _createRoute(AdminReportDetailsPage(report: report));
+        }
+        return null;
       case Routes.adminUsers:
         return _createRoute(const AdminUsersPage());
       case Routes.adminNotifications:

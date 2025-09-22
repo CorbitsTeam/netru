@@ -5,8 +5,7 @@ class MobileAdminDrawer extends StatelessWidget {
   final String? selectedRoute;
   final Function(String)? onRouteSelected;
 
-  const MobileAdminDrawer({Key? key, this.selectedRoute, this.onRouteSelected})
-    : super(key: key);
+  const MobileAdminDrawer({super.key, this.selectedRoute, this.onRouteSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +261,7 @@ class MobileAdminDrawer extends StatelessWidget {
       builder:
           (context) => AlertDialog(
             title: const Text('قريباً'),
-            content: Text('هذه الميزة قيد التطوير وستكون متاحة قريباً.'),
+            content: const Text('هذه الميزة قيد التطوير وستكون متاحة قريباً.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),

@@ -1,348 +1,180 @@
 import 'package:flutter/material.dart';
-import '../widgets/admin_sidebar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../domain/entities/admin_user_entity.dart';
+import '../cubit/admin_users_cubit.dart';
+import '../widgets/mobile_admin_drawer.dart';
+import '../widgets/user_avatar_widget.dart';
+import 'user_details_page.dart';
 
 class AdminUsersPage extends StatefulWidget {
-  const AdminUsersPage({Key? key}) : super(key: key);
+  const AdminUsersPage({super.key});
 
   @override
   State<AdminUsersPage> createState() => _AdminUsersPageState();
 }
 
 class _AdminUsersPageState extends State<AdminUsersPage> {
-  String? _selectedUserType;
-  String? _selectedVerificationStatus;
-  String? _selectedGovernorate;
-  DateTime? _startDate;
-  DateTime? _endDate;
+  late AdminUsersCubit _adminUsersCubit;
+  List<AdminUserEntity> _filteredUsers = [];
+  String _searchQuery = '';
+  AdminUserType? _selectedUserType;
+  VerificationStatus? _selectedVerificationStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _adminUsersCubit = GetIt.instance<AdminUsersCubit>();
+    _adminUsersCubit.loadUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          const AdminSidebar(selectedRoute: '/admin/users'),
-          Expanded(
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildFilters(),
-                Expanded(child: _buildUsersContent()),
-              ],
+    return BlocProvider<AdminUsersCubit>(
+      create: (context) => _adminUsersCubit,
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 1,
+          title: Text(
+            'إدارة المستخدمين',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'إدارة المستخدمين',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-                  Text(
-                    'عرض وإدارة جميع المستخدمين المسجلين',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                _showBulkNotificationDialog();
-              },
-              icon: const Icon(Icons.send),
-              label: const Text('إرسال إشعار جماعي'),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton.icon(
-              onPressed: () {
-                _exportUsers();
-              },
-              icon: const Icon(Icons.download),
-              label: const Text('تصدير'),
+          iconTheme: const IconThemeData(color: Colors.black87),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.filter_list, size: 24.sp),
+              onPressed: _showFilterDialog,
+              tooltip: 'تصفية',
             ),
           ],
+        ),
+        drawer: const MobileAdminDrawer(selectedRoute: '/admin/users'),
+        body: BlocListener<AdminUsersCubit, AdminUsersState>(
+          listener: (context, state) {
+            if (state is AdminUsersVerified) {
+              _showSnackBar('تم توثيق المستخدم بنجاح', Colors.green);
+            } else if (state is AdminUsersSuspended) {
+              _showSnackBar('تم تحديث حالة المستخدم بنجاح', Colors.orange);
+            } else if (state is AdminUsersError) {
+              _showSnackBar(state.message, Colors.red);
+            }
+          },
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await _adminUsersCubit.loadUsers();
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [_buildSummaryCards(), _buildUsersContent()],
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFilters() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.grey[50],
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: 'البحث في المستخدمين...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    // Search logic will be implemented here
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'نوع المستخدم',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedUserType,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'citizen',
-                      child: Text('مواطن مصري'),
-                    ),
-                    DropdownMenuItem(value: 'foreigner', child: Text('أجنبي')),
-                    DropdownMenuItem(value: 'admin', child: Text('مدير')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedUserType = value;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'حالة التحقق',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedVerificationStatus,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'pending',
-                      child: Text('في الانتظار'),
-                    ),
-                    DropdownMenuItem(value: 'verified', child: Text('محقق')),
-                    DropdownMenuItem(value: 'rejected', child: Text('مرفوض')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedVerificationStatus = value;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'المحافظة',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedGovernorate,
-                  items: const [
-                    DropdownMenuItem(value: 'cairo', child: Text('القاهرة')),
-                    DropdownMenuItem(value: 'giza', child: Text('الجيزة')),
-                    DropdownMenuItem(
-                      value: 'alexandria',
-                      child: Text('الإسكندرية'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGovernorate = value;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _selectDateRange(),
-                  icon: const Icon(Icons.date_range),
-                  label: Text(
-                    _startDate != null && _endDate != null
-                        ? '${_startDate!.day}/${_startDate!.month} - ${_endDate!.day}/${_endDate!.month}'
-                        : 'اختر فترة التسجيل',
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton(
-                onPressed: _clearFilters,
-                child: const Text('مسح المرشحات'),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: _applyFilters,
-                child: const Text('تطبيق'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildSummaryCards() {
+    return BlocBuilder<AdminUsersCubit, AdminUsersState>(
+      builder: (context, state) {
+        if (state is AdminUsersLoaded) {
+          final users = state.users;
+          final totalUsers = users.length;
+          final verifiedUsers =
+              users
+                  .where(
+                    (u) => u.verificationStatus == VerificationStatus.verified,
+                  )
+                  .length;
+          final pendingUsers =
+              users
+                  .where(
+                    (u) => u.verificationStatus == VerificationStatus.pending,
+                  )
+                  .length;
+          final citizenUsers =
+              users.where((u) => u.userType == AdminUserType.citizen).length;
 
-  Widget _buildUsersContent() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Summary Cards
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCard(
+          return Container(
+            padding: EdgeInsets.all(16.w),
+            child: GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              children: [
+                _buildSummaryCard(
                   'إجمالي المستخدمين',
-                  '2,567',
+                  totalUsers.toString(),
                   Icons.people,
                   Colors.blue,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  'مواطنين',
-                  '2,234',
-                  Icons.person,
+                _buildSummaryCard(
+                  'موثقين',
+                  verifiedUsers.toString(),
+                  Icons.verified_user,
                   Colors.green,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  'أجانب',
-                  '333',
-                  Icons.person_outline,
+                _buildSummaryCard(
+                  'في الانتظار',
+                  pendingUsers.toString(),
+                  Icons.pending,
                   Colors.orange,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  'طلبات التحقق',
-                  '45',
-                  Icons.verified_user,
+                _buildSummaryCard(
+                  'مواطنين',
+                  citizenUsers.toString(),
+                  Icons.flag,
                   Colors.purple,
                 ),
+              ],
+            ),
+          );
+        }
+        return Container(
+          padding: EdgeInsets.all(16.w),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            childAspectRatio: 1.5,
+            crossAxisSpacing: 12.w,
+            mainAxisSpacing: 12.h,
+            children: [
+              _buildSummaryCard(
+                'إجمالي المستخدمين',
+                '0',
+                Icons.people,
+                Colors.blue,
               ),
+              _buildSummaryCard(
+                'موثقين',
+                '0',
+                Icons.verified_user,
+                Colors.green,
+              ),
+              _buildSummaryCard(
+                'في الانتظار',
+                '0',
+                Icons.pending,
+                Colors.orange,
+              ),
+              _buildSummaryCard('مواطنين', '0', Icons.flag, Colors.purple),
             ],
           ),
-
-          const SizedBox(height: 24),
-
-          // Users Table
-          Expanded(
-            child: Card(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey[200]!),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Checkbox(value: false, onChanged: (value) {}),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          flex: 2,
-                          child: Text(
-                            'الاسم والبريد',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            'النوع',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            'المحافظة',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            'حالة التحقق',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            'تاريخ التسجيل',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            'البلاغات',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 120,
-                          child: Text(
-                            'الإجراءات',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: 15, // Replace with actual data
-                      itemBuilder: (context, index) {
-                        return _buildUserRow(index);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -353,34 +185,310 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     Color color,
   ) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
+                Icon(icon, color: color, size: 24.sp),
+                const Spacer(),
                 Text(
                   value,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: TextStyle(
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
                 ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsersContent() {
+    return BlocBuilder<AdminUsersCubit, AdminUsersState>(
+      builder: (context, state) {
+        if (state is AdminUsersLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
+        } else if (state is AdminUsersError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64.sp, color: AppColors.error),
+                SizedBox(height: 16.h),
                 Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  'حدث خطأ في تحميل البيانات',
+                  style: TextStyle(fontSize: 16.sp, color: AppColors.error),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  state.message,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24.h),
+                ElevatedButton(
+                  onPressed: () => _adminUsersCubit.loadUsers(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                  ),
+                  child: Text(
+                    'إعادة المحاولة',
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else if (state is AdminUsersLoaded) {
+          _filteredUsers = _filterUsers(state.users);
+
+          return Container(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                _buildSearchBar(),
+                SizedBox(height: 16.h),
+                _filteredUsers.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      primary: false,
+                      itemCount: _filteredUsers.length,
+                      itemBuilder: (context, index) {
+                        final user = _filteredUsers[index];
+                        return _buildUserCard(user, index);
+                      },
+                    ),
+              ],
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'البحث عن مستخدم...',
+          hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14.sp),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 20.sp),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 12.h,
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.people_outline, size: 64.sp, color: Colors.grey[400]),
+          SizedBox(height: 16.h),
+          Text(
+            'لا توجد بيانات مستخدمين',
+            style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserCard(AdminUserEntity user, int index) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 12.h),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                UserAvatarWidget(
+                  imageUrl: user.profileImage,
+                  userName: user.fullName,
+                  radius: 25,
+                  backgroundColor: _getUserTypeColor(
+                    user.userType,
+                  ).withOpacity(0.1),
+                  textColor: _getUserTypeColor(user.userType),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.fullName,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        user.email,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+                  onSelected: (value) => _handleUserAction(value, user),
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'view',
+                          child: Row(
+                            children: [
+                              Icon(Icons.visibility, color: Colors.blue),
+                              SizedBox(width: 8),
+                              Text('عرض'),
+                            ],
+                          ),
+                        ),
+                        // Show verify option only for non-verified users
+                        if (user.verificationStatus !=
+                            VerificationStatus.verified)
+                          const PopupMenuItem(
+                            value: 'verify',
+                            child: Row(
+                              children: [
+                                Icon(Icons.verified, color: Colors.green),
+                                SizedBox(width: 8),
+                                Text('توثيق'),
+                              ],
+                            ),
+                          ),
+                        // Show suspend option for verified users
+                        if (user.verificationStatus ==
+                            VerificationStatus.verified)
+                          const PopupMenuItem(
+                            value: 'suspend',
+                            child: Row(
+                              children: [
+                                Icon(Icons.block, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('إيقاف الحساب'),
+                              ],
+                            ),
+                          ),
+                      ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                _buildStatusChip(
+                  _getUserTypeText(user.userType),
+                  _getUserTypeColor(user.userType),
+                ),
+                SizedBox(width: 8.w),
+                _buildStatusChip(
+                  _getVerificationStatusText(user.verificationStatus),
+                  _getVerificationStatusColor(user.verificationStatus),
+                ),
+              ],
+            ),
+            if (user.phone?.isNotEmpty == true) ...[
+              SizedBox(height: 8.h),
+              Row(
+                children: [
+                  Icon(Icons.phone, size: 16.sp, color: Colors.grey[600]),
+                  SizedBox(width: 4.w),
+                  Text(
+                    user.phone!,
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ],
+            if (user.governorate?.isNotEmpty == true) ...[
+              SizedBox(height: 4.h),
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 16.sp, color: Colors.grey[600]),
+                  SizedBox(width: 4.w),
+                  Text(
+                    user.governorate!,
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ],
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                Icon(Icons.date_range, size: 16.sp, color: Colors.grey[600]),
+                SizedBox(width: 4.w),
+                Text(
+                  'تاريخ التسجيل: ${_formatDate(user.createdAt)}',
+                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -390,330 +498,271 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     );
   }
 
-  Widget _buildUserRow(int index) {
-    final isEven = index % 2 == 0;
-    final verificationStatus = ['pending', 'verified', 'rejected'][index % 3];
-    final userType = ['citizen', 'foreigner', 'admin'][index % 3];
-
+  Widget _buildStatusChip(String value, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isEven ? Colors.grey[25] : Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Row(
-        children: [
-          Checkbox(value: false, onChanged: (value) {}),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[300],
-                  child: Text('ص${index + 1}'),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'مستخدم رقم ${index + 1}',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        'user${index + 1}@example.com',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getUserTypeColor(userType).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _getUserTypeLabel(userType),
-                style: TextStyle(
-                  color: _getUserTypeColor(userType),
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          const Expanded(child: Text('القاهرة')),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getVerificationColor(
-                  verificationStatus,
-                ).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _getVerificationLabel(verificationStatus),
-                style: TextStyle(
-                  color: _getVerificationColor(verificationStatus),
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          const Expanded(child: Text('2024/01/15')),
-          Expanded(
-            child: Text(
-              '${(index + 1) * 3}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(
-            width: 120,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.visibility, size: 16),
-                  onPressed: () => _viewUser(index),
-                  tooltip: 'عرض',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 16),
-                  onPressed: () => _editUser(index),
-                  tooltip: 'تعديل',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.verified_user, size: 16),
-                  onPressed: () => _verifyUser(index),
-                  tooltip: 'تحقق',
-                ),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, size: 16),
-                  onSelected: (value) => _handleUserAction(index, value),
-                  itemBuilder:
-                      (context) => [
-                        const PopupMenuItem(
-                          value: 'send_notification',
-                          child: Text('إرسال إشعار'),
-                        ),
-                        const PopupMenuItem(
-                          value: 'suspend',
-                          child: Text('إيقاف'),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text('حذف'),
-                        ),
-                      ],
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: Text(
+        value,
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: color,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
 
-  Color _getUserTypeColor(String type) {
-    switch (type) {
-      case 'citizen':
+  String _getUserTypeText(AdminUserType userType) {
+    return userType.arabicName;
+  }
+
+  Color _getUserTypeColor(AdminUserType userType) {
+    switch (userType) {
+      case AdminUserType.citizen:
+        return Colors.blue;
+      case AdminUserType.foreigner:
         return Colors.green;
-      case 'foreigner':
-        return Colors.orange;
-      case 'admin':
+      case AdminUserType.admin:
         return Colors.purple;
-      default:
-        return Colors.grey;
     }
   }
 
-  String _getUserTypeLabel(String type) {
-    switch (type) {
-      case 'citizen':
-        return 'مواطن';
-      case 'foreigner':
-        return 'أجنبي';
-      case 'admin':
-        return 'مدير';
-      default:
-        return 'غير محدد';
-    }
-  }
-
-  Color _getVerificationColor(String status) {
+  String _getVerificationStatusText(VerificationStatus status) {
     switch (status) {
-      case 'verified':
-        return Colors.green;
-      case 'pending':
-        return Colors.orange;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getVerificationLabel(String status) {
-    switch (status) {
-      case 'verified':
-        return 'محقق';
-      case 'pending':
-        return 'معلق';
-      case 'rejected':
+      case VerificationStatus.verified:
+        return 'موثق';
+      case VerificationStatus.pending:
+        return 'قيد المراجعة';
+      case VerificationStatus.rejected:
         return 'مرفوض';
-      default:
-        return 'غير محدد';
+      case VerificationStatus.unverified:
+        return 'غير موثق';
     }
   }
 
-  void _selectDateRange() async {
-    final DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-      initialDateRange:
-          _startDate != null && _endDate != null
-              ? DateTimeRange(start: _startDate!, end: _endDate!)
-              : null,
-    );
-
-    if (picked != null) {
-      setState(() {
-        _startDate = picked.start;
-        _endDate = picked.end;
-      });
+  Color _getVerificationStatusColor(VerificationStatus status) {
+    switch (status) {
+      case VerificationStatus.verified:
+        return Colors.green;
+      case VerificationStatus.pending:
+        return Colors.orange;
+      case VerificationStatus.rejected:
+        return Colors.red;
+      case VerificationStatus.unverified:
+        return Colors.grey;
     }
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  List<AdminUserEntity> _filterUsers(List<AdminUserEntity> users) {
+    return users.where((user) {
+      final matchesSearch =
+          _searchQuery.isEmpty ||
+          user.fullName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          (user.phone?.contains(_searchQuery) == true);
+
+      final matchesUserType =
+          _selectedUserType == null || user.userType == _selectedUserType;
+
+      final matchesVerification =
+          _selectedVerificationStatus == null ||
+          user.verificationStatus == _selectedVerificationStatus;
+
+      return matchesSearch && matchesUserType && matchesVerification;
+    }).toList();
+  }
+
+  void _showFilterDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder:
+          (context) => Container(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'تصفية المستخدمين',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20.h),
+                _buildFilterItem(
+                  'نوع المستخدم',
+                  _selectedUserType?.arabicName,
+                  AdminUserType.values.map((e) => e.arabicName).toList(),
+                ),
+                _buildFilterItem(
+                  'حالة التوثيق',
+                  _selectedVerificationStatus != null
+                      ? _getVerificationStatusText(_selectedVerificationStatus!)
+                      : null,
+                  VerificationStatus.values
+                      .map((e) => _getVerificationStatusText(e))
+                      .toList(),
+                ),
+                SizedBox(height: 20.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _clearFilters,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          foregroundColor: Colors.black87,
+                        ),
+                        child: const Text('إعادة تعيين'),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _applyFilters,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                        ),
+                        child: const Text('تطبيق'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+    );
+  }
+
+  Widget _buildFilterItem(String title, String? value, List<String> options) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+        ),
+        SizedBox(height: 8.h),
+        DropdownButtonFormField<String>(
+          value: value,
+          hint: Text('اختر $title'),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 8.h,
+            ),
+          ),
+          items:
+              options
+                  .map(
+                    (option) =>
+                        DropdownMenuItem(value: option, child: Text(option)),
+                  )
+                  .toList(),
+          onChanged: (newValue) {
+            setState(() {
+              if (title == 'نوع المستخدم') {
+                _selectedUserType =
+                    newValue != null
+                        ? AdminUserType.values.firstWhere(
+                          (e) => e.arabicName == newValue,
+                        )
+                        : null;
+              } else if (title == 'حالة التوثيق') {
+                _selectedVerificationStatus =
+                    newValue != null
+                        ? VerificationStatus.values.firstWhere(
+                          (e) => _getVerificationStatusText(e) == newValue,
+                        )
+                        : null;
+              }
+            });
+          },
+        ),
+        SizedBox(height: 16.h),
+      ],
+    );
   }
 
   void _clearFilters() {
     setState(() {
       _selectedUserType = null;
       _selectedVerificationStatus = null;
-      _selectedGovernorate = null;
-      _startDate = null;
-      _endDate = null;
     });
+    Navigator.pop(context);
   }
 
   void _applyFilters() {
-    // Apply filters logic
-    print('Applying filters...');
-  }
-
-  void _showBulkNotificationDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('إرسال إشعار جماعي'),
-            content: SizedBox(
-              width: 400,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'المجموعة المستهدفة',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'all',
-                        child: Text('جميع المستخدمين'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'citizens',
-                        child: Text('المواطنين فقط'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'foreigners',
-                        child: Text('الأجانب فقط'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'verified',
-                        child: Text('المحققين فقط'),
-                      ),
-                    ],
-                    onChanged: (value) {},
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'عنوان الإشعار',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'محتوى الإشعار',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم إرسال الإشعار بنجاح')),
-                  );
-                },
-                child: const Text('إرسال'),
-              ),
-            ],
-          ),
-    );
+    setState(() {});
+    Navigator.pop(context);
   }
 
   void _exportUsers() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('جاري تصدير بيانات المستخدمين...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('جاري تصدير المستخدمين...')));
   }
 
-  void _viewUser(int index) {
-    // Navigate to user details
-  }
-
-  void _editUser(int index) {
-    // Navigate to edit user
-  }
-
-  void _verifyUser(int index) {
+  void _showBulkActionsDialog() {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('تحقق من المستخدم'),
+            title: const Text('العمليات المجمعة'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('هل تريد الموافقة على تحقق هذا المستخدم؟'),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'ملاحظات (اختياري)',
-                    border: OutlineInputBorder(),
+                ListTile(
+                  leading: const Icon(Icons.verified_user, color: Colors.green),
+                  title: const Text('توثيق المستخدمين المحددين'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _bulkVerifyUsers();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.email, color: Colors.blue),
+                  title: const Text('إرسال إشعار جماعي'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _sendBulkNotification();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.file_download,
+                    color: Colors.orange,
                   ),
-                  maxLines: 2,
+                  title: const Text('تصدير البيانات'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _exportUsers();
+                  },
                 ),
               ],
             ),
@@ -722,136 +771,62 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('إلغاء'),
               ),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم رفض التحقق')),
-                  );
-                },
-                child: const Text('رفض'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم الموافقة على التحقق')),
-                  );
-                },
-                child: const Text('موافقة'),
-              ),
             ],
           ),
     );
   }
 
-  void _handleUserAction(int index, String action) {
+  void _handleUserAction(String action, AdminUserEntity user) {
     switch (action) {
-      case 'send_notification':
-        _showSendNotificationDialog(index);
+      case 'view':
+        _viewUser(user);
+        break;
+      case 'verify':
+        _adminUsersCubit.verifyUserById(user.id, VerificationStatus.verified);
+        // The success message will be shown through BlocListener
         break;
       case 'suspend':
-        _showSuspendUserDialog(index);
-        break;
-      case 'delete':
-        _showDeleteUserDialog(index);
+        _showSuspendDialog(user);
         break;
     }
   }
 
-  void _showSendNotificationDialog(int userIndex) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('إرسال إشعار'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'عنوان الإشعار',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'محتوى الإشعار',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم إرسال الإشعار')),
-                  );
-                },
-                child: const Text('إرسال'),
-              ),
-            ],
-          ),
+  void _viewUser(AdminUserEntity user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UserDetailsPage(user: user)),
     );
   }
 
-  void _showSuspendUserDialog(int userIndex) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('إيقاف المستخدم'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('هل أنت متأكد من إيقاف هذا المستخدم؟'),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'سبب الإيقاف',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 2,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم إيقاف المستخدم')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                child: const Text('إيقاف'),
-              ),
-            ],
-          ),
+  void _bulkVerifyUsers() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('جاري توثيق المستخدمين المحددين...')),
     );
   }
 
-  void _showDeleteUserDialog(int userIndex) {
+  void _sendBulkNotification() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('جاري إرسال الإشعار الجماعي...')),
+    );
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showSuspendDialog(AdminUserEntity user) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('حذف المستخدم'),
-            content: const Text(
-              'هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.',
-            ),
+            title: const Text('إيقاف الحساب'),
+            content: Text('هل أنت متأكد من إيقاف حساب ${user.fullName}؟'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -860,15 +835,26 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم حذف المستخدم')),
+                  _adminUsersCubit.suspendUserById(
+                    user.id,
+                    true,
+                    reason: 'تم إيقاف الحساب من قبل الإدارة',
                   );
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('حذف'),
+                child: const Text(
+                  'إيقاف',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
     );
+  }
+
+  @override
+  void dispose() {
+    _adminUsersCubit.close();
+    super.dispose();
   }
 }

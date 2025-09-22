@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/admin_user_entity.dart';
+import '../entities/user_profile_detail_entity.dart';
 
 abstract class AdminUserRepository {
   Future<Either<Failure, List<AdminUserEntity>>> getAllUsers({
@@ -51,4 +52,8 @@ abstract class AdminUserRepository {
     DateTime? endDate,
     int? limit,
   });
+
+  Future<Either<Failure, UserProfileDetailEntity>> getUserDetailedProfile(
+    String userId,
+  );
 }

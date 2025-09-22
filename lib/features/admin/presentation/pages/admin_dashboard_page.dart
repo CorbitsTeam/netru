@@ -1,2 +1,2 @@
-// This file exports the enhanced admin dashboard page
-export 'admin_dashboard_page_enhanced.dart';
+// This file exports the mobile admin dashboard page
+export 'mobile_admin_dashboard_page.dart';

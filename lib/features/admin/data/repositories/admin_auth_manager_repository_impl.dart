@@ -4,7 +4,7 @@ import '../../domain/usecases/manage_auth_accounts.dart';
 import '../datasources/admin_auth_manager_data_source.dart';
 
 class AdminAuthManagerRepositoryImpl implements AdminAuthManagerRepository {
-  final AdminUserRemoteDataSource remoteDataSource;
+  final AdminAuthManagerRemoteDataSource remoteDataSource;
 
   AdminAuthManagerRepositoryImpl({required this.remoteDataSource});
 
@@ -109,6 +109,6 @@ class AdminAuthManagerRepositoryImpl implements AdminAuthManagerRepository {
     final emailPart =
         emailPrefix.length >= 3 ? emailPrefix.substring(0, 3) : emailPrefix;
 
-    return '${namePrefix}@${emailPart}123';
+    return '$namePrefix@${emailPart}123';
   }
 }

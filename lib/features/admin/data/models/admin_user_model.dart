@@ -20,7 +20,6 @@ class AdminUserModel extends AdminUserEntity {
     super.verifiedAt,
     required super.createdAt,
     required super.updatedAt,
-    super.isActive = true,
     super.lastLoginAt,
     super.reportCount = 0,
     super.permissions = const [],
@@ -49,7 +48,6 @@ class AdminUserModel extends AdminUserEntity {
               : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      isActive: json['is_active'] ?? true,
       lastLoginAt:
           json['last_login_at'] != null
               ? DateTime.parse(json['last_login_at'])
@@ -79,7 +77,6 @@ class AdminUserModel extends AdminUserEntity {
       'verified_at': verifiedAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
-      'is_active': isActive,
       'last_login_at': lastLoginAt?.toIso8601String(),
       'report_count': reportCount,
       'permissions': permissions,
