@@ -14,10 +14,12 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreen> createState() =>
+      _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState
+    extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
@@ -36,25 +38,42 @@ class _SplashScreenState extends State<SplashScreen>
   void _initializeAnimations() {
     // Logo animation controller
     _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(
+        milliseconds: 1500,
+      ),
       vsync: this,
     );
 
     // Text animation controller
     _textController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(
+        milliseconds: 1000,
+      ),
       vsync: this,
     );
 
     // Logo animations
-    _logoScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
-    );
-
-    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _logoScaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(
       CurvedAnimation(
         parent: _logoController,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _logoOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(
+          0.0,
+          0.6,
+          curve: Curves.easeIn,
+        ),
       ),
     );
 
@@ -62,13 +81,21 @@ class _SplashScreenState extends State<SplashScreen>
     _textOpacityAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
+    ).animate(
+      CurvedAnimation(
+        parent: _textController,
+        curve: Curves.easeIn,
+      ),
+    );
 
     _textSlideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOutBack),
+      CurvedAnimation(
+        parent: _textController,
+        curve: Curves.easeOutBack,
+      ),
     );
   }
 
@@ -77,11 +104,15 @@ class _SplashScreenState extends State<SplashScreen>
     await _logoController.forward();
 
     // Wait a bit, then start text animation
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(milliseconds: 300),
+    );
     await _textController.forward();
 
     // Wait before navigating
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(
+      const Duration(milliseconds: 1500),
+    );
 
     if (mounted) {
       _navigateToNextScreen();
@@ -90,7 +121,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigateToNextScreen() async {
     // First check if a user is already authenticated with Supabase
-    final user = UserDataHelper().getCurrentUser();
+    final user =
+        UserDataHelper().getCurrentUser();
 
     if (mounted) {
       if (user != null) {
@@ -108,18 +140,24 @@ class _SplashScreenState extends State<SplashScreen>
 
         // Non-admin users go to the regular home (bottom bar)
         context.pushReplacementNamed(Routes.customBottomBar);
+
         return;
       }
 
       // If not logged in, check if user has seen onboarding
-      final hasSeenOnboarding = await OnboardingPrefs.hasSeenOnboarding();
+      final hasSeenOnboarding =
+          await OnboardingPrefs.hasSeenOnboarding();
 
       if (hasSeenOnboarding) {
         // Navigate to login if onboarding was seen
-        context.pushReplacementNamed(Routes.loginScreen);
+        context.pushReplacementNamed(
+          Routes.loginScreen,
+        );
       } else {
         // Navigate to onboarding if first time
-        context.pushReplacementNamed(Routes.onboardingScreen);
+        context.pushReplacementNamed(
+          Routes.onboardingScreen,
+        );
       }
     }
   }
@@ -142,39 +180,50 @@ class _SplashScreenState extends State<SplashScreen>
             Expanded(
               child: Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
                   children: [
                     // Logo container with animation
                     AnimatedBuilder(
                       animation: _logoController,
                       builder: (context, child) {
                         return Opacity(
-                          opacity: _logoOpacityAnimation.value,
+                          opacity:
+                              _logoOpacityAnimation
+                                  .value,
                           child: Transform.scale(
-                            scale: _logoScaleAnimation.value,
+                            scale:
+                                _logoScaleAnimation
+                                    .value,
                             child: Column(
                               children: [
                                 Container(
-                                  padding: EdgeInsets.all(25.w),
+                                  padding:
+                                      EdgeInsets.all(
+                                        25.w,
+                                      ),
                                   child: Image.asset(
-                                    AppAssets.mainLogo,
-                                    fit: BoxFit.contain,
+                                    AppAssets
+                                        .mainLogo,
+                                    fit:
+                                        BoxFit
+                                            .contain,
                                   ),
                                 ),
-                                Container(
-                                  width: 50.w,
-                                  height: 3.h,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Colors.transparent,
-                                        AppColors.primaryColor,
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(2.r),
-                                  ),
-                                ),
+                                // Container(
+                                //   width: 50.w,
+                                //   height: 3.h,
+                                //   decoration: BoxDecoration(
+                                //     gradient: const LinearGradient(
+                                //       colors: [
+                                //         Colors.transparent,
+                                //         AppColors.primaryColor,
+                                //         Colors.transparent,
+                                //       ],
+                                //     ),
+                                //     borderRadius: BorderRadius.circular(2.r),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -189,9 +238,11 @@ class _SplashScreenState extends State<SplashScreen>
                       animation: _textController,
                       builder: (context, child) {
                         return SlideTransition(
-                          position: _textSlideAnimation,
+                          position:
+                              _textSlideAnimation,
                           child: FadeTransition(
-                            opacity: _textOpacityAnimation,
+                            opacity:
+                                _textOpacityAnimation,
                             child: Column(
                               children: [
                                 // Text(
@@ -205,34 +256,61 @@ class _SplashScreenState extends State<SplashScreen>
                                 //   ),
                                 // ),
                                 // SizedBox(height: 12.h),
-                                SizedBox(height: 16.h),
-                                Text(
-                                  'secure_digital_identity'.tr(),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.copyWith(
-                                    color: AppColors.primaryColor,
-                                    letterSpacing: 0.5,
-                                  ),
-                                  textAlign: TextAlign.center,
+                                SizedBox(
+                                  height: 16.h,
                                 ),
-                                SizedBox(height: 40.h),
+                                Text(
+                                  'secure_digital_identity'
+                                      .tr(),
+                                  style: Theme.of(
+                                        context,
+                                      )
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        color:
+                                            AppColors
+                                                .primaryColor,
+                                        letterSpacing:
+                                            0.5,
+                                      ),
+                                  textAlign:
+                                      TextAlign
+                                          .center,
+                                ),
+                                SizedBox(
+                                  height: 40.h,
+                                ),
 
                                 // Loading indicator
                                 Container(
                                   width: 80.w,
                                   height: 6.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(3.r),
+                                    color:
+                                        Colors
+                                            .grey[200],
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                          3.r,
+                                        ),
                                   ),
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(3.r),
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                          3.r,
+                                        ),
                                     child: const LinearProgressIndicator(
-                                      backgroundColor: Colors.transparent,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.primaryColor,
-                                      ),
+                                      backgroundColor:
+                                          Colors
+                                              .transparent,
+                                      valueColor:
+                                          AlwaysStoppedAnimation<
+                                            Color
+                                          >(
+                                            AppColors
+                                                .primaryColor,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -255,24 +333,35 @@ class _SplashScreenState extends State<SplashScreen>
                 return FadeTransition(
                   opacity: _textOpacityAnimation,
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 22.h),
+                    margin: EdgeInsets.only(
+                      bottom: 22.h,
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
                       children: [
                         SizedBox(
                           width: 30.w,
                           height: 30.h,
-                          child: Image.asset(AppAssets.corbitsTeam),
+                          child: Image.asset(
+                            AppAssets.corbitsTeam,
+                          ),
                         ),
                         SizedBox(width: 8.w),
                         Text(
                           'Powered by Corbits',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primaryColor,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color:
+                                    AppColors
+                                        .primaryColor,
+                                fontWeight:
+                                    FontWeight
+                                        .w500,
+                              ),
                         ),
                       ],
                     ),

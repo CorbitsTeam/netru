@@ -15,26 +15,35 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() =>
+      _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   // Form keys for each tab
   final _citizenFormKey = GlobalKey<FormState>();
-  final _foreignerFormKey = GlobalKey<FormState>();
+  final _foreignerFormKey =
+      GlobalKey<FormState>();
   final _adminFormKey = GlobalKey<FormState>();
 
   // Controllers for each form
-  final _citizenNationalIdController = TextEditingController();
-  final _citizenPasswordController = TextEditingController();
+  final _citizenNationalIdController =
+      TextEditingController();
+  final _citizenPasswordController =
+      TextEditingController();
 
-  final _foreignerPassportController = TextEditingController();
-  final _foreignerPasswordController = TextEditingController();
+  final _foreignerPassportController =
+      TextEditingController();
+  final _foreignerPasswordController =
+      TextEditingController();
 
-  final _adminEmailController = TextEditingController();
-  final _adminPasswordController = TextEditingController();
+  final _adminEmailController =
+      TextEditingController();
+  final _adminPasswordController =
+      TextEditingController();
 
   bool _obscureCitizenPassword = true;
   bool _obscureForeignerPassword = true;
@@ -45,7 +54,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
   }
 
   @override
@@ -68,22 +80,31 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     switch (userType) {
       case UserType.citizen:
         formKey = _citizenFormKey;
-        identifier = _citizenNationalIdController.text.trim();
-        password = _citizenPasswordController.text;
+        identifier =
+            _citizenNationalIdController.text
+                .trim();
+        password =
+            _citizenPasswordController.text;
         break;
       case UserType.foreigner:
         formKey = _foreignerFormKey;
-        identifier = _foreignerPassportController.text.trim();
-        password = _foreignerPasswordController.text;
+        identifier =
+            _foreignerPassportController.text
+                .trim();
+        password =
+            _foreignerPasswordController.text;
         break;
       case UserType.admin:
         formKey = _adminFormKey;
-        identifier = _adminEmailController.text.trim();
+        identifier =
+            _adminEmailController.text.trim();
         password = _adminPasswordController.text;
         break;
     }
 
-    if (!(formKey.currentState?.validate() ?? false)) return;
+    if (!(formKey.currentState?.validate() ??
+        false))
+      return;
 
     context.read<LoginCubit>().loginUser(
       identifier: identifier,
@@ -97,7 +118,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+            Icon(
+              Icons.error_outline,
+              color: Colors.white,
+              size: 20.sp,
+            ),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -114,7 +139,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
         margin: EdgeInsets.all(16.w),
         duration: const Duration(seconds: 4),
@@ -126,22 +153,29 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     context.pushNamed(Routes.signupScreen);
   }
 
-  void _navigateBasedOnUserType(LoginUserEntity user) async {
+  void _navigateBasedOnUserType(
+    LoginUserEntity user,
+  ) async {
     // Save user data to SharedPreferences and refresh from database
     try {
       final userHelper = UserDataHelper();
       await userHelper.saveCurrentUser(user);
 
       // Refresh user data from database to get complete information
-      await userHelper.refreshUserDataFromDatabase();
+      await userHelper
+          .refreshUserDataFromDatabase();
     } catch (e) {
-      print('Error saving/refreshing user data: $e');
+      print(
+        'Error saving/refreshing user data: $e',
+      );
     }
 
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:
-        context.pushReplacementNamed(Routes.customBottomBar);
+        context.pushReplacementNamed(
+          Routes.customBottomBar,
+        );
         break;
       case UserType.admin:
         context.pushReplacementNamed(Routes.adminDashboard);
@@ -156,12 +190,17 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         // Dispose the old controller properly
         final oldIndex = _tabController.index;
         _tabController.dispose();
-        _tabController = TabController(length: 3, vsync: this);
+        _tabController = TabController(
+          length: 3,
+          vsync: this,
+        );
         // Keep the current tab if it's still valid, otherwise go to admin tab
         if (oldIndex < 2) {
           _tabController.index = oldIndex;
         } else {
-          _tabController.animateTo(2); // Switch to admin tab
+          _tabController.animateTo(
+            2,
+          ); // Switch to admin tab
         }
       });
     }
@@ -187,7 +226,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         },
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: 24.w,
+            ),
             child: Column(
               children: [
                 SizedBox(height: 40.h),
@@ -196,13 +237,18 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 _buildTabBar(),
                 // SizedBox(height: 24.h),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height:
+                      MediaQuery.of(
+                        context,
+                      ).size.height *
+                      0.4,
                   child: TabBarView(
                     controller: _tabController,
                     children: [
                       _buildCitizenForm(),
                       _buildForeignerForm(),
-                      if (_showAdminTab) _buildAdminForm(),
+                      if (_showAdminTab)
+                        _buildAdminForm(),
                     ],
                   ),
                 ),
@@ -262,7 +308,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   Widget _buildTabBar() {
     return Container(
-      height: 50.h,
+      height: 40.h,
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(25.r),
@@ -271,12 +317,16 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         controller: _tabController,
         indicator: BoxDecoration(
           color: AppColors.primary,
-          borderRadius: BorderRadius.circular(25.r),
+          borderRadius: BorderRadius.circular(
+            25.r,
+          ),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF6B7280),
+        unselectedLabelColor: const Color(
+          0xFF6B7280,
+        ),
         labelStyle: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.w600,
@@ -290,7 +340,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         tabs: [
           const Tab(text: 'مواطن مصري'),
           const Tab(text: 'مقيم أجنبي'),
-          if (_showAdminTab) const Tab(text: 'مدير'),
+          if (_showAdminTab)
+            const Tab(text: 'مدير'),
         ],
       ),
     );
@@ -303,30 +354,40 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         children: [
           SizedBox(height: 32.h),
           _buildTextField(
-            controller: _citizenNationalIdController,
+            controller:
+                _citizenNationalIdController,
             label: 'الرقم القومي',
             hint: 'أدخل الرقم القومي (14 رقم)',
             icon: Icons.person_outline,
             keyboardType: TextInputType.number,
             validator:
-                (value) => context.read<LoginCubit>().validateIdentifier(
-                  value,
-                  UserType.citizen,
-                ),
+                (value) => context
+                    .read<LoginCubit>()
+                    .validateIdentifier(
+                      value,
+                      UserType.citizen,
+                    ),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 18.h),
           _buildPasswordField(
-            controller: _citizenPasswordController,
+            controller:
+                _citizenPasswordController,
             validator:
-                (value) => context.read<LoginCubit>().validatePassword(value),
+                (value) => context
+                    .read<LoginCubit>()
+                    .validatePassword(value),
             obscureText: _obscureCitizenPassword,
             onToggleVisibility:
                 () => setState(
-                  () => _obscureCitizenPassword = !_obscureCitizenPassword,
+                  () =>
+                      _obscureCitizenPassword =
+                          !_obscureCitizenPassword,
                 ),
           ),
-          SizedBox(height: 40.h),
-          _buildLoginButton(() => _handleLogin(UserType.citizen)),
+          SizedBox(height: 20.h),
+          _buildLoginButton(
+            () => _handleLogin(UserType.citizen),
+          ),
         ],
       ),
     );
@@ -339,30 +400,42 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         children: [
           SizedBox(height: 32.h),
           _buildTextField(
-            controller: _foreignerPassportController,
+            controller:
+                _foreignerPassportController,
             label: 'رقم جواز السفر',
             hint: 'أدخل رقم جواز السفر',
             icon: Icons.flight_outlined,
             keyboardType: TextInputType.text,
             validator:
-                (value) => context.read<LoginCubit>().validateIdentifier(
-                  value,
-                  UserType.foreigner,
-                ),
+                (value) => context
+                    .read<LoginCubit>()
+                    .validateIdentifier(
+                      value,
+                      UserType.foreigner,
+                    ),
           ),
           SizedBox(height: 24.h),
           _buildPasswordField(
-            controller: _foreignerPasswordController,
+            controller:
+                _foreignerPasswordController,
             validator:
-                (value) => context.read<LoginCubit>().validatePassword(value),
-            obscureText: _obscureForeignerPassword,
+                (value) => context
+                    .read<LoginCubit>()
+                    .validatePassword(value),
+            obscureText:
+                _obscureForeignerPassword,
             onToggleVisibility:
                 () => setState(
-                  () => _obscureForeignerPassword = !_obscureForeignerPassword,
+                  () =>
+                      _obscureForeignerPassword =
+                          !_obscureForeignerPassword,
                 ),
           ),
-          SizedBox(height: 40.h),
-          _buildLoginButton(() => _handleLogin(UserType.foreigner)),
+          SizedBox(height: 20.h),
+          _buildLoginButton(
+            () =>
+                _handleLogin(UserType.foreigner),
+          ),
         ],
       ),
     );
@@ -379,32 +452,43 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             label: 'البريد الإلكتروني',
             hint: 'أدخل البريد الإلكتروني',
             icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
+            keyboardType:
+                TextInputType.emailAddress,
             validator:
-                (value) => context.read<LoginCubit>().validateIdentifier(
-                  value,
-                  UserType.admin,
-                ),
+                (value) => context
+                    .read<LoginCubit>()
+                    .validateIdentifier(
+                      value,
+                      UserType.admin,
+                    ),
           ),
           SizedBox(height: 24.h),
           _buildPasswordField(
             controller: _adminPasswordController,
             validator:
-                (value) => context.read<LoginCubit>().validatePassword(value),
+                (value) => context
+                    .read<LoginCubit>()
+                    .validatePassword(value),
             obscureText: _obscureAdminPassword,
             onToggleVisibility:
                 () => setState(
-                  () => _obscureAdminPassword = !_obscureAdminPassword,
+                  () =>
+                      _obscureAdminPassword =
+                          !_obscureAdminPassword,
                 ),
           ),
           SizedBox(height: 40.h),
-          _buildLoginButton(() => _handleLogin(UserType.admin)),
+          _buildLoginButton(
+            () => _handleLogin(UserType.admin),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLoginButton(VoidCallback onPressed) {
+  Widget _buildLoginButton(
+    VoidCallback onPressed,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 50.h,
@@ -416,7 +500,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(
+              16.r,
+            ),
           ),
         ),
         child:
@@ -424,10 +510,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 ? SizedBox(
                   width: 24.w,
                   height: 24.h,
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
+                  child:
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                 )
                 : Text(
                   'تسجيل الدخول',
@@ -450,7 +537,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     required String? Function(String?) validator,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -467,11 +555,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           keyboardType: keyboardType,
           validator: validator,
           textDirection:
-              keyboardType == TextInputType.emailAddress
+              keyboardType ==
+                      TextInputType.emailAddress
                   ? TextDirection.ltr
                   : TextDirection.rtl,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 14.sp,
             color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
@@ -479,35 +568,61 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             hintText: hint,
             hintStyle: TextStyle(
               color: const Color(0xFF9CA3AF),
-              fontSize: 15.sp,
+              fontSize: 12.sp,
               fontFamily: 'Almarai',
             ),
-            prefixIcon: Icon(icon, color: AppColors.primary, size: 22.sp),
+            prefixIcon: Icon(
+              icon,
+              color: AppColors.primary,
+              size: 22.sp,
+            ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.error,
+              ),
             ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
+            focusedErrorBorder:
+                OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 2,
+                  ),
+                ),
             filled: true,
             fillColor: const Color(0xFFF9FAFB),
             contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 16.h,
+              horizontal: 4.w,
+              vertical: 4.h,
             ),
           ),
         ),
@@ -522,7 +637,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     required VoidCallback onToggleVisibility,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         Text(
           'كلمة المرور',
@@ -539,7 +655,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           obscureText: obscureText,
           validator: validator,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 14.sp,
             color: const Color(0xFF1a1a1a),
             fontFamily: 'Almarai',
           ),
@@ -547,49 +663,72 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             hintText: 'أدخل كلمة المرور',
             hintStyle: TextStyle(
               color: const Color(0xFF9CA3AF),
-              fontSize: 15.sp,
+              fontSize: 12.sp,
               fontFamily: 'Almarai',
             ),
             prefixIcon: Icon(
               Icons.lock_outline,
               color: AppColors.primary,
-              size: 22.sp,
+              size: 20.sp,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 obscureText
                     ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+                    : Icons
+                        .visibility_off_outlined,
                 color: const Color(0xFF6B7280),
-                size: 22.sp,
+                size: 20.sp,
               ),
               onPressed: onToggleVisibility,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.error,
+              ),
             ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
+            focusedErrorBorder:
+                OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 2,
+                  ),
+                ),
             filled: true,
             fillColor: const Color(0xFFF9FAFB),
             contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 16.h,
+              horizontal: 4.w,
+              vertical: 4.h,
             ),
           ),
         ),
@@ -602,7 +741,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 800),
       delay: const Duration(milliseconds: 800),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment:
+            MainAxisAlignment.center,
         children: [
           Text(
             'ليس لديك حساب؟ ',

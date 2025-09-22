@@ -9,12 +9,15 @@ import '../../domain/entities/extracted_document_data.dart';
 class DataEntryStep extends StatefulWidget {
   final UserType userType;
   final ExtractedDocumentData? extractedData;
-  final Function(Map<String, String>) onDataChanged;
+  final Function(Map<String, String>)
+  onDataChanged;
   final Map<String, String> currentData;
-  final String? username; // The username from first step (email or phone)
+  final String?
+  username; // The username from first step (email or phone)
   final bool
   isEmailMode; // Whether the username is email (true) or phone (false)
-  final String? initialPassword; // Password from first step
+  final String?
+  initialPassword; // Password from first step
 
   const DataEntryStep({
     super.key,
@@ -28,13 +31,17 @@ class DataEntryStep extends StatefulWidget {
   });
 
   @override
-  State<DataEntryStep> createState() => _DataEntryStepState();
+  State<DataEntryStep> createState() =>
+      _DataEntryStepState();
 }
 
-class _DataEntryStepState extends State<DataEntryStep> {
-  late final Map<String, TextEditingController> _controllers;
+class _DataEntryStepState
+    extends State<DataEntryStep> {
+  late final Map<String, TextEditingController>
+  _controllers;
   bool _isPopulating = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -52,45 +59,71 @@ class _DataEntryStepState extends State<DataEntryStep> {
     if (widget.username != null) {
       if (widget.isEmailMode) {
         emailValue = widget.username!;
-        phoneValue = widget.currentData['phone'] ?? '';
+        phoneValue =
+            widget.currentData['phone'] ?? '';
       } else {
         phoneValue = widget.username!;
-        emailValue = widget.currentData['email'] ?? '';
+        emailValue =
+            widget.currentData['email'] ?? '';
       }
     } else {
-      emailValue = widget.currentData['email'] ?? '';
-      phoneValue = widget.currentData['phone'] ?? '';
+      emailValue =
+          widget.currentData['email'] ?? '';
+      phoneValue =
+          widget.currentData['phone'] ?? '';
     }
 
     _controllers = {
       'fullName': TextEditingController(
-        text: widget.currentData['fullName'] ?? '',
+        text:
+            widget.currentData['fullName'] ?? '',
       ),
       'nationalId': TextEditingController(
-        text: widget.currentData['nationalId'] ?? '',
+        text:
+            widget.currentData['nationalId'] ??
+            '',
       ),
       'birthDate': TextEditingController(
-        text: widget.currentData['birthDate'] ?? '',
+        text:
+            widget.currentData['birthDate'] ?? '',
       ),
-      'phone': TextEditingController(text: phoneValue),
-      'email': TextEditingController(text: emailValue),
+      'phone': TextEditingController(
+        text: phoneValue,
+      ),
+      'email': TextEditingController(
+        text: emailValue,
+      ),
       'password': TextEditingController(
-        text: widget.currentData['password'] ?? widget.initialPassword ?? '',
+        text:
+            widget.currentData['password'] ??
+            widget.initialPassword ??
+            '',
       ),
     };
     if (widget.userType == UserType.foreigner) {
       _controllers.addAll({
         'passportNumber': TextEditingController(
-          text: widget.currentData['passportNumber'] ?? '',
+          text:
+              widget
+                  .currentData['passportNumber'] ??
+              '',
         ),
         'nationality': TextEditingController(
-          text: widget.currentData['nationality'] ?? '',
+          text:
+              widget.currentData['nationality'] ??
+              '',
         ),
         'passportIssueDate': TextEditingController(
-          text: widget.currentData['passportIssueDate'] ?? '',
+          text:
+              widget
+                  .currentData['passportIssueDate'] ??
+              '',
         ),
         'passportExpiryDate': TextEditingController(
-          text: widget.currentData['passportExpiryDate'] ?? '',
+          text:
+              widget
+                  .currentData['passportExpiryDate'] ??
+              '',
         ),
       });
     }
@@ -120,21 +153,28 @@ class _DataEntryStepState extends State<DataEntryStep> {
       _isPopulating = true;
       final data = widget.extractedData!;
 
-      if (data.fullName != null && data.fullName!.isNotEmpty) {
-        _controllers['fullName']!.text = data.fullName!;
+      if (data.fullName != null &&
+          data.fullName!.isNotEmpty) {
+        _controllers['fullName']!.text =
+            data.fullName!;
       }
-      if (data.nationalId != null && data.nationalId!.isNotEmpty) {
-        _controllers['nationalId']!.text = data.nationalId!;
+      if (data.nationalId != null &&
+          data.nationalId!.isNotEmpty) {
+        _controllers['nationalId']!.text =
+            data.nationalId!;
       }
       if (data.birthDate != null) {
         // Convert DateTime to string format
         final birthDate = data.birthDate!;
         final formattedDate =
             '${birthDate.year}-${birthDate.month.toString().padLeft(2, '0')}-${birthDate.day.toString().padLeft(2, '0')}';
-        _controllers['birthDate']!.text = formattedDate;
+        _controllers['birthDate']!.text =
+            formattedDate;
       }
-      if (data.passportNumber != null && data.passportNumber!.isNotEmpty) {
-        _controllers['passportNumber']?.text = data.passportNumber!;
+      if (data.passportNumber != null &&
+          data.passportNumber!.isNotEmpty) {
+        _controllers['passportNumber']?.text =
+            data.passportNumber!;
       }
 
       _isPopulating = false;
@@ -157,38 +197,56 @@ class _DataEntryStepState extends State<DataEntryStep> {
       child: Form(
         key: _formKey,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
             // Basic Information Section
-            _buildSectionTitle('البيانات الأساسية', 0),
+            _buildSectionTitle(
+              'البيانات الأساسية',
+              0,
+            ),
             SizedBox(height: 16.h),
             _buildBasicFields(),
 
-            SizedBox(height: 32.h),
+            SizedBox(height: 20.h),
 
             // Contact Information Section
-            _buildSectionTitle('معلومات الاتصال', 1),
+            _buildSectionTitle(
+              'معلومات الاتصال',
+              1,
+            ),
             SizedBox(height: 16.h),
             _buildContactFields(),
 
             // Passport fields for foreigners
-            if (widget.userType == UserType.foreigner) ...[
+            if (widget.userType ==
+                UserType.foreigner) ...[
               SizedBox(height: 32.h),
-              _buildSectionTitle('بيانات جواز السفر', 2),
+              _buildSectionTitle(
+                'بيانات جواز السفر',
+                2,
+              ),
               SizedBox(height: 16.h),
               _buildPassportFields(),
             ],
 
-            SizedBox(height: 80.h), // Extra space for bottom padding
+            SizedBox(
+              height: 80.h,
+            ), // Extra space for bottom padding
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title, int index) {
+  Widget _buildSectionTitle(
+    String title,
+    int index,
+  ) {
     return FadeInUp(
-      duration: Duration(milliseconds: 800 + (index * 100)),
+      duration: Duration(
+        milliseconds: 800 + (index * 100),
+      ),
       child: Row(
         children: [
           Container(
@@ -196,7 +254,9 @@ class _DataEntryStepState extends State<DataEntryStep> {
             height: 24.h,
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2.r),
+              borderRadius: BorderRadius.circular(
+                2.r,
+              ),
             ),
           ),
           SizedBox(width: 12.w),
@@ -219,7 +279,8 @@ class _DataEntryStepState extends State<DataEntryStep> {
         _buildAnimatedField(
           controller: _controllers['fullName']!,
           label: 'الاسم الكامل',
-          hint: 'أدخل الاسم الكامل كما هو مكتوب في المستند',
+          hint:
+              'أدخل الاسم الكامل كما هو مكتوب في المستند',
           prefixIcon: Icons.person_outline,
           animationDelay: 0,
           validator: (value) {
@@ -234,10 +295,12 @@ class _DataEntryStepState extends State<DataEntryStep> {
 
         if (widget.userType == UserType.citizen)
           _buildAnimatedField(
-            controller: _controllers['nationalId']!,
+            controller:
+                _controllers['nationalId']!,
             label: 'الرقم القومي',
             hint: 'أدخل الرقم القومي (14 رقم)',
-            prefixIcon: Icons.credit_card_outlined,
+            prefixIcon:
+                Icons.credit_card_outlined,
             animationDelay: 100,
             keyboardType: TextInputType.number,
             validator: (value) {
@@ -251,43 +314,66 @@ class _DataEntryStepState extends State<DataEntryStep> {
             },
           ),
 
-        if (widget.userType == UserType.citizen) SizedBox(height: 16.h),
+        if (widget.userType == UserType.citizen)
+          SizedBox(height: 16.h),
 
         // Modern Date Picker for Birth Date
         FadeInUp(
-          duration: const Duration(milliseconds: 900),
+          duration: const Duration(
+            milliseconds: 900,
+          ),
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(
+                16.r,
+              ),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary
+                    .withOpacity(0.2),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.primary
+                      .withOpacity(0.08),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: InkWell(
-              onTap: () => _selectDate(context, _controllers['birthDate']!),
-              borderRadius: BorderRadius.circular(16.r),
+              onTap:
+                  () => _selectDate(
+                    context,
+                    _controllers['birthDate']!,
+                  ),
+              borderRadius: BorderRadius.circular(
+                16.r,
+              ),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 8.w,
+                  vertical: 6.h,
+                ),
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(8.w),
+                      padding: EdgeInsets.all(
+                        8.w,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.r),
+                        color: AppColors.primary
+                            .withOpacity(0.1),
+                        borderRadius:
+                            BorderRadius.circular(
+                              8.r,
+                            ),
                       ),
                       child: Icon(
-                        Icons.calendar_today_outlined,
+                        Icons
+                            .calendar_today_outlined,
                         color: AppColors.primary,
                         size: 20.sp,
                       ),
@@ -295,30 +381,41 @@ class _DataEntryStepState extends State<DataEntryStep> {
                     SizedBox(width: 16.w),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
                         children: [
                           Text(
                             'تاريخ الميلاد',
                             style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primary,
+                              fontSize: 14.sp,
+                              fontWeight:
+                                  FontWeight.w500,
+                              color:
+                                  AppColors
+                                      .primary,
                             ),
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            _controllers['birthDate']!.text.isEmpty
+                            _controllers['birthDate']!
+                                    .text
+                                    .isEmpty
                                 ? 'اختر تاريخ الميلاد'
                                 : _formatDisplayDate(
-                                  _controllers['birthDate']!.text,
+                                  _controllers['birthDate']!
+                                      .text,
                                 ),
                             style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 12.sp,
                               color:
-                                  _controllers['birthDate']!.text.isEmpty
-                                      ? Colors.grey[500]
-                                      : AppColors.textPrimary,
+                                  _controllers['birthDate']!
+                                          .text
+                                          .isEmpty
+                                      ? Colors
+                                          .grey[500]
+                                      : AppColors
+                                          .textPrimary,
                             ),
                           ),
                         ],
@@ -349,14 +446,20 @@ class _DataEntryStepState extends State<DataEntryStep> {
           animationDelay: 500,
           keyboardType: TextInputType.phone,
           readOnly:
-              !widget.isEmailMode, // Read-only if phone was used for signup
+              !widget
+                  .isEmailMode, // Read-only if phone was used for signup
           validator: (value) {
             if (value?.trim().isEmpty ?? true) {
               return 'رقم الهاتف مطلوب';
             }
             if (!RegExp(
               r'^\+?[0-9]{10,15}$',
-            ).hasMatch(value!.replaceAll(RegExp(r'[\s-]'), ''))) {
+            ).hasMatch(
+              value!.replaceAll(
+                RegExp(r'[\s-]'),
+                '',
+              ),
+            )) {
               return 'رقم الهاتف غير صحيح';
             }
             return null;
@@ -375,14 +478,18 @@ class _DataEntryStepState extends State<DataEntryStep> {
                   : 'أدخل البريد الإلكتروني',
           prefixIcon: Icons.email_outlined,
           animationDelay: 600,
-          keyboardType: TextInputType.emailAddress,
+          keyboardType:
+              TextInputType.emailAddress,
           readOnly:
-              widget.isEmailMode, // Read-only if email was used for signup
+              widget
+                  .isEmailMode, // Read-only if email was used for signup
           validator: (value) {
             if (value?.trim().isEmpty ?? true) {
               return 'البريد الإلكتروني مطلوب';
             }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+            if (!RegExp(
+              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+            ).hasMatch(value!)) {
               return 'البريد الإلكتروني غير صحيح';
             }
             return null;
@@ -396,7 +503,8 @@ class _DataEntryStepState extends State<DataEntryStep> {
     return Column(
       children: [
         _buildAnimatedField(
-          controller: _controllers['passportNumber']!,
+          controller:
+              _controllers['passportNumber']!,
           label: 'رقم جواز السفر',
           hint: 'أدخل رقم جواز السفر',
           prefixIcon: Icons.assignment_outlined,
@@ -412,7 +520,8 @@ class _DataEntryStepState extends State<DataEntryStep> {
         SizedBox(height: 16.h),
 
         _buildAnimatedField(
-          controller: _controllers['nationality']!,
+          controller:
+              _controllers['nationality']!,
           label: 'الجنسية',
           hint: 'أدخل الجنسية',
           prefixIcon: Icons.flag_outlined,
@@ -431,10 +540,12 @@ class _DataEntryStepState extends State<DataEntryStep> {
           children: [
             Expanded(
               child: _buildAnimatedField(
-                controller: _controllers['passportIssueDate']!,
+                controller:
+                    _controllers['passportIssueDate']!,
                 label: 'تاريخ الإصدار',
                 hint: 'اختر تاريخ الإصدار',
-                prefixIcon: Icons.date_range_outlined,
+                prefixIcon:
+                    Icons.date_range_outlined,
                 animationDelay: 800,
                 readOnly: true,
                 onTap:
@@ -443,7 +554,8 @@ class _DataEntryStepState extends State<DataEntryStep> {
                       _controllers['passportIssueDate']!,
                     ),
                 validator: (value) {
-                  if (value?.trim().isEmpty ?? true) {
+                  if (value?.trim().isEmpty ??
+                      true) {
                     return 'تاريخ الإصدار مطلوب';
                   }
                   return null;
@@ -453,10 +565,12 @@ class _DataEntryStepState extends State<DataEntryStep> {
             SizedBox(width: 16.w),
             Expanded(
               child: _buildAnimatedField(
-                controller: _controllers['passportExpiryDate']!,
+                controller:
+                    _controllers['passportExpiryDate']!,
                 label: 'تاريخ الانتهاء',
                 hint: 'اختر تاريخ الانتهاء',
-                prefixIcon: Icons.event_busy_outlined,
+                prefixIcon:
+                    Icons.event_busy_outlined,
                 animationDelay: 900,
                 readOnly: true,
                 onTap:
@@ -465,7 +579,8 @@ class _DataEntryStepState extends State<DataEntryStep> {
                       _controllers['passportExpiryDate']!,
                     ),
                 validator: (value) {
-                  if (value?.trim().isEmpty ?? true) {
+                  if (value?.trim().isEmpty ??
+                      true) {
                     return 'تاريخ الانتهاء مطلوب';
                   }
                   return null;
@@ -492,7 +607,9 @@ class _DataEntryStepState extends State<DataEntryStep> {
     bool obscureText = false,
   }) {
     return FadeInUp(
-      duration: Duration(milliseconds: 800 + animationDelay),
+      duration: Duration(
+        milliseconds: 800 + animationDelay,
+      ),
       child: GestureDetector(
         onTap: readOnly ? onTap : null,
         child: AbsorbPointer(
@@ -503,7 +620,9 @@ class _DataEntryStepState extends State<DataEntryStep> {
             hint: hint,
             prefixIcon: prefixIcon,
             validator: validator,
-            keyboardType: keyboardType ?? TextInputType.text,
+            keyboardType:
+                keyboardType ??
+                TextInputType.text,
             obscureText: obscureText,
             maxLines: maxLines,
             enabled: !readOnly,
@@ -560,5 +679,6 @@ class _DataEntryStepState extends State<DataEntryStep> {
     return dateString;
   }
 
-  bool get isValid => _formKey.currentState?.validate() ?? false;
+  bool get isValid =>
+      _formKey.currentState?.validate() ?? false;
 }
