@@ -3,7 +3,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
 import '../../domain/entities/reports_entity.dart';
-import '../../../../core/utils/user_data_helper.dart';
 
 /// خدمة إنشاء تقارير PDF احترافية للحكومة المصرية
 /// Professional PDF Report Generator Service for Egyptian Government
@@ -402,31 +401,19 @@ class ProfessionalEgyptianPdfService {
 
   /// بناء جدول معلومات مقدم البلاغ
   static pw.Widget _buildReporterTable(ReportEntity report) {
-    // الحصول على بيانات المستخدم الحقيقية
-    final userHelper = UserDataHelper();
-    final currentUser = userHelper.getCurrentUser();
+    // استخدام بيانات مقدم البلاغ الفعلي من ReportEntity
+    // بدلاً من المستخدم الحالي المسجل دخوله
 
     return _buildOfficialTable(
       title: 'بيانات مقدم البلاغ',
       icon: '●',
       data: [
-        [
-          'الاسم الكامل',
-          currentUser?.fullName ?? '${report.firstName} ${report.lastName}',
-        ],
-        [
-          'رقم الهوية الوطنية',
-          currentUser?.nationalId ??
-              userHelper.getUserNationalId() ??
-              report.nationalId,
-        ],
-        [
-          'رقم الهاتف',
-          currentUser?.phone ?? userHelper.getUserPhone() ?? report.phone,
-        ],
+        ['الاسم الكامل', '${report.firstName} ${report.lastName}'],
+        ['رقم الهوية الوطنية', report.nationalId],
+        ['رقم الهاتف', report.phone],
         [
           'العنوان',
-          currentUser?.address ?? userHelper.getUserAddress() ?? 'غير محدد',
+          report.locationName.toString(), // العنوان غير متوفر في ReportEntity
         ],
         ['تاريخ تقديم البلاغ', _formatArabicDate(report.reportDateTime)],
       ],
@@ -691,9 +678,7 @@ class ProfessionalEgyptianPdfService {
     pw.Context context,
     ReportEntity report,
   ) {
-    // الحصول على بيانات المستخدم
-    final userHelper = UserDataHelper();
-    final currentUser = userHelper.getCurrentUser();
+    // استخدام بيانات مقدم البلاغ الفعلي من ReportEntity
 
     return pw.Container(
       margin: const pw.EdgeInsets.only(top: 20),
@@ -736,12 +721,11 @@ class ProfessionalEgyptianPdfService {
                     style: const pw.TextStyle(fontSize: 8, color: _darkGray),
                     textDirection: pw.TextDirection.rtl,
                   ),
-                  if (currentUser?.fullName != null)
-                    pw.Text(
-                      'مقدم البلاغ: ${currentUser!.fullName}',
-                      style: const pw.TextStyle(fontSize: 8, color: _darkGray),
-                      textDirection: pw.TextDirection.rtl,
-                    ),
+                  pw.Text(
+                    'مقدم البلاغ: ${report.firstName} ${report.lastName}',
+                    style: const pw.TextStyle(fontSize: 8, color: _darkGray),
+                    textDirection: pw.TextDirection.rtl,
+                  ),
                 ],
               ),
               pw.Column(
@@ -757,12 +741,11 @@ class ProfessionalEgyptianPdfService {
                     style: const pw.TextStyle(fontSize: 8, color: _darkGray),
                     textDirection: pw.TextDirection.rtl,
                   ),
-                  if (currentUser?.nationalId != null)
-                    pw.Text(
-                      'هوية المبلغ: ${currentUser!.nationalId}',
-                      style: const pw.TextStyle(fontSize: 8, color: _darkGray),
-                      textDirection: pw.TextDirection.rtl,
-                    ),
+                  pw.Text(
+                    'هوية المبلغ: ${report.nationalId}',
+                    style: const pw.TextStyle(fontSize: 8, color: _darkGray),
+                    textDirection: pw.TextDirection.rtl,
+                  ),
                 ],
               ),
             ],

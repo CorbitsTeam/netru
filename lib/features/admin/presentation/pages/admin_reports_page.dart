@@ -132,7 +132,7 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
                     );
                   }
                 },
-                child: AdminReportsListView(),
+                child: const AdminReportsListView(),
               ),
             ),
           ),
@@ -406,24 +406,25 @@ class AdminReportsListView extends StatelessWidget {
             onRefresh: () => context.read<AdminReportsCubit>().loadReports(),
             color: AppColors.primaryColor,
             backgroundColor: Colors.white,
-            child: Column(
-              children: [
-                // Statistics header
-                _buildStatisticsHeader(state.statistics),
-                SizedBox(height: 20.h),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Statistics header
+                  _buildStatisticsHeader(state.statistics),
+                  SizedBox(height: 20.h),
 
-                // Reports list
-                Expanded(
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                  // Reports list
+                  ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
                     itemCount: state.reports.length,
                     itemBuilder: (context, index) {
                       final report = state.reports[index];
                       return AdminReportCard(report: report);
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }
