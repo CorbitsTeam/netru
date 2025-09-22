@@ -13,21 +13,33 @@ class UserHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userHelper = UserDataHelper();
-    final isLoggedIn = userHelper.isUserLoggedIn();
+    final isLoggedIn =
+        userHelper.isUserLoggedIn();
     final fullName = userHelper.getUserFullName();
-    final firstTwoNames = fullName.split(' ').take(2).join(' ');
+    final firstTwoNames = fullName
+        .split(' ')
+        .take(2)
+        .join(' ');
 
-    final location = userHelper.getCurrentUser()?.location ?? '';
-    final firstLocationWord = location.split(' ').first;
+    final location =
+        userHelper.getCurrentUser()?.location ??
+        '';
+    final firstLocationWord =
+        location.split(' ').first;
 
     log("👤 Name: $firstTwoNames");
     log("📍 Location: $firstLocationWord");
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 8.w,
+        vertical: 12.h,
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment:
+            CrossAxisAlignment.center,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
         children: [
           // User profile section - تم تعديله ليكون مشابهًا للصورة
           Flexible(
@@ -40,23 +52,29 @@ class UserHeaderWidget extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: Colors.white,
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.5),
+                      color: AppColors.primary
+                          .withOpacity(0.5),
                       width: 1.w,
                     ),
                   ),
-                  child: _buildProfileImage(userHelper),
+                  child: _buildProfileImage(
+                    userHelper,
+                  ),
                 ),
 
                 Container(
                   width: 1.5.w,
                   height: 20.h,
                   color: AppColors.primary,
-                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 4.w,
+                  ),
                 ),
 
                 // User info section - تم تعديله ليكون مشابهًا للصورة
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     if (isLoggedIn) ...[
                       Text(
@@ -64,19 +82,25 @@ class UserHeaderWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10.sp,
                           color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        overflow:
+                            TextOverflow.ellipsis,
                       ),
-                      if (firstLocationWord.isNotEmpty) ...[
+                      if (firstLocationWord
+                          .isNotEmpty) ...[
                         Text(
                           firstLocationWord,
                           style: TextStyle(
                             fontSize: 8.sp,
                             color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                            fontWeight:
+                                FontWeight.bold,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          overflow:
+                              TextOverflow
+                                  .ellipsis,
                         ),
                       ],
                     ] else
@@ -98,11 +122,14 @@ class UserHeaderWidget extends StatelessWidget {
           ),
           IconButton(
             onPressed:
-                () => Navigator.pushNamed(context, Routes.notificationsPage),
+                () => Navigator.pushNamed(
+                  context,
+                  Routes.notificationsPage,
+                ),
             icon: Icon(
               Icons.notifications_sharp,
               color: AppColors.primary,
-              size: 25.sp,
+              size: 22.sp,
             ),
             padding: EdgeInsets.zero,
           ),
@@ -111,10 +138,14 @@ class UserHeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileImage(UserDataHelper userHelper) {
-    final profileImage = userHelper.getUserProfileImage();
+  Widget _buildProfileImage(
+    UserDataHelper userHelper,
+  ) {
+    final profileImage =
+        userHelper.getUserProfileImage();
 
-    if (profileImage != null && profileImage.isNotEmpty) {
+    if (profileImage != null &&
+        profileImage.isNotEmpty) {
       return ClipOval(
         child: CachedNetworkImage(
           imageUrl: profileImage,
@@ -122,8 +153,11 @@ class UserHeaderWidget extends StatelessWidget {
           width: double.infinity,
           height: double.infinity,
           errorWidget:
-              (context, error, stackTrace) => _buildDefaultAvatar(userHelper),
-          placeholder: (context, url) => _buildDefaultAvatar(userHelper),
+              (context, error, stackTrace) =>
+                  _buildDefaultAvatar(userHelper),
+          placeholder:
+              (context, url) =>
+                  _buildDefaultAvatar(userHelper),
         ),
       );
     }
@@ -131,7 +165,9 @@ class UserHeaderWidget extends StatelessWidget {
     return _buildDefaultAvatar(userHelper);
   }
 
-  Widget _buildDefaultAvatar(UserDataHelper userHelper) {
+  Widget _buildDefaultAvatar(
+    UserDataHelper userHelper,
+  ) {
     // final isLoggedIn = userHelper.isUserLoggedIn();
     // final firstName = userHelper.getUserFirstName();
 

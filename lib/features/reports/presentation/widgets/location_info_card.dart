@@ -30,7 +30,9 @@ class LocationInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(
+          color: Colors.grey[300]!,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
@@ -41,7 +43,8 @@ class LocationInfoCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           // Header with title and map button
           Row(
@@ -57,7 +60,7 @@ class LocationInfoCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -70,20 +73,30 @@ class LocationInfoCard extends StatelessWidget {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(6.r),
+                      color:
+                          AppColors.primaryColor,
+                      borderRadius:
+                          BorderRadius.circular(
+                            6.r,
+                          ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize:
+                          MainAxisSize.min,
                       children: [
-                        Icon(Icons.map, color: Colors.white, size: 14.sp),
+                        Icon(
+                          Icons.map,
+                          color: Colors.white,
+                          size: 14.sp,
+                        ),
                         SizedBox(width: 4.w),
                         Text(
                           'عرض',
                           style: TextStyle(
                             fontSize: 12.sp,
                             color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                            fontWeight:
+                                FontWeight.w500,
                           ),
                         ),
                       ],
@@ -95,7 +108,8 @@ class LocationInfoCard extends StatelessWidget {
           SizedBox(height: 12.h),
 
           // Location name
-          if (locationName != null && locationName!.isNotEmpty) ...[
+          if (locationName != null &&
+              locationName!.isNotEmpty) ...[
             Text(
               'العنوان:',
               style: TextStyle(
@@ -107,13 +121,17 @@ class LocationInfoCard extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               locationName!,
-              style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.black87,
+              ),
             ),
             SizedBox(height: 12.h),
           ],
 
           // Location details
-          if (locationDetails != null && locationDetails!.isNotEmpty) ...[
+          if (locationDetails != null &&
+              locationDetails!.isNotEmpty) ...[
             Text(
               'التفاصيل:',
               style: TextStyle(
@@ -139,11 +157,16 @@ class LocationInfoCard extends StatelessWidget {
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(
+                8.r,
+              ),
+              border: Border.all(
+                color: Colors.grey[200]!,
+              ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   'الإحداثيات:',

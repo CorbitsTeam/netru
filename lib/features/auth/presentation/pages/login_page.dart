@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -271,8 +272,8 @@ class _LoginPageState extends State<LoginPage>
           // اللوغو بدون إطار - واضح وبسيط
           GestureDetector(
             onDoubleTap: _onLogoDoubleTap,
-            child: Image.asset(
-              AppAssets.mainLogo,
+            child: SvgPicture.asset(
+              AppAssets.mainLogoSvg,
               width: 120.w,
               height: 120.h,
               fit: BoxFit.contain,
@@ -748,7 +749,7 @@ class _LoginPageState extends State<LoginPage>
             'ليس لديك حساب؟ ',
             style: TextStyle(
               color: const Color(0xFF6B7280),
-              fontSize: 15.sp,
+              fontSize: 14.sp,
               fontFamily: 'Almarai',
             ),
           ),
@@ -758,7 +759,7 @@ class _LoginPageState extends State<LoginPage>
               'إنشاء حساب جديد',
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 15.sp,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Almarai',
               ),

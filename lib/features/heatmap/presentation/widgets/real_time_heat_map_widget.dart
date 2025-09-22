@@ -7,17 +7,22 @@ import '../cubit/heatmap_cubit.dart';
 import '../cubit/heatmap_state.dart';
 import '../../../../core/services/location_service.dart';
 
-class RealTimeHeatMapWidget extends StatefulWidget {
+class RealTimeHeatMapWidget
+    extends StatefulWidget {
   const RealTimeHeatMapWidget({super.key});
 
   @override
-  State<RealTimeHeatMapWidget> createState() => _RealTimeHeatMapWidgetState();
+  State<RealTimeHeatMapWidget> createState() =>
+      _RealTimeHeatMapWidgetState();
 }
 
-class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
+class _RealTimeHeatMapWidgetState
+    extends State<RealTimeHeatMapWidget>
     with SingleTickerProviderStateMixin {
-  final MapController _mapController = MapController();
-  final LocationService _locationService = LocationService();
+  final MapController _mapController =
+      MapController();
+  final LocationService _locationService =
+      LocationService();
   late AnimationController _animationController;
 
   @override
@@ -29,7 +34,9 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
     );
     _animationController.repeat();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((
+      _,
+    ) {
       _moveToCurrentLocation();
     });
   }
@@ -41,7 +48,8 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
   }
 
   void _moveToCurrentLocation() {
-    final currentLocation = _locationService.currentLocation;
+    final currentLocation =
+        _locationService.currentLocation;
     if (currentLocation != null) {
       _mapController.move(currentLocation, 11.0);
     }
@@ -50,30 +58,50 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
   @override
   Widget build(BuildContext context) {
     final currentLocation =
-        _locationService.currentLocation ?? const LatLng(30.0444, 31.2357);
+        _locationService.currentLocation ??
+        const LatLng(30.0444, 31.2357);
 
-    return BlocBuilder<HeatmapCubit, HeatmapState>(
+    return BlocBuilder<
+      HeatmapCubit,
+      HeatmapState
+    >(
       builder: (context, state) {
         List<Widget> layers = [
           // الطبقة الأساسية للخريطة
           TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.example.netru_app',
+            urlTemplate:
+                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName:
+                'com.example.netru_app',
             maxZoom: 18,
           ),
         ];
 
         // إضافة النقاط الحرارية حسب حالة البيانات
         if (state is HeatmapLoaded) {
-          layers.addAll(_buildHeatmapLayers(state.reports));
-        } else if (state is HeatmapReportsLoaded) {
-          layers.addAll(_buildHeatmapLayers(state.reports));
-        } else if (state is HeatmapGovernorateFilterApplied) {
-          layers.addAll(_buildHeatmapLayers(state.filteredReports));
+          layers.addAll(
+            _buildHeatmapLayers(state.reports),
+          );
+        } else if (state
+            is HeatmapReportsLoaded) {
+          layers.addAll(
+            _buildHeatmapLayers(state.reports),
+          );
+        } else if (state
+            is HeatmapGovernorateFilterApplied) {
+          layers.addAll(
+            _buildHeatmapLayers(
+              state.filteredReports,
+            ),
+          );
         }
 
         // طبقة الموقع الحالي
-        layers.add(_buildCurrentLocationLayer(currentLocation));
+        layers.add(
+          _buildCurrentLocationLayer(
+            currentLocation,
+          ),
+        );
 
         return Stack(
           children: [
@@ -95,17 +123,25 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
             // مؤشر التحميل
             if (state is HeatmapLoading)
               Container(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(child: CircularProgressIndicator()),
+                color: Colors.black.withOpacity(
+                  0.3,
+                ),
+                child: const Center(
+                  child:
+                      CircularProgressIndicator(),
+                ),
               ),
 
             // رسالة الخطأ
             if (state is HeatmapFailure)
               Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withOpacity(
+                  0.3,
+                ),
                 child: Center(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.error_outline,
@@ -118,15 +154,22 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 8.h),
                       ElevatedButton(
                         onPressed: () {
-                          context.read<HeatmapCubit>().refreshData();
+                          context
+                              .read<
+                                HeatmapCubit
+                              >()
+                              .refreshData();
                         },
-                        child: const Text('إعادة المحاولة'),
+                        child: const Text(
+                          'إعادة المحاولة',
+                        ),
                       ),
                     ],
                   ),
@@ -141,7 +184,9 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
     );
   }
 
-  List<Widget> _buildHeatmapLayers(List<dynamic> reports) {
+  List<Widget> _buildHeatmapLayers(
+    List<dynamic> reports,
+  ) {
     List<Widget> layers = [];
 
     // طبقة الدوائر الحرارية
@@ -150,15 +195,21 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
 
     for (final report in reports) {
       final location = report.location;
-      final reportCount = _getReportSeverityLevel(report);
+      final reportCount = _getReportSeverityLevel(
+        report,
+      );
 
       // إضافة دائرة حرارية
       heatCircles.add(
         CircleMarker(
           point: location,
           radius: _calculateRadius(reportCount),
-          color: _getCrimeColor(reportCount).withOpacity(0.3),
-          borderColor: _getCrimeColor(reportCount),
+          color: _getCrimeColor(
+            reportCount,
+          ).withOpacity(0.3),
+          borderColor: _getCrimeColor(
+            reportCount,
+          ),
           borderStrokeWidth: 1,
         ),
       );
@@ -170,26 +221,37 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
           width: 30.w,
           height: 30.h,
           child: GestureDetector(
-            onTap: () => _showReportDetails(report),
+            onTap:
+                () => _showReportDetails(report),
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
                 return Transform.scale(
-                  scale: 1.0 + (0.1 * _animationController.value),
+                  scale:
+                      1.0 +
+                      (0.1 *
+                          _animationController
+                              .value),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: _getCrimeColor(reportCount),
+                      color: _getCrimeColor(
+                        reportCount,
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: _getCrimeColor(reportCount).withOpacity(0.4),
+                          color: _getCrimeColor(
+                            reportCount,
+                          ).withOpacity(0.4),
                           spreadRadius: 2,
                           blurRadius: 4,
                         ),
                       ],
                     ),
                     child: Icon(
-                      _getReportIcon(report.reportType),
+                      _getReportIcon(
+                        report.reportType,
+                      ),
                       color: Colors.white,
                       size: 16.w,
                     ),
@@ -204,16 +266,22 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
 
     // إضافة الطبقات
     if (heatCircles.isNotEmpty) {
-      layers.add(CircleLayer(circles: heatCircles));
+      layers.add(
+        CircleLayer(circles: heatCircles),
+      );
     }
     if (reportMarkers.isNotEmpty) {
-      layers.add(MarkerLayer(markers: reportMarkers));
+      layers.add(
+        MarkerLayer(markers: reportMarkers),
+      );
     }
 
     return layers;
   }
 
-  Widget _buildCurrentLocationLayer(LatLng currentLocation) {
+  Widget _buildCurrentLocationLayer(
+    LatLng currentLocation,
+  ) {
     return MarkerLayer(
       markers: [
         Marker(
@@ -224,16 +292,25 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
             decoration: BoxDecoration(
               color: Colors.blue,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(
+                color: Colors.white,
+                width: 3,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: Colors.blue.withOpacity(
+                    0.3,
+                  ),
                   spreadRadius: 3,
                   blurRadius: 6,
                 ),
               ],
             ),
-            child: Icon(Icons.my_location, color: Colors.white, size: 20.w),
+            child: Icon(
+              Icons.my_location,
+              color: Colors.white,
+              size: 20.w,
+            ),
           ),
         ),
       ],
@@ -246,7 +323,8 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
       reportCount = state.reports.length;
     } else if (state is HeatmapReportsLoaded) {
       reportCount = state.reports.length;
-    } else if (state is HeatmapGovernorateFilterApplied) {
+    } else if (state
+        is HeatmapGovernorateFilterApplied) {
       reportCount = state.filteredReports.length;
     }
 
@@ -254,13 +332,20 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
       top: 16.h,
       left: 16.w,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.w,
+          vertical: 8.h,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(
+            20.r,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(
+                0.1,
+              ),
               spreadRadius: 1,
               blurRadius: 4,
             ),
@@ -269,7 +354,11 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_on, color: Colors.red, size: 16.w),
+            Icon(
+              Icons.location_on,
+              color: Colors.red,
+              size: 16.w,
+            ),
             SizedBox(width: 4.w),
             Text(
               '$reportCount تقرير',
@@ -328,21 +417,27 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
 
   IconData _getReportIcon(String reportType) {
     // تحديد الأيقونة بناءً على نوع التقرير
-    if (reportType.contains('سرقة') || reportType.contains('theft')) {
+    if (reportType.contains('سرقة') ||
+        reportType.contains('theft')) {
       return Icons.security;
     } else if (reportType.contains('اعتداء') ||
         reportType.contains('assault')) {
       return Icons.warning;
-    } else if (reportType.contains('حادث') || reportType.contains('accident')) {
+    } else if (reportType.contains('حادث') ||
+        reportType.contains('accident')) {
       return Icons.car_crash;
-    } else if (reportType.contains('مخدرات') || reportType.contains('drugs')) {
+    } else if (reportType.contains('مخدرات') ||
+        reportType.contains('drugs')) {
       return Icons.local_pharmacy;
     } else {
       return Icons.report_problem;
     }
   }
 
-  void _handleMapTap(LatLng point, HeatmapState state) {
+  void _handleMapTap(
+    LatLng point,
+    HeatmapState state,
+  ) {
     // يمكن إضافة منطق للتعامل مع النقر على الخريطة
     // مثل إضافة نقطة جديدة أو عرض معلومات المنطقة
   }
@@ -352,7 +447,9 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.r),
+        ),
       ),
       builder:
           (context) => DraggableScrollableSheet(
@@ -360,13 +457,19 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
             minChildSize: 0.3,
             maxChildSize: 0.9,
             builder:
-                (context, scrollController) => Container(
+                (
+                  context,
+                  scrollController,
+                ) => Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20.r),
-                    ),
+                    borderRadius:
+                        BorderRadius.vertical(
+                          top: Radius.circular(
+                            20.r,
+                          ),
+                        ),
                   ),
                   child: ListView(
                     controller: scrollController,
@@ -377,8 +480,12 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                           width: 40.w,
                           height: 4.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2.r),
+                            color:
+                                Colors.grey[300],
+                            borderRadius:
+                                BorderRadius.circular(
+                                  2.r,
+                                ),
                           ),
                         ),
                       ),
@@ -388,17 +495,29 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                       Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(8.w),
+                            padding:
+                                EdgeInsets.all(
+                                  8.w,
+                                ),
                             decoration: BoxDecoration(
                               color: _getCrimeColor(
-                                _getReportSeverityLevel(report),
+                                _getReportSeverityLevel(
+                                  report,
+                                ),
                               ).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8.r),
+                              borderRadius:
+                                  BorderRadius.circular(
+                                    8.r,
+                                  ),
                             ),
                             child: Icon(
-                              _getReportIcon(report.reportType),
+                              _getReportIcon(
+                                report.reportType,
+                              ),
                               color: _getCrimeColor(
-                                _getReportSeverityLevel(report),
+                                _getReportSeverityLevel(
+                                  report,
+                                ),
                               ),
                               size: 24.w,
                             ),
@@ -406,20 +525,29 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                           SizedBox(width: 12.w),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
                               children: [
                                 Text(
-                                  report.reportType,
+                                  report
+                                      .reportType,
                                   style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize:
+                                        18.sp,
+                                    fontWeight:
+                                        FontWeight
+                                            .bold,
                                   ),
                                 ),
                                 Text(
                                   '${report.governorate} - ${report.city}',
                                   style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.grey[600],
+                                    fontSize:
+                                        14.sp,
+                                    color:
+                                        Colors
+                                            .grey[600],
                                   ),
                                 ),
                               ],
@@ -432,17 +560,27 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                       // تفاصيل التقرير
                       _buildDetailRow(
                         'الحالة',
-                        _getStatusText(report.status),
-                        _getStatusColor(report.status),
+                        _getStatusText(
+                          report.status,
+                        ),
+                        _getStatusColor(
+                          report.status,
+                        ),
                       ),
                       _buildDetailRow(
                         'الأولوية',
-                        _getPriorityText(report.priority),
-                        _getPriorityColor(report.priority),
+                        _getPriorityText(
+                          report.priority,
+                        ),
+                        _getPriorityColor(
+                          report.priority,
+                        ),
                       ),
                       _buildDetailRow(
                         'تاريخ التقرير',
-                        _formatDate(report.reportDate),
+                        _formatDate(
+                          report.reportDate,
+                        ),
                         Colors.grey[700]!,
                       ),
                       _buildDetailRow(
@@ -455,29 +593,42 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
 
                       // إحداثيات الموقع
                       Container(
-                        padding: EdgeInsets.all(16.w),
+                        padding: EdgeInsets.all(
+                          16.w,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius:
+                              BorderRadius.circular(
+                                8.r,
+                              ),
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
                           children: [
                             Text(
                               'الإحداثيات',
                               style: TextStyle(
                                 fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight:
+                                    FontWeight
+                                        .bold,
                               ),
                             ),
                             SizedBox(height: 8.h),
                             Text(
                               'خط العرض: ${report.location.latitude.toStringAsFixed(6)}',
-                              style: TextStyle(fontSize: 12.sp),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                              ),
                             ),
                             Text(
                               'خط الطول: ${report.location.longitude.toStringAsFixed(6)}',
-                              style: TextStyle(fontSize: 12.sp),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                              ),
                             ),
                           ],
                         ),
@@ -491,22 +642,38 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                Navigator.pop(context);
-                                _centerMapOnReport(report);
+                                Navigator.pop(
+                                  context,
+                                );
+                                _centerMapOnReport(
+                                  report,
+                                );
                               },
-                              icon: const Icon(Icons.center_focus_strong),
-                              label: const Text('توسيط الخريطة'),
+                              icon: const Icon(
+                                Icons
+                                    .center_focus_strong,
+                              ),
+                              label: const Text(
+                                'توسيط الخريطة',
+                              ),
                             ),
                           ),
                           SizedBox(width: 12.w),
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () {
-                                Navigator.pop(context);
+                                Navigator.pop(
+                                  context,
+                                );
                                 // يمكن إضافة المزيد من التفاصيل
                               },
-                              icon: const Icon(Icons.info_outline),
-                              label: const Text('المزيد'),
+                              icon: const Icon(
+                                Icons
+                                    .info_outline,
+                              ),
+                              label: const Text(
+                                'المزيد',
+                              ),
                             ),
                           ),
                         ],
@@ -518,11 +685,18 @@ class _RealTimeHeatMapWidgetState extends State<RealTimeHeatMapWidget>
     );
   }
 
-  Widget _buildDetailRow(String label, String value, Color valueColor) {
+  Widget _buildDetailRow(
+    String label,
+    String value,
+    Color valueColor,
+  ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        vertical: 8.h,
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 80.w,
