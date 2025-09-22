@@ -8,7 +8,8 @@ import 'location_selector_modal.dart';
 class SimpleLocationStep extends StatefulWidget {
   final GovernorateModel? selectedGovernorate;
   final CityModel? selectedCity;
-  final Function(GovernorateModel?) onGovernorateChanged;
+  final Function(GovernorateModel?)
+  onGovernorateChanged;
   final Function(CityModel?) onCityChanged;
 
   const SimpleLocationStep({
@@ -20,10 +21,12 @@ class SimpleLocationStep extends StatefulWidget {
   });
 
   @override
-  State<SimpleLocationStep> createState() => _SimpleLocationStepState();
+  State<SimpleLocationStep> createState() =>
+      _SimpleLocationStepState();
 }
 
-class _SimpleLocationStepState extends State<SimpleLocationStep> {
+class _SimpleLocationStepState
+    extends State<SimpleLocationStep> {
   void _showGovernorateSelector() {
     showModalBottomSheet(
       context: context,
@@ -34,7 +37,9 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
             title: 'اختر المحافظة',
             type: LocationType.governorate,
             onSelected: (governorate) {
-              widget.onGovernorateChanged(governorate as GovernorateModel);
+              widget.onGovernorateChanged(
+                governorate as GovernorateModel,
+              );
               // Reset city when governorate changes
               widget.onCityChanged(null);
             },
@@ -45,12 +50,17 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
   void _showCitySelector() {
     if (widget.selectedGovernorate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى اختيار المحافظة أولاً')),
+        const SnackBar(
+          content: Text(
+            'يرجى اختيار المحافظة أولاً',
+          ),
+        ),
       );
       return;
     }
 
-    final parentId = widget.selectedGovernorate?.id;
+    final parentId =
+        widget.selectedGovernorate?.id;
     if (parentId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -72,7 +82,9 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
             type: LocationType.city,
             parentId: parentId,
             onSelected: (city) {
-              widget.onCityChanged(city as CityModel);
+              widget.onCityChanged(
+                city as CityModel,
+              );
             },
           ),
     );
@@ -83,43 +95,49 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           // Title
-          FadeInDown(
-            duration: const Duration(milliseconds: 600),
-            child: Text(
-              'اختر العنوان',
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
+          // FadeInDown(
+          //   duration: const Duration(milliseconds: 600),
+          //   child: Text(
+          //     'اختر العنوان',
+          //     style: TextStyle(
+          //       fontSize: 24.sp,
+          //       fontWeight: FontWeight.bold,
+          //       color: AppColors.textPrimary,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 8.h),
 
-          SizedBox(height: 8.h),
+          // FadeInDown(
+          //   duration: const Duration(milliseconds: 700),
+          //   child: Text(
+          //     'اختر المحافظة والمدينة التي تقيم بها',
+          //     style: TextStyle(
+          //       fontSize: 16.sp,
+          //       color: AppColors.textSecondary,
+          //       height: 1.5,
+          //     ),
+          //   ),
+          // ),
 
-          FadeInDown(
-            duration: const Duration(milliseconds: 700),
-            child: Text(
-              'اختر المحافظة والمدينة التي تقيم بها',
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
-            ),
-          ),
-
-          SizedBox(height: 32.h),
+          // SizedBox(height: 32.h),
 
           // Governorate selector
           _buildLocationCard(
             title: 'المحافظة',
-            subtitle: widget.selectedGovernorate?.name ?? 'اختر المحافظة',
+            subtitle:
+                widget
+                    .selectedGovernorate
+                    ?.name ??
+                'اختر المحافظة',
             icon: Icons.location_city,
-            isSelected: widget.selectedGovernorate != null,
+            isSelected:
+                widget.selectedGovernorate !=
+                null,
             onTap: _showGovernorateSelector,
             delay: 800,
           ),
@@ -129,18 +147,25 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
           // City selector
           _buildLocationCard(
             title: 'المدينة',
-            subtitle: widget.selectedCity?.name ?? 'اختر المدينة',
+            subtitle:
+                widget.selectedCity?.name ??
+                'اختر المدينة',
             icon: Icons.business,
-            isSelected: widget.selectedCity != null,
+            isSelected:
+                widget.selectedCity != null,
             onTap: _showCitySelector,
             delay: 900,
-            enabled: widget.selectedGovernorate != null,
+            enabled:
+                widget.selectedGovernorate !=
+                null,
           ),
 
           SizedBox(height: 32.h),
 
           // Summary
-          if (widget.selectedGovernorate != null || widget.selectedCity != null)
+          if (widget.selectedGovernorate !=
+                  null ||
+              widget.selectedCity != null)
             _buildSummaryCard(),
         ],
       ),
@@ -161,26 +186,35 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
       child: GestureDetector(
         onTap: enabled ? onTap : null,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: EdgeInsets.all(20.w),
+          duration: const Duration(
+            milliseconds: 300,
+          ),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color:
                 enabled
                     ? (isSelected
-                        ? AppColors.primary.withOpacity(0.1)
+                        ? AppColors.primary
+                            .withOpacity(0.1)
                         : Colors.white)
                     : Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(
+              16.r,
+            ),
             border: Border.all(
               color:
                   enabled
-                      ? (isSelected ? AppColors.primary : AppColors.border)
+                      ? (isSelected
+                          ? AppColors.primary
+                          : AppColors.border)
                       : Colors.grey.shade300,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(
+                  0.05,
+                ),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -190,7 +224,9 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
             children: [
               // Icon
               AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(
+                  milliseconds: 300,
+                ),
                 width: 48.w,
                 height: 48.h,
                 decoration: BoxDecoration(
@@ -198,15 +234,21 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
                       enabled
                           ? (isSelected
                               ? AppColors.primary
-                              : AppColors.primary.withOpacity(0.1))
+                              : AppColors.primary
+                                  .withOpacity(
+                                    0.1,
+                                  ))
                           : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius:
+                      BorderRadius.circular(12.r),
                 ),
                 child: Icon(
                   icon,
                   color:
                       enabled
-                          ? (isSelected ? Colors.white : AppColors.primary)
+                          ? (isSelected
+                              ? Colors.white
+                              : AppColors.primary)
                           : Colors.grey.shade500,
                   size: 24.sp,
                 ),
@@ -217,30 +259,39 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
               // Text content
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
+                        fontWeight:
+                            FontWeight.w600,
                         color:
                             enabled
-                                ? AppColors.textPrimary
-                                : Colors.grey.shade500,
+                                ? AppColors
+                                    .textPrimary
+                                : Colors
+                                    .grey
+                                    .shade500,
                       ),
                     ),
                     SizedBox(height: 4.h),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                         color:
                             enabled
                                 ? (isSelected
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary)
-                                : Colors.grey.shade400,
+                                    ? AppColors
+                                        .textPrimary
+                                    : AppColors
+                                        .textSecondary)
+                                : Colors
+                                    .grey
+                                    .shade400,
                       ),
                     ),
                   ],
@@ -251,7 +302,10 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16.sp,
-                color: enabled ? AppColors.textSecondary : Colors.grey.shade400,
+                color:
+                    enabled
+                        ? AppColors.textSecondary
+                        : Colors.grey.shade400,
               ),
             ],
           ),
@@ -262,21 +316,36 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
 
   Widget _buildSummaryCard() {
     return FadeInUp(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(
+        milliseconds: 1000,
+      ),
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.success.withOpacity(0.3)),
+          color: AppColors.success.withOpacity(
+            0.1,
+          ),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          border: Border.all(
+            color: AppColors.success.withOpacity(
+              0.3,
+            ),
+          ),
         ),
         child: Row(
           children: [
-            Icon(Icons.check_circle, color: AppColors.success, size: 24.sp),
+            Icon(
+              Icons.check_circle,
+              color: AppColors.success,
+              size: 24.sp,
+            ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     'العنوان المحدد',
@@ -291,7 +360,8 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
                     _buildAddressText(),
                     style: TextStyle(
                       fontSize: 16.sp,
-                      color: AppColors.textPrimary,
+                      color:
+                          AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -305,10 +375,13 @@ class _SimpleLocationStepState extends State<SimpleLocationStep> {
 
   String _buildAddressText() {
     List<String> parts = [];
-    if (widget.selectedCity != null) parts.add(widget.selectedCity!.name);
+    if (widget.selectedCity != null)
+      parts.add(widget.selectedCity!.name);
     if (widget.selectedGovernorate != null) {
       parts.add(widget.selectedGovernorate!.name);
     }
-    return parts.isNotEmpty ? parts.join(' - ') : 'لم يتم تحديد العنوان';
+    return parts.isNotEmpty
+        ? parts.join(' - ')
+        : 'لم يتم تحديد العنوان';
   }
 }
