@@ -81,10 +81,13 @@ class RealTimeStatisticsCards extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Colors.grey.withValues(alpha: 0.2),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   spreadRadius: 1,
                   blurRadius: 4,
                   offset: const Offset(0, 2),
@@ -199,7 +202,10 @@ class RealTimeStatisticsCards extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.grey[100],
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Colors.grey.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
             child: Padding(
               padding: EdgeInsets.all(12.w),
@@ -263,7 +269,7 @@ class RealTimeStatisticsCards extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.red[50],
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 1),
       ),
       child: Center(
         child: Column(

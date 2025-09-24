@@ -29,14 +29,14 @@ class AdminReportCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               spreadRadius: 0,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: _getStatusColor(report.reportStatus).withOpacity(0.2),
+            color: _getStatusColor(report.reportStatus).withValues(alpha: 0.2),
             width: 1.5,
           ),
         ),
@@ -54,7 +54,7 @@ class AdminReportCard extends StatelessWidget {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
@@ -90,7 +90,7 @@ class AdminReportCard extends StatelessWidget {
                         BoxShadow(
                           color: _getStatusColor(
                             report.reportStatus,
-                          ).withOpacity(0.3),
+                          ).withValues(alpha: 0.3),
                           spreadRadius: 0,
                           blurRadius: 4,
                           offset: const Offset(0, 2),
@@ -162,7 +162,7 @@ class AdminReportCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: _getPriorityColor(
                           report.priorityLevel,
-                        ).withOpacity(0.1),
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(
                           color: _getPriorityColor(report.priorityLevel),
@@ -321,7 +321,7 @@ class AdminReportCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: _getVerificationColor(
                       report.verificationStatus,
-                    ).withOpacity(0.1),
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
@@ -371,13 +371,13 @@ class AdminReportCard extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   AppColors.primaryColor,
-                  AppColors.primaryColor.withOpacity(0.8),
+                  AppColors.primaryColor.withValues(alpha: 0.8),
                 ],
               ),
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.3),
+                  color: AppColors.primaryColor.withValues(alpha: 0.3),
                   spreadRadius: 0,
                   blurRadius: 6,
                   offset: const Offset(0, 3),
@@ -472,7 +472,7 @@ class AdminReportCard extends StatelessWidget {
           width: 40.w,
           height: 40.h,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(color: color, width: 1.5),
           ),

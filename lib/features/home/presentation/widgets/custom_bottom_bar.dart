@@ -2,13 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
-import 'package:netru_app/features/heatmap/presentation/pages/improved_crime_heat_map_page.dart';
+import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/di/injection_container.dart';
 import 'package:netru_app/features/heatmap/presentation/cubit/heatmap_cubit.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
+import 'package:netru_app/features/reports/presentation/sub_features/create_report/pages/create_report_page.dart';
 import 'package:netru_app/features/settings/presentation/page/settings_page.dart';
-import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/reports/presentation/pages/reports_page.dart';
 
 class CustomBottomBar extends StatefulWidget {
@@ -23,7 +23,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const ImprovedCrimeHeatMapPage(),
+    const CrimeHeatMapPage(),
     const CreateReportPage(),
     const ReportsPage(),
     const SettingsPage(),
@@ -52,7 +52,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
             color: Theme.of(context).scaffoldBackgroundColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
+                color: Colors.grey.withValues(alpha: 0.2),
                 blurRadius: 10,
                 offset: const Offset(0, -2),
               ),
@@ -92,7 +92,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                     color: AppColors.primaryColor,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.3),
+                        color: AppColors.primaryColor.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

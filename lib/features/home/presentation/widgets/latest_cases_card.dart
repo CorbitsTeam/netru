@@ -139,8 +139,8 @@ class _LatestCasesCardState extends State<LatestCasesCard>
       height: 180.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.red.withOpacity(0.1),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: Colors.red.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Center(
         child: Column(
@@ -196,7 +196,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
         color: Colors.yellow[50],
-        border: Border.all(color: Colors.yellow.withOpacity(0.6)),
+        border: Border.all(color: Colors.yellow.withValues(alpha: 0.6)),
       ),
       child: Center(
         child: Column(
@@ -231,7 +231,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -258,7 +258,10 @@ class _LatestCasesCardState extends State<LatestCasesCard>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.7),
+                    ],
                   ),
                 ),
               ),
@@ -354,7 +357,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
                             Text(
                               _formatDate(cases[_currentIndex].incidentDate),
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -377,7 +380,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
                                 color:
                                     index == _currentIndex
                                         ? Colors.white
-                                        : Colors.white.withOpacity(0.5),
+                                        : Colors.white.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -409,7 +412,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
                     children: [
                       Icon(
                         Icons.location_on,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         size: 14.sp,
                       ),
                       SizedBox(width: 4.w),
@@ -417,7 +420,7 @@ class _LatestCasesCardState extends State<LatestCasesCard>
                         child: Text(
                           cases[_currentIndex].displayLocation,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12.sp,
                           ),
                           overflow: TextOverflow.ellipsis,

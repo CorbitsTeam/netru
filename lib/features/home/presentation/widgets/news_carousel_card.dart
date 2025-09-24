@@ -143,8 +143,8 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
       height: 180.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.red.withOpacity(0.1),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: Colors.red.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Center(
         child: Column(
@@ -196,7 +196,7 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -229,7 +229,7 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withValues(alpha: 0.7),
                       ],
                     ),
                   ),
@@ -257,7 +257,7 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                             ).toLocal(),
                           ),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                           ),
@@ -284,7 +284,9 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                                       color:
                                           index == _currentIndex
                                               ? Colors.white
-                                              : Colors.white.withOpacity(0.5),
+                                              : Colors.white.withValues(
+                                                alpha: 0.5,
+                                              ),
                                       borderRadius: BorderRadius.circular(3.r),
                                     ),
                                   ),

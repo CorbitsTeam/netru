@@ -27,7 +27,7 @@ class LocationPermissionDialog extends StatelessWidget {
               width: 80.w,
               height: 80.h,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

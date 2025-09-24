@@ -27,7 +27,7 @@ class ComprehensiveAdminActions extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -42,7 +42,7 @@ class ComprehensiveAdminActions extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(

@@ -163,7 +163,7 @@ class _AdminAuthManagerPageState extends State<AdminAuthManagerPage> {
                   radius: 24.r,
                   backgroundColor: Theme.of(
                     context,
-                  ).primaryColor.withOpacity(0.1),
+                  ).primaryColor.withValues(alpha: 0.1),
                   child: Icon(
                     Icons.person_outline,
                     color: Theme.of(context).primaryColor,
@@ -198,7 +198,7 @@ class _AdminAuthManagerPageState extends State<AdminAuthManagerPage> {
                   decoration: BoxDecoration(
                     color: _getUserTypeColor(
                       user['user_type'],
-                    ).withOpacity(0.1),
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(

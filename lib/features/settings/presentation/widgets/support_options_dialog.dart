@@ -3,16 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SupportOptionsDialog
-    extends StatelessWidget {
+class SupportOptionsDialog extends StatelessWidget {
   const SupportOptionsDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Container(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -32,11 +29,7 @@ class SupportOptionsDialog
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color:
-                        Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.color,
+                    color: Theme.of(context).textTheme.headlineSmall?.color,
                   ),
                 ),
               ],
@@ -60,8 +53,7 @@ class SupportOptionsDialog
               icon: Icons.phone_outlined,
               title: 'الاتصال المباشر',
               subtitle: '+201000000012',
-              onTap:
-                  () => _makePhoneCall(context),
+              onTap: () => _makePhoneCall(context),
             ),
 
             SizedBox(height: 12.h),
@@ -80,8 +72,7 @@ class SupportOptionsDialog
               context,
               icon: Icons.help_outline,
               title: 'الأسئلة الشائعة',
-              subtitle:
-                  'إجابات فورية للأسئلة الشائعة',
+              subtitle: 'إجابات فورية للأسئلة الشائعة',
               onTap: () => _openFAQ(context),
             ),
 
@@ -91,24 +82,12 @@ class SupportOptionsDialog
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12.h,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                          8.r,
-                        ),
-                    side: const BorderSide(
-                      color:
-                          AppColors.primaryColor,
-                    ),
+                    borderRadius: BorderRadius.circular(8.r),
+                    side: const BorderSide(color: AppColors.primaryColor),
                   ),
                 ),
                 child: Text(
@@ -139,13 +118,9 @@ class SupportOptionsDialog
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: Theme.of(
-              context,
-            ).dividerColor.withOpacity(0.5),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
           ),
         ),
         child: Row(
@@ -153,33 +128,22 @@ class SupportOptionsDialog
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor
-                    .withOpacity(0.1),
-                borderRadius:
-                    BorderRadius.circular(6.r),
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6.r),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primaryColor,
-                size: 20.sp,
-              ),
+              child: Icon(icon, color: AppColors.primaryColor, size: 20.sp),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color:
-                          Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.color,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -187,11 +151,7 @@ class SupportOptionsDialog
                     subtitle,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color:
-                          Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -199,10 +159,7 @@ class SupportOptionsDialog
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color:
-                  Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.color,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               size: 16.sp,
             ),
           ],
@@ -211,9 +168,7 @@ class SupportOptionsDialog
     );
   }
 
-  Future<void> _sendEmail(
-    BuildContext context,
-  ) async {
+  Future<void> _sendEmail(BuildContext context) async {
     const email = 'support@netruapp.com';
     const subject = 'طلب دعم فني - تطبيق نترو';
     const body = '''
@@ -248,35 +203,22 @@ class SupportOptionsDialog
     }
   }
 
-  Future<void> _makePhoneCall(
-    BuildContext context,
-  ) async {
+  Future<void> _makePhoneCall(BuildContext context) async {
     const phoneNumber = '+966123456789';
-    final Uri phoneUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
 
     try {
       if (await canLaunchUrl(phoneUri)) {
         await launchUrl(phoneUri);
       } else {
-        _showPhoneNotAvailableDialog(
-          context,
-          phoneNumber,
-        );
+        _showPhoneNotAvailableDialog(context, phoneNumber);
       }
     } catch (e) {
-      _showPhoneNotAvailableDialog(
-        context,
-        phoneNumber,
-      );
+      _showPhoneNotAvailableDialog(context, phoneNumber);
     }
   }
 
-  Future<void> _openLiveChat(
-    BuildContext context,
-  ) async {
+  Future<void> _openLiveChat(BuildContext context) async {
     // For now, show a message that live chat will be available soon
     // In the future, this could integrate with customer support platforms
     showDialog(
@@ -289,11 +231,7 @@ class SupportOptionsDialog
             ),
             actions: [
               TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('حسناً'),
               ),
             ],
@@ -301,9 +239,7 @@ class SupportOptionsDialog
     );
   }
 
-  Future<void> _openFAQ(
-    BuildContext context,
-  ) async {
+  Future<void> _openFAQ(BuildContext context) async {
     // This could navigate to an FAQ page or open a web page
     showDialog(
       context: context,
@@ -315,11 +251,7 @@ class SupportOptionsDialog
             ),
             actions: [
               TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('حسناً'),
               ),
             ],
@@ -327,25 +259,17 @@ class SupportOptionsDialog
     );
   }
 
-  void _showFallbackEmailDialog(
-    BuildContext context,
-    String email,
-  ) {
+  void _showFallbackEmailDialog(BuildContext context, String email) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text(
-              'تعذر فتح البريد الإلكتروني',
-            ),
+            title: const Text('تعذر فتح البريد الإلكتروني'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'يمكنكم إرسال بريد إلكتروني إلى:',
-                ),
+                const Text('يمكنكم إرسال بريد إلكتروني إلى:'),
                 SizedBox(height: 8.h),
                 SelectableText(
                   email,
@@ -358,11 +282,7 @@ class SupportOptionsDialog
             ),
             actions: [
               TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('حسناً'),
               ),
             ],
@@ -370,10 +290,7 @@ class SupportOptionsDialog
     );
   }
 
-  void _showPhoneNotAvailableDialog(
-    BuildContext context,
-    String phoneNumber,
-  ) {
+  void _showPhoneNotAvailableDialog(BuildContext context, String phoneNumber) {
     showDialog(
       context: context,
       builder:
@@ -381,12 +298,9 @@ class SupportOptionsDialog
             title: const Text('تعذر الاتصال'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'يمكنكم الاتصال على الرقم:',
-                ),
+                const Text('يمكنكم الاتصال على الرقم:'),
                 SizedBox(height: 8.h),
                 SelectableText(
                   phoneNumber,
@@ -399,11 +313,7 @@ class SupportOptionsDialog
             ),
             actions: [
               TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('حسناً'),
               ),
             ],

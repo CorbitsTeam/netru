@@ -19,15 +19,17 @@ class SecurityInfoCard extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       margin: EdgeInsets.symmetric(vertical: 8.h),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -42,13 +44,15 @@ class SecurityInfoCard extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                 ],
               ),
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

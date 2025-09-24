@@ -22,7 +22,7 @@ class ReportMediaViewer extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -39,7 +39,7 @@ class ReportMediaViewer extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(
@@ -78,7 +78,7 @@ class ReportMediaViewer extends StatelessWidget {
                     vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
@@ -215,9 +215,9 @@ class ReportMediaViewer extends StatelessWidget {
               width: double.infinity,
               height: 220.h,
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -265,7 +265,7 @@ class ReportMediaViewer extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(50.r),
               ),
               child: Icon(
@@ -305,7 +305,7 @@ class ReportMediaViewer extends StatelessWidget {
         border: Border.all(color: Colors.grey[200]!, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -344,7 +344,7 @@ class ReportMediaViewer extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
@@ -461,7 +461,7 @@ class _FullScreenMediaViewer extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.8),
+        backgroundColor: Colors.black.withValues(alpha: 0.8),
         foregroundColor: Colors.white,
         title: Text(
           'عرض الوسائط',
@@ -547,7 +547,7 @@ class _FullScreenMediaViewer extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(40.w),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Column(

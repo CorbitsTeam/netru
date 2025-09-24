@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
+import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
 import 'package:netru_app/features/notifications/data/datasources/firebase_notification_service.dart';
 import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
@@ -32,8 +34,7 @@ import '../../features/auth/domain/usecases/register_user.dart';
 import '../../features/auth/domain/usecases/signup_user.dart';
 import '../../features/auth/domain/usecases/update_user_profile.dart';
 import '../../features/auth/domain/usecases/upload_profile_image.dart';
-import '../../features/auth/presentation/cubit/login_cubit.dart';
-import '../../features/auth/presentation/cubit/signup_cubit.dart';
+
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
 // ===========================
 // Chatbot Feature

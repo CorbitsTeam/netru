@@ -5,7 +5,11 @@ class MobileAdminDrawer extends StatelessWidget {
   final String? selectedRoute;
   final Function(String)? onRouteSelected;
 
-  const MobileAdminDrawer({super.key, this.selectedRoute, this.onRouteSelected});
+  const MobileAdminDrawer({
+    super.key,
+    this.selectedRoute,
+    this.onRouteSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +95,7 @@ class MobileAdminDrawer extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
+            Theme.of(context).primaryColor.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -130,7 +134,7 @@ class MobileAdminDrawer extends StatelessWidget {
                   'لوحة التحكم الإدارية',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -155,7 +159,9 @@ class MobileAdminDrawer extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
       decoration: BoxDecoration(
         color:
-            isSelected ? Theme.of(context).primaryColor.withOpacity(0.1) : null,
+            isSelected
+                ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
+                : null,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: ListTile(

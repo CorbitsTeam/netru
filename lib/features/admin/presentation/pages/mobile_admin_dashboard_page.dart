@@ -147,7 +147,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
           end: Alignment.bottomRight,
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
+            Theme.of(context).primaryColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16.r),
@@ -168,7 +168,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
             'هنا يمكنك إدارة جميع جوانب النظام ومتابعة الإحصائيات',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -244,7 +244,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -261,7 +261,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
                 child: Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(icon, color: color, size: 20.sp),
@@ -311,7 +311,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
             borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -342,7 +342,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
             borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -450,7 +450,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
       leading: Container(
         padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Icon(icon, color: Theme.of(context).primaryColor),

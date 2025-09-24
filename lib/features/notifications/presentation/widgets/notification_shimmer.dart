@@ -44,7 +44,7 @@ class _NotificationShimmerState extends State<NotificationShimmer>
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
             elevation: 2,
-            shadowColor: Colors.black.withOpacity(0.1),
+            shadowColor: Colors.black.withValues(alpha: 0.1),
             child: Padding(
               padding: EdgeInsets.all(16.r),
               child: Row(
@@ -58,8 +58,8 @@ class _NotificationShimmerState extends State<NotificationShimmer>
                         width: 40.w,
                         height: 40.h,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300]!.withOpacity(
-                            _animation.value,
+                          color: Colors.grey[300]!.withValues(
+                            alpha: _animation.value,
                           ),
                           shape: BoxShape.circle,
                         ),
@@ -81,8 +81,8 @@ class _NotificationShimmerState extends State<NotificationShimmer>
                               height: 16.h,
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300]!.withOpacity(
-                                  _animation.value,
+                                color: Colors.grey[300]!.withValues(
+                                  alpha: _animation.value,
                                 ),
                                 borderRadius: BorderRadius.circular(4.r),
                               ),
@@ -99,8 +99,8 @@ class _NotificationShimmerState extends State<NotificationShimmer>
                               height: 12.h,
                               width: 200.w,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300]!.withOpacity(
-                                  _animation.value,
+                                color: Colors.grey[300]!.withValues(
+                                  alpha: _animation.value,
                                 ),
                                 borderRadius: BorderRadius.circular(4.r),
                               ),
@@ -116,8 +116,8 @@ class _NotificationShimmerState extends State<NotificationShimmer>
                               height: 12.h,
                               width: 150.w,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300]!.withOpacity(
-                                  _animation.value,
+                                color: Colors.grey[300]!.withValues(
+                                  alpha: _animation.value,
                                 ),
                                 borderRadius: BorderRadius.circular(4.r),
                               ),
@@ -134,8 +134,8 @@ class _NotificationShimmerState extends State<NotificationShimmer>
                               height: 10.h,
                               width: 80.w,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300]!.withOpacity(
-                                  _animation.value,
+                                color: Colors.grey[300]!.withValues(
+                                  alpha: _animation.value,
                                 ),
                                 borderRadius: BorderRadius.circular(4.r),
                               ),

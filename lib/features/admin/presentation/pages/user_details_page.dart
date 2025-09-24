@@ -10,7 +10,6 @@ import '../../domain/entities/user_profile_detail_entity.dart';
 import '../cubit/admin_users_cubit.dart';
 import '../widgets/user_avatar_widget.dart';
 import '../widgets/identity_documents_widget.dart';
-import 'user_reports_list_page.dart';
 
 class UserDetailsPage extends StatefulWidget {
   final AdminUserEntity user;
@@ -151,7 +150,6 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                   SizedBox(height: 16.h),
                   _buildReportsSection(),
                   SizedBox(height: 16.h),
-                 
                 ],
               ),
             ),
@@ -175,7 +173,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
               radius: 40,
               backgroundColor: _getUserTypeColor(
                 widget.user.userType,
-              ).withOpacity(0.1),
+              ).withValues(alpha: 0.1),
               textColor: _getUserTypeColor(widget.user.userType),
             ),
             SizedBox(width: 16.w),
@@ -462,7 +460,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
         //           decoration: BoxDecoration(
         //             color: Colors.grey[50],
         //             borderRadius: BorderRadius.circular(8.r),
-        //             border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        //             border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         //           ),
         //           child: Row(
         //             children: [
@@ -503,7 +501,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
         //                 decoration: BoxDecoration(
         //                   color: _getReportStatusColor(
         //                     report.status,
-        //                   ).withOpacity(0.1),
+        //                   ).withValues(alpha: 0.1),
         //                   borderRadius: BorderRadius.circular(4.r),
         //                 ),
         //                 child: Text(
@@ -575,19 +573,17 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     );
   }
 
-  Color _getReportStatusColor(dynamic status) {
-    return Colors.blue; // Default color
-  }
+  // Color _getReportStatusColor(dynamic status) {
+  //   return Colors.blue; // Default color
+  // }
 
-  String _getReportStatusText(dynamic status) {
-    return 'قيد المراجعة'; // Default text
-  }
+  // String _getReportStatusText(dynamic status) {
+  //   return 'قيد المراجعة'; // Default text
+  // }
 
-  String _formatDate(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-  }
-
-
+  // String _formatDate(DateTime dateTime) {
+  //   return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  // }
 
   Widget _buildReportStatCard(
     String title,
@@ -598,9 +594,9 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -625,59 +621,59 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     );
   }
 
-  Widget _buildActivitySection() {
-    return _buildSection(
-      title: 'النشاط',
-      icon: Icons.analytics,
-      children: [
-        _buildInfoRow(
-          'عدد التقارير',
-          widget.user.reportCount.toString(),
-          Icons.report,
-        ),
-        if (widget.user.permissions.isNotEmpty) _buildPermissionsRow(),
-      ],
-    );
-  }
+  // Widget _buildActivitySection() {
+  //   return _buildSection(
+  //     title: 'النشاط',
+  //     icon: Icons.analytics,
+  //     children: [
+  //       _buildInfoRow(
+  //         'عدد التقارير',
+  //         widget.user.reportCount.toString(),
+  //         Icons.report,
+  //       ),
+  //       if (widget.user.permissions.isNotEmpty) _buildPermissionsRow(),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildPermissionsRow() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.security, size: 20.sp, color: Colors.grey[600]),
-            SizedBox(width: 8.w),
-            Text(
-              'الصلاحيات:',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        Wrap(
-          spacing: 8.w,
-          runSpacing: 4.h,
-          children:
-              widget.user.permissions
-                  .map(
-                    (permission) => Chip(
-                      label: Text(
-                        permission,
-                        style: TextStyle(fontSize: 12.sp),
-                      ),
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                    ),
-                  )
-                  .toList(),
-        ),
-      ],
-    );
-  }
+  // Widget _buildPermissionsRow() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Icon(Icons.security, size: 20.sp, color: Colors.grey[600]),
+  //           SizedBox(width: 8.w),
+  //           Text(
+  //             'الصلاحيات:',
+  //             style: TextStyle(
+  //               fontSize: 14.sp,
+  //               fontWeight: FontWeight.w500,
+  //               color: Colors.grey[700],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       SizedBox(height: 8.h),
+  //       Wrap(
+  //         spacing: 8.w,
+  //         runSpacing: 4.h,
+  //         children:
+  //             widget.user.permissions
+  //                 .map(
+  //                   (permission) => Chip(
+  //                     label: Text(
+  //                       permission,
+  //                       style: TextStyle(fontSize: 12.sp),
+  //                     ),
+  //                     backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+  //                   ),
+  //                 )
+  //                 .toList(),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildSection({
     required String title,
@@ -757,9 +753,9 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         value,

@@ -23,14 +23,14 @@ class ReportCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               spreadRadius: 0,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: _getStatusColor(report.status).withOpacity(0.2),
+            color: _getStatusColor(report.status).withValues(alpha: 0.2),
             width: 1.5,
           ),
         ),
@@ -48,7 +48,7 @@ class ReportCard extends StatelessWidget {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
@@ -84,7 +84,7 @@ class ReportCard extends StatelessWidget {
                         BoxShadow(
                           color: _getStatusColor(
                             report.status,
-                          ).withOpacity(0.3),
+                          ).withValues(alpha: 0.3),
                           spreadRadius: 0,
                           blurRadius: 4,
                           offset: const Offset(0, 2),
@@ -212,13 +212,13 @@ class ReportCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.primaryColor,
-                      AppColors.primaryColor.withOpacity(0.8),
+                      AppColors.primaryColor.withValues(alpha: 0.8),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.3),
+                      color: AppColors.primaryColor.withValues(alpha: 0.3),
                       spreadRadius: 0,
                       blurRadius: 6,
                       offset: const Offset(0, 3),

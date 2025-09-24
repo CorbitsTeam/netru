@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
+import 'package:netru_app/features/auth/email_verification/presentation/pages/email_verification_page.dart';
+import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
+import 'package:netru_app/features/auth/login/presentation/pages/login_page.dart';
+import 'package:netru_app/features/auth/profile_completion/presentation/pages/complete_profile_page.dart';
+import 'package:netru_app/features/auth/signup/presentation/pages/signup_page.dart';
+import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
+import 'package:netru_app/features/reports/presentation/sub_features/create_report/pages/create_report_page.dart';
+import 'package:netru_app/features/reports/presentation/sub_features/report_details/pages/report_details_page.dart';
 import '../di/injection_container.dart';
-import '../../features/auth/presentation/cubit/signup_cubit.dart';
-import '../../features/auth/presentation/cubit/login_cubit.dart';
-import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_report_details_page.dart';
@@ -18,11 +20,9 @@ import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
 import '../../features/admin/domain/entities/admin_report_entity.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
-import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/crime_heat_map_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
-import 'package:netru_app/features/reports/presentation/pages/report_details_page.dart';
 import '../../features/reports/domain/entities/reports_entity.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../routing/routes.dart';
@@ -63,7 +63,7 @@ class AppRouter {
         return _createRoute(
           BlocProvider<SignupCubit>(
             create: (context) => sl<SignupCubit>(),
-            child: const ImprovedSignupPage(),
+            child: const SignupPage(),
           ),
         );
 

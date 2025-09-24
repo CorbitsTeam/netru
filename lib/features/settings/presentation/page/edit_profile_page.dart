@@ -1,34 +1,27 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:netru_app/core/theme/app_colors.dart';
+import 'package:netru_app/core/widgets/app_widgets.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/core/di/injection_container.dart'
-    as di;
+import 'package:netru_app/core/di/injection_container.dart' as di;
 import 'package:netru_app/features/auth/domain/usecases/update_user_profile.dart';
 import 'package:netru_app/features/auth/domain/usecases/upload_profile_image.dart';
+import 'package:netru_app/features/settings/presentation/widgets/profile_form_widgets.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
   @override
-  State<EditProfilePage> createState() =>
-      _EditProfilePageState();
+  State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState
-    extends State<EditProfilePage> {
+class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController =
-      TextEditingController();
-  final _phoneController =
-      TextEditingController();
-  final _locationController =
-      TextEditingController();
-  final _addressController =
-      TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _addressController = TextEditingController();
 
   File? _selectedImage;
   String? _currentImageUrl;
@@ -49,8 +42,7 @@ class _EditProfilePageState
       _fullNameController.text = user.fullName;
       _phoneController.text = user.phone ?? '';
       _locationController.text = user.location;
-      _addressController.text =
-          user.address ?? '';
+      _addressController.text = user.address ?? '';
       _currentImageUrl = user.profileImage;
     }
   }
@@ -72,8 +64,7 @@ class _EditProfilePageState
         title: Text(
           'تعديل الملف الشخصي',
           style: TextStyle(
-            color: Colors.black87,
-            fontSize: 16.sp,
+            fontSize: UIConstants.fontSizeExtraLarge,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -82,476 +73,121 @@ class _EditProfilePageState
         elevation: 0,
         actions: [
           TextButton(
-            onPressed:
-                _isLoading ? null : _saveProfile,
-            child:
-                _isLoading
-                    ? SizedBox(
-                      width: 20.w,
-                      height: 20.h,
-                      child:
-                          const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color:
-                                AppColors
-                                    .primaryColor,
-                          ),
-                    )
-                    : Text(
-                      'حفظ',
-                      style: TextStyle(
-                        color:
-                            AppColors
-                                .primaryColor,
-                        fontSize: 13.sp,
-                        fontWeight:
-                            FontWeight.w600,
-                      ),
-                    ),
+            onPressed: _isLoading ? null : _saveProfile,
+            child: Text(
+              'حفظ',
+              style: TextStyle(
+                fontSize: UIConstants.fontSizeLarge,
+                fontWeight: FontWeight.w600,
+                color: _isLoading 
+                    ? Colors.grey 
+                    : Theme.of(context).primaryColor,
+              ),
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Profile Image Section
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(
-                          12.r,
-                        ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withValues(
-                              alpha: 0.05,
-                            ),
-                        blurRadius: 10,
-                        offset: const Offset(
-                          0,
-                          2,
-                        ),
-                      ),
-                    ],
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              UIConstants.verticalSpaceLarge,
+              
+              // Profile Image Section
+              ProfileFormSection(
+                title: 'الصورة الشخصية',
+                children: [
+                  ProfileImagePicker(
+                    selectedImage: _selectedImage,
+                    currentImageUrl: _currentImageUrl,
+                    isUploading: _isImageUploading,
+                    onPickImage: _showImagePicker,
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'صورة الملف الشخصي',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight:
-                              FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: 15.h),
-                      Stack(
-                        alignment:
-                            Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 50.r,
-                            backgroundColor:
-                                Colors.grey[200],
-                            child:
-                                _buildProfileImage(),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap:
-                                  _isImageUploading
-                                      ? null
-                                      : _showImagePicker,
-                              child: Container(
-                                padding:
-                                    EdgeInsets.all(
-                                      8.w,
-                                    ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      AppColors
-                                          .primaryColor,
-                                  shape:
-                                      BoxShape
-                                          .circle,
-                                  border: Border.all(
-                                    color:
-                                        Colors
-                                            .white,
-                                    width: 2,
-                                  ),
-                                ),
-                                child:
-                                    _isImageUploading
-                                        ? SizedBox(
-                                          width:
-                                              16.w,
-                                          height:
-                                              16.h,
-                                          child: const CircularProgressIndicator(
-                                            strokeWidth:
-                                                2,
-                                            color:
-                                                Colors.white,
-                                          ),
-                                        )
-                                        : Icon(
-                                          Icons
-                                              .camera_alt,
-                                          color:
-                                              Colors.white,
-                                          size:
-                                              16.sp,
-                                        ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.h),
-                      Text(
-                        'اضغط لتغيير الصورة',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 15.h),
-
-                // Personal Information Section
-                Container(
-                  padding: EdgeInsets.all(20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(
-                          12.r,
-                        ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withValues(
-                              alpha: 0.05,
-                            ),
-                        blurRadius: 10,
-                        offset: const Offset(
-                          0,
-                          2,
-                        ),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'المعلومات الشخصية',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight:
-                              FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-
-                      // Full Name Field
-                      _buildTextField(
-                        controller:
-                            _fullNameController,
-                        label: 'الاسم الكامل',
-                        icon: Icons.person,
-                        validator: (value) {
-                          if (value?.isEmpty ==
-                              true) {
-                            return 'يرجى إدخال الاسم الكامل';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 15.h),
-
-                      // Phone Field
-                      _buildTextField(
-                        controller:
-                            _phoneController,
-                        label: 'رقم الهاتف',
-                        icon: Icons.phone,
-                        keyboardType:
-                            TextInputType.phone,
-                        validator: (value) {
-                          if (value?.isEmpty ==
-                              true) {
-                            return 'يرجى إدخال رقم الهاتف';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16.h),
-
-                      // Location Field
-                      _buildTextField(
-                        controller:
-                            _locationController,
-                        label: 'الموقع',
-                        icon: Icons.location_on,
-                      ),
-                      SizedBox(height: 16.h),
-
-                      // Address Field
-                      _buildTextField(
-                        controller:
-                            _addressController,
-                        label: 'العنوان',
-                        icon: Icons.home,
-                        maxLines: 3,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30.h),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage() {
-    if (_selectedImage != null) {
-      return ClipOval(
-        child: Image.file(
-          _selectedImage!,
-          width: 100.r,
-          height: 100.r,
-          fit: BoxFit.cover,
-        ),
-      );
-    } else if (_currentImageUrl != null &&
-        _currentImageUrl!.isNotEmpty) {
-      return ClipOval(
-        child: Image.network(
-          _currentImageUrl!,
-          width: 100.r,
-          height: 100.r,
-          fit: BoxFit.cover,
-          errorBuilder: (
-            context,
-            error,
-            stackTrace,
-          ) {
-            return Icon(
-              Icons.person,
-              size: 50.r,
-              color: Colors.grey[600],
-            );
-          },
-          loadingBuilder: (
-            context,
-            child,
-            loadingProgress,
-          ) {
-            if (loadingProgress == null)
-              return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value:
-                    loadingProgress
-                                .expectedTotalBytes !=
-                            null
-                        ? loadingProgress
-                                .cumulativeBytesLoaded /
-                            loadingProgress
-                                .expectedTotalBytes!
-                        : null,
+                ],
               ),
-            );
-          },
-        ),
-      );
-    } else {
-      return Icon(
-        Icons.person,
-        size: 50.r,
-        color: Colors.grey[600],
-      );
-    }
-  }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(8.w),
-        labelText: label,
-        prefixIcon: Icon(
-          icon,
-          color: AppColors.primaryColor,
+              // Personal Information Section
+              ProfileFormSection(
+                title: 'المعلومات الشخصية',
+                children: [
+                  AppFormField(
+                    controller: _fullNameController,
+                    label: 'الاسم الكامل',
+                    icon: Icons.person,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'يرجى إدخال الاسم الكامل';
+                      }
+                      return null;
+                    },
+                  ),
+                  UIConstants.verticalSpaceMedium,
+                  AppFormField(
+                    controller: _phoneController,
+                    label: 'رقم الهاتف',
+                    icon: Icons.phone,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'يرجى إدخال رقم الهاتف';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+
+              // Location Information Section
+              ProfileFormSection(
+                title: 'معلومات الموقع',
+                children: [
+                  AppFormField(
+                    controller: _locationController,
+                    label: 'المدينة',
+                    icon: Icons.location_city,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'يرجى إدخال المدينة';
+                      }
+                      return null;
+                    },
+                  ),
+                  UIConstants.verticalSpaceMedium,
+                  AppFormField(
+                    controller: _addressController,
+                    label: 'العنوان التفصيلي',
+                    icon: Icons.home,
+                    maxLines: 3,
+                    hintText: 'اكتب عنوانك التفصيلي (اختياري)',
+                  ),
+                ],
+              ),
+
+              UIConstants.verticalSpaceLarge,
+
+              // Save Button
+              SaveProfileButton(
+                isLoading: _isLoading,
+                onPressed: _saveProfile,
+              ),
+
+              UIConstants.verticalSpaceLarge,
+            ],
+          ),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: AppColors.primaryColor,
-            width: 2,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: BorderSide(
-            color: Colors.grey[300]!,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 2,
-          ),
-        ),
-        filled: true,
-        fillColor: Colors.grey[50],
       ),
     );
   }
 
   void _showImagePicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20.r),
-        ),
-      ),
-      builder:
-          (context) => Container(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'اختر مصدر الصورة',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment
-                          .spaceEvenly,
-                  children: [
-                    _buildImageSourceOption(
-                      icon: Icons.camera_alt,
-                      label: 'الكاميرا',
-                      onTap:
-                          () => _pickImage(
-                            ImageSource.camera,
-                          ),
-                    ),
-                    _buildImageSourceOption(
-                      icon: Icons.photo_library,
-                      label: 'المعرض',
-                      onTap:
-                          () => _pickImage(
-                            ImageSource.gallery,
-                          ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-              ],
-            ),
-          ),
-    );
-  }
-
-  Widget _buildImageSourceOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(20.w),
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor
-              .withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(
-            12.r,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 40.sp,
-              color: AppColors.primaryColor,
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImage(
-    ImageSource source,
-  ) async {
-    Navigator.of(
+    ImageSourceBottomSheet.show(
       context,
-    ).pop(); // Close bottom sheet
+      onSourceSelected: _pickImage,
+    );
+  }
 
+  Future<void> _pickImage(ImageSource source) async {
     try {
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(
@@ -571,13 +207,9 @@ class _EditProfilePageState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'حدث خطأ أثناء اختيار الصورة: $e',
-            ),
+            content: Text('خطأ في اختيار الصورة: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -597,17 +229,13 @@ class _EditProfilePageState
       final user = userHelper.getCurrentUser();
 
       if (user?.id == null) {
-        throw Exception(
-          'لا يمكن العثور على معرف المستخدم',
-        );
+        throw Exception('لم يتم العثور على بيانات المستخدم');
       }
 
       // Generate unique filename
-      final fileName =
-          'profile_${user!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final fileName = 'profile_${user!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final uploadUseCase =
-          di.sl<UploadProfileImageUseCase>();
+      final uploadUseCase = di.sl<UploadProfileImageUseCase>();
       final result = await uploadUseCase(
         UploadProfileImageParams(
           imageFile: _selectedImage!,
@@ -623,28 +251,22 @@ class _EditProfilePageState
           setState(() {
             _currentImageUrl = imageUrl;
           });
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'تم رفع الصورة بنجاح',
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم رفع الصورة بنجاح'),
+                backgroundColor: Colors.green,
               ),
-              backgroundColor: Colors.green,
-            ),
-          );
+            );
+          }
         },
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'فشل في رفع الصورة: $e',
-            ),
+            content: Text('فشل في رفع الصورة: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -657,8 +279,7 @@ class _EditProfilePageState
   }
 
   Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate())
-      return;
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
@@ -669,29 +290,22 @@ class _EditProfilePageState
       final user = userHelper.getCurrentUser();
 
       if (user?.id == null) {
-        throw Exception(
-          'لا يمكن العثور على معرف المستخدم',
-        );
+        throw Exception('لم يتم العثور على بيانات المستخدم');
       }
 
       final updateData = {
-        'full_name':
-            _fullNameController.text.trim(),
+        'full_name': _fullNameController.text.trim(),
         'phone': _phoneController.text.trim(),
-        // 'location': _locationController.text.trim(),
+        'location': _locationController.text.trim(),
         'address': _addressController.text.trim(),
       };
 
       // Add profile image URL if it was updated
-      if (_currentImageUrl != null &&
-          _currentImageUrl !=
-              user!.profileImage) {
-        updateData['profile_image'] =
-            _currentImageUrl!;
+      if (_currentImageUrl != null && _currentImageUrl != user!.profileImage) {
+        updateData['profile_image'] = _currentImageUrl!;
       }
 
-      final updateUseCase =
-          di.sl<UpdateUserProfileUseCase>();
+      final updateUseCase = di.sl<UpdateUserProfileUseCase>();
       final result = await updateUseCase(
         UpdateUserProfileParams(
           userId: user!.id,
@@ -703,38 +317,26 @@ class _EditProfilePageState
         (failure) {
           throw Exception(failure.message);
         },
-        (updatedUser) async {
+        (updatedUser) {
           // Update local user data
-          await userHelper.saveCurrentUser(
-            updatedUser,
-          );
-
+          userHelper.saveCurrentUser(updatedUser);
+          
           if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(
-                  'تم حفظ التغييرات بنجاح',
-                ),
+                content: Text('تم تحديث الملف الشخصي بنجاح'),
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.of(context).pop(
-              true,
-            ); // Return true to indicate success
+            Navigator.of(context).pop();
           }
         },
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'فشل في حفظ التغييرات: $e',
-            ),
+            content: Text('فشل في تحديث الملف الشخصي: $e'),
             backgroundColor: Colors.red,
           ),
         );

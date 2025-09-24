@@ -60,12 +60,12 @@ class ReportInfoSection extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: AppColors.primaryColor.withOpacity(0.3),
+                    color: AppColors.primaryColor.withValues(alpha: 0.3),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -79,7 +79,9 @@ class ReportInfoSection extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(8.w),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
+                            color: AppColors.primaryColor.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Icon(
@@ -104,10 +106,10 @@ class ReportInfoSection extends StatelessWidget {
                       width: double.infinity,
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.05),
+                        color: AppColors.primaryColor.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(
-                          color: AppColors.primaryColor.withOpacity(0.2),
+                          color: AppColors.primaryColor.withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -255,7 +257,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     spreadRadius: 2,
                   ),
@@ -410,7 +412,9 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                                     borderRadius: BorderRadius.circular(12.r),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -471,7 +475,10 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.selectedReportType?.nameAr ?? widget.hintText,
-        suffixIcon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryColor),
+        suffixIcon: const Icon(
+          Icons.arrow_drop_down,
+          color: AppColors.primaryColor,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey[300]!),

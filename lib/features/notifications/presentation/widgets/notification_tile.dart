@@ -24,7 +24,7 @@ class NotificationTile extends StatelessWidget {
         color: notification.isRead ? Colors.white : Colors.blue.shade50,
         borderRadius: BorderRadius.circular(12.r),
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12.r),
@@ -38,7 +38,7 @@ class NotificationTile extends StatelessWidget {
                   width: 40.w,
                   height: 40.h,
                   decoration: BoxDecoration(
-                    color: _getIconColor().withOpacity(0.1),
+                    color: _getIconColor().withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(_getIcon(), color: _getIconColor(), size: 20.sp),

@@ -185,7 +185,7 @@ class _ChatPageState extends State<ChatPage> {
             width: 80.w,
             height: 80.w,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.smart_toy, size: 40.sp, color: AppColors.primary),

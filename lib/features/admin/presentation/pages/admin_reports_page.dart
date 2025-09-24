@@ -49,7 +49,7 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -229,7 +229,7 @@ class AdminReportsListView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         spreadRadius: 0,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
@@ -267,14 +267,14 @@ class AdminReportsListView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     spreadRadius: 0,
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
                 border: Border.all(
-                  color: Colors.red.withOpacity(0.2),
+                  color: Colors.red.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -285,7 +285,7 @@ class AdminReportsListView extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(50.r),
                       ),
                       child: Icon(
@@ -356,7 +356,7 @@ class AdminReportsListView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       spreadRadius: 0,
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -443,13 +443,13 @@ class AdminReportsListView extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primaryColor,
-            AppColors.primaryColor.withOpacity(0.8),
+            AppColors.primaryColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
+            color: AppColors.primaryColor.withValues(alpha: 0.3),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -463,7 +463,7 @@ class AdminReportsListView extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -480,7 +480,7 @@ class AdminReportsListView extends StatelessWidget {
                     Text(
                       'إجمالي البلاغات',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -500,7 +500,7 @@ class AdminReportsListView extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
@@ -548,7 +548,7 @@ class AdminReportsListView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Column(
@@ -565,7 +565,7 @@ class AdminReportsListView extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w500,
               ),

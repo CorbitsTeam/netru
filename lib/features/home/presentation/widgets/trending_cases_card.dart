@@ -42,7 +42,7 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.r),
           color: Colors.yellow[50],
-          border: Border.all(color: Colors.yellow.withOpacity(0.6)),
+          border: Border.all(color: Colors.yellow.withValues(alpha: 0.6)),
         ),
         child: const Center(
           child: Text('تبعيات القضايا غير جاهزة — قم بعمل Restart للتطبيق.'),
@@ -97,8 +97,8 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
       height: 200.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.red.withOpacity(0.1),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: Colors.red.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Center(
         child: Column(
@@ -162,12 +162,15 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,10 +285,14 @@ class _TrendingCasesCardState extends State<TrendingCasesCard> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(caseModel.status).withOpacity(0.1),
+                  color: _getStatusColor(
+                    caseModel.status,
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: _getStatusColor(caseModel.status).withOpacity(0.3),
+                    color: _getStatusColor(
+                      caseModel.status,
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(

@@ -80,7 +80,7 @@ class RecentActivityWidget extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20.r,
-            backgroundColor: activity.type.color.withOpacity(0.1),
+            backgroundColor: activity.type.color.withValues(alpha: 0.1),
             child: Icon(
               activity.type.icon,
               color: activity.type.color,
@@ -314,7 +314,7 @@ class _ActivityFilterState extends State<ActivityFilter> {
                         });
                         widget.onFilterChanged(_selectedTypes);
                       },
-                      selectedColor: type.color.withOpacity(0.3),
+                      selectedColor: type.color.withValues(alpha: 0.3),
                       checkmarkColor: type.color,
                     );
                   }).toList(),

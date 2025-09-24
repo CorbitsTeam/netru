@@ -123,7 +123,7 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
             width: 80.w,
             height: 80.w,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -221,6 +221,4 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
     // This would be handled by the repository
     _chatCubit.loadUserSessions(); // Refresh list
   }
-
-
 }

@@ -41,7 +41,7 @@ void showModernSnackBar(
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: backgroundColor.withOpacity(0.5),
+              color: backgroundColor.withValues(alpha: 0.5),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),

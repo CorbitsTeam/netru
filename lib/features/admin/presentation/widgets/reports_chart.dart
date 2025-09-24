@@ -121,7 +121,7 @@ class ReportsChart extends StatelessWidget {
                                 show: true,
                                 color: Theme.of(
                                   context,
-                                ).primaryColor.withOpacity(0.1),
+                                ).primaryColor.withValues(alpha: 0.1),
                               ),
                             ),
                           ],

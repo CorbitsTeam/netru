@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,10 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
             listener: (context, state) {
               if (state is HomeFcmTokenSuccess) {
                 // FCM token received successfully
-                print('🎉 FCM Token: ${state.fcmToken}');
+                log('🎉 FCM Token: ${state.fcmToken}');
               } else if (state is HomeFailure) {
                 // Handle FCM token error
-                print('❌ FCM Error: ${state.error}');
+                log('❌ FCM Error: ${state.error}');
               }
             },
             child: Scaffold(

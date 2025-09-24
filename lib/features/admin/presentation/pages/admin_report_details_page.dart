@@ -138,7 +138,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           margin: EdgeInsets.only(right: 12.w),
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: _getStatusColor(widget.report.reportStatus).withOpacity(0.1),
+            color: _getStatusColor(
+              widget.report.reportStatus,
+            ).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20.r),
           ),
           child: Text(
@@ -285,13 +287,13 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         gradient: LinearGradient(
           colors: [
             AppColors.primaryColor,
-            AppColors.primaryColor.withOpacity(0.8),
+            AppColors.primaryColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
+            color: AppColors.primaryColor.withValues(alpha: 0.3),
             spreadRadius: 0,
             blurRadius: 15,
             offset: const Offset(0, 6),
@@ -305,7 +307,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Icon(Icons.assignment, color: Colors.white, size: 28.sp),
@@ -318,7 +320,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                     Text(
                       'رقم البلاغ',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -363,7 +365,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                         vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
@@ -384,7 +386,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             width: double.infinity,
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16.r),
             ),
             child: Column(
@@ -393,7 +395,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                 Text(
                   'نوع البلاغ',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -412,14 +414,14 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                   children: [
                     Icon(
                       Icons.access_time,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       size: 16.sp,
                     ),
                     SizedBox(width: 6.w),
                     Text(
                       'تم الإبلاغ: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(widget.report.submittedAt)}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -432,14 +434,14 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                     children: [
                       Icon(
                         Icons.event,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         size: 16.sp,
                       ),
                       SizedBox(width: 6.w),
                       Text(
                         'وقت الحادثة: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(widget.report.incidentDateTime!)}',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -470,7 +472,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -485,7 +487,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -508,7 +510,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
@@ -552,9 +554,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
+              color: Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -586,7 +588,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -602,7 +604,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -635,10 +637,10 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                               vertical: 2.h,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
+                              color: Colors.green.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8.r),
                               border: Border.all(
-                                color: Colors.green.withOpacity(0.3),
+                                color: Colors.green.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -793,7 +795,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.05),
+              color: Colors.green.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
@@ -857,7 +859,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.05),
+              color: Colors.blue.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
@@ -903,9 +905,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
+                color: Colors.purple.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Colors.purple.withOpacity(0.3)),
+                border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -945,7 +947,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.05),
+                color: Colors.amber.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Column(
@@ -970,7 +972,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                           vertical: 4.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.2),
+                          color: Colors.amber.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
@@ -1008,7 +1010,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1055,7 +1057,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -1070,7 +1072,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.1),
+                  color: Colors.amber.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(Icons.badge, color: Colors.amber[700], size: 20.sp),
@@ -1244,7 +1246,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
+                color: Colors.amber.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(8.r),
                   bottomRight: Radius.circular(8.r),
@@ -1307,7 +1309,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                           width: double.infinity,
                           padding: EdgeInsets.all(16.w),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.1),
+                            color: Colors.amber.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(16.r),
                               topRight: Radius.circular(16.r),
@@ -1428,9 +1430,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -1500,7 +1502,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -1515,7 +1517,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Icons.trending_up, color: Colors.blue, size: 24.sp),
@@ -1554,12 +1556,12 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             decoration: BoxDecoration(
               color: _getReportStatusColor(
                 currentReportStatus,
-              ).withOpacity(0.1),
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
                 color: _getReportStatusColor(
                   currentReportStatus,
-                ).withOpacity(0.3),
+                ).withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -1639,9 +1641,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               width: double.infinity,
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1696,7 +1698,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           elevation: isPrimary ? 4 : 1,
           shadowColor:
               isPrimary
-                  ? _getReportStatusColor(status).withOpacity(0.3)
+                  ? _getReportStatusColor(status).withValues(alpha: 0.3)
                   : Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
@@ -1744,7 +1746,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -1759,7 +1761,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -1826,7 +1828,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -2298,7 +2300,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       leading: Container(
         padding: EdgeInsets.all(10.w),
         decoration: BoxDecoration(
-          color: actionColor.withOpacity(0.1),
+          color: actionColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Icon(icon, color: actionColor, size: 22.sp),
@@ -2327,7 +2329,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -2342,7 +2344,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
@@ -2378,9 +2380,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               width: double.infinity,
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.05),
+                color: Colors.orange.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
               ),
               child: Text(
                 widget.report.adminNotes!,
@@ -2418,9 +2420,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               width: double.infinity,
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.05),
+                color: Colors.green.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Colors.green.withOpacity(0.2)),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
               ),
               child: Text(
                 widget.report.publicNotes!,
@@ -2455,7 +2457,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -2470,7 +2472,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.withOpacity(0.1),
+                  color: Colors.indigo.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Icons.history, color: Colors.indigo, size: 24.sp),
@@ -2573,7 +2575,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -2588,7 +2590,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.1),
+                  color: Colors.teal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Icons.comment, color: Colors.teal, size: 24.sp),
@@ -2606,7 +2608,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.1),
+                  color: Colors.teal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
@@ -2642,14 +2644,14 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       decoration: BoxDecoration(
         color:
             comment.isInternal
-                ? Colors.orange.withOpacity(0.05)
-                : Colors.blue.withOpacity(0.05),
+                ? Colors.orange.withValues(alpha: 0.05)
+                : Colors.blue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
           color:
               comment.isInternal
-                  ? Colors.orange.withOpacity(0.2)
-                  : Colors.blue.withOpacity(0.2),
+                  ? Colors.orange.withValues(alpha: 0.2)
+                  : Colors.blue.withValues(alpha: 0.2),
         ),
       ),
       child: Column(

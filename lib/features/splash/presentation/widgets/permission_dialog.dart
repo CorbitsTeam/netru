@@ -34,7 +34,7 @@ class PermissionDialog extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -51,13 +51,13 @@ class PermissionDialog extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     AppColors.primaryColor,
-                    AppColors.primaryColor.withOpacity(0.8),
+                    AppColors.primaryColor.withValues(alpha: 0.8),
                   ],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.3),
+                    color: AppColors.primaryColor.withValues(alpha: 0.3),
                     blurRadius: 15,
                     spreadRadius: 2,
                   ),
@@ -72,10 +72,10 @@ class PermissionDialog extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20.r),
                 border: Border.all(
-                  color: AppColors.primaryColor.withOpacity(0.2),
+                  color: AppColors.primaryColor.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -170,13 +170,13 @@ class PermissionDialog extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           AppColors.primaryColor,
-                          AppColors.primaryColor.withOpacity(0.8),
+                          AppColors.primaryColor.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12.r),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primaryColor.withOpacity(0.3),
+                          color: AppColors.primaryColor.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),

@@ -18,7 +18,12 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   DateTime? _endDate;
   final List<int> _selectedNotifications = [];
 
-  final List<String> _notificationTypes = ['عام', 'تحديث بلاغ', 'تحقق مستخدم', 'نظام'];
+  final List<String> _notificationTypes = [
+    'عام',
+    'تحديث بلاغ',
+    'تحقق مستخدم',
+    'نظام',
+  ];
   final List<String> _statusOptions = ['مرسل', 'مجدول', 'مسودة', 'فشل'];
 
   // Mock notifications data
@@ -107,12 +112,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         ],
       ),
       drawer: const MobileAdminDrawer(selectedRoute: '/admin/notifications'),
-      body: Column(
-        children: [
-          _buildStatsCards(),
-          _buildTabSection(),
-        ],
-      ),
+      body: Column(children: [_buildStatsCards(), _buildTabSection()]),
       floatingActionButton: FloatingActionButton(
         onPressed: _showCreateNotificationDialog,
         backgroundColor: Theme.of(context).primaryColor,
@@ -157,7 +157,12 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -165,7 +170,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -187,10 +192,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
           SizedBox(height: 4.h),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -209,7 +211,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 4,
                   offset: const Offset(0, 2),
@@ -221,7 +223,10 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
               labelColor: Colors.blue,
               unselectedLabelColor: Colors.grey[600],
               indicatorColor: Colors.blue,
-              labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+              labelStyle: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
               unselectedLabelStyle: TextStyle(fontSize: 14.sp),
               tabs: const [
                 Tab(text: 'جميع الإشعارات'),
@@ -260,33 +265,41 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   }
 
   Widget _buildScheduledNotificationsTab() {
-    final scheduledNotifications = _notifications.where((n) => n['status'] == 'مجدول').toList();
-    
+    final scheduledNotifications =
+        _notifications.where((n) => n['status'] == 'مجدول').toList();
+
     return Container(
       padding: EdgeInsets.all(16.w),
-      child: scheduledNotifications.isEmpty
-          ? _buildEmptyState('لا توجد إشعارات مجدولة', Icons.schedule)
-          : ListView.separated(
-              itemCount: scheduledNotifications.length,
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) =>
-                  _buildNotificationCard(scheduledNotifications[index], index),
-            ),
+      child:
+          scheduledNotifications.isEmpty
+              ? _buildEmptyState('لا توجد إشعارات مجدولة', Icons.schedule)
+              : ListView.separated(
+                itemCount: scheduledNotifications.length,
+                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                itemBuilder:
+                    (context, index) => _buildNotificationCard(
+                      scheduledNotifications[index],
+                      index,
+                    ),
+              ),
     );
   }
 
   Widget _buildDraftsTab() {
     final drafts = _notifications.where((n) => n['status'] == 'مسودة').toList();
-    
+
     return Container(
       padding: EdgeInsets.all(16.w),
-      child: drafts.isEmpty
-          ? _buildEmptyState('لا توجد مسودات', Icons.drafts)
-          : ListView.separated(
-              itemCount: drafts.length,
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) => _buildNotificationCard(drafts[index], index),
-            ),
+      child:
+          drafts.isEmpty
+              ? _buildEmptyState('لا توجد مسودات', Icons.drafts)
+              : ListView.separated(
+                itemCount: drafts.length,
+                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                itemBuilder:
+                    (context, index) =>
+                        _buildNotificationCard(drafts[index], index),
+              ),
     );
   }
 
@@ -299,10 +312,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
           SizedBox(height: 16.h),
           Text(
             message,
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -317,7 +327,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -377,7 +387,9 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
     Function(String?) onChanged,
   ) {
     return InkWell(
-      onTap: () => _showFilterBottomSheet(label, selectedValue, options, onChanged),
+      onTap:
+          () =>
+              _showFilterBottomSheet(label, selectedValue, options, onChanged),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
@@ -412,7 +424,8 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   Widget _buildDateRangeChip() {
     String dateText = 'التاريخ';
     if (_startDate != null && _endDate != null) {
-      dateText = '${_startDate!.day}/${_startDate!.month} - ${_endDate!.day}/${_endDate!.month}';
+      dateText =
+          '${_startDate!.day}/${_startDate!.month} - ${_endDate!.day}/${_endDate!.month}';
     }
 
     return InkWell(
@@ -480,7 +493,11 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
     );
   }
 
-  Widget _buildBulkActionButton(String label, IconData icon, VoidCallback onPressed) {
+  Widget _buildBulkActionButton(
+    String label,
+    IconData icon,
+    VoidCallback onPressed,
+  ) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -498,7 +515,9 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
     return ListView.separated(
       itemCount: _notifications.length,
       separatorBuilder: (context, index) => SizedBox(height: 12.h),
-      itemBuilder: (context, index) => _buildNotificationCard(_notifications[index], index),
+      itemBuilder:
+          (context, index) =>
+              _buildNotificationCard(_notifications[index], index),
     );
   }
 
@@ -517,7 +536,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 4,
               offset: const Offset(0, 2),
@@ -534,7 +553,9 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                 else
                   CircleAvatar(
                     radius: 20.r,
-                    backgroundColor: _getTypeColor(notification['type']).withOpacity(0.1),
+                    backgroundColor: _getTypeColor(
+                      notification['type'],
+                    ).withValues(alpha: 0.1),
                     child: Icon(
                       _getTypeIcon(notification['type']),
                       color: _getTypeColor(notification['type']),
@@ -566,15 +587,31 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                   ),
                 ),
                 PopupMenuButton<String>(
-                  onSelected: (action) => _handleNotificationAction(notification, action),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(value: 'view', child: Text('عرض')),
-                    const PopupMenuItem(value: 'edit', child: Text('تعديل')),
-                    if (notification['status'] == 'مسودة' || notification['status'] == 'مجدول')
-                      const PopupMenuItem(value: 'send', child: Text('إرسال الآن')),
-                    const PopupMenuItem(value: 'duplicate', child: Text('تكرار')),
-                    const PopupMenuItem(value: 'delete', child: Text('حذف')),
-                  ],
+                  onSelected:
+                      (action) =>
+                          _handleNotificationAction(notification, action),
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(value: 'view', child: Text('عرض')),
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Text('تعديل'),
+                        ),
+                        if (notification['status'] == 'مسودة' ||
+                            notification['status'] == 'مجدول')
+                          const PopupMenuItem(
+                            value: 'send',
+                            child: Text('إرسال الآن'),
+                          ),
+                        const PopupMenuItem(
+                          value: 'duplicate',
+                          child: Text('تكرار'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text('حذف'),
+                        ),
+                      ],
                 ),
               ],
             ),
@@ -588,17 +625,25 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
             SizedBox(height: 12.h),
             Row(
               children: [
-                _buildStatusBadge(notification['type'], _getTypeColor(notification['type'])),
+                _buildStatusBadge(
+                  notification['type'],
+                  _getTypeColor(notification['type']),
+                ),
                 SizedBox(width: 8.w),
-                _buildStatusBadge(notification['status'], _getStatusColor(notification['status'])),
-                if (notification['status'] == 'مرسل' && notification['deliveryRate'] > 0)
-                  ...[
-                    SizedBox(width: 8.w),
-                    _buildStatusBadge(
-                      '${notification['deliveryRate']}% تسليم',
-                      notification['deliveryRate'] >= 95 ? Colors.green : Colors.orange,
-                    ),
-                  ],
+                _buildStatusBadge(
+                  notification['status'],
+                  _getStatusColor(notification['status']),
+                ),
+                if (notification['status'] == 'مرسل' &&
+                    notification['deliveryRate'] > 0) ...[
+                  SizedBox(width: 8.w),
+                  _buildStatusBadge(
+                    '${notification['deliveryRate']}% تسليم',
+                    notification['deliveryRate'] >= 95
+                        ? Colors.green
+                        : Colors.orange,
+                  ),
+                ],
                 const Spacer(),
                 Text(
                   notification['sentDate'] != null
@@ -618,9 +663,9 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
@@ -713,40 +758,45 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
-      builder: (context) => Container(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2.r),
-              ),
+      builder:
+          (context) => Container(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                ...options.map(
+                  (option) => ListTile(
+                    title: Text(option),
+                    trailing:
+                        selectedValue == option
+                            ? Icon(Icons.check, color: Colors.blue, size: 20.sp)
+                            : null,
+                    onTap: () {
+                      onChanged(selectedValue == option ? null : option);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16.h),
-            Text(
-              title,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16.h),
-            ...options.map(
-              (option) => ListTile(
-                title: Text(option),
-                trailing: selectedValue == option
-                    ? Icon(Icons.check, color: Colors.blue, size: 20.sp)
-                    : null,
-                onTap: () {
-                  onChanged(selectedValue == option ? null : option);
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -755,9 +805,10 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      initialDateRange: _startDate != null && _endDate != null
-          ? DateTimeRange(start: _startDate!, end: _endDate!)
-          : null,
+      initialDateRange:
+          _startDate != null && _endDate != null
+              ? DateTimeRange(start: _startDate!, end: _endDate!)
+              : null,
     );
 
     if (picked != null) {
@@ -790,32 +841,35 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   void _showAnalytics() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'إحصائيات الإشعارات',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: SizedBox(
-          width: 300.w,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildAnalyticRow('إجمالي الإشعارات المرسلة', '2,347'),
-              _buildAnalyticRow('معدل التسليم', '97.8%'),
-              _buildAnalyticRow('معدل القراءة', '85.2%'),
-              _buildAnalyticRow('الإشعارات اليوم', '23'),
-              _buildAnalyticRow('الإشعارات المجدولة', '8'),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            title: Text(
+              'إحصائيات الإشعارات',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: SizedBox(
+              width: 300.w,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildAnalyticRow('إجمالي الإشعارات المرسلة', '2,347'),
+                  _buildAnalyticRow('معدل التسليم', '97.8%'),
+                  _buildAnalyticRow('معدل القراءة', '85.2%'),
+                  _buildAnalyticRow('الإشعارات اليوم', '23'),
+                  _buildAnalyticRow('الإشعارات المجدولة', '8'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إغلاق'),
+              ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -847,228 +901,283 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          title: Text(
-            'إنشاء إشعار جديد',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  title: Text(
+                    'إنشاء إشعار جديد',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  content: SizedBox(
+                    width: 350.w,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: titleController,
+                            decoration: InputDecoration(
+                              labelText: 'عنوان الإشعار',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          TextField(
+                            controller: contentController,
+                            decoration: InputDecoration(
+                              labelText: 'محتوى الإشعار',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            maxLines: 3,
+                          ),
+                          SizedBox(height: 16.h),
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'نوع الإشعار',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            value: selectedType,
+                            items:
+                                _notificationTypes.map((type) {
+                                  return DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                (value) =>
+                                    setModalState(() => selectedType = value),
+                          ),
+                          SizedBox(height: 16.h),
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'المجموعة المستهدفة',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            value: selectedTarget,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'all',
+                                child: Text('جميع المستخدمين'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'citizens',
+                                child: Text('المواطنين فقط'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'foreigners',
+                                child: Text('الأجانب فقط'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'verified',
+                                child: Text('المحققين فقط'),
+                              ),
+                            ],
+                            onChanged:
+                                (value) =>
+                                    setModalState(() => selectedTarget = value),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('إلغاء'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تم حفظ الإشعار كمسودة'),
+                          ),
+                        );
+                      },
+                      child: const Text('حفظ كمسودة'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تم إرسال الإشعار بنجاح'),
+                          ),
+                        );
+                      },
+                      child: const Text('إرسال الآن'),
+                    ),
+                  ],
+                ),
           ),
-          content: SizedBox(
-            width: 350.w,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      labelText: 'عنوان الإشعار',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  TextField(
-                    controller: contentController,
-                    decoration: InputDecoration(
-                      labelText: 'محتوى الإشعار',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                    maxLines: 3,
-                  ),
-                  SizedBox(height: 16.h),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: 'نوع الإشعار',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                    value: selectedType,
-                    items: _notificationTypes.map((type) {
-                      return DropdownMenuItem(value: type, child: Text(type));
-                    }).toList(),
-                    onChanged: (value) => setModalState(() => selectedType = value),
-                  ),
-                  SizedBox(height: 16.h),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: 'المجموعة المستهدفة',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                    value: selectedTarget,
-                    items: const [
-                      DropdownMenuItem(value: 'all', child: Text('جميع المستخدمين')),
-                      DropdownMenuItem(value: 'citizens', child: Text('المواطنين فقط')),
-                      DropdownMenuItem(value: 'foreigners', child: Text('الأجانب فقط')),
-                      DropdownMenuItem(value: 'verified', child: Text('المحققين فقط')),
-                    ],
-                    onChanged: (value) => setModalState(() => selectedTarget = value),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
-            ),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم حفظ الإشعار كمسودة')),
-                );
-              },
-              child: const Text('حفظ كمسودة'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم إرسال الإشعار بنجاح')),
-                );
-              },
-              child: const Text('إرسال الآن'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   void _showBulkNotificationDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'إرسال جماعي',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: SizedBox(
-          width: 350.w,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'إرسال إشعار لعدة مجموعات من المستخدمين',
-                style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            title: Text(
+              'إرسال جماعي',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: SizedBox(
+              width: 350.w,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'إرسال إشعار لعدة مجموعات من المستخدمين',
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 16.h),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'عنوان الإشعار',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'محتوى الإشعار',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    maxLines: 3,
+                  ),
+                ],
               ),
-              SizedBox(height: 16.h),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'عنوان الإشعار',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إلغاء'),
               ),
-              SizedBox(height: 16.h),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'محتوى الإشعار',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                ),
-                maxLines: 3,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم إرسال الإشعارات بنجاح')),
+                  );
+                },
+                child: const Text('إرسال'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم إرسال الإشعارات بنجاح')),
-              );
-            },
-            child: const Text('إرسال'),
-          ),
-        ],
-      ),
     );
   }
 
   void _bulkSend() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'إرسال الإشعارات',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'هل تريد إرسال ${_selectedNotifications.length} إشعار؟',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _selectedNotifications.clear();
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم إرسال الإشعارات المحددة')),
-              );
-            },
-            child: Text(
-              'إرسال',
-              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
+            title: Text(
+              'إرسال الإشعارات',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'هل تريد إرسال ${_selectedNotifications.length} إشعار؟',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedNotifications.clear();
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم إرسال الإشعارات المحددة')),
+                  );
+                },
+                child: Text(
+                  'إرسال',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _bulkDelete() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'حذف الإشعارات',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'هل تريد حذف ${_selectedNotifications.length} إشعار؟',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _selectedNotifications.clear();
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم حذف الإشعارات المحددة')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(
-              'حذف',
-              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
+            title: Text(
+              'حذف الإشعارات',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'هل تريد حذف ${_selectedNotifications.length} إشعار؟',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedNotifications.clear();
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم حذف الإشعارات المحددة')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text(
+                  'حذف',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
-  void _handleNotificationAction(Map<String, dynamic> notification, String action) {
+  void _handleNotificationAction(
+    Map<String, dynamic> notification,
+    String action,
+  ) {
     switch (action) {
       case 'view':
         _viewNotificationDetails(notification);
@@ -1082,9 +1191,9 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         _sendNotificationNow(notification);
         break;
       case 'duplicate':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تكرار الإشعار')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تم تكرار الإشعار')));
         break;
       case 'delete':
         _deleteNotification(notification);
@@ -1095,110 +1204,119 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   void _viewNotificationDetails(Map<String, dynamic> notification) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'تفاصيل الإشعار',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('العنوان: ${notification['title']}'),
-              SizedBox(height: 8.h),
-              Text('النوع: ${notification['type']}'),
-              SizedBox(height: 8.h),
-              Text('الحالة: ${notification['status']}'),
-              SizedBox(height: 8.h),
-              Text('عدد المستلمين: ${notification['recipients']}'),
-              SizedBox(height: 8.h),
-              if (notification['deliveryRate'] > 0)
-                Text('معدل التسليم: ${notification['deliveryRate']}%'),
-              SizedBox(height: 8.h),
-              Text('المحتوى: ${notification['content']}'),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            title: Text(
+              'تفاصيل الإشعار',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('العنوان: ${notification['title']}'),
+                  SizedBox(height: 8.h),
+                  Text('النوع: ${notification['type']}'),
+                  SizedBox(height: 8.h),
+                  Text('الحالة: ${notification['status']}'),
+                  SizedBox(height: 8.h),
+                  Text('عدد المستلمين: ${notification['recipients']}'),
+                  SizedBox(height: 8.h),
+                  if (notification['deliveryRate'] > 0)
+                    Text('معدل التسليم: ${notification['deliveryRate']}%'),
+                  SizedBox(height: 8.h),
+                  Text('المحتوى: ${notification['content']}'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إغلاق'),
+              ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
-          ),
-        ],
-      ),
     );
   }
 
   void _sendNotificationNow(Map<String, dynamic> notification) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'إرسال الإشعار',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'هل تريد إرسال الإشعار: ${notification['title']}؟',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم إرسال الإشعار')),
-              );
-            },
-            child: Text(
-              'إرسال',
-              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
+            title: Text(
+              'إرسال الإشعار',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'هل تريد إرسال الإشعار: ${notification['title']}؟',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم إرسال الإشعار')),
+                  );
+                },
+                child: Text(
+                  'إرسال',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _deleteNotification(Map<String, dynamic> notification) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        title: Text(
-          'حذف الإشعار',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'هل تريد حذف الإشعار: ${notification['title']}؟',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم حذف الإشعار')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(
-              'حذف',
-              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
+            title: Text(
+              'حذف الإشعار',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'هل تريد حذف الإشعار: ${notification['title']}؟',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء', style: TextStyle(fontSize: 14.sp)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم حذف الإشعار')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text(
+                  'حذف',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

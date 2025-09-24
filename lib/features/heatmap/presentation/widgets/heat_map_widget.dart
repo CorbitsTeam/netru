@@ -11,17 +11,13 @@ class HeatMapWidget extends StatefulWidget {
   const HeatMapWidget({super.key});
 
   @override
-  State<HeatMapWidget> createState() =>
-      _HeatMapWidgetState();
+  State<HeatMapWidget> createState() => _HeatMapWidgetState();
 }
 
-class _HeatMapWidgetState
-    extends State<HeatMapWidget>
+class _HeatMapWidgetState extends State<HeatMapWidget>
     with SingleTickerProviderStateMixin {
-  final MapController _mapController =
-      MapController();
-  final LocationService _locationService =
-      LocationService();
+  final MapController _mapController = MapController();
+  final LocationService _locationService = LocationService();
   late AnimationController _animationController;
 
   @override
@@ -33,9 +29,7 @@ class _HeatMapWidgetState
     );
     _animationController.repeat();
 
-    WidgetsBinding.instance.addPostFrameCallback((
-      _,
-    ) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _moveToCurrentLocation();
     });
   }
@@ -47,8 +41,7 @@ class _HeatMapWidgetState
   }
 
   void _moveToCurrentLocation() {
-    final currentLocation =
-        _locationService.currentLocation;
+    final currentLocation = _locationService.currentLocation;
     if (currentLocation != null) {
       _mapController.move(currentLocation, 11.0);
     }
@@ -57,13 +50,9 @@ class _HeatMapWidgetState
   @override
   Widget build(BuildContext context) {
     final currentLocation =
-        _locationService.currentLocation ??
-        const LatLng(30.0444, 31.2357);
+        _locationService.currentLocation ?? const LatLng(30.0444, 31.2357);
 
-    return BlocBuilder<
-      HeatmapCubit,
-      HeatmapState
-    >(
+    return BlocBuilder<HeatmapCubit, HeatmapState>(
       builder: (context, state) {
         return Stack(
           children: [
@@ -75,41 +64,25 @@ class _HeatMapWidgetState
                 initialZoom: 11.0,
                 minZoom: 6.0,
                 maxZoom: 18.0,
-                onTap:
-                    (tapPosition, point) =>
-                        _handleMapTap(
-                          point,
-                          state,
-                        ),
+                onTap: (tapPosition, point) => _handleMapTap(point, state),
               ),
               children: [
                 // طبقة الخريطة الأساسية
                 TileLayer(
-                  urlTemplate:
-                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName:
-                      'com.netru.app',
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.netru.app',
                 ),
 
                 // طبقة النقاط الحرارية
                 if (state is HeatmapLoaded)
-                  ..._buildHeatmapLayers(
-                    state.reports,
-                  ),
+                  ..._buildHeatmapLayers(state.reports),
                 if (state is HeatmapReportsLoaded)
-                  ..._buildHeatmapLayers(
-                    state.reports,
-                  ),
-                if (state
-                    is HeatmapGovernorateFilterApplied)
-                  ..._buildHeatmapLayers(
-                    state.filteredReports,
-                  ),
+                  ..._buildHeatmapLayers(state.reports),
+                if (state is HeatmapGovernorateFilterApplied)
+                  ..._buildHeatmapLayers(state.filteredReports),
 
                 // طبقة الموقع الحالي
-                _buildCurrentLocationLayer(
-                  currentLocation,
-                ),
+                _buildCurrentLocationLayer(currentLocation),
               ],
             ),
 
@@ -123,14 +96,9 @@ class _HeatMapWidgetState
                     heroTag: "zoom_in",
                     mini: true,
                     onPressed: () {
-                      final zoom =
-                          _mapController
-                              .camera
-                              .zoom;
+                      final zoom = _mapController.camera.zoom;
                       _mapController.move(
-                        _mapController
-                            .camera
-                            .center,
+                        _mapController.camera.center,
                         zoom + 1,
                       );
                     },
@@ -143,22 +111,15 @@ class _HeatMapWidgetState
                     heroTag: "zoom_out",
                     mini: true,
                     onPressed: () {
-                      final zoom =
-                          _mapController
-                              .camera
-                              .zoom;
+                      final zoom = _mapController.camera.zoom;
                       _mapController.move(
-                        _mapController
-                            .camera
-                            .center,
+                        _mapController.camera.center,
                         zoom - 1,
                       );
                     },
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    child: const Icon(
-                      Icons.remove,
-                    ),
+                    child: const Icon(Icons.remove),
                   ),
                 ],
               ),
@@ -169,9 +130,7 @@ class _HeatMapWidgetState
     );
   }
 
-  List<Widget> _buildHeatmapLayers(
-    List<dynamic> reports,
-  ) {
+  List<Widget> _buildHeatmapLayers(List<dynamic> reports) {
     List<Widget> layers = [];
 
     // طبقة الدوائر الحرارية
@@ -183,16 +142,13 @@ class _HeatMapWidgetState
     for (final report in reports) {
       final key =
           '${report.location.latitude.toStringAsFixed(2)},${report.location.longitude.toStringAsFixed(2)}';
-      areaReports
-          .putIfAbsent(key, () => [])
-          .add(report);
+      areaReports.putIfAbsent(key, () => []).add(report);
     }
 
     // إنشاء الدوائر الحرارية والعلامات
     for (final entry in areaReports.entries) {
       final reportsInArea = entry.value;
-      final location =
-          reportsInArea.first.location;
+      final location = reportsInArea.first.location;
       final intensity = reportsInArea.length;
 
       // دائرة حرارية
@@ -200,9 +156,7 @@ class _HeatMapWidgetState
         CircleMarker(
           point: location,
           radius: _calculateRadius(intensity),
-          color: _getCrimeColor(
-            intensity,
-          ).withOpacity(0.3),
+          color: _getCrimeColor(intensity).withValues(alpha: 0.3),
           borderColor: _getCrimeColor(intensity),
           borderStrokeWidth: 2,
         ),
@@ -215,19 +169,14 @@ class _HeatMapWidgetState
           width: 40.w,
           height: 40.h,
           child: GestureDetector(
-            onTap:
-                () => _showAreaDetails(
-                  reportsInArea,
-                ),
+            onTap: () => _showAreaDetails(reportsInArea),
             child: Container(
               decoration: BoxDecoration(
                 color: _getCrimeColor(intensity),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: _getCrimeColor(
-                      intensity,
-                    ).withOpacity(0.4),
+                    color: _getCrimeColor(intensity).withValues(alpha: 0.4),
                     blurRadius: 6,
                     spreadRadius: 2,
                   ),
@@ -251,22 +200,16 @@ class _HeatMapWidgetState
 
     // إضافة الطبقات
     if (heatCircles.isNotEmpty) {
-      layers.add(
-        CircleLayer(circles: heatCircles),
-      );
+      layers.add(CircleLayer(circles: heatCircles));
     }
     if (reportMarkers.isNotEmpty) {
-      layers.add(
-        MarkerLayer(markers: reportMarkers),
-      );
+      layers.add(MarkerLayer(markers: reportMarkers));
     }
 
     return layers;
   }
 
-  Widget _buildCurrentLocationLayer(
-    LatLng currentLocation,
-  ) {
+  Widget _buildCurrentLocationLayer(LatLng currentLocation) {
     return MarkerLayer(
       markers: [
         Marker(
@@ -279,13 +222,8 @@ class _HeatMapWidgetState
               return Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blue.withOpacity(
-                    0.3,
-                  ),
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
+                  color: Colors.blue.withValues(alpha: 0.3),
+                  border: Border.all(color: Colors.blue, width: 2),
                 ),
                 child: const Icon(
                   Icons.my_location,
@@ -312,23 +250,16 @@ class _HeatMapWidgetState
     return Colors.green;
   }
 
-  void _handleMapTap(
-    LatLng point,
-    HeatmapState state,
-  ) {
+  void _handleMapTap(LatLng point, HeatmapState state) {
     // يمكن إضافة منطق للتعامل مع النقر على الخريطة
-    print(
-      'Tapped at: ${point.latitude}, ${point.longitude}',
-    );
+    print('Tapped at: ${point.latitude}, ${point.longitude}');
   }
 
   void _showAreaDetails(List<dynamic> reports) {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20.r),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
       builder:
           (context) => Container(
@@ -336,8 +267,7 @@ class _HeatMapWidgetState
             padding: EdgeInsets.all(20.w),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'تفاصيل المنطقة',
@@ -349,23 +279,17 @@ class _HeatMapWidgetState
                 SizedBox(height: 16.h),
                 Text(
                   'عدد التقارير: ${reports.length}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                  ),
+                  style: TextStyle(fontSize: 14.sp),
                 ),
                 SizedBox(height: 8.h),
                 Text(
                   'المحافظة: ${reports.first.governorate}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                  ),
+                  style: TextStyle(fontSize: 14.sp),
                 ),
                 SizedBox(height: 8.h),
                 Text(
                   'المدينة: ${reports.first.city}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                  ),
+                  style: TextStyle(fontSize: 14.sp),
                 ),
                 SizedBox(height: 16.h),
                 Text(
@@ -380,25 +304,17 @@ class _HeatMapWidgetState
                     .take(5)
                     .map(
                       (report) => Padding(
-                        padding:
-                            EdgeInsets.symmetric(
-                              vertical: 2.h,
-                            ),
+                        padding: EdgeInsets.symmetric(vertical: 2.h),
                         child: Text(
                           '• ${report.reportType}',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                          ),
+                          style: TextStyle(fontSize: 12.sp),
                         ),
                       ),
                     ),
                 if (reports.length > 5)
                   Text(
                     'و ${reports.length - 5} تقارير أخرى...',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                   ),
               ],
             ),

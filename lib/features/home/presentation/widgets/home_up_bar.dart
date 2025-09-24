@@ -17,7 +17,7 @@ class HomeUpBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -33,18 +33,18 @@ class HomeUpBar extends StatelessWidget {
               height: 55.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(27.5.r),
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.r),
                 child: Icon(
-                  Icons.person, 
-                  color: AppColors.primary, 
-                  size: 28.sp
+                  Icons.person,
+                  color: AppColors.primary,
+                  size: 28.sp,
                 ),
               ),
             ),
@@ -104,18 +104,19 @@ class HomeUpBar extends StatelessWidget {
                   width: 45.w,
                   height: 45.h,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(22.5.r),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
                   child: IconButton(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      Routes.notificationsPage,
-                    ),
+                    onPressed:
+                        () => Navigator.pushNamed(
+                          context,
+                          Routes.notificationsPage,
+                        ),
                     icon: Icon(
                       Icons.notifications_outlined,
                       color: AppColors.primary,

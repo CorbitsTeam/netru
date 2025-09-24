@@ -182,7 +182,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                                         style: theme.textTheme.bodyLarge
                                             ?.copyWith(
                                               color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.6),
+                                                  .withValues(alpha: 0.6),
                                             ),
                                       ),
                                     ],
@@ -198,7 +198,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                                           widget.selectedItem != null
                                               ? theme.colorScheme.onSurface
                                               : theme.colorScheme.onSurface
-                                                  .withOpacity(0.6),
+                                                  .withValues(alpha: 0.6),
                                     ),
                                   ),
                         ),
@@ -298,7 +298,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                             decoration: BoxDecoration(
                               color:
                                   isSelected
-                                      ? AppColors.primary.withOpacity(0.1)
+                                      ? AppColors.primary.withValues(alpha: 0.1)
                                       : null,
                             ),
                             child: Row(

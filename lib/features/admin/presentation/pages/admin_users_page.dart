@@ -194,7 +194,10 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+            colors: [
+              color.withValues(alpha: 0.1),
+              color.withValues(alpha: 0.05),
+            ],
           ),
         ),
         child: Column(
@@ -309,7 +312,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -369,7 +372,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   radius: 25,
                   backgroundColor: _getUserTypeColor(
                     user.userType,
-                  ).withOpacity(0.1),
+                  ).withValues(alpha: 0.1),
                   textColor: _getUserTypeColor(user.userType),
                 ),
                 SizedBox(width: 12.w),
@@ -502,9 +505,9 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         value,
@@ -722,59 +725,59 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     Navigator.pop(context);
   }
 
-  void _exportUsers() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('جاري تصدير المستخدمين...')));
-  }
+  // void _exportUsers() {
+  //   ScaffoldMessenger.of(
+  //     context,
+  //   ).showSnackBar(const SnackBar(content: Text('جاري تصدير المستخدمين...')));
+  // }
 
-  void _showBulkActionsDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('العمليات المجمعة'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.verified_user, color: Colors.green),
-                  title: const Text('توثيق المستخدمين المحددين'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _bulkVerifyUsers();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.email, color: Colors.blue),
-                  title: const Text('إرسال إشعار جماعي'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _sendBulkNotification();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.file_download,
-                    color: Colors.orange,
-                  ),
-                  title: const Text('تصدير البيانات'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _exportUsers();
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
-              ),
-            ],
-          ),
-    );
-  }
+  // void _showBulkActionsDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder:
+  //         (context) => AlertDialog(
+  //           title: const Text('العمليات المجمعة'),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               ListTile(
+  //                 leading: const Icon(Icons.verified_user, color: Colors.green),
+  //                 title: const Text('توثيق المستخدمين المحددين'),
+  //                 onTap: () {
+  //                   Navigator.pop(context);
+  //                   _bulkVerifyUsers();
+  //                 },
+  //               ),
+  //               ListTile(
+  //                 leading: const Icon(Icons.email, color: Colors.blue),
+  //                 title: const Text('إرسال إشعار جماعي'),
+  //                 onTap: () {
+  //                   Navigator.pop(context);
+  //                   _sendBulkNotification();
+  //                 },
+  //               ),
+  //               ListTile(
+  //                 leading: const Icon(
+  //                   Icons.file_download,
+  //                   color: Colors.orange,
+  //                 ),
+  //                 title: const Text('تصدير البيانات'),
+  //                 onTap: () {
+  //                   Navigator.pop(context);
+  //                   _exportUsers();
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: const Text('إلغاء'),
+  //             ),
+  //           ],
+  //         ),
+  //   );
+  // }
 
   void _handleUserAction(String action, AdminUserEntity user) {
     switch (action) {
@@ -798,17 +801,17 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     );
   }
 
-  void _bulkVerifyUsers() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('جاري توثيق المستخدمين المحددين...')),
-    );
-  }
+  // void _bulkVerifyUsers() {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('جاري توثيق المستخدمين المحددين...')),
+  //   );
+  // }
 
-  void _sendBulkNotification() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('جاري إرسال الإشعار الجماعي...')),
-    );
-  }
+  // void _sendBulkNotification() {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('جاري إرسال الإشعار الجماعي...')),
+  //   );
+  // }
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(

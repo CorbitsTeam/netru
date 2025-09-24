@@ -98,9 +98,9 @@ class IdentityDocumentsWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -144,9 +144,9 @@ class IdentityDocumentsWidget extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.05),
+        color: Colors.red.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,8 +226,11 @@ class IdentityDocumentsWidget extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: Colors.red.withOpacity(0.3), width: 2),
-            color: Colors.red.withOpacity(0.05),
+            border: Border.all(
+              color: Colors.red.withValues(alpha: 0.3),
+              width: 2,
+            ),
+            color: Colors.red.withValues(alpha: 0.05),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -256,10 +259,10 @@ class IdentityDocumentsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -435,7 +438,7 @@ class IdentityDocumentsWidget extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
