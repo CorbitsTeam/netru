@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_entity.dart';
+import '../../../widgets/validated_text_form_field.dart';
 
 class ProfileDataEntry extends StatefulWidget {
   final UserType userType;
@@ -55,6 +56,23 @@ class _ProfileDataEntryState extends State<ProfileDataEntry> {
       data[key] = controller.text;
     });
     widget.onDataChanged(data);
+  }
+
+  ValidationType _getValidationType(TextInputType? keyboardType, String? hint) {
+    if (hint?.contains('البريد') == true || hint?.contains('الإيميل') == true) {
+      return ValidationType.email;
+    }
+    if (hint?.contains('الهاتف') == true || hint?.contains('الجوال') == true) {
+      return ValidationType.phone;
+    }
+    if (hint?.contains('الهوية') == true ||
+        hint?.contains('الرقم القومي') == true) {
+      return ValidationType.nationalId;
+    }
+    if (hint?.contains('الاسم') == true) {
+      return ValidationType.name;
+    }
+    return ValidationType.required;
   }
 
   @override
@@ -159,50 +177,14 @@ class _ProfileDataEntryState extends State<ProfileDataEntry> {
           ),
         ),
         SizedBox(height: 8.h),
-        TextFormField(
+        ValidatedTextFormField(
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: const Color(0xFF1F2937),
-            fontFamily: 'Almarai',
-          ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: const Color(0xFF9CA3AF),
-              fontSize: 12.sp,
-              fontFamily: 'Almarai',
-            ),
-            prefixIcon: Icon(icon, color: AppColors.primary, size: 20.sp),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
-            ),
-            filled: true,
-            fillColor: const Color(0xFFF9FAFB),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 16.h,
-            ),
-          ),
+          hint: hint,
+          prefixIcon: Icon(icon, color: AppColors.primary, size: 20.sp),
+          validationType: _getValidationType(keyboardType, hint),
+          realTimeValidation: true,
         ),
       ],
     );

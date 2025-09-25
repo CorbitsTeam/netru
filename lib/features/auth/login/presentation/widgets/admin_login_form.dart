@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../cubit/login_cubit.dart';
-import 'login_text_field.dart';
-import 'login_password_field.dart';
+import '../../../widgets/validated_text_form_field.dart';
 import 'login_button.dart';
 
 class AdminLoginForm extends StatefulWidget {
@@ -51,12 +50,14 @@ class _AdminLoginFormState extends State<AdminLoginForm> {
       child: Column(
         children: [
           SizedBox(height: 32.h),
-          LoginTextField(
+          ValidatedTextFormField(
             controller: _emailController,
             label: 'البريد الإلكتروني',
             hint: 'أدخل البريد الإلكتروني',
-            icon: Icons.email_outlined,
+            prefixIcon: Icon(Icons.email_outlined),
             keyboardType: TextInputType.emailAddress,
+            validationType: ValidationType.email,
+            realTimeValidation: true,
             validator:
                 (value) => context.read<LoginCubit>().validateIdentifier(
                   value,
@@ -64,13 +65,24 @@ class _AdminLoginFormState extends State<AdminLoginForm> {
                 ),
           ),
           SizedBox(height: 24.h),
-          LoginPasswordField(
+          ValidatedTextFormField(
             controller: _passwordController,
+            label: 'كلمة المرور',
+            hint: 'أدخل كلمة المرور',
+            prefixIcon: Icon(Icons.lock_outline),
+            obscureText: _obscurePassword,
+            validationType: ValidationType.password,
+            realTimeValidation: true,
             validator:
                 (value) => context.read<LoginCubit>().validatePassword(value),
-            obscureText: _obscurePassword,
-            onToggleVisibility:
-                () => setState(() => _obscurePassword = !_obscurePassword),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey[600],
+              ),
+              onPressed:
+                  () => setState(() => _obscurePassword = !_obscurePassword),
+            ),
           ),
           SizedBox(height: 40.h),
           LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),

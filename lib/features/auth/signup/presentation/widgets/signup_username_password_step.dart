@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../widgets/validated_text_form_field.dart';
 import 'signup_step_container.dart';
 
 class SignupUsernamePasswordStep extends StatefulWidget {
@@ -34,6 +34,15 @@ class _SignupUsernamePasswordStepState
   bool _confirmPasswordObscured = true;
 
   @override
+  void initState() {
+    super.initState();
+    // Add listener to password controller to update UI when text changes
+    widget.passwordController.addListener(() {
+      setState(() {}); // Rebuild to update password strength indicator
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SignupStepContainer(
       // title: 'بيانات الدخول الأساسية',
@@ -46,28 +55,30 @@ class _SignupUsernamePasswordStepState
             // Username Field (Email or Phone)
             FadeInUp(
               duration: const Duration(milliseconds: 800),
-              child: CustomTextField(
+              child: ValidatedTextFormField(
                 controller: widget.usernameController,
-                label: 'البريد الإلكتروني',
-                hint: 'أدخل بريدك الإلكتروني',
-                prefixIcon: Icons.email_outlined,
+                label: widget.isEmailMode ? 'البريد الإلكتروني' : 'رقم الهاتف',
+                hint:
+                    widget.isEmailMode
+                        ? 'أدخل بريدك الإلكتروني'
+                        : 'أدخل رقم هاتفك',
+                prefixIcon: Icon(
+                  widget.isEmailMode
+                      ? Icons.email_outlined
+                      : Icons.phone_outlined,
+                  color: AppColors.textSecondary,
+                  size: 20.sp,
+                ),
                 keyboardType:
                     widget.isEmailMode
                         ? TextInputType.emailAddress
                         : TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'البريد الإلكتروني مطلوب';
-                  }
-                  if (widget.isEmailMode) {
-                    if (!RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value)) {
-                      return 'أدخل بريد إلكتروني صحيح';
-                    }
-                  }
-                  return null;
-                },
+                validationType:
+                    widget.isEmailMode
+                        ? ValidationType.email
+                        : ValidationType.phone,
+                realTimeValidation: true,
+                showValidationIcon: true,
               ),
             ),
 
@@ -76,31 +87,42 @@ class _SignupUsernamePasswordStepState
             // Password Field
             FadeInUp(
               duration: const Duration(milliseconds: 900),
-              child: CustomTextField(
-                controller: widget.passwordController,
-                label: 'كلمة المرور',
-                hint: 'أدخل كلمة مرور قوية',
-                prefixIcon: Icons.lock_outline,
-                obscureText: _passwordObscured,
-                suffixIcon: IconButton(
-                  onPressed:
-                      () => setState(() {
-                        _passwordObscured = !_passwordObscured;
-                      }),
-                  icon: Icon(
-                    _passwordObscured ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.textSecondary,
+              child: Column(
+                children: [
+                  ValidatedTextFormField(
+                    controller: widget.passwordController,
+                    label: 'كلمة المرور',
+                    hint: 'أدخل كلمة مرور قوية (8 أحرف على الأقل)',
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: AppColors.textSecondary,
+                      size: 20.sp,
+                    ),
+                    obscureText: _passwordObscured,
+                    suffixIcon: IconButton(
+                      onPressed:
+                          () => setState(() {
+                            _passwordObscured = !_passwordObscured;
+                          }),
+                      icon: Icon(
+                        _passwordObscured
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: AppColors.textSecondary,
+                        size: 20.sp,
+                      ),
+                    ),
+                    validationType: ValidationType.password,
+                    realTimeValidation: true,
+                    showValidationIcon:
+                        false, // We'll show strength indicator instead
                   ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'كلمة المرور مطلوبة';
-                  }
-                  if (value.length < 6) {
-                    return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-                  }
-                  return null;
-                },
+                  // Password strength indicator
+                  PasswordStrengthIndicator(
+                    password: widget.passwordController.text,
+                    show: widget.passwordController.text.isNotEmpty,
+                  ),
+                ],
               ),
             ),
 
@@ -109,11 +131,15 @@ class _SignupUsernamePasswordStepState
             // Confirm Password Field
             FadeInUp(
               duration: const Duration(milliseconds: 1000),
-              child: CustomTextField(
+              child: ValidatedTextFormField(
                 controller: widget.confirmPasswordController,
                 label: 'تأكيد كلمة المرور',
                 hint: 'أعد كتابة كلمة المرور',
-                prefixIcon: Icons.lock_outline,
+                prefixIcon: Icon(
+                  Icons.lock_outline,
+                  color: AppColors.textSecondary,
+                  size: 20.sp,
+                ),
                 obscureText: _confirmPasswordObscured,
                 suffixIcon: IconButton(
                   onPressed:
@@ -125,6 +151,7 @@ class _SignupUsernamePasswordStepState
                         ? Icons.visibility_off
                         : Icons.visibility,
                     color: AppColors.textSecondary,
+                    size: 20.sp,
                   ),
                 ),
                 validator: (value) {
@@ -136,6 +163,8 @@ class _SignupUsernamePasswordStepState
                   }
                   return null;
                 },
+                realTimeValidation: true,
+                showValidationIcon: true,
               ),
             ),
           ],

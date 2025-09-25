@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../domain/entities/user_entity.dart';
+import '../../../widgets/validated_text_form_field.dart';
 import '../cubit/login_cubit.dart';
-import 'login_text_field.dart';
-import 'login_password_field.dart';
 import 'login_button.dart';
 
 class CitizenLoginForm extends StatefulWidget {
@@ -51,26 +50,34 @@ class _CitizenLoginFormState extends State<CitizenLoginForm> {
       child: Column(
         children: [
           SizedBox(height: 32.h),
-          LoginTextField(
+          ValidatedTextFormField(
             controller: _nationalIdController,
             label: 'الرقم القومي',
             hint: 'أدخل الرقم القومي (14 رقم)',
-            icon: Icons.person_outline,
+            prefixIcon: Icon(Icons.person_outline, size: 20.sp),
             keyboardType: TextInputType.number,
-            validator:
-                (value) => context.read<LoginCubit>().validateIdentifier(
-                  value,
-                  UserType.citizen,
-                ),
+            validationType: ValidationType.nationalId,
+            realTimeValidation: true,
+            showValidationIcon: true,
           ),
           SizedBox(height: 18.h),
-          LoginPasswordField(
+          ValidatedTextFormField(
             controller: _passwordController,
-            validator:
-                (value) => context.read<LoginCubit>().validatePassword(value),
+            label: 'كلمة المرور',
+            hint: 'أدخل كلمة المرور',
+            prefixIcon: Icon(Icons.lock_outline, size: 20.sp),
             obscureText: _obscurePassword,
-            onToggleVisibility:
-                () => setState(() => _obscurePassword = !_obscurePassword),
+            suffixIcon: IconButton(
+              onPressed:
+                  () => setState(() => _obscurePassword = !_obscurePassword),
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                size: 20.sp,
+              ),
+            ),
+            validationType: ValidationType.required,
+            realTimeValidation: true,
+            showValidationIcon: true,
           ),
           SizedBox(height: 20.h),
           LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),

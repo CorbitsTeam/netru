@@ -15,6 +15,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/widgets/custom_snack_bar.dart';
+import 'package:netru_app/features/auth/widgets/modern_dialog.dart';
 import '../../../../../core/services/location_service.dart';
 import '../widgets/signup_header.dart';
 import '../widgets/signup_progress_indicator.dart';
@@ -367,8 +368,6 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     return SignupStepContainer(
-      title: 'البيانات الشخصية',
-      subtitle: 'أدخل بياناتك الشخصية بدقة',
       child: DataEntryStep(
         userType: _selectedUserType ?? UserType.citizen,
         extractedData: _extractedData,
@@ -387,7 +386,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildLocationStep() {
     return SignupStepContainer(
-      title: 'العنوان',
+      // title: 'العنوان',
       subtitle: 'حدد موقعك بدقة',
       child: SimpleLocationStep(
         selectedGovernorate: _selectedGovernorate,
@@ -889,150 +888,73 @@ class _SignupPageState extends State<SignupPage> {
     _startResendTimer();
   }
 
-  // 🆕 Show dialog when user already exists
+  // 🆕 Show modern dialog when user already exists
   void _showUserExistsDialog(
     BuildContext context,
     String message,
     String field,
   ) {
-    showDialog(
+    ModernDialog.show(
       context: context,
+      title: 'حساب موجود مسبقاً',
+      message: message,
+      icon: Icon(
+        Icons.account_circle_outlined,
+        color: AppColors.warning,
+        size: 32.sp,
+      ),
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.info_outline, color: AppColors.warning, size: 24.sp),
-              SizedBox(width: 12.w),
-              Text(
-                'حساب موجود مسبقاً',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                  fontFamily: 'Almarai',
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: AppColors.textSecondary,
-              fontFamily: 'Almarai',
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            // Login Button
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Navigate to login screen
-                Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  'تسجيل الدخول',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Almarai',
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            // Try Again Button
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Clear error and allow user to try again
-                if (mounted) {
-                  context.read<SignupCubit>().clearErrorAndRetry();
-                }
-                // Clear the conflicting field
-                if (field == 'email') {
-                  _usernameController.clear();
-                } else if (field == 'phone') {
-                  _usernameController.clear();
-                }
-                // Reset to initial step if needed
-                setState(() {
-                  if (_currentStep > 0) {
-                    _currentStep = 0;
-                    _pageController.animateToPage(
-                      0,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                });
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.primary),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  field == 'email'
-                      ? 'جرب إيميل آخر'
-                      : field == 'phone'
-                      ? 'جرب رقم آخر'
-                      : field == 'nationalId'
-                      ? 'تأكد من الرقم القومي'
-                      : 'تأكد من البيانات',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Almarai',
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            // Cancel Button
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Stay on current page
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.border),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  'إلغاء',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Almarai',
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+      actions: [
+        ModernDialogAction(
+          text: 'تسجيل الدخول',
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
+          },
+          isPrimary: true,
+          icon: Icon(Icons.login, size: 16.sp, color: Colors.white),
+        ),
+        ModernDialogAction(
+          text:
+              field == 'email'
+                  ? 'جرب إيميل آخر'
+                  : field == 'phone'
+                  ? 'جرب رقم آخر'
+                  : field == 'nationalId'
+                  ? 'تأكد من الرقم القومي'
+                  : 'تأكد من البيانات',
+          onPressed: () {
+            Navigator.of(context).pop();
+            if (mounted) {
+              context.read<SignupCubit>().clearErrorAndRetry();
+            }
+            // Clear the conflicting field
+            if (field == 'email' || field == 'phone') {
+              _usernameController.clear();
+            }
+            // Reset to initial step if needed
+            setState(() {
+              if (_currentStep > 0) {
+                _currentStep = 0;
+                _pageController.animateToPage(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            });
+          },
+          icon: Icon(Icons.edit, size: 16.sp),
+        ),
+        ModernDialogAction(
+          text: 'إلغاء',
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.close, size: 16.sp),
+        ),
+      ],
     );
-  }
+  } // Start resend countdown timer
 
-  // Start resend countdown timer
   void _startResendTimer() {
     setState(() => _resendCountdown = 60);
     _resendTimer?.cancel();
