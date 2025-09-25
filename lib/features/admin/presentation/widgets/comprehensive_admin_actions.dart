@@ -184,17 +184,17 @@ class ComprehensiveAdminActions extends StatelessWidget {
             ),
             children: [
               ListTile(
-                leading: Icon(Icons.verified, color: Colors.green),
+                leading: const Icon(Icons.verified, color: Colors.green),
                 title: const Text('توثيق البلاغ'),
                 onTap: () => _verifyReport(context),
               ),
               ListTile(
-                leading: Icon(Icons.flag, color: Colors.red),
+                leading: const Icon(Icons.flag, color: Colors.red),
                 title: const Text('الإبلاغ عن محتوى مشكوك فيه'),
                 onTap: () => _flagReport(context),
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.transfer_within_a_station,
                   color: Colors.blue,
                 ),
@@ -202,12 +202,12 @@ class ComprehensiveAdminActions extends StatelessWidget {
                 onTap: () => _transferReport(context),
               ),
               ListTile(
-                leading: Icon(Icons.archive, color: Colors.grey),
+                leading: const Icon(Icons.archive, color: Colors.grey),
                 title: const Text('أرشفة البلاغ'),
                 onTap: () => _archiveReport(context),
               ),
               ListTile(
-                leading: Icon(Icons.picture_as_pdf, color: Colors.red),
+                leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                 title: const Text('تصدير تقرير PDF'),
                 onTap: () => _generateAndSharePdf(context),
               ),

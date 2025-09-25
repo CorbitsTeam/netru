@@ -28,13 +28,13 @@ class IdentityDocumentsWidget extends StatelessWidget {
     return Column(
       children: [
         // عرض الوثائق الموجودة
-        ...documents.map((doc) => _buildDocumentCard(doc)).toList(),
+        ...documents.map((doc) => _buildDocumentCard(doc)),
 
         // عرض الوثائق المفقودة
         if (missingDocs.isNotEmpty)
           ...missingDocs
               .map((docType) => _buildMissingDocumentCard(docType))
-              .toList(),
+              ,
 
         // حالة خاصة عندما لا توجد وثائق على الإطلاق
         if (documents.isEmpty && requiredDocs.isNotEmpty) _buildEmptyState(),
@@ -451,7 +451,7 @@ class IdentityDocumentsWidget extends StatelessWidget {
                 placeholder:
                     (context, url) => Container(
                       color: Colors.grey[200],
-                      child: Center(
+                      child: const Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(

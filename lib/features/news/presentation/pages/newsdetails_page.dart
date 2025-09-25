@@ -47,7 +47,7 @@ class _NewsDetailsViewState
   late Animation<double> _fadeAnimation;
 
   bool _isScrolled = false;
-  bool _isFavorite = false;
+  final bool _isFavorite = false;
 
   @override
   void initState() {
@@ -91,8 +91,9 @@ class _NewsDetailsViewState
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
-        if (mounted)
+        if (mounted) {
           _fabAnimationController.forward();
+        }
       },
     );
   }

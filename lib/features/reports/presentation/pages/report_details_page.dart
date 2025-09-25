@@ -27,8 +27,9 @@ class ReportDetailsPage extends StatelessWidget {
   ) async {
     if (!context.mounted) return;
     try {
-      if (Navigator.canPop(context))
+      if (Navigator.canPop(context)) {
         Navigator.pop(context);
+      }
     } catch (_) {
       // ignore any pop errors
     }

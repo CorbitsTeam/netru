@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
+import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
 import 'package:netru_app/features/notifications/data/datasources/firebase_notification_service.dart';
 import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
@@ -15,25 +17,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 // ===========================
-// Auth Feature
+// Auth Feature - Unified & Refactored
 // ===========================
-import '../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../features/auth/data/datasources/user_data_source.dart';
+import '../../features/auth/data/datasources/auth_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/auth/data/repositories/user_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/repositories/user_repository.dart';
-import '../../features/auth/domain/usecases/check_user_exists.dart';
-import '../../features/auth/domain/usecases/get_user_by_id.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
-import '../../features/auth/domain/usecases/login_with_email.dart';
 import '../../features/auth/domain/usecases/logout_user.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
-import '../../features/auth/domain/usecases/signup_user.dart';
+import '../../features/auth/domain/usecases/validate_critical_data.dart';
+import '../../features/auth/domain/usecases/check_data_exists.dart';
+import '../../features/auth/domain/usecases/profile_completion_usecases.dart';
+import '../../features/auth/domain/usecases/get_user_by_id.dart';
+import '../../features/auth/domain/usecases/signup_with_data.dart';
 import '../../features/auth/domain/usecases/update_user_profile.dart';
 import '../../features/auth/domain/usecases/upload_profile_image.dart';
-import '../../features/auth/presentation/cubit/login_cubit.dart';
-import '../../features/auth/presentation/cubit/signup_cubit.dart';
+import '../../features/auth/profile_completion/presentation/cubit/profile_completion_cubit.dart';
+
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
 // ===========================
 // Chatbot Feature
@@ -182,47 +182,75 @@ Future<void> _initHeatmapDependencies() async {
 }
 
 /// ===========================
-/// Auth
+/// Auth - Unified & Refactored
 /// ===========================
 Future<void> _initAuthDependencies() async {
   final supabaseClient = sl<SupabaseClient>();
 
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(supabaseClient: supabaseClient),
+  // Unified Auth Data Source
+  sl.registerLazySingleton<AuthDataSource>(
+    () => SupabaseAuthDataSource(supabaseClient: supabaseClient),
   );
 
-  sl.registerLazySingleton<UserDataSource>(
-    () => SupabaseUserDataSource(supabaseClient: supabaseClient),
-  );
-
+  // Unified Auth Repository
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: sl()),
+    () => AuthRepositoryImpl(authDataSource: sl()),
   );
 
-  sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(userDataSource: sl()),
-  );
+  // Validation Use Cases
+  sl.registerLazySingleton(() => ValidateCriticalDataUseCase(sl()));
+  sl.registerLazySingleton(() => CheckEmailExistsInUsersUseCase(sl()));
+  // Register use-case that checks whether an email exists in Supabase Auth
+  sl.registerLazySingleton(() => CheckEmailExistsInAuthUseCase(sl()));
+  sl.registerLazySingleton(() => CheckPhoneExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckNationalIdExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckPassportExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
 
-  sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
-  sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
+  // Auth Use Cases
+  sl.registerLazySingleton(() => RegisterUserUseCase(sl(), sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUserUseCase(sl()));
-  sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
   sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
-  sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
+  // Ensure update profile and upload profile image use-cases are registered
   sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
   sl.registerLazySingleton(() => UploadProfileImageUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpWithDataUseCase(sl()));
 
+  // Profile Completion Use Cases
+  sl.registerLazySingleton(() => CompleteProfileUseCase(sl(), sl()));
+  sl.registerLazySingleton(() => VerifyEmailAndCompleteSignupUseCase(sl()));
+  sl.registerLazySingleton(() => ResendVerificationEmailUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpWithEmailOnlyUseCase(sl()));
+
+  // Cubits
   sl.registerFactory(
     () => SignupCubit(
       registerUserUseCase: sl(),
-      signUpUserUseCase: sl(),
+      signUpWithDataUseCase: sl(),
       locationService: sl(),
+      checkEmailExistsInUsersUseCase: sl(),
+      checkEmailExistsInAuthUseCase: sl(),
+      checkPhoneExistsUseCase: sl(),
+      checkNationalIdExistsUseCase: sl(),
+      checkPassportExistsUseCase: sl(),
     ),
   );
 
+  sl.registerFactory(() => LoginCubit(loginUserUseCase: sl()));
+
+  // Profile Completion Cubit
   sl.registerFactory(
-    () => LoginCubit(checkUserExistsUseCase: sl(), loginUserUseCase: sl()),
+    () => ProfileCompletionCubit(
+      completeProfileUseCase: sl(),
+      verifyEmailAndCompleteSignupUseCase: sl(),
+      resendVerificationEmailUseCase: sl(),
+      validateCriticalDataUseCase: sl(),
+      checkPhoneExistsUseCase: sl(),
+      checkNationalIdExistsUseCase: sl(),
+      checkPassportExistsUseCase: sl(),
+      checkEmailExistsInUsersUseCase: sl(),
+    ),
   );
 
   sl.get<LoggerService>().logInfo('✅ Auth dependencies initialized');

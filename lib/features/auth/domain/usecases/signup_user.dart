@@ -1,21 +1,32 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
-import '../entities/login_user_entity.dart';
-import '../repositories/user_repository.dart';
+import '../entities/user_entity.dart';
+import '../repositories/auth_repository.dart';
 
 class SignUpUserUseCase {
-  final UserRepository _userRepository;
+  final AuthRepository _authRepository;
 
-  SignUpUserUseCase({required UserRepository userRepository})
-    : _userRepository = userRepository;
+  SignUpUserUseCase({required AuthRepository authRepository})
+    : _authRepository = authRepository;
 
-  Future<Either<Failure, LoginUserEntity>> call(SignUpUserParams params) async {
-    return await _userRepository.signUpUser(params.userData);
+  Future<Either<Failure, UserEntity>> call(SignUpUserParams params) async {
+    return await _authRepository.registerUser(
+      user: params.user,
+      password: params.password,
+      documents: params.documents,
+    );
   }
 }
 
 class SignUpUserParams {
-  final Map<String, dynamic> userData;
+  final UserEntity user;
+  final String password;
+  final List<File>? documents;
 
-  SignUpUserParams({required this.userData});
+  SignUpUserParams({
+    required this.user,
+    required this.password,
+    this.documents,
+  });
 }

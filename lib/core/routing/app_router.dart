@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/features/auth/presentation/pages/improved_signup_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/email_verification_page.dart';
-import 'package:netru_app/features/auth/presentation/pages/complete_profile_page.dart';
+import 'package:netru_app/features/auth/email_verification/presentation/pages/email_verification_page.dart';
+import 'package:netru_app/features/auth/profile_completion/presentation/pages/complete_profile_page.dart';
+import 'package:netru_app/features/auth/signup/presentation/pages/signup_page.dart';
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
+import '../../features/auth/login/presentation/cubit/login_cubit.dart';
+import '../../features/auth/login/presentation/pages/login_page.dart';
+import '../../features/auth/signup/presentation/cubits/signup_cubit.dart';
 import '../di/injection_container.dart';
-import '../../features/auth/presentation/cubit/signup_cubit.dart';
-import '../../features/auth/presentation/cubit/login_cubit.dart';
-import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_report_details_page.dart';
@@ -63,7 +63,7 @@ class AppRouter {
         return _createRoute(
           BlocProvider<SignupCubit>(
             create: (context) => sl<SignupCubit>(),
-            child: const ImprovedSignupPage(),
+            child: const SignupPage(),
           ),
         );
 

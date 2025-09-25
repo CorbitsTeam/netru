@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/reports_model.dart';
@@ -33,18 +34,11 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
         throw Exception('لا يوجد مستخدم مسجل دخول');
       }
 
-      print('🔍 Debug - Current User Info:');
-      print('   ID: ${currentUser.id}');
-      print('   User Type: ${currentUser.userType}');
-      print('   National ID: ${currentUser.nationalId}');
-      print('   Passport: ${currentUser.passportNumber}');
-      print('   Identifier: ${currentUser.identifier}');
 
       // Strategy 1: Try multiple search approaches comprehensively
       List<ReportModel> foundReports = [];
 
       // Primary search: Use user_id
-      print('🔍 Debug - Strategy 1: Search by user_id: ${currentUser.id}');
       try {
         final userIdResponse = await supabaseClient
             .from('reports')
@@ -54,34 +48,28 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               users!reports_user_id_fkey(full_name, email),
               report_media(id, media_type, file_url, file_name)
             ''')
-            .eq('user_id', currentUser.id)
+            .eq('user_id', currentUser.id.toString())
             .order('submitted_at', ascending: false);
 
-        print(
-          '🔍 Debug - user_id query result count: ${userIdResponse.length}',
-        );
-        print('🔍 Debug - Raw query response: $userIdResponse');
 
         if (userIdResponse.isNotEmpty) {
           try {
             foundReports.addAll(
               userIdResponse.map((json) => ReportModel.fromJson(json)).toList(),
             );
-            print('✅ Found ${userIdResponse.length} reports using user_id');
           } catch (jsonError) {
-            print('❌ JSON parsing error in user_id strategy: $jsonError');
+            debugPrint(
+              'Error parsing JSON: $jsonError',
+              wrapWidth: 1024,
+            );
           }
         }
       } catch (e) {
-        print('⚠️ user_id search failed: $e');
       }
 
       // Strategy 2: Search by reporter_national_id if we have identifier
       final userIdentifier = currentUser.identifier;
       if (userIdentifier != null && userIdentifier.isNotEmpty) {
-        print(
-          '🔍 Debug - Strategy 2: Search by reporter_national_id: $userIdentifier',
-        );
         try {
           final nationalIdResponse = await supabaseClient
               .from('reports')
@@ -94,10 +82,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               .eq('reporter_national_id', userIdentifier)
               .order('submitted_at', ascending: false);
 
-          print(
-            '🔍 Debug - reporter_national_id query result count: ${nationalIdResponse.length}',
-          );
-          print('🔍 Debug - Raw nationalId response: $nationalIdResponse');
 
           if (nationalIdResponse.isNotEmpty) {
             // Avoid duplicates by checking IDs
@@ -108,24 +92,16 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                   foundReports.add(report);
                 }
               }
-              print(
-                '✅ Found ${nationalIdResponse.length} additional reports using reporter_national_id',
-              );
             } catch (jsonError) {
-              print('❌ JSON parsing error in nationalId strategy: $jsonError');
             }
           }
         } catch (e) {
-          print('⚠️ reporter_national_id search failed: $e');
         }
       }
 
       // Strategy 3: Alternative search by national_id if available
       if (currentUser.nationalId != null &&
           currentUser.nationalId!.isNotEmpty) {
-        print(
-          '🔍 Debug - Strategy 3: Search by national_id from user: ${currentUser.nationalId}',
-        );
         try {
           final altNationalIdResponse = await supabaseClient
               .from('reports')
@@ -138,9 +114,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               .eq('reporter_national_id', currentUser.nationalId!)
               .order('submitted_at', ascending: false);
 
-          print(
-            '🔍 Debug - alternative national_id query result count: ${altNationalIdResponse.length}',
-          );
           if (altNationalIdResponse.isNotEmpty) {
             // Avoid duplicates by checking IDs
             for (final json in altNationalIdResponse) {
@@ -149,30 +122,21 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                 foundReports.add(report);
               }
             }
-            print(
-              '✅ Found ${altNationalIdResponse.length} additional reports using alternative national_id',
-            );
           }
         } catch (e) {
-          print('⚠️ alternative national_id search failed: $e');
         }
       }
 
       // Strategy 4: Emergency fallback - get all reports and filter locally
       if (foundReports.isEmpty) {
-        print('🔍 Debug - Strategy 4: Emergency fallback - search all reports');
         try {
           // First try with simple query (no joins) to avoid foreign key issues
           final simpleResponse = await supabaseClient
               .from('reports')
               .select('*')
-              .eq('user_id', currentUser.id)
+              .eq('user_id', currentUser.id.toString())
               .order('submitted_at', ascending: false);
 
-          print(
-            '🔍 Debug - Simple query result count: ${simpleResponse.length}',
-          );
-          print('🔍 Debug - Simple query response: $simpleResponse');
 
           if (simpleResponse.isNotEmpty) {
             try {
@@ -180,9 +144,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                 final report = ReportModel.fromJson(json);
                 foundReports.add(report);
               }
-              print('✅ Simple query found ${simpleResponse.length} reports');
             } catch (jsonError) {
-              print('❌ JSON parsing error in simple query: $jsonError');
             }
           } else {
             // If still no results, try the comprehensive fallback
@@ -197,9 +159,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                 .order('submitted_at', ascending: false)
                 .limit(1000); // Reasonable limit
 
-            print(
-              '🔍 Debug - Total reports in database: ${allReportsResponse.length}',
-            );
 
             // Filter locally by any matching criteria
             for (final json in allReportsResponse) {
@@ -219,28 +178,19 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                 }
               }
             }
-            print(
-              '✅ Emergency fallback found ${foundReports.length} matching reports',
-            );
           }
         } catch (e) {
-          print('⚠️ Emergency fallback failed: $e');
         }
       }
 
       // Sort by update date (most recent first)
       foundReports.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-      print(
-        '📊 Final result: Found ${foundReports.length} total reports for user',
-      );
       if (foundReports.isNotEmpty) {
-        print('📋 Report IDs: ${foundReports.map((r) => r.id).join(", ")}');
       }
 
       return foundReports;
     } catch (e) {
-      print('❌ Critical error in getAllReports: $e');
       throw Exception('خطأ في جلب البلاغات: $e');
     }
   }
@@ -260,17 +210,12 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
 
       // Extract first media file if available
       final mediaList = response['report_media'] as List?;
-      print('📥 Datasource getReportById Debug for report $id:');
-      print('   report_media list: $mediaList');
 
       if (mediaList != null && mediaList.isNotEmpty) {
         final firstMedia = mediaList.first;
         response['media_url'] = firstMedia['file_url'];
         response['media_type'] = firstMedia['media_type'];
-        print('   Setting media_url: ${firstMedia['file_url']}');
-        print('   Setting media_type: ${firstMedia['media_type']}');
       } else {
-        print('   No media found for this report');
       }
 
       return ReportModel.fromJson(response);
@@ -329,47 +274,39 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
   @override
   Future<String?> uploadMedia(File file, String fileName) async {
     try {
-      print('Starting media upload for file: ${file.path}');
 
       // Check if file exists before attempting to read
       if (!await file.exists()) {
-        print('File does not exist at path: ${file.path}');
         throw Exception('File does not exist at path: ${file.path}');
       }
 
       // Check if file is readable and not empty
       final fileStats = await file.stat();
-      print('File size: ${fileStats.size} bytes');
 
       if (fileStats.size == 0) {
-        print('File is empty: ${file.path}');
         throw Exception('File is empty: ${file.path}');
       }
 
       // Read file bytes
       final bytes = await file.readAsBytes();
-      print('Successfully read ${bytes.length} bytes from file');
 
       // Generate proper file name with extension
       final extension = file.path.split('.').last.toLowerCase();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fullFileName = '${fileName}_$timestamp.$extension';
 
-      print('Uploading file with name: $fullFileName to bucket: reports-media');
 
       // Upload to Supabase Storage
       final uploadResponse = await supabaseClient.storage
           .from('reports-media')
           .uploadBinary(fullFileName, bytes);
 
-      print('Upload response: $uploadResponse');
 
       // Get public URL
       final url = supabaseClient.storage
           .from('reports-media')
           .getPublicUrl(fullFileName);
 
-      print('Generated public URL: $url');
 
       // Verify the URL is not empty
       if (url.isEmpty) {
@@ -378,7 +315,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
 
       return url;
     } catch (e) {
-      print('Error in uploadMedia: $e');
       // Re-throw with more specific error information
       if (e.toString().contains('Row level security')) {
         throw Exception(
@@ -402,9 +338,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
     String mediaType,
   ) async {
     try {
-      print('Attaching media to report: $reportId');
-      print('Media URL: $mediaUrl');
-      print('Media Type: $mediaType');
 
       // Validate inputs
       if (reportId.isEmpty) {
@@ -433,9 +366,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               .select()
               .single();
 
-      print('Successfully attached media to report. Media record: $response');
     } catch (e) {
-      print('Error in attachMediaToReport: $e');
 
       // Provide more specific error messages
       if (e.toString().contains('foreign key')) {

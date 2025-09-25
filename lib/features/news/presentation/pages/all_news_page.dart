@@ -491,8 +491,9 @@ class _AllNewsPageState
                             loadingProgress,
                           ) {
                             if (loadingProgress ==
-                                null)
+                                null) {
                               return child;
+                            }
                             return Center(
                               child: CircularProgressIndicator(
                                 color:

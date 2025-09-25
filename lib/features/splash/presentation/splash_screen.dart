@@ -6,9 +6,8 @@ import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
+import '../../../core/domain/entities/signup_entities.dart';
 import '../../onboarding/utils/onboarding_prefs.dart';
-import '../../auth/domain/entities/login_user_entity.dart';
-
 import '../../../core/constants/app_assets.dart';
 
 class SplashScreen extends StatefulWidget {
