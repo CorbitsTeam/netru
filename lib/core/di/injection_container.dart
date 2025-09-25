@@ -222,6 +222,10 @@ Future<void> _initAuthDependencies() async {
       registerUserUseCase: sl(),
       signUpWithDataUseCase: sl(),
       locationService: sl(),
+      checkEmailExistsInUsersUseCase: sl(),
+      checkPhoneExistsUseCase: sl(),
+      checkNationalIdExistsUseCase: sl(),
+      checkPassportExistsUseCase: sl(),
     ),
   );
 

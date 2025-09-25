@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:netru_app/core/services/location_service.dart';
 import 'package:netru_app/features/auth/domain/entities/user_entity.dart';
 
-
 abstract class SignupState extends Equatable {
   const SignupState();
 
@@ -241,4 +240,18 @@ class SignupError extends SignupState {
 
   @override
   List<Object?> get props => [message];
+}
+
+// 🆕 New state for showing login option when user already exists
+class SignupUserExistsWithLoginOption extends SignupState {
+  final String message;
+  final String dataType; // 'email', 'phone', 'nationalId', 'passport'
+
+  const SignupUserExistsWithLoginOption({
+    required this.message,
+    required this.dataType,
+  });
+
+  @override
+  List<Object?> get props => [message, dataType];
 }

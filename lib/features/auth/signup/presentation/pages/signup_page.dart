@@ -146,13 +146,13 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {
         _isSubmitting = false;
       });
-    } else if (state is SignupFailure && state.message.contains('موجود')) {
-      // 🆕 Handle user already exists - show dialog and redirect to login
+    } else if (state is SignupUserExistsWithLoginOption) {
+      // 🆕 Handle user already exists - show dialog with login option
       setState(() {
         _isSubmitting = false;
       });
 
-      _showUserExistsDialog(context, state.message, 'general');
+      _showUserExistsDialog(context, state.message, state.dataType);
     } else if (state is SignupEmailSent) {
       // 🆕 Handle OTP sent state - transition to next step
       setState(() {
@@ -170,7 +170,7 @@ class _SignupPageState extends State<SignupPage> {
         type: SnackBarType.success,
       );
 
-      // Transition to OTP verification step
+      // Transition to OTP verification step only if not coming from user exists error
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           _proceedToNextStep();
@@ -182,14 +182,31 @@ class _SignupPageState extends State<SignupPage> {
         _isSubmitting = true;
       });
     } else if (state is SignupCompleted || state is SignupSuccess) {
+      setState(() {
+        _isSubmitting = false;
+      });
+
       showModernSnackBar(
         context,
-        message: 'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول',
+        message: 'تم إنشاء الحساب بنجاح! جاري توجيهك لصفحة اختيار اللغة...',
         type: SnackBarType.success,
       );
-      // Navigate to login page after successful registration
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
+
+      // Clear cache and navigate to language selection page
+      Future.delayed(const Duration(seconds: 1), () async {
+        if (!mounted) return;
+
+        // Clear cache after successful signup
+        await context.read<SignupCubit>().clearCacheAfterSuccessfulSignup();
+
+        if (!mounted) return;
+
+        // Navigate to language selection page (or main app)
+        // Replace with the actual route for language selection
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          Routes.loginScreen, // TODO: Change to language selection route
+          (route) => false,
+        );
       });
     } else {
       setState(() {
@@ -911,6 +928,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
           actions: [
+            // Login Button
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -918,7 +936,7 @@ class _SignupPageState extends State<SignupPage> {
                 Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8.r),
@@ -927,7 +945,7 @@ class _SignupPageState extends State<SignupPage> {
                   'تسجيل الدخول',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Almarai',
                   ),
@@ -935,13 +953,64 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
             SizedBox(width: 8.w),
+            // Try Again Button
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Clear error and allow user to try again
+                if (mounted) {
+                  context.read<SignupCubit>().clearErrorAndRetry();
+                }
+                // Clear the conflicting field
+                if (field == 'email') {
+                  _usernameController.clear();
+                } else if (field == 'phone') {
+                  _usernameController.clear();
+                }
+                // Reset to initial step if needed
+                setState(() {
+                  if (_currentStep > 0) {
+                    _currentStep = 0;
+                    _pageController.animateToPage(
+                      0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primary),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  field == 'email'
+                      ? 'جرب إيميل آخر'
+                      : field == 'phone'
+                      ? 'جرب رقم آخر'
+                      : field == 'nationalId'
+                      ? 'تأكد من الرقم القومي'
+                      : 'تأكد من البيانات',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Almarai',
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            // Cancel Button
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 // Stay on current page
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.border),
                   borderRadius: BorderRadius.circular(8.r),
@@ -950,7 +1019,7 @@ class _SignupPageState extends State<SignupPage> {
                   'إلغاء',
                   style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 14.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Almarai',
                   ),

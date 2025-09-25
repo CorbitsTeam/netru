@@ -7,6 +7,8 @@ import 'package:netru_app/features/auth/data/models/user_model.dart';
 import 'package:netru_app/features/auth/domain/entities/user_entity.dart';
 import 'package:netru_app/features/auth/domain/usecases/register_user.dart';
 import 'package:netru_app/features/auth/domain/usecases/signup_with_data.dart';
+import 'package:netru_app/features/auth/domain/usecases/check_data_exists.dart';
+import 'package:netru_app/core/utils/app_shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'signup_state.dart';
 
@@ -14,14 +16,26 @@ class SignupCubit extends Cubit<SignupState> {
   final RegisterUserUseCase _registerUserUseCase;
   final SignUpWithDataUseCase _signUpWithDataUseCase;
   final LocationService _locationService;
+  final CheckEmailExistsInUsersUseCase _checkEmailExistsInUsersUseCase;
+  final CheckPhoneExistsUseCase _checkPhoneExistsUseCase;
+  final CheckNationalIdExistsUseCase _checkNationalIdExistsUseCase;
+  final CheckPassportExistsUseCase _checkPassportExistsUseCase;
 
   SignupCubit({
     required RegisterUserUseCase registerUserUseCase,
     required SignUpWithDataUseCase signUpWithDataUseCase,
     required LocationService locationService,
+    required CheckEmailExistsInUsersUseCase checkEmailExistsInUsersUseCase,
+    required CheckPhoneExistsUseCase checkPhoneExistsUseCase,
+    required CheckNationalIdExistsUseCase checkNationalIdExistsUseCase,
+    required CheckPassportExistsUseCase checkPassportExistsUseCase,
   }) : _registerUserUseCase = registerUserUseCase,
        _signUpWithDataUseCase = signUpWithDataUseCase,
        _locationService = locationService,
+       _checkEmailExistsInUsersUseCase = checkEmailExistsInUsersUseCase,
+       _checkPhoneExistsUseCase = checkPhoneExistsUseCase,
+       _checkNationalIdExistsUseCase = checkNationalIdExistsUseCase,
+       _checkPassportExistsUseCase = checkPassportExistsUseCase,
        super(SignupInitial());
 
   void selectUserType(UserType userType) {
@@ -40,8 +54,25 @@ class SignupCubit extends Cubit<SignupState> {
     }
   }
 
-  void enterFormData(Map<String, dynamic> formData) {
+  Future<void> enterFormData(Map<String, dynamic> formData) async {
     final currentState = state;
+
+    // ✅ التحقق من البيانات المميزة قبل المتابعة
+    final nationalId = formData['national_id'] as String?;
+    final phone = formData['phone'] as String?;
+    final passportNumber = formData['passport_number'] as String?;
+
+    // تنفيذ التحقق من البيانات المميزة
+    final isDataValid = await checkUserDataExists(
+      nationalId: nationalId,
+      phone: phone,
+      passportNumber: passportNumber,
+    );
+
+    if (!isDataValid) {
+      // إذا كانت البيانات موجودة، فإن التحقق سيتعامل مع إظهار الرسالة
+      return;
+    }
 
     if (currentState is SignupOCRCompleted) {
       emit(
@@ -443,6 +474,123 @@ class SignupCubit extends Cubit<SignupState> {
     emit(SignupInitial());
   }
 
+  // 🆕 Method to reset error state and allow user to try again
+  void clearErrorAndRetry() {
+    // Keep the current step but clear the error
+    final currentState = state;
+    if (currentState is SignupUserExistsWithLoginOption ||
+        currentState is SignupError ||
+        currentState is SignupFailure) {
+      // Go back to the appropriate state without the error
+      log('🔄 مسح الخطأ والعودة للحالة الأولى');
+      emit(SignupInitial());
+    }
+  }
+
+  // 🆕 Method to clear cache after successful signup
+  Future<void> clearCacheAfterSuccessfulSignup() async {
+    try {
+      log('🧹 بدء مسح الكاش بعد نجاح التسجيل...');
+
+      // Clear all app preferences except credentials
+      final AppPreferences appPreferences = AppPreferences();
+      await appPreferences.clearExceptCredentials();
+
+      log('✅ تم مسح الكاش بنجاح بعد التسجيل');
+    } catch (e) {
+      log('⚠️ خطأ في مسح الكاش: $e');
+    }
+  }
+
+  // 🆕 Helper method to validate single field during input
+  Future<void> validateSingleField({
+    required String fieldName,
+    required String value,
+    required String fieldType, // 'email', 'phone', 'nationalId', 'passport'
+  }) async {
+    if (value.trim().isEmpty) return;
+
+    try {
+      switch (fieldType) {
+        case 'email':
+          final emailCheckResult = await _checkEmailExistsInUsersUseCase.call(
+            value,
+          );
+          emailCheckResult.fold(
+            (failure) => log('⚠️ خطأ في فحص الإيميل: ${failure.message}'),
+            (exists) {
+              if (exists) {
+                emit(
+                  const SignupUserExistsWithLoginOption(
+                    message:
+                        'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول؟',
+                    dataType: 'email',
+                  ),
+                );
+              }
+            },
+          );
+          break;
+
+        case 'phone':
+          final phoneCheckResult = await _checkPhoneExistsUseCase.call(value);
+          phoneCheckResult.fold(
+            (failure) => log('⚠️ خطأ في فحص رقم الهاتف: ${failure.message}'),
+            (exists) {
+              if (exists) {
+                emit(
+                  const SignupUserExistsWithLoginOption(
+                    message: 'هذا الرقم مستخدم من قبل. هل تريد تسجيل الدخول؟',
+                    dataType: 'phone',
+                  ),
+                );
+              }
+            },
+          );
+          break;
+
+        case 'nationalId':
+          final nationalIdCheckResult = await _checkNationalIdExistsUseCase
+              .call(value);
+          nationalIdCheckResult.fold(
+            (failure) => log('⚠️ خطأ في فحص الرقم القومي: ${failure.message}'),
+            (exists) {
+              if (exists) {
+                emit(
+                  const SignupUserExistsWithLoginOption(
+                    message: 'الرقم القومي مسجل مسبقاً. هل تريد تسجيل الدخول؟',
+                    dataType: 'nationalId',
+                  ),
+                );
+              }
+            },
+          );
+          break;
+
+        case 'passport':
+          final passportCheckResult = await _checkPassportExistsUseCase.call(
+            value,
+          );
+          passportCheckResult.fold(
+            (failure) => log('⚠️ خطأ في فحص رقم الجواز: ${failure.message}'),
+            (exists) {
+              if (exists) {
+                emit(
+                  const SignupUserExistsWithLoginOption(
+                    message: 'رقم الجواز مسجل مسبقاً. هل تريد تسجيل الدخول؟',
+                    dataType: 'passport',
+                  ),
+                );
+              }
+            },
+          );
+          break;
+      }
+    } catch (e) {
+      log('⚠️ خطأ في التحقق من $fieldName: $e');
+    }
+  }
+
   void goBack() {
     final currentState = state;
 
@@ -552,46 +700,42 @@ class SignupCubit extends Cubit<SignupState> {
       }
 
       if (isEmailMode) {
-        // Check if email already exists in auth.users table
-        try {
-          final existingUsers =
-              await Supabase.instance.client
-                  .from('auth.users')
-                  .select('id')
-                  .eq('email', username)
-                  .maybeSingle();
+        // ✅ التحقق من وجود البريد الإلكتروني باستخدام Use Case
+        final emailCheckResult = await _checkEmailExistsInUsersUseCase.call(
+          username,
+        );
 
-          if (existingUsers != null) {
-            log('❌ البريد الإلكتروني موجود في auth.users');
-            emit(
-              const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'),
-            );
-            return;
-          }
-        } catch (authCheckError) {
-          // If auth table check fails, check public.users table as fallback
-          try {
-            final existingUser =
-                await Supabase.instance.client
-                    .from('users')
-                    .select('id')
-                    .eq('email', username)
-                    .maybeSingle();
-
-            if (existingUser != null) {
-              log('❌ البريد الإلكتروني موجود في public.users');
+        final shouldStop = await emailCheckResult.fold(
+          (failure) async {
+            log('⚠️ خطأ في فحص البريد الإلكتروني: ${failure.message}');
+            // في حالة فشل التحقق، نكمل العملية ونترك Supabase يتعامل معها
+            return false;
+          },
+          (emailExists) async {
+            if (emailExists) {
+              log('❌ البريد الإلكتروني موجود مسبقاً - توقف العملية');
               emit(
-                const SignupFailure(message: 'البريد الإلكتروني مستخدم من قبل'),
+                const SignupUserExistsWithLoginOption(
+                  message:
+                      'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
+                  dataType: 'email',
+                ),
               );
-              return;
+              return true; // يجب التوقف
             }
-          } catch (publicCheckError) {
-            log('⚠️ فشل فحص البريد الإلكتروني المكرر: $publicCheckError');
-            // Continue with signup if both checks fail (let Supabase handle it)
-          }
+            log('✅ البريد الإلكتروني غير موجود - يمكن المتابعة');
+            return false; // يمكن المتابعة
+          },
+        );
+
+        // إذا كان يجب التوقف، لا نكمل
+        if (shouldStop) {
+          log('🛑 توقف العملية - لن يتم إنشاء حساب');
+          return;
         }
 
         // Email signup
+        log('📨 بدء إنشاء حساب المصادقة للإيميل: $username');
         final response = await Supabase.instance.client.auth.signUp(
           email: username,
           password: password,
@@ -604,11 +748,44 @@ class SignupCubit extends Cubit<SignupState> {
           throw Exception('فشل في إنشاء حساب المصادقة');
         }
       } else {
+        // ✅ التحقق من وجود رقم الهاتف باستخدام Use Case
+        final phoneCheckResult = await _checkPhoneExistsUseCase.call(username);
+
+        final shouldStop = await phoneCheckResult.fold(
+          (failure) async {
+            log('⚠️ خطأ في فحص رقم الهاتف: ${failure.message}');
+            // في حالة فشل التحقق، نكمل العملية ونترك Supabase يتعامل معها
+            return false;
+          },
+          (phoneExists) async {
+            if (phoneExists) {
+              log('❌ رقم الهاتف موجود مسبقاً - توقف العملية');
+              emit(
+                const SignupUserExistsWithLoginOption(
+                  message:
+                      'هذا الرقم مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
+                  dataType: 'phone',
+                ),
+              );
+              return true; // يجب التوقف
+            }
+            log('✅ رقم الهاتف غير موجود - يمكن المتابعة');
+            return false; // يمكن المتابعة
+          },
+        );
+
+        // إذا كان يجب التوقف، لا نكمل
+        if (shouldStop) {
+          log('🛑 توقف العملية - لن يتم إنشاء حساب');
+          return;
+        }
+
         // Phone signup with SMS OTP
         log('📱 بدء إرسال OTP إلى: $username');
 
         try {
           // Create auth account with phone number
+          log('📱 بدء إنشاء حساب المصادقة للهاتف: $username');
           final response = await Supabase.instance.client.auth.signUp(
             phone: username,
             password: password,
@@ -985,81 +1162,77 @@ class SignupCubit extends Cubit<SignupState> {
     }
   }
 
-  // 🆕 Check if user data already exists
+  // 🆕 Check if user data already exists using proper Use Cases
   Future<bool> checkUserDataExists({
     required String? nationalId,
     required String? phone,
     required String? passportNumber,
   }) async {
     try {
-      // Use UserRepository's checkUserExists method
+      // Check national ID for citizens
       if (nationalId != null && nationalId.isNotEmpty) {
-        // For signup, we need to create a dummy userData to test validation
-        // This will trigger the validation in the data source
-        try {
-          await _signUpWithDataUseCase.call(
-            SignUpWithDataParams(
-              userData: {
-                'national_id': nationalId,
-                'user_type': 'citizen',
-                'test_mode': true, // Add test flag to avoid actual signup
-              },
+        final nationalIdCheckResult = await _checkNationalIdExistsUseCase.call(
+          nationalId,
+        );
+
+        final nationalIdExists = nationalIdCheckResult.fold((failure) {
+          log('⚠️ خطأ في فحص الرقم القومي: ${failure.message}');
+          return false; // في حالة الخطأ، نفترض عدم الوجود
+        }, (exists) => exists);
+
+        if (nationalIdExists) {
+          emit(
+            const SignupUserExistsWithLoginOption(
+              message:
+                  'الرقم القومي مسجل مسبقاً. هل تريد تسجيل الدخول بحسابك الموجود؟',
+              dataType: 'nationalId',
             ),
           );
-        } catch (e) {
-          if (e.toString().contains('الرقم القومي مستخدم من قبل')) {
-            emit(
-              SignupError(
-                message:
-                    'الرقم القومي مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
-              ),
-            );
-            return false;
-          }
+          return false;
         }
       }
 
       // Check phone number
       if (phone != null && phone.isNotEmpty) {
-        try {
-          await _signUpWithDataUseCase.call(
-            SignUpWithDataParams(userData: {'phone': phone, 'test_mode': true}),
+        final phoneCheckResult = await _checkPhoneExistsUseCase.call(phone);
+
+        final phoneExists = phoneCheckResult.fold((failure) {
+          log('⚠️ خطأ في فحص رقم الهاتف: ${failure.message}');
+          return false; // في حالة الخطأ، نفترض عدم الوجود
+        }, (exists) => exists);
+
+        if (phoneExists) {
+          emit(
+            const SignupUserExistsWithLoginOption(
+              message:
+                  'رقم الهاتف مسجل مسبقاً. هل تريد تسجيل الدخول بحسابك الموجود؟',
+              dataType: 'phone',
+            ),
           );
-        } catch (e) {
-          if (e.toString().contains('رقم الهاتف مستخدم من قبل')) {
-            emit(
-              SignupError(
-                message:
-                    'رقم الهاتف مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
-              ),
-            );
-            return false;
-          }
+          return false;
         }
       }
 
       // Check passport for foreigners
       if (passportNumber != null && passportNumber.isNotEmpty) {
-        try {
-          await _signUpWithDataUseCase.call(
-            SignUpWithDataParams(
-              userData: {
-                'passport_number': passportNumber,
-                'user_type': 'foreigner',
-                'test_mode': true,
-              },
+        final passportCheckResult = await _checkPassportExistsUseCase.call(
+          passportNumber,
+        );
+
+        final passportExists = passportCheckResult.fold((failure) {
+          log('⚠️ خطأ في فحص رقم الجواز: ${failure.message}');
+          return false; // في حالة الخطأ، نفترض عدم الوجود
+        }, (exists) => exists);
+
+        if (passportExists) {
+          emit(
+            const SignupUserExistsWithLoginOption(
+              message:
+                  'رقم الجواز مسجل مسبقاً. هل تريد تسجيل الدخول بحسابك الموجود؟',
+              dataType: 'passport',
             ),
           );
-        } catch (e) {
-          if (e.toString().contains('رقم الباسبور مستخدم من قبل')) {
-            emit(
-              SignupError(
-                message:
-                    'رقم الجواز مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
-              ),
-            );
-            return false;
-          }
+          return false;
         }
       }
 
