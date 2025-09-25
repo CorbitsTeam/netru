@@ -32,14 +32,23 @@ class _SignupUsernamePasswordStepState
     extends State<SignupUsernamePasswordStep> {
   bool _passwordObscured = true;
   bool _confirmPasswordObscured = true;
+  late VoidCallback _passwordListener;
 
   @override
   void initState() {
     super.initState();
-    // Add listener to password controller to update UI when text changes
-    widget.passwordController.addListener(() {
+    // Create listener to password controller to update UI when text changes
+    _passwordListener = () {
       setState(() {}); // Rebuild to update password strength indicator
-    });
+    };
+    widget.passwordController.addListener(_passwordListener);
+  }
+
+  @override
+  void dispose() {
+    // Remove listener before disposal
+    widget.passwordController.removeListener(_passwordListener);
+    super.dispose();
   }
 
   @override

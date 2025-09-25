@@ -198,6 +198,8 @@ Future<void> _initAuthDependencies() async {
   // Validation Use Cases
   sl.registerLazySingleton(() => ValidateCriticalDataUseCase(sl()));
   sl.registerLazySingleton(() => CheckEmailExistsInUsersUseCase(sl()));
+  // Register use-case that checks whether an email exists in Supabase Auth
+  sl.registerLazySingleton(() => CheckEmailExistsInAuthUseCase(sl()));
   sl.registerLazySingleton(() => CheckPhoneExistsUseCase(sl()));
   sl.registerLazySingleton(() => CheckNationalIdExistsUseCase(sl()));
   sl.registerLazySingleton(() => CheckPassportExistsUseCase(sl()));
@@ -223,6 +225,7 @@ Future<void> _initAuthDependencies() async {
       signUpWithDataUseCase: sl(),
       locationService: sl(),
       checkEmailExistsInUsersUseCase: sl(),
+      checkEmailExistsInAuthUseCase: sl(),
       checkPhoneExistsUseCase: sl(),
       checkNationalIdExistsUseCase: sl(),
       checkPassportExistsUseCase: sl(),

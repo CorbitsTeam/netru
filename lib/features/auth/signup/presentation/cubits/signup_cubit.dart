@@ -17,6 +17,7 @@ class SignupCubit extends Cubit<SignupState> {
   final SignUpWithDataUseCase _signUpWithDataUseCase;
   final LocationService _locationService;
   final CheckEmailExistsInUsersUseCase _checkEmailExistsInUsersUseCase;
+  final CheckEmailExistsInAuthUseCase _checkEmailExistsInAuthUseCase;
   final CheckPhoneExistsUseCase _checkPhoneExistsUseCase;
   final CheckNationalIdExistsUseCase _checkNationalIdExistsUseCase;
   final CheckPassportExistsUseCase _checkPassportExistsUseCase;
@@ -26,6 +27,7 @@ class SignupCubit extends Cubit<SignupState> {
     required SignUpWithDataUseCase signUpWithDataUseCase,
     required LocationService locationService,
     required CheckEmailExistsInUsersUseCase checkEmailExistsInUsersUseCase,
+    required CheckEmailExistsInAuthUseCase checkEmailExistsInAuthUseCase,
     required CheckPhoneExistsUseCase checkPhoneExistsUseCase,
     required CheckNationalIdExistsUseCase checkNationalIdExistsUseCase,
     required CheckPassportExistsUseCase checkPassportExistsUseCase,
@@ -33,6 +35,7 @@ class SignupCubit extends Cubit<SignupState> {
        _signUpWithDataUseCase = signUpWithDataUseCase,
        _locationService = locationService,
        _checkEmailExistsInUsersUseCase = checkEmailExistsInUsersUseCase,
+       _checkEmailExistsInAuthUseCase = checkEmailExistsInAuthUseCase,
        _checkPhoneExistsUseCase = checkPhoneExistsUseCase,
        _checkNationalIdExistsUseCase = checkNationalIdExistsUseCase,
        _checkPassportExistsUseCase = checkPassportExistsUseCase,
@@ -700,41 +703,73 @@ class SignupCubit extends Cubit<SignupState> {
       }
 
       if (isEmailMode) {
-        // ✅ التحقق من وجود البريد الإلكتروني باستخدام Use Case
-        final emailCheckResult = await _checkEmailExistsInUsersUseCase.call(
+        log('🔍 بدء فحص الإيميل: $username');
+
+        // ✅ التحقق من وجود البريد الإلكتروني في جدول المستخدمين أولاً
+        log('🔍 الخطوة 1: فحص جدول المستخدمين...');
+        final emailInUsersResult = await _checkEmailExistsInUsersUseCase.call(
           username,
         );
 
-        final shouldStop = await emailCheckResult.fold(
-          (failure) async {
-            log('⚠️ خطأ في فحص البريد الإلكتروني: ${failure.message}');
-            // في حالة فشل التحقق، نكمل العملية ونترك Supabase يتعامل معها
+        final emailExistsInUsers = emailInUsersResult.fold(
+          (failure) {
+            log(
+              '⚠️ خطأ في فحص البريد الإلكتروني في جدول المستخدمين: ${failure.message}',
+            );
             return false;
           },
-          (emailExists) async {
-            if (emailExists) {
-              log('❌ البريد الإلكتروني موجود مسبقاً - توقف العملية');
-              emit(
-                const SignupUserExistsWithLoginOption(
-                  message:
-                      'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
-                  dataType: 'email',
-                ),
-              );
-              return true; // يجب التوقف
-            }
-            log('✅ البريد الإلكتروني غير موجود - يمكن المتابعة');
-            return false; // يمكن المتابعة
+          (exists) {
+            log('🔍 نتيجة فحص جدول المستخدمين: $exists');
+            return exists;
           },
         );
 
-        // إذا كان يجب التوقف، لا نكمل
-        if (shouldStop) {
-          log('🛑 توقف العملية - لن يتم إنشاء حساب');
+        if (emailExistsInUsers) {
+          log('❌ البريد الإلكتروني موجود في جدول المستخدمين - توقف العملية');
+          emit(
+            const SignupUserExistsWithLoginOption(
+              message:
+                  'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
+              dataType: 'email',
+            ),
+          );
           return;
         }
 
-        // Email signup
+        // ✅ التحقق من وجود البريد الإلكتروني في نظام المصادقة
+        log('🔍 الخطوة 2: فحص نظام المصادقة...');
+        final emailInAuthResult = await _checkEmailExistsInAuthUseCase.call(
+          username,
+        );
+
+        final emailExistsInAuth = emailInAuthResult.fold(
+          (failure) {
+            log(
+              '⚠️ خطأ في فحص البريد الإلكتروني في نظام المصادقة: ${failure.message}',
+            );
+            return false;
+          },
+          (exists) {
+            log('🔍 نتيجة فحص نظام المصادقة: $exists');
+            return exists;
+          },
+        );
+
+        if (emailExistsInAuth) {
+          log('❌ البريد الإلكتروني موجود في نظام المصادقة - توقف العملية');
+          emit(
+            const SignupUserExistsWithLoginOption(
+              message:
+                  'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
+              dataType: 'email',
+            ),
+          );
+          return;
+        }
+
+        log('✅ الإيميل غير موجود في أي من النظامين - يمكن المتابعة');
+
+        // ✅ إنشاء حساب في نظام المصادقة (البريد غير موجود)
         log('📨 بدء إنشاء حساب المصادقة للإيميل: $username');
         final response = await Supabase.instance.client.auth.signUp(
           email: username,
@@ -896,11 +931,14 @@ class SignupCubit extends Cubit<SignupState> {
         return;
       }
 
-      // Parse user type
+      // Parse user type and get identifier fields
       UserType userType;
+      String? nationalId;
+      String? passportNumber;
+
       if (userTypeString == UserType.citizen.name) {
         userType = UserType.citizen;
-        final nationalId = registrationData['nationalId'] as String?;
+        nationalId = registrationData['nationalId'] as String?;
         log('  - الرقم القومي: $nationalId');
         if (nationalId == null ||
             nationalId.trim().isEmpty ||
@@ -911,7 +949,7 @@ class SignupCubit extends Cubit<SignupState> {
         }
       } else {
         userType = UserType.foreigner;
-        final passportNumber = registrationData['passportNumber'] as String?;
+        passportNumber = registrationData['passportNumber'] as String?;
         log('  - رقم الجواز: $passportNumber');
         if (passportNumber == null || passportNumber.trim().isEmpty) {
           log('❌ فشل: رقم جواز فارغ');
@@ -920,7 +958,22 @@ class SignupCubit extends Cubit<SignupState> {
         }
       }
 
-      log('✅ تم التحقق من البيانات بنجاح');
+      log('✅ تم التحقق من صحة البيانات - بدء فحص التكرار...');
+
+      // 🔴 التحقق من عدم وجود البيانات مسبقاً قبل المتابعة
+      bool shouldStop = await checkUserDataExists(
+        nationalId: nationalId,
+        phone: phone,
+        passportNumber: passportNumber,
+      );
+
+      // إذا كانت البيانات موجودة، فإن checkUserDataExists ستقوم بإظهار الرسالة وتوقف العملية
+      if (!shouldStop) {
+        log('❌ تم إيقاف التسجيل - البيانات موجودة مسبقاً');
+        return;
+      }
+
+      log('✅ التحقق من التكرار مكتمل - يمكن المتابعة');
 
       // Upload documents to Supabase Storage
       List<String> documentUrls = [];

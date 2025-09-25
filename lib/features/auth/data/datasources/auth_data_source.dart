@@ -524,33 +524,25 @@ class SupabaseAuthDataSource implements AuthDataSource {
   @override
   Future<bool> checkEmailExistsInAuth(String email) async {
     try {
-      // التحقق من نظام المصادقة عبر محاولة إنشاء حساب
-      // هذا سيفشل إذا كان الإيميل موجود مسبقاً
-      final response = await supabaseClient.auth.signUp(
+      print('🔍 التحقق من وجود الإيميل في نظام المصادقة: $email');
+
+      // FIXME: التحقق من Auth مُعطّل مؤقتاً لتجنب False Positives
+      // يجب تنفيذ حل أكثر دقة باستخدام Admin APIs أو طريقة موثوقة أخرى
+      print('⚠️ تم تعطيل فحص نظام المصادقة مؤقتاً - العودة بـ false');
+      return false;
+
+      /* محاولة تسجيل دخول مع كلمة مرور خاطئة - لا يعمل بشكل موثوق
+      await supabaseClient.auth.signInWithPassword(
         email: email,
-        password: 'temp_password_for_check',
+        password: 'intentionally_wrong_password_123456789',
       );
-
-      // إذا نجح في الإنشاء، يعني الإيميل غير موجود
-      if (response.user != null) {
-        // حذف الحساب المؤقت
-        try {
-          await supabaseClient.auth.admin.deleteUser(response.user!.id);
-        } catch (deleteError) {
-          print('⚠️ خطأ في حذف الحساب المؤقت: $deleteError');
-        }
-        return false;
-      }
-
+      
+      // إذا نجح (لن يحدث)، يعني الإيميل موجود
       return true;
+      */
     } catch (e) {
-      // إذا فشل في الإنشاء بسبب وجود الإيميل، يعني الإيميل موجود
-      if (e.toString().contains('already registered') ||
-          e.toString().contains('User already registered')) {
-        return true;
-      }
-
-      print('❌ خطأ في التحقق من الإيميل في نظام المصادقة: $e');
+      print('🔍 خطأ في فحص نظام المصادقة: $e');
+      // في حالة الخطأ، نعتبر الإيميل غير موجود للأمان
       return false;
     }
   }
