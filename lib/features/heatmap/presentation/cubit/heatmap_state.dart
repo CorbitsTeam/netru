@@ -40,6 +40,28 @@ class HeatmapGovernorateFilterApplied extends HeatmapState {
   });
 }
 
+class HeatmapCrimeTypeFilterApplied extends HeatmapState {
+  final List<ReportLocationEntity> filteredReports;
+  final String selectedCrimeType;
+
+  HeatmapCrimeTypeFilterApplied({
+    required this.filteredReports,
+    required this.selectedCrimeType,
+  });
+}
+
+class HeatmapCombinedFilterApplied extends HeatmapState {
+  final List<ReportLocationEntity> filteredReports;
+  final String? selectedGovernorate;
+  final String? selectedCrimeType;
+
+  HeatmapCombinedFilterApplied({
+    required this.filteredReports,
+    this.selectedGovernorate,
+    this.selectedCrimeType,
+  });
+}
+
 class HeatmapFailure extends HeatmapState {
   final String error;
 

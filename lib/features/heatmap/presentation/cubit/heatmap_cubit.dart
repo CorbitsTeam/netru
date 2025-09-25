@@ -134,6 +134,75 @@ class HeatmapCubit extends Cubit<HeatmapState> {
     return _allReports.where((report) => report.reportType == type).toList();
   }
 
+  // فلترة التقارير حسب نوع الجريمة
+  Future<void> filterByCrimeType(String crimeType) async {
+    try {
+      emit(HeatmapLoading());
+
+      // فلترة التقارير المحلية حسب نوع الجريمة
+      final filteredReports =
+          _allReports
+              .where(
+                (report) => report.reportType.toLowerCase().contains(
+                  crimeType.toLowerCase(),
+                ),
+              )
+              .toList();
+
+      emit(
+        HeatmapCrimeTypeFilterApplied(
+          filteredReports: filteredReports,
+          selectedCrimeType: crimeType,
+        ),
+      );
+    } catch (e) {
+      emit(HeatmapFailure('فشل في تطبيق فلتر نوع الجريمة: ${e.toString()}'));
+    }
+  }
+
+  // فلترة مجمعة حسب المحافظة ونوع الجريمة
+  Future<void> applyFilters({String? governorate, String? crimeType}) async {
+    try {
+      emit(HeatmapLoading());
+
+      List<ReportLocationEntity> filteredReports = List.from(_allReports);
+
+      // تطبيق فلتر المحافظة
+      if (governorate != null && governorate.isNotEmpty) {
+        filteredReports =
+            filteredReports
+                .where(
+                  (report) => report.governorate.toLowerCase().contains(
+                    governorate.toLowerCase(),
+                  ),
+                )
+                .toList();
+      }
+
+      // تطبيق فلتر نوع الجريمة
+      if (crimeType != null && crimeType.isNotEmpty) {
+        filteredReports =
+            filteredReports
+                .where(
+                  (report) => report.reportType.toLowerCase().contains(
+                    crimeType.toLowerCase(),
+                  ),
+                )
+                .toList();
+      }
+
+      emit(
+        HeatmapCombinedFilterApplied(
+          filteredReports: filteredReports,
+          selectedGovernorate: governorate,
+          selectedCrimeType: crimeType,
+        ),
+      );
+    } catch (e) {
+      emit(HeatmapFailure('فشل في تطبيق الفلاتر: ${e.toString()}'));
+    }
+  }
+
   // دالة للحصول على إحصائيات سريعة
   Map<String, int> getQuickStats() {
     return {
