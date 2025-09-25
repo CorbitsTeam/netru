@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../domain/entities/login_user_entity.dart';
+import '../../../domain/entities/user_entity.dart';
 
 abstract class LoginState extends Equatable {
   const LoginState();
@@ -13,7 +13,7 @@ class LoginInitial extends LoginState {}
 class LoginLoading extends LoginState {}
 
 class LoginSuccess extends LoginState {
-  final LoginUserEntity user;
+  final UserEntity user;
 
   const LoginSuccess({required this.user});
 

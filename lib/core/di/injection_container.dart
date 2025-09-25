@@ -17,16 +17,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 // ===========================
-// Auth Feature - Unified
+// Auth Feature - Unified & Refactored
 // ===========================
 import '../../features/auth/data/datasources/auth_data_source.dart';
-import '../../features/auth/data/repositories/unified_auth_repository.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/usecases/check_email_exists_in_auth.dart';
-import '../../features/auth/domain/usecases/check_phone_exists.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
 import '../../features/auth/domain/usecases/logout_user.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
+import '../../features/auth/domain/usecases/validate_critical_data.dart';
+import '../../features/auth/domain/usecases/check_data_exists.dart';
+import '../../features/auth/domain/usecases/profile_completion_usecases.dart';
+import '../../features/auth/domain/usecases/get_user_by_id.dart';
+import '../../features/auth/domain/usecases/signup_with_data.dart';
+import '../../features/auth/profile_completion/presentation/cubit/profile_completion_cubit.dart';
 
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
 // ===========================
@@ -176,7 +180,7 @@ Future<void> _initHeatmapDependencies() async {
 }
 
 /// ===========================
-/// Auth
+/// Auth - Unified & Refactored
 /// ===========================
 Future<void> _initAuthDependencies() async {
   final supabaseClient = sl<SupabaseClient>();
@@ -188,25 +192,54 @@ Future<void> _initAuthDependencies() async {
 
   // Unified Auth Repository
   sl.registerLazySingleton<AuthRepository>(
-    () => UnifiedAuthRepository(authDataSource: sl()),
+    () => AuthRepositoryImpl(authDataSource: sl()),
   );
 
-  sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
+  // Validation Use Cases
+  sl.registerLazySingleton(() => ValidateCriticalDataUseCase(sl()));
+  sl.registerLazySingleton(() => CheckEmailExistsInUsersUseCase(sl()));
+  sl.registerLazySingleton(() => CheckPhoneExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckNationalIdExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckPassportExistsUseCase(sl()));
+  sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
+
+  // Auth Use Cases
+  sl.registerLazySingleton(() => RegisterUserUseCase(sl(), sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUserUseCase(sl()));
-  sl.registerLazySingleton(() => CheckEmailExistsInAuthUseCase(sl()));
-  sl.registerLazySingleton(() => CheckPhoneExistsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpWithDataUseCase(sl()));
 
+  // Profile Completion Use Cases
+  sl.registerLazySingleton(() => CompleteProfileUseCase(sl(), sl()));
+  sl.registerLazySingleton(() => VerifyEmailAndCompleteSignupUseCase(sl()));
+  sl.registerLazySingleton(() => ResendVerificationEmailUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpWithEmailOnlyUseCase(sl()));
+
+  // Cubits
   sl.registerFactory(
     () => SignupCubit(
       registerUserUseCase: sl(),
+      signUpWithDataUseCase: sl(),
       locationService: sl(),
-      checkEmailExistsInAuthUseCase: sl(),
-      checkPhoneExistsUseCase: sl(),
     ),
   );
 
   sl.registerFactory(() => LoginCubit(loginUserUseCase: sl()));
+
+  // Profile Completion Cubit
+  sl.registerFactory(
+    () => ProfileCompletionCubit(
+      completeProfileUseCase: sl(),
+      verifyEmailAndCompleteSignupUseCase: sl(),
+      resendVerificationEmailUseCase: sl(),
+      validateCriticalDataUseCase: sl(),
+      checkPhoneExistsUseCase: sl(),
+      checkNationalIdExistsUseCase: sl(),
+      checkPassportExistsUseCase: sl(),
+      checkEmailExistsInUsersUseCase: sl(),
+    ),
+  );
 
   sl.get<LoggerService>().logInfo('✅ Auth dependencies initialized');
 }

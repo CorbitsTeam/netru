@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/routing/routes.dart';
-import '../../../domain/entities/login_user_entity.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../../domain/usecases/login_user.dart';
 import 'login_state.dart';
 
@@ -66,7 +66,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   /// Get navigation route based on user type
-  String getNavigationRoute(LoginUserEntity user) {
+  String getNavigationRoute(UserEntity user) {
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:

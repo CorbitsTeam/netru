@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../domain/entities/login_user_entity.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../cubit/login_cubit.dart';
 import 'login_text_field.dart';
 import 'login_password_field.dart';

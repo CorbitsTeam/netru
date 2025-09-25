@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:netru_app/core/utils/app_shared_preferences.dart';
-import 'package:netru_app/features/auth/data/models/login_user_model.dart';
-import 'package:netru_app/features/auth/domain/entities/login_user_entity.dart';
+import 'package:netru_app/features/auth/data/models/user_model.dart';
+import 'package:netru_app/features/auth/domain/entities/user_entity.dart';
 import 'package:netru_app/features/auth/domain/usecases/get_user_by_id.dart';
 import 'package:netru_app/core/di/injection_container.dart' as di;
 
@@ -15,11 +15,11 @@ class UserDataHelper {
   UserDataHelper._internal();
 
   /// Get current logged-in user data from AppPreferences
-  LoginUserEntity? getCurrentUser() {
+  UserEntity? getCurrentUser() {
     try {
-      return AppPreferences().getModel<LoginUserEntity>(
+      return AppPreferences().getModel<UserEntity>(
         'current_user',
-        (json) => LoginUserModel.fromJson(json),
+        (json) => UserModel.fromJson(json),
       );
     } catch (e) {
       debugPrint('Error getting current user: $e', wrapWidth: 1024);
@@ -28,12 +28,12 @@ class UserDataHelper {
   }
 
   /// Save current user data to AppPreferences
-  Future<void> saveCurrentUser(LoginUserEntity user) async {
+  Future<void> saveCurrentUser(UserEntity user) async {
     try {
-      await AppPreferences().saveModel<LoginUserEntity>(
+      await AppPreferences().saveModel<UserEntity>(
         'current_user',
         user,
-        (user) => LoginUserModel.fromEntity(user).toJson(),
+        (user) => UserModel.fromEntity(user).toJson(),
       );
     } catch (e) {
       debugPrint('Error saving current user: $e', wrapWidth: 1024);
@@ -61,7 +61,7 @@ class UserDataHelper {
       // Get fresh user data from database
       final getUserUseCase = di.sl<GetUserByIdUseCase>();
       final result = await getUserUseCase(
-        GetUserByIdParams(userId: currentUser!.id),
+        GetUserByIdParams(userId: currentUser!.id!),
       );
 
       return result.fold(
@@ -74,9 +74,12 @@ class UserDataHelper {
         },
         (freshUser) async {
           // Update local storage with fresh data
-          await saveCurrentUser(freshUser);
-          debugPrint('User data refreshed successfully', wrapWidth: 1024);
-          return true;
+          if (freshUser != null) {
+            await saveCurrentUser(freshUser);
+            debugPrint('User data refreshed successfully', wrapWidth: 1024);
+            return true;
+          }
+          return false;
         },
       );
     } catch (e) {

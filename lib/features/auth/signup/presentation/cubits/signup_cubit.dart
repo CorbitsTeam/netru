@@ -6,21 +6,21 @@ import 'package:netru_app/core/utils/egyptian_id_parser.dart';
 import 'package:netru_app/features/auth/data/models/user_model.dart';
 import 'package:netru_app/features/auth/domain/entities/user_entity.dart';
 import 'package:netru_app/features/auth/domain/usecases/register_user.dart';
-import 'package:netru_app/features/auth/domain/usecases/signup_user.dart';
+import 'package:netru_app/features/auth/domain/usecases/signup_with_data.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   final RegisterUserUseCase _registerUserUseCase;
-  final SignUpUserUseCase _signUpUserUseCase;
+  final SignUpWithDataUseCase _signUpWithDataUseCase;
   final LocationService _locationService;
 
   SignupCubit({
     required RegisterUserUseCase registerUserUseCase,
-    required SignUpUserUseCase signUpUserUseCase,
+    required SignUpWithDataUseCase signUpWithDataUseCase,
     required LocationService locationService,
   }) : _registerUserUseCase = registerUserUseCase,
-       _signUpUserUseCase = signUpUserUseCase,
+       _signUpWithDataUseCase = signUpWithDataUseCase,
        _locationService = locationService,
        super(SignupInitial());
 
@@ -426,13 +426,13 @@ class SignupCubit extends Cubit<SignupState> {
       }
 
       // Ensure only one identifier type is sent to repository
-      final result = await _signUpUserUseCase(
-        SignUpUserParams(userData: userData),
+      final result = await _signUpWithDataUseCase(
+        SignUpWithDataParams(userData: userData),
       );
 
       result.fold(
         (failure) => emit(SignupFailure(message: failure.message)),
-        (user) => emit(SignupSuccess(user: user as UserEntity)),
+        (user) => emit(SignupSuccess(user: user)),
       );
     } catch (e) {
       emit(SignupFailure(message: 'خطأ في إنشاء الحساب: ${e.toString()}'));
@@ -997,8 +997,8 @@ class SignupCubit extends Cubit<SignupState> {
         // For signup, we need to create a dummy userData to test validation
         // This will trigger the validation in the data source
         try {
-          await _signUpUserUseCase.call(
-            SignUpUserParams(
+          await _signUpWithDataUseCase.call(
+            SignUpWithDataParams(
               userData: {
                 'national_id': nationalId,
                 'user_type': 'citizen',
@@ -1022,8 +1022,8 @@ class SignupCubit extends Cubit<SignupState> {
       // Check phone number
       if (phone != null && phone.isNotEmpty) {
         try {
-          await _signUpUserUseCase.call(
-            SignUpUserParams(userData: {'phone': phone, 'test_mode': true}),
+          await _signUpWithDataUseCase.call(
+            SignUpWithDataParams(userData: {'phone': phone, 'test_mode': true}),
           );
         } catch (e) {
           if (e.toString().contains('رقم الهاتف مستخدم من قبل')) {
@@ -1041,8 +1041,8 @@ class SignupCubit extends Cubit<SignupState> {
       // Check passport for foreigners
       if (passportNumber != null && passportNumber.isNotEmpty) {
         try {
-          await _signUpUserUseCase.call(
-            SignUpUserParams(
+          await _signUpWithDataUseCase.call(
+            SignUpWithDataParams(
               userData: {
                 'passport_number': passportNumber,
                 'user_type': 'foreigner',

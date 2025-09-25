@@ -27,6 +27,7 @@ class SignupNavigationButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(18.w),
+      margin: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
           if (showPreviousButton && onPrevious != null)

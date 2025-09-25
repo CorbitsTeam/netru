@@ -146,13 +146,13 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {
         _isSubmitting = false;
       });
-    } else if (state is SignupUserAlreadyExists) {
+    } else if (state is SignupFailure && state.message.contains('موجود')) {
       // 🆕 Handle user already exists - show dialog and redirect to login
       setState(() {
         _isSubmitting = false;
       });
 
-      _showUserExistsDialog(context, state.message, state.field);
+      _showUserExistsDialog(context, state.message, 'general');
     } else if (state is SignupEmailSent) {
       // 🆕 Handle OTP sent state - transition to next step
       setState(() {

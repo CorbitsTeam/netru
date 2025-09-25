@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-enum UserType { citizen, foreigner }
+enum UserType { citizen, foreigner, admin }
 
-enum VerificationStatus { pending, verified, rejected }
+enum VerificationStatus { unverified, pending, verified, rejected }
 
 class UserEntity extends Equatable {
   final String? id;
@@ -20,9 +20,13 @@ class UserEntity extends Equatable {
   final String? districtName;
   final String? address;
   final DateTime? dateOfBirth;
+  final String? role;
+  final String? nationality;
+  final String? profileImage;
   final VerificationStatus verificationStatus;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final DateTime? verifiedAt;
 
   const UserEntity({
     this.id,
@@ -40,9 +44,13 @@ class UserEntity extends Equatable {
     this.districtName,
     this.address,
     this.dateOfBirth,
+    this.role,
+    this.nationality,
+    this.profileImage,
     this.verificationStatus = VerificationStatus.pending,
     this.createdAt,
     this.updatedAt,
+    this.verifiedAt,
   });
 
   @override
@@ -59,9 +67,13 @@ class UserEntity extends Equatable {
     districtId,
     address,
     dateOfBirth,
+    role,
+    nationality,
+    profileImage,
     verificationStatus,
     createdAt,
     updatedAt,
+    verifiedAt,
   ];
 
   UserEntity copyWith({
@@ -80,9 +92,13 @@ class UserEntity extends Equatable {
     String? districtName,
     String? address,
     DateTime? dateOfBirth,
+    String? role,
+    String? nationality,
+    String? profileImage,
     VerificationStatus? verificationStatus,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? verifiedAt,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -100,9 +116,53 @@ class UserEntity extends Equatable {
       districtName: districtName ?? this.districtName,
       address: address ?? this.address,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      role: role ?? this.role,
+      nationality: nationality ?? this.nationality,
+      profileImage: profileImage ?? this.profileImage,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
     );
+  }
+
+  /// Helper method to get the identifier based on user type
+  String? get identifier {
+    switch (userType) {
+      case UserType.citizen:
+        return nationalId;
+      case UserType.foreigner:
+        return passportNumber;
+      case UserType.admin:
+        return email;
+    }
+  }
+
+  /// Helper method to determine if the user is an admin
+  bool get isAdmin => userType == UserType.admin;
+
+  /// Helper method to determine if the user is verified
+  bool get isVerified => verificationStatus == VerificationStatus.verified;
+
+  /// Get user's full address combining governorate, city, district, and address
+  String get fullAddress {
+    final parts =
+        [
+          governorateName,
+          cityName,
+          districtName,
+          address,
+        ].where((part) => part != null && part.isNotEmpty).toList();
+    return parts.isEmpty ? 'غير محدد' : parts.join(', ');
+  }
+
+  /// Get user's location as governorate and city
+  String get location {
+    final parts =
+        [
+          governorateName,
+          cityName,
+        ].where((part) => part != null && part.isNotEmpty).toList();
+    return parts.isEmpty ? 'غير محدد' : parts.join(', ');
   }
 }

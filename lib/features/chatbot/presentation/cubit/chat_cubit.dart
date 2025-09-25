@@ -64,7 +64,7 @@ class ChatCubit extends Cubit<ChatState> {
       }
 
       final result = await _createSessionUseCase(
-        CreateSessionParams(userId: user.id, title: title),
+        CreateSessionParams(userId: user.id!, title: title),
       );
 
       result.fold(
@@ -114,7 +114,7 @@ class ChatCubit extends Cubit<ChatState> {
       }
 
       final result = await _getUserSessionsUseCase(
-        GetUserSessionsParams(userId: user.id),
+        GetUserSessionsParams(userId: user.id!),
       );
 
       result.fold(

@@ -5,7 +5,7 @@ import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/utils/user_data_helper.dart';
-import '../../../domain/entities/login_user_entity.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
 import '../widgets/login_header.dart';
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     context.pushNamed(Routes.signupScreen);
   }
 
-  void _navigateBasedOnUserType(LoginUserEntity user) async {
+  void _navigateBasedOnUserType(UserEntity user) async {
     // Save user data to SharedPreferences and refresh from database
     try {
       final userHelper = UserDataHelper();

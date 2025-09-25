@@ -9,19 +9,30 @@ import '../datasources/auth_data_source.dart';
 import '../models/user_model.dart';
 import '../models/identity_document_model.dart';
 
+/// Auth Repository Implementation
+/// يجمع كل العمليات المتعلقة بالمصادقة وإدارة المستخدمين
 class AuthRepositoryImpl implements AuthRepository {
   final AuthDataSource authDataSource;
 
   AuthRepositoryImpl({required this.authDataSource});
 
+  // ========================
+  // Authentication Methods
+  // ========================
+
   @override
-  Future<Either<Failure, UserEntity>> loginWithEmail(String email, String password) async {
+  Future<Either<Failure, UserEntity>> loginWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
       final user = await authDataSource.loginWithEmail(email, password);
       if (user != null) {
         return Right(user);
       } else {
-        return const Left(ServerFailure('فشل تسجيل الدخول. يرجى التحقق من بياناتك.'));
+        return const Left(
+          ServerFailure('فشل تسجيل الدخول. يرجى التحقق من بياناتك.'),
+        );
       }
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -43,7 +54,9 @@ class AuthRepositoryImpl implements AuthRepository {
       if (user != null) {
         return Right(user);
       } else {
-        return const Left(ServerFailure('فشل تسجيل الدخول. يرجى التحقق من بياناتك.'));
+        return const Left(
+          ServerFailure('فشل تسجيل الدخول. يرجى التحقق من بياناتك.'),
+        );
       }
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -59,6 +72,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  // ========================
+  // Registration Methods
+  // ========================
 
   @override
   Future<Either<Failure, UserEntity>> registerUser({
@@ -81,9 +98,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> signUpWithEmailOnly(String email, String password) async {
+  Future<Either<Failure, String>> signUpWithEmailOnly(
+    String email,
+    String password,
+  ) async {
     try {
-      final authUserId = await authDataSource.signUpWithEmailOnly(email, password);
+      final authUserId = await authDataSource.signUpWithEmailOnly(
+        email,
+        password,
+      );
       return Right(authUserId);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -91,10 +114,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> completeUserProfile(UserEntity user, String authUserId) async {
+  Future<Either<Failure, UserEntity>> completeUserProfile(
+    UserEntity user,
+    String authUserId,
+  ) async {
     try {
       final userModel = UserModel.fromEntity(user);
-      final completedUser = await authDataSource.completeUserProfile(userModel, authUserId);
+      final completedUser = await authDataSource.completeUserProfile(
+        userModel,
+        authUserId,
+      );
       return Right(completedUser);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -102,7 +131,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity?>> verifyEmailAndCompleteSignup(UserEntity userData) async {
+  Future<Either<Failure, UserEntity?>> verifyEmailAndCompleteSignup(
+    UserEntity userData,
+  ) async {
     try {
       final userModel = UserModel.fromEntity(userData);
       final user = await authDataSource.verifyEmailAndCompleteSignup(userModel);
@@ -121,6 +152,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  // ========================
+  // User Retrieval Methods
+  // ========================
 
   @override
   Future<Either<Failure, UserEntity?>> getCurrentUser() async {
@@ -153,7 +188,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity?>> getUserByNationalId(String nationalId) async {
+  Future<Either<Failure, UserEntity?>> getUserByNationalId(
+    String nationalId,
+  ) async {
     try {
       final user = await authDataSource.getUserByNationalId(nationalId);
       return Right(user);
@@ -163,7 +200,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity?>> getUserByPassport(String passportNumber) async {
+  Future<Either<Failure, UserEntity?>> getUserByPassport(
+    String passportNumber,
+  ) async {
     try {
       final user = await authDataSource.getUserByPassport(passportNumber);
       return Right(user);
@@ -173,14 +212,24 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> updateUserProfile(String userId, Map<String, dynamic> userData) async {
+  Future<Either<Failure, UserEntity>> updateUserProfile(
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
     try {
-      final updatedUser = await authDataSource.updateUserProfile(userId, userData);
+      final updatedUser = await authDataSource.updateUserProfile(
+        userId,
+        userData,
+      );
       return Right(updatedUser);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  // ========================
+  // Critical Validation Methods
+  // ========================
 
   @override
   Future<Either<Failure, bool>> checkUserExists(String identifier) async {
@@ -203,6 +252,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, bool>> checkEmailExistsInUsers(String email) async {
+    try {
+      final exists = await authDataSource.checkEmailExistsInUsers(email);
+      return Right(exists);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> checkNationalIdExists(String nationalId) async {
     try {
       final exists = await authDataSource.checkNationalIdExists(nationalId);
@@ -213,7 +272,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> checkPassportExists(String passportNumber) async {
+  Future<Either<Failure, bool>> checkPassportExists(
+    String passportNumber,
+  ) async {
     try {
       final exists = await authDataSource.checkPassportExists(passportNumber);
       return Right(exists);
@@ -232,8 +293,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // ========================
+  // Document Management
+  // ========================
+
   @override
-  Future<Either<Failure, String>> uploadDocument(File documentFile, String fileName) async {
+  Future<Either<Failure, String>> uploadDocument(
+    File documentFile,
+    String fileName,
+  ) async {
     try {
       final compressedFile = await ImageCompressionUtils.compressImageToSize(
         documentFile,
@@ -248,18 +316,33 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, IdentityDocumentEntity>> createIdentityDocument(IdentityDocumentEntity document) async {
+  Future<Either<Failure, IdentityDocumentEntity>> createIdentityDocument(
+    IdentityDocumentEntity document,
+  ) async {
     try {
       final documentModel = IdentityDocumentModel.fromEntity(document);
-      final createdDoc = await authDataSource.createIdentityDocument(documentModel);
+      final createdDoc = await authDataSource.createIdentityDocument(
+        documentModel,
+      );
       return Right(createdDoc);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
-  Future<void> _uploadUserDocuments(String userId, List<File> documents, UserType userType) async {
-    final docType = userType == UserType.citizen ? DocumentType.nationalId : DocumentType.passport;
+  // ========================
+  // Private Helper Methods
+  // ========================
+
+  Future<void> _uploadUserDocuments(
+    String userId,
+    List<File> documents,
+    UserType userType,
+  ) async {
+    final docType =
+        userType == UserType.citizen
+            ? DocumentType.nationalId
+            : DocumentType.passport;
 
     try {
       String? frontImageUrl;
@@ -267,12 +350,18 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (documents.isNotEmpty) {
         final frontFileName = '${userId}_${docType.name}_front.jpg';
-        frontImageUrl = await authDataSource.uploadImage(documents[0], frontFileName);
+        frontImageUrl = await authDataSource.uploadImage(
+          documents[0],
+          frontFileName,
+        );
       }
 
       if (documents.length > 1 && userType == UserType.citizen) {
         final backFileName = '${userId}_${docType.name}_back.jpg';
-        backImageUrl = await authDataSource.uploadImage(documents[1], backFileName);
+        backImageUrl = await authDataSource.uploadImage(
+          documents[1],
+          backFileName,
+        );
       }
 
       final identityDoc = IdentityDocumentModel(

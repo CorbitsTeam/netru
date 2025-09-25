@@ -54,7 +54,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               users!reports_user_id_fkey(full_name, email),
               report_media(id, media_type, file_url, file_name)
             ''')
-            .eq('user_id', currentUser.id)
+            .eq('user_id', currentUser.id!)
             .order('submitted_at', ascending: false);
 
         print(
@@ -166,7 +166,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
           final simpleResponse = await supabaseClient
               .from('reports')
               .select('*')
-              .eq('user_id', currentUser.id)
+              .eq('user_id', currentUser.id!)
               .order('submitted_at', ascending: false);
 
           print(
