@@ -73,14 +73,8 @@ class ProfileReviewStep extends StatelessWidget {
                   return;
                 }
 
-                final userModel = {
-                  'id': currentUser.id,
-                  'email': email,
-                  ...userData,
-                };
-
-                // Use cubit to complete profile (expecting UserModel in original code)
-                context.read<SignupCubit>().registerUser(userModel);
+                // Registration logic will be handled here
+                // context.read<SignupCubit>().registerUser();
               },
               isLoading: state is SignupLoading,
               backgroundColor: AppColors.primary,

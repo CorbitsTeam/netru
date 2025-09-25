@@ -59,7 +59,9 @@ class _ProfileDataEntryState extends State<ProfileDataEntry> {
 
   @override
   void dispose() {
-    _controllers.values.forEach((controller) => controller.dispose());
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 

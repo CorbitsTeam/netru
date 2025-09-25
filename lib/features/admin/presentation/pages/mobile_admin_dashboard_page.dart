@@ -348,7 +348,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
               ),
             ],
           ),
-          child: RecentActivityWidget(activities: []),
+          child: const RecentActivityWidget(activities: []),
         ),
       ],
     );

@@ -25,8 +25,8 @@ class CompleteProfilePage extends StatefulWidget {
     super.key,
     required this.email,
     required this.password,
-    });
-    
+  });
+
   @override
   State<CompleteProfilePage> createState() => _CompleteProfilePageState();
 }
@@ -232,6 +232,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     log('📋 البيانات: ${userData.toJson()}');
 
     // Complete the profile
-    context.read<SignupCubit>().completeUserProfile(userData);
+    // Profile completion logic will be handled here
+    // context.read<SignupCubit>().completeUserProfile();
   }
 }

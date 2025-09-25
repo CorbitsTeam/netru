@@ -248,7 +248,7 @@ $appDescription
                   label: 'البناء:',
                   value: _packageInfo?.buildNumber ?? '1',
                 ),
-                AppInfoRow(label: 'المطور:', value: 'فريق كوربيتس'),
+                const AppInfoRow(label: 'المطور:', value: 'فريق كوربيتس'),
               ],
             ),
             actions: [

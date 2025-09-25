@@ -1,38 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import '../../../domain/entities/login_user_entity.dart';
-import '../../../domain/usecases/check_user_exists.dart';
 import '../../../domain/usecases/login_user.dart';
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  final CheckUserExistsUseCase _checkUserExistsUseCase;
   final LoginUserUseCase _loginUserUseCase;
 
-  LoginCubit({
-    required CheckUserExistsUseCase checkUserExistsUseCase,
-    required LoginUserUseCase loginUserUseCase,
-  }) : _checkUserExistsUseCase = checkUserExistsUseCase,
-       _loginUserUseCase = loginUserUseCase,
-       super(LoginInitial());
+  LoginCubit({required LoginUserUseCase loginUserUseCase})
+    : _loginUserUseCase = loginUserUseCase,
+      super(LoginInitial());
 
   /// Check if user exists by identifier
   Future<void> checkUserExists(String identifier) async {
     if (identifier.trim().isEmpty) {
-      emit(const UserExistsCheckFailure(error: 'المعرف لا يمكن أن يكون فارغ'));
+      emit(const LoginFailure(error: 'المعرف لا يمكن أن يكون فارغ'));
       return;
     }
 
-    emit(UserExistsCheckLoading());
-
-    final result = await _checkUserExistsUseCase(
-      CheckUserExistsParams(identifier: identifier.trim()),
-    );
-
-    result.fold(
-      (failure) => emit(UserExistsCheckFailure(error: failure.message)),
-      (exists) => emit(UserExistsCheckSuccess(exists: exists)),
-    );
+    emit(LoginLoading());
+    // For now, skip the user exists check and proceed to login
+    // This check can be implemented later if needed
+    emit(LoginInitial());
   }
 
   /// Login user with identifier and password

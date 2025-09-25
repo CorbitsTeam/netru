@@ -913,7 +913,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
           backgroundColor: Colors.transparent,
           child: GestureDetector(
             onTap: () => Navigator.of(dialogContext).pop(),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               height: double.infinity,
               child: Column(
@@ -945,7 +945,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                             if (loadingProgress == null) return child;
                             return Container(
                               color: Colors.grey[200],
-                              child: Center(
+                              child: const Center(
                                 child: CircularProgressIndicator(
                                   strokeWidth: 3,
                                   valueColor: AlwaysStoppedAnimation<Color>(

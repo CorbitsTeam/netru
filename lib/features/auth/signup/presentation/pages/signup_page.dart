@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:animate_do/animate_do.dart';
+
 import 'package:netru_app/core/domain/entities/signup_entities.dart';
 import 'package:netru_app/features/auth/widgets/data_entry_step.dart';
 import 'package:netru_app/features/auth/widgets/document_upload_step.dart';
@@ -20,7 +20,7 @@ import '../widgets/signup_header.dart';
 import '../widgets/signup_progress_indicator.dart';
 import '../widgets/signup_username_password_step.dart';
 import '../widgets/signup_otp_verification_step.dart';
-import '../widgets/signup_navigation_buttons_new.dart';
+import '../widgets/signup_navigation_buttons.dart';
 import '../widgets/signup_step_container.dart';
 import '../cubits/signup_cubit.dart';
 import '../cubits/signup_state.dart';
@@ -110,22 +110,25 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void dispose() {
-    // Remove listeners first to avoid them firing after controllers are disposed
+    // Cancel any running timers first
+    _resendTimer?.cancel();
+    _otpErrorController?.close();
+
+    // Remove listeners safely
     try {
       _usernameController.removeListener(_usernameListener);
       _passwordController.removeListener(_passwordListener);
       _confirmPasswordController.removeListener(_confirmPasswordListener);
     } catch (_) {
-      // ignore: no-empty-block
+      // Ignore errors during listener removal
     }
 
+    // Dispose controllers
     _pageController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _otpController.dispose();
-    _otpErrorController?.close();
-    _resendTimer?.cancel();
 
     super.dispose();
   }
@@ -143,6 +146,13 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {
         _isSubmitting = false;
       });
+    } else if (state is SignupUserAlreadyExists) {
+      // 🆕 Handle user already exists - show dialog and redirect to login
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      _showUserExistsDialog(context, state.message, state.field);
     } else if (state is SignupEmailSent) {
       // 🆕 Handle OTP sent state - transition to next step
       setState(() {
@@ -174,12 +184,12 @@ class _SignupPageState extends State<SignupPage> {
     } else if (state is SignupCompleted || state is SignupSuccess) {
       showModernSnackBar(
         context,
-        message: 'تم إنشاء الحساب بنجاح! مرحباً بك',
+        message: 'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول',
         type: SnackBarType.success,
       );
-      // Navigate after a short delay to show the success message
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.of(context).pushReplacementNamed(Routes.customBottomBar);
+      // Navigate to login page after successful registration
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
       });
     } else {
       setState(() {
@@ -190,38 +200,34 @@ class _SignupPageState extends State<SignupPage> {
 
   List<Widget> _buildStepWidgets() {
     return [
-      SingleChildScrollView(
-        child: SignupUsernamePasswordStep(
-          usernameController: _usernameController,
-          passwordController: _passwordController,
-          confirmPasswordController: _confirmPasswordController,
-          isEmailMode: _isEmailMode,
-          onEmailModeChanged: (isEmail) {
-            setState(() {
-              _isEmailMode = isEmail;
-            });
-          },
-          formKey: _formKey,
-        ),
+      SignupUsernamePasswordStep(
+        usernameController: _usernameController,
+        passwordController: _passwordController,
+        confirmPasswordController: _confirmPasswordController,
+        isEmailMode: _isEmailMode,
+        onEmailModeChanged: (isEmail) {
+          setState(() {
+            _isEmailMode = isEmail;
+          });
+        },
+        formKey: _formKey,
       ),
-      SingleChildScrollView(
-        child: SignupOTPVerificationStep(
-          isEmailMode: _isEmailMode,
-          username: _usernameController.text,
-          isVerified: _isVerified,
-          isCheckingVerification: _isCheckingVerification,
-          otpCode: _otpCode,
-          otpController: _otpController,
-          otpErrorController: _otpErrorController,
-          resendCountdown: _resendCountdown,
-          onOTPChanged: (value) {
-            setState(() {
-              _otpCode = value;
-            });
-          },
-          onOTPCompleted: _verifyOTP,
-          onResendOTP: _resendOTP,
-        ),
+      SignupOTPVerificationStep(
+        isEmailMode: _isEmailMode,
+        username: _usernameController.text,
+        isVerified: _isVerified,
+        isCheckingVerification: _isCheckingVerification,
+        otpCode: _otpCode,
+        otpController: _otpController,
+        otpErrorController: _otpErrorController,
+        resendCountdown: _resendCountdown,
+        onOTPChanged: (value) {
+          setState(() {
+            _otpCode = value;
+          });
+        },
+        onOTPCompleted: _verifyOTP,
+        onResendOTP: _resendOTP,
       ),
       _buildUserTypeStep(),
       _buildDocumentStep(),
@@ -234,120 +240,95 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 0,
+      ),
       body: BlocConsumer<SignupCubit, SignupState>(
         listener: _handleBlocState,
         builder: (context, state) {
-          return Column(
-            children: [
-              // Header with logo and title
-              SignupHeader(
-                title: 'إنشاء حساب جديد',
-                subtitle: 'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
-                showLogo: false,
+          return CustomScrollView(
+            slivers: [
+              // Header and progress indicator as non-scrollable sections
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    // Header with logo and title
+                    const SignupHeader(
+                      title: 'إنشاء حساب جديد',
+                      subtitle: 'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
+                      showLogo: false,
+                    ),
+                    // Progress indicator
+                    SignupProgressIndicator(
+                      currentStep: _currentStep,
+                      stepTitles: _stepTitles,
+                    ),
+                    SizedBox(height: 16.h),
+                  ],
+                ),
               ),
-
-              // Progress indicator
-              SignupProgressIndicator(
-                currentStep: _currentStep,
-                stepTitles: _stepTitles,
-              ),
-
-              SizedBox(height: 16.h),
-
-              // Page content
-              Expanded(
+              // PageView content
+              SliverFillRemaining(
                 child: PageView(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
                   children: _buildStepWidgets(),
                 ),
               ),
-
-              // Navigation buttons
-              SignupNavigationButtons(
-                onPrevious: _currentStep > 0 ? _previousStep : null,
-                onNext:
-                    _canProceedToNext() &&
-                            !_isSubmitting &&
-                            !_isCheckingVerification
-                        ? () {
-                          if (_isSubmitting || _isCheckingVerification) return;
-                          _nextStep();
-                        }
-                        : null,
-                nextButtonText: _getNextButtonText(),
-                isLoading: _isSubmitting || _isCheckingVerification,
-                canProceed: _canProceedToNext(),
-                showPreviousButton: _currentStep > 0,
-              ),
             ],
+          );
+        },
+      ),
+      bottomNavigationBar: BlocBuilder<SignupCubit, SignupState>(
+        builder: (context, state) {
+          return SignupNavigationButtons(
+            onPrevious: _currentStep > 0 ? _previousStep : null,
+            onNext:
+                _canProceedToNext() &&
+                        !_isSubmitting &&
+                        !_isCheckingVerification
+                    ? () {
+                      if (_isSubmitting || _isCheckingVerification) return;
+                      _nextStep();
+                    }
+                    : null,
+            nextButtonText: _getNextButtonText(),
+            isLoading: _isSubmitting || _isCheckingVerification,
+            canProceed: _canProceedToNext(),
+            showPreviousButton: _currentStep > 0,
           );
         },
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        onPressed: () {
-          if (_currentStep > 0) {
-            _previousStep();
-          } else {
-            Navigator.pop(context);
-          }
-        },
-        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-      ),
-      title: FadeInDown(
-        duration: const Duration(milliseconds: 400),
-        child: Text(
-          'إنشاء حساب جديد',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
-      centerTitle: true,
-    );
-  }
-
   Widget _buildUserTypeStep() {
-    return SingleChildScrollView(
-      child: SignupStepContainer(
-        title: 'نوع المستخدم',
-        subtitle: 'اختر نوع المستخدم المناسب لك',
-        child: UserTypeSelectionStep(
-          selectedUserType: _selectedUserType,
-          onUserTypeSelected: (type) {
-            setState(() {
-              _selectedUserType = type;
-            });
-          },
-        ),
+    return SignupStepContainer(
+      title: 'نوع المستخدم',
+      subtitle: 'اختر نوع المستخدم المناسب لك',
+      child: UserTypeSelectionStep(
+        selectedUserType: _selectedUserType,
+        onUserTypeSelected: (type) {
+          setState(() {
+            _selectedUserType = type;
+          });
+        },
       ),
     );
   }
 
   Widget _buildDocumentStep() {
-    return SingleChildScrollView(
-      child: SignupStepContainer(
-        title: 'رفع المستندات',
-        subtitle: 'قم برفع المستندات المطلوبة',
-        child: DocumentUploadStep(
-          userType: _selectedUserType ?? UserType.citizen,
-          selectedDocuments: _selectedDocuments,
-          onDocumentsChanged: (documents) {
-            setState(() {
-              _selectedDocuments = documents;
-            });
-          },
-        ),
+    return SignupStepContainer(
+      child: DocumentUploadStep(
+        userType: _selectedUserType ?? UserType.citizen,
+        selectedDocuments: _selectedDocuments,
+        onDocumentsChanged: (documents) {
+          setState(() {
+            _selectedDocuments = documents;
+          });
+        },
       ),
     );
   }
@@ -368,46 +349,42 @@ class _SignupPageState extends State<SignupPage> {
       _userData['phone'] = _usernameController.text.trim();
     }
 
-    return SingleChildScrollView(
-      child: SignupStepContainer(
-        title: 'البيانات الشخصية',
-        subtitle: 'أدخل بياناتك الشخصية بدقة',
-        child: DataEntryStep(
-          userType: _selectedUserType ?? UserType.citizen,
-          extractedData: _extractedData,
-          currentData: _userData,
-          username: _usernameController.text.trim(),
-          isEmailMode: _isEmailMode,
-          initialPassword: currentPassword,
-          onDataChanged: (data) {
-            setState(() {
-              _userData = _mergeUserData(data);
-            });
-          },
-        ),
+    return SignupStepContainer(
+      title: 'البيانات الشخصية',
+      subtitle: 'أدخل بياناتك الشخصية بدقة',
+      child: DataEntryStep(
+        userType: _selectedUserType ?? UserType.citizen,
+        extractedData: _extractedData,
+        currentData: _userData,
+        username: _usernameController.text.trim(),
+        isEmailMode: _isEmailMode,
+        initialPassword: currentPassword,
+        onDataChanged: (data) {
+          setState(() {
+            _userData = _mergeUserData(data);
+          });
+        },
       ),
     );
   }
 
   Widget _buildLocationStep() {
-    return SingleChildScrollView(
-      child: SignupStepContainer(
-        title: 'العنوان',
-        subtitle: 'حدد موقعك بدقة',
-        child: SimpleLocationStep(
-          selectedGovernorate: _selectedGovernorate,
-          selectedCity: _selectedCity,
-          onGovernorateChanged: (governorate) {
-            setState(() {
-              _selectedGovernorate = governorate;
-            });
-          },
-          onCityChanged: (city) {
-            setState(() {
-              _selectedCity = city;
-            });
-          },
-        ),
+    return SignupStepContainer(
+      title: 'العنوان',
+      subtitle: 'حدد موقعك بدقة',
+      child: SimpleLocationStep(
+        selectedGovernorate: _selectedGovernorate,
+        selectedCity: _selectedCity,
+        onGovernorateChanged: (governorate) {
+          setState(() {
+            _selectedGovernorate = governorate;
+          });
+        },
+        onCityChanged: (city) {
+          setState(() {
+            _selectedCity = city;
+          });
+        },
       ),
     );
   }
@@ -893,6 +870,97 @@ class _SignupPageState extends State<SignupPage> {
 
     await _sendOTP();
     _startResendTimer();
+  }
+
+  // 🆕 Show dialog when user already exists
+  void _showUserExistsDialog(
+    BuildContext context,
+    String message,
+    String field,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: AppColors.warning, size: 24.sp),
+              SizedBox(width: 12.w),
+              Text(
+                'حساب موجود مسبقاً',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Almarai',
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: AppColors.textSecondary,
+              fontFamily: 'Almarai',
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to login screen
+                Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  'تسجيل الدخول',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Almarai',
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Stay on current page
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  'إلغاء',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Almarai',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Start resend countdown timer

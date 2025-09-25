@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:netru_app/core/widgets/app_widgets.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/core/di/injection_container.dart' as di;
-import 'package:netru_app/features/auth/domain/usecases/update_user_profile.dart';
-import 'package:netru_app/features/auth/domain/usecases/upload_profile_image.dart';
+
 import 'package:netru_app/features/settings/presentation/widgets/profile_form_widgets.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -79,9 +77,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               style: TextStyle(
                 fontSize: UIConstants.fontSizeLarge,
                 fontWeight: FontWeight.w600,
-                color: _isLoading 
-                    ? Colors.grey 
-                    : Theme.of(context).primaryColor,
+                color:
+                    _isLoading ? Colors.grey : Theme.of(context).primaryColor,
               ),
             ),
           ),
@@ -93,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             children: [
               UIConstants.verticalSpaceLarge,
-              
+
               // Profile Image Section
               ProfileFormSection(
                 title: 'الصورة الشخصية',
@@ -167,10 +164,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               UIConstants.verticalSpaceLarge,
 
               // Save Button
-              SaveProfileButton(
-                isLoading: _isLoading,
-                onPressed: _saveProfile,
-              ),
+              SaveProfileButton(isLoading: _isLoading, onPressed: _saveProfile),
 
               UIConstants.verticalSpaceLarge,
             ],
@@ -181,10 +175,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _showImagePicker() {
-    ImageSourceBottomSheet.show(
-      context,
-      onSourceSelected: _pickImage,
-    );
+    ImageSourceBottomSheet.show(context, onSourceSelected: _pickImage);
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -232,36 +223,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         throw Exception('لم يتم العثور على بيانات المستخدم');
       }
 
-      // Generate unique filename
-      final fileName = 'profile_${user!.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      final uploadUseCase = di.sl<UploadProfileImageUseCase>();
-      final result = await uploadUseCase(
-        UploadProfileImageParams(
-          imageFile: _selectedImage!,
-          fileName: fileName,
-        ),
-      );
-
-      result.fold(
-        (failure) {
-          throw Exception(failure.message);
-        },
-        (imageUrl) {
-          setState(() {
-            _currentImageUrl = imageUrl;
-          });
-          
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم رفع الصورة بنجاح'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        },
-      );
+      // TODO: Implement unified auth repository upload functionality
+      // Upload functionality will be added later
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('رفع الصورة معطل مؤقتاً'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -305,33 +276,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         updateData['profile_image'] = _currentImageUrl!;
       }
 
-      final updateUseCase = di.sl<UpdateUserProfileUseCase>();
-      final result = await updateUseCase(
-        UpdateUserProfileParams(
-          userId: user!.id,
-          userData: updateData,
-        ),
-      );
-
-      result.fold(
-        (failure) {
-          throw Exception(failure.message);
-        },
-        (updatedUser) {
-          // Update local user data
-          userHelper.saveCurrentUser(updatedUser);
-          
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم تحديث الملف الشخصي بنجاح'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.of(context).pop();
-          }
-        },
-      );
+      // TODO: Implement unified auth repository update functionality
+      // Update functionality will be added later
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تحديث الملف الشخصي معطل مؤقتاً'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

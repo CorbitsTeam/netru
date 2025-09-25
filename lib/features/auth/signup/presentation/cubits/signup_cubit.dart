@@ -984,4 +984,89 @@ class SignupCubit extends Cubit<SignupState> {
       );
     }
   }
+
+  // 🆕 Check if user data already exists
+  Future<bool> checkUserDataExists({
+    required String? nationalId,
+    required String? phone,
+    required String? passportNumber,
+  }) async {
+    try {
+      // Use UserRepository's checkUserExists method
+      if (nationalId != null && nationalId.isNotEmpty) {
+        // For signup, we need to create a dummy userData to test validation
+        // This will trigger the validation in the data source
+        try {
+          await _signUpUserUseCase.call(
+            SignUpUserParams(
+              userData: {
+                'national_id': nationalId,
+                'user_type': 'citizen',
+                'test_mode': true, // Add test flag to avoid actual signup
+              },
+            ),
+          );
+        } catch (e) {
+          if (e.toString().contains('الرقم القومي مستخدم من قبل')) {
+            emit(
+              SignupError(
+                message:
+                    'الرقم القومي مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
+              ),
+            );
+            return false;
+          }
+        }
+      }
+
+      // Check phone number
+      if (phone != null && phone.isNotEmpty) {
+        try {
+          await _signUpUserUseCase.call(
+            SignUpUserParams(userData: {'phone': phone, 'test_mode': true}),
+          );
+        } catch (e) {
+          if (e.toString().contains('رقم الهاتف مستخدم من قبل')) {
+            emit(
+              SignupError(
+                message:
+                    'رقم الهاتف مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
+              ),
+            );
+            return false;
+          }
+        }
+      }
+
+      // Check passport for foreigners
+      if (passportNumber != null && passportNumber.isNotEmpty) {
+        try {
+          await _signUpUserUseCase.call(
+            SignUpUserParams(
+              userData: {
+                'passport_number': passportNumber,
+                'user_type': 'foreigner',
+                'test_mode': true,
+              },
+            ),
+          );
+        } catch (e) {
+          if (e.toString().contains('رقم الباسبور مستخدم من قبل')) {
+            emit(
+              SignupError(
+                message:
+                    'رقم الجواز مسجل مسبقاً. يرجى تسجيل الدخول باستخدام حسابك الموجود.',
+              ),
+            );
+            return false;
+          }
+        }
+      }
+
+      return true; // All checks passed
+    } catch (e) {
+      emit(SignupError(message: 'خطأ في التحقق من البيانات: ${e.toString()}'));
+      return false;
+    }
+  }
 }

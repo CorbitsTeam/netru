@@ -19,6 +19,8 @@ abstract class AuthRepository {
   );
   Future<Either<Failure, bool>> checkNationalIdExists(String nationalId);
   Future<Either<Failure, bool>> checkPassportExists(String passportNumber);
+  Future<Either<Failure, bool>> checkEmailExistsInAuth(String email);
+  Future<Either<Failure, bool>> checkPhoneExists(String phone);
   Future<Either<Failure, UserEntity?>> getCurrentUser();
   Future<Either<Failure, void>> logout();
 }

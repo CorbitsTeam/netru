@@ -25,7 +25,6 @@ class SignupStepContainer extends StatelessWidget {
       delay: Duration(milliseconds: animationDelay),
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 24.w),
         padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -38,36 +37,49 @@ class SignupStepContainer extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (title != null) ...[
-              Text(
-                title!,
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1F2937),
-                  fontFamily: 'Almarai',
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (title != null || subtitle != null) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (title != null) ...[
+                        Text(
+                          title!,
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1F2937),
+                            fontFamily: 'Almarai',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 8.h),
+                      ],
+                      if (subtitle != null) ...[
+                        Text(
+                          subtitle!,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: const Color(0xFF6B7280),
+                            fontFamily: 'Almarai',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 16.h),
+                      ],
+                    ],
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 8.h),
+              ],
+              child,
             ],
-            if (subtitle != null) ...[
-              Text(
-                subtitle!,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: const Color(0xFF6B7280),
-                  fontFamily: 'Almarai',
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 24.h),
-            ],
-            child,
-          ],
+          ),
         ),
       ),
     );

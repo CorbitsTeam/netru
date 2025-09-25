@@ -26,53 +26,27 @@ class SignupNavigationButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10.r,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      padding: EdgeInsets.all(18.w),
       child: Row(
         children: [
-          if (showPreviousButton && onPrevious != null) ...[
+          if (showPreviousButton && onPrevious != null)
             Expanded(
-              child: OutlinedButton(
+              child: AnimatedButton(
+                text: previousButtonText,
                 onPressed: isLoading ? null : onPrevious,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  minimumSize: Size(double.infinity, 48.h),
-                ),
-                child: Text(
-                  previousButtonText,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Almarai',
-                  ),
-                ),
+                backgroundColor: Colors.grey[300],
+                textColor: AppColors.textPrimary,
+                height: 38.h,
               ),
             ),
-            SizedBox(width: 16.w),
-          ],
+          if (showPreviousButton && onPrevious != null) SizedBox(width: 16.w),
           Expanded(
-            flex: showPreviousButton ? 1 : 2,
+            flex: showPreviousButton ? 2 : 1,
             child: AnimatedButton(
               text: nextButtonText,
               onPressed: (canProceed && !isLoading) ? onNext : null,
               isLoading: isLoading,
-              backgroundColor: AppColors.primary,
-              textColor: Colors.white,
-              borderRadius: 12.r,
-              height: 48.h,
+              height: 38.h,
             ),
           ),
         ],

@@ -33,7 +33,7 @@ class AppLoadingWidget extends StatelessWidget {
           SizedBox(
             width: size ?? 40.w,
             height: size ?? 40.h,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
             ),

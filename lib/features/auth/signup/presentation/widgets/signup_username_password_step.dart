@@ -36,132 +36,34 @@ class _SignupUsernamePasswordStepState
   @override
   Widget build(BuildContext context) {
     return SignupStepContainer(
-      title: 'بيانات الدخول الأساسية',
-      subtitle: 'أدخل بريدك الإلكتروني أو رقم هاتفك وكلمة مرور قوية',
+      // title: 'بيانات الدخول الأساسية',
+      subtitle: 'أدخل بريدك الإلكتروني وكلمة مرور قوية',
       child: Form(
         key: widget.formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Mode Toggle (Email or Phone)
-            FadeInUp(
-              duration: const Duration(milliseconds: 700),
-              child: Container(
-                padding: EdgeInsets.all(4.w),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          widget.onEmailModeChanged(true);
-                          // Clear form validation state when switching modes
-                          widget.formKey.currentState?.reset();
-                          widget.usernameController.clear();
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          decoration: BoxDecoration(
-                            color:
-                                widget.isEmailMode
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Text(
-                            'البريد الإلكتروني',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  widget.isEmailMode
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          widget.onEmailModeChanged(false);
-                          // Clear form validation state when switching modes
-                          widget.formKey.currentState?.reset();
-                          widget.usernameController.clear();
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          decoration: BoxDecoration(
-                            color:
-                                !widget.isEmailMode
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Text(
-                            'رقم الهاتف',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  !widget.isEmailMode
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            SizedBox(height: 20.h),
-
             // Username Field (Email or Phone)
             FadeInUp(
               duration: const Duration(milliseconds: 800),
               child: CustomTextField(
                 controller: widget.usernameController,
-                label: widget.isEmailMode ? 'البريد الإلكتروني' : 'رقم الهاتف',
-                hint:
-                    widget.isEmailMode
-                        ? 'أدخل بريدك الإلكتروني'
-                        : 'أدخل رقم هاتفك',
-                prefixIcon:
-                    widget.isEmailMode
-                        ? Icons.email_outlined
-                        : Icons.phone_outlined,
+                label: 'البريد الإلكتروني',
+                hint: 'أدخل بريدك الإلكتروني',
+                prefixIcon: Icons.email_outlined,
                 keyboardType:
                     widget.isEmailMode
                         ? TextInputType.emailAddress
                         : TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return widget.isEmailMode
-                        ? 'البريد الإلكتروني مطلوب'
-                        : 'رقم الهاتف مطلوب';
+                    return 'البريد الإلكتروني مطلوب';
                   }
                   if (widget.isEmailMode) {
                     if (!RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value)) {
                       return 'أدخل بريد إلكتروني صحيح';
-                    }
-                  } else {
-                    if (!RegExp(
-                      r'^\+?[0-9]{10,15}$',
-                    ).hasMatch(value.replaceAll(RegExp(r'[\s-]'), ''))) {
-                      return 'أدخل رقم هاتف صحيح';
                     }
                   }
                   return null;

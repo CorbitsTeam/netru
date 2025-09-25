@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../../core/constants/app_assets.dart';
-import '../../../../../core/theme/app_colors.dart';
 
 class SignupHeader extends StatelessWidget {
   final String title;
@@ -26,16 +25,7 @@ class SignupHeader extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary.withValues(alpha: 0.1),
-              Colors.transparent,
-            ],
-          ),
-        ),
+
         child: Column(
           children: [
             if (showLogo) ...[

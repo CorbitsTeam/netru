@@ -54,7 +54,7 @@ class AppProfileAvatar extends StatelessWidget {
                                       loadingProgress.expectedTotalBytes!
                                   : null,
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
+                          valueColor: const AlwaysStoppedAnimation<Color>(
                             AppColors.primaryColor,
                           ),
                         ),
@@ -191,7 +191,7 @@ class AppProfileHeader extends StatelessWidget {
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primaryColor,
-                  side: BorderSide(color: AppColors.primaryColor),
+                  side: const BorderSide(color: AppColors.primaryColor),
                   padding: UIConstants.paddingSymmetricMedium,
                   shape: RoundedRectangleBorder(
                     borderRadius: UIConstants.borderRadiusMedium,

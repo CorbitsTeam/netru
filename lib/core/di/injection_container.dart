@@ -17,23 +17,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 // ===========================
-// Auth Feature
+// Auth Feature - Unified
 // ===========================
-import '../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../features/auth/data/datasources/user_data_source.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/auth/data/repositories/user_repository_impl.dart';
+import '../../features/auth/data/datasources/auth_data_source.dart';
+import '../../features/auth/data/repositories/unified_auth_repository.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/repositories/user_repository.dart';
-import '../../features/auth/domain/usecases/check_user_exists.dart';
-import '../../features/auth/domain/usecases/get_user_by_id.dart';
+import '../../features/auth/domain/usecases/check_email_exists_in_auth.dart';
+import '../../features/auth/domain/usecases/check_phone_exists.dart';
 import '../../features/auth/domain/usecases/login_user.dart';
-import '../../features/auth/domain/usecases/login_with_email.dart';
 import '../../features/auth/domain/usecases/logout_user.dart';
 import '../../features/auth/domain/usecases/register_user.dart';
-import '../../features/auth/domain/usecases/signup_user.dart';
-import '../../features/auth/domain/usecases/update_user_profile.dart';
-import '../../features/auth/domain/usecases/upload_profile_image.dart';
 
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
 // ===========================
@@ -188,43 +181,32 @@ Future<void> _initHeatmapDependencies() async {
 Future<void> _initAuthDependencies() async {
   final supabaseClient = sl<SupabaseClient>();
 
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(supabaseClient: supabaseClient),
+  // Unified Auth Data Source
+  sl.registerLazySingleton<AuthDataSource>(
+    () => SupabaseAuthDataSource(supabaseClient: supabaseClient),
   );
 
-  sl.registerLazySingleton<UserDataSource>(
-    () => SupabaseUserDataSource(supabaseClient: supabaseClient),
-  );
-
+  // Unified Auth Repository
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: sl()),
+    () => UnifiedAuthRepository(authDataSource: sl()),
   );
 
-  sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(userDataSource: sl()),
-  );
-
-  sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUserUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUserUseCase(sl()));
-  sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
-  sl.registerLazySingleton(() => GetUserByIdUseCase(sl()));
-  sl.registerLazySingleton(() => SignUpUserUseCase(userRepository: sl()));
-  sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
-  sl.registerLazySingleton(() => UploadProfileImageUseCase(sl()));
+  sl.registerLazySingleton(() => CheckEmailExistsInAuthUseCase(sl()));
+  sl.registerLazySingleton(() => CheckPhoneExistsUseCase(sl()));
 
   sl.registerFactory(
     () => SignupCubit(
       registerUserUseCase: sl(),
-      signUpUserUseCase: sl(),
       locationService: sl(),
+      checkEmailExistsInAuthUseCase: sl(),
+      checkPhoneExistsUseCase: sl(),
     ),
   );
 
-  sl.registerFactory(
-    () => LoginCubit(checkUserExistsUseCase: sl(), loginUserUseCase: sl()),
-  );
+  sl.registerFactory(() => LoginCubit(loginUserUseCase: sl()));
 
   sl.get<LoggerService>().logInfo('✅ Auth dependencies initialized');
 }

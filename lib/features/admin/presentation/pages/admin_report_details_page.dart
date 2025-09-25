@@ -1358,7 +1358,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                                 loadingProgress,
                               ) {
                                 if (loadingProgress == null) return child;
-                                return Container(
+                                return SizedBox(
                                   height: 300.h,
                                   child: Center(
                                     child: Column(
@@ -1384,7 +1384,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                                 );
                               },
                               errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                                return SizedBox(
                                   height: 300.h,
                                   child: Center(
                                     child: Column(
@@ -1635,7 +1635,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                     ),
                   );
                 })
-                .toList(),
+                ,
           ] else ...[
             Container(
               width: double.infinity,
@@ -1728,7 +1728,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.red, width: 2),
+          side: const BorderSide(color: Colors.red, width: 2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -2758,8 +2758,9 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
 
     // الرقم الأول يجب أن يكون 2 أو 3 (تاريخ الميلاد في القرن العشرين أو الحادي والعشرين)
     final firstDigit = int.tryParse(nationalId[0]);
-    if (firstDigit == null || (firstDigit != 2 && firstDigit != 3))
+    if (firstDigit == null || (firstDigit != 2 && firstDigit != 3)) {
       return false;
+    }
 
     return true;
   }

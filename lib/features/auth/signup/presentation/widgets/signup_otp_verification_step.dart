@@ -37,7 +37,6 @@ class SignupOTPVerificationStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SignupStepContainer(
-      title: isVerified ? 'تم التأكيد بنجاح!' : 'تأكيد الهوية',
       subtitle:
           isVerified
               ? 'تم تأكيد هويتك بنجاح. يمكنك الآن المتابعة.'
@@ -117,8 +116,8 @@ class SignupOTPVerificationStep extends StatelessWidget {
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
                       borderRadius: BorderRadius.circular(12.r),
-                      fieldHeight: 52.h,
-                      fieldWidth: 52.w,
+                      fieldHeight: 48.h,
+                      fieldWidth: 48.w,
                       activeFillColor: Colors.white,
                       inactiveFillColor: Colors.white,
                       selectedFillColor: Colors.white,
