@@ -283,30 +283,118 @@ class NotificationService {
 
   /// Handle navigation when notification is tapped
   void _handleNotificationNavigation(Map<String, dynamic> data) {
+    _logger.logInfo('🧭 Handling notification navigation with data: $data');
+
     try {
+      final notificationType = data['notification_type'] as String?;
+      final type = data['type'] as String?;
+      final reportId = data['report_id'] as String?;
+      final navigationRoute = data['navigation_route'] as String?;
+      final action = data['action'] as String?;
       final screen = data['screen'] as String?;
       final id = data['id'];
 
-      _logger.logInfo('🧭 Navigating to: $screen with id: $id');
+      _logger.logInfo('📍 Navigation details:');
+      _logger.logInfo('   Type: $type');
+      _logger.logInfo('   Notification Type: $notificationType');
+      _logger.logInfo('   Report ID: $reportId');
+      _logger.logInfo('   Route: $navigationRoute');
+      _logger.logInfo('   Action: $action');
+      _logger.logInfo('   Screen: $screen');
 
-      // You can implement your own navigation logic here
-      // For example, using a navigator key from your app:
-      switch (screen) {
+      // Handle different notification types
+      switch (type ?? notificationType ?? screen) {
+        case 'report_status_update':
+        case 'report_update':
+        case 'report_assignment':
+        case 'report_notification':
+          _navigateToReport(reportId, navigationRoute);
+          break;
+
+        case 'investigator_assignment':
+        case 'work_assignment':
+          _navigateToAdminReport(reportId, navigationRoute);
+          break;
+
+        case 'news':
+          _navigateToNews(data);
+          break;
+
+        case 'system':
+        case 'general':
+          _navigateToNotifications();
+          break;
+
+        // Legacy support for old notification format
         case 'order':
-          // Navigate to order details
-          // AppNavigator.pushNamed('/orderDetails', arguments: id);
           _logger.logInfo('📲 Navigate to order: $id');
           break;
         case 'chat':
-          // Navigate to chat
-          // AppNavigator.pushNamed('/chat', arguments: data);
           _logger.logInfo('💬 Navigate to chat with data: $data');
           break;
+
         default:
-          _logger.logInfo('🏠 Navigate to home or default screen');
+          _logger.logInfo(
+            '🏠 Unknown notification type, navigating to notifications',
+          );
+          _navigateToNotifications();
       }
     } catch (e) {
-      _logger.logError('❌ Navigation error: $e');
+      _logger.logError('❌ Error handling notification navigation: $e');
+      _navigateToNotifications(); // Fallback
     }
+  }
+
+  /// Navigate to report details for regular users
+  void _navigateToReport(String? reportId, String? route) {
+    if (reportId != null) {
+      _logger.logInfo('📋 Navigating to report: $reportId');
+      // TODO: Implement navigation to report details
+      // Example: Get.toNamed('/report_details', arguments: reportId);
+
+      // For now, log the intended navigation
+      _logger.logInfo(
+        '� Would navigate to: ${route ?? '/report_details'} with reportId: $reportId',
+      );
+    } else {
+      _navigateToNotifications();
+    }
+  }
+
+  /// Navigate to admin report details
+  void _navigateToAdminReport(String? reportId, String? route) {
+    if (reportId != null) {
+      _logger.logInfo('👨‍💼 Navigating to admin report: $reportId');
+      // TODO: Implement navigation to admin report details
+      // Example: Get.toNamed('/admin/report_details', arguments: reportId);
+
+      // For now, log the intended navigation
+      _logger.logInfo(
+        '� Would navigate to: ${route ?? '/admin/report_details'} with reportId: $reportId',
+      );
+    } else {
+      _navigateToNotifications();
+    }
+  }
+
+  /// Navigate to news section
+  void _navigateToNews(Map<String, dynamic> data) {
+    final newsId = data['news_id'] as String?;
+    _logger.logInfo('📰 Navigating to news: $newsId');
+
+    // TODO: Implement navigation to news
+    // Example: Get.toNamed('/news', arguments: newsId);
+
+    _logger.logInfo('🚀 Would navigate to: /news with newsId: $newsId');
+  }
+
+  /// Navigate to notifications list
+  void _navigateToNotifications() {
+    _logger.logInfo('🔔 Navigating to notifications list');
+
+    // TODO: Implement navigation to notifications
+    // Example: Get.toNamed('/notifications');
+
+    _logger.logInfo('🚀 Would navigate to: /notifications');
   }
 }
