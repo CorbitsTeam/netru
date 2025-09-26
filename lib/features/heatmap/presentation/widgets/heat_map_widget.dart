@@ -335,8 +335,9 @@ class _HeatMapWidgetState extends State<HeatMapWidget>
   IconData _getCrimeTypeIcon(String crimeType) {
     if (crimeType.contains('سرقة')) return Icons.security;
     if (crimeType.contains('اعتداء')) return Icons.warning;
-    if (crimeType.contains('مرور') || crimeType.contains('حادث'))
+    if (crimeType.contains('مرور') || crimeType.contains('حادث')) {
       return Icons.directions_car;
+    }
     if (crimeType.contains('مخدرات')) return Icons.local_pharmacy;
     if (crimeType.contains('احتيال')) return Icons.monetization_on;
     if (crimeType.contains('عنف')) return Icons.home;
@@ -347,11 +348,13 @@ class _HeatMapWidgetState extends State<HeatMapWidget>
   Color _getCrimeTypeColor(String crimeType) {
     if (crimeType.contains('سرقة')) return Colors.red;
     if (crimeType.contains('اعتداء')) return Colors.orange;
-    if (crimeType.contains('مرور') || crimeType.contains('حادث'))
+    if (crimeType.contains('مرور') || crimeType.contains('حادث')) {
       return Colors.blue;
+    }
     if (crimeType.contains('مخدرات')) return Colors.purple;
-    if (crimeType.contains('احتيال'))
+    if (crimeType.contains('احتيال')) {
       return Colors.yellow[700] ?? Colors.yellow;
+    }
     if (crimeType.contains('عنف')) return Colors.pink;
     return Colors.grey;
   }
@@ -393,8 +396,9 @@ class _HeatMapWidgetState extends State<HeatMapWidget>
       final reports = entry.value;
 
       if (governorate == 'غير محدد' ||
-          !governorateLocations.containsKey(governorate))
+          !governorateLocations.containsKey(governorate)) {
         continue;
+      }
 
       final location = governorateLocations[governorate]!;
       final reportCount = reports.length;

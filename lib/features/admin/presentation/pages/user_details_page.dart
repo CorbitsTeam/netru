@@ -10,7 +10,6 @@ import '../../domain/entities/user_profile_detail_entity.dart';
 import '../cubit/admin_users_cubit.dart';
 import '../widgets/user_avatar_widget.dart';
 import '../widgets/identity_documents_widget.dart';
-import 'user_reports_list_page.dart';
 
 class UserDetailsPage extends StatefulWidget {
   final AdminUserEntity user;

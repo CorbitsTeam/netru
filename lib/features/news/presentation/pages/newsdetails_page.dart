@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netru_app/core/constants/app_assets.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/features/news/data/models/news_model.dart';
 import 'package:share_plus/share_plus.dart';
