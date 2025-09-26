@@ -6,7 +6,7 @@ import 'package:netru_app/core/extensions/navigation_extensions.dart';
 import 'package:netru_app/core/routing/routes.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import '../../../core/domain/entities/signup_entities.dart';
+import '../../auth/domain/entities/user_entity.dart';
 import '../../onboarding/utils/onboarding_prefs.dart';
 import '../../../core/constants/app_assets.dart';
 
@@ -14,12 +14,10 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() =>
-      _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState
-    extends State<SplashScreen>
+class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
@@ -38,42 +36,25 @@ class _SplashScreenState
   void _initializeAnimations() {
     // Logo animation controller
     _logoController = AnimationController(
-      duration: const Duration(
-        milliseconds: 1500,
-      ),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
     // Text animation controller
     _textController = AnimationController(
-      duration: const Duration(
-        milliseconds: 1000,
-      ),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
     // Logo animations
-    _logoScaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: Curves.elasticOut,
-      ),
+    _logoScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
     );
 
-    _logoOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
+    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _logoController,
-        curve: const Interval(
-          0.0,
-          0.6,
-          curve: Curves.easeIn,
-        ),
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
       ),
     );
 
@@ -81,21 +62,13 @@ class _SplashScreenState
     _textOpacityAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _textController,
-        curve: Curves.easeIn,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
 
     _textSlideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(
-        parent: _textController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _textController, curve: Curves.easeOutBack),
     );
   }
 
@@ -104,15 +77,11 @@ class _SplashScreenState
     await _logoController.forward();
 
     // Wait a bit, then start text animation
-    await Future.delayed(
-      const Duration(milliseconds: 300),
-    );
+    await Future.delayed(const Duration(milliseconds: 300));
     await _textController.forward();
 
     // Wait before navigating
-    await Future.delayed(
-      const Duration(milliseconds: 1500),
-    );
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     if (mounted) {
       _navigateToNextScreen();
@@ -121,8 +90,7 @@ class _SplashScreenState
 
   void _navigateToNextScreen() async {
     // First check if a user is already authenticated with Supabase
-    final user =
-        UserDataHelper().getCurrentUser();
+    final user = UserDataHelper().getCurrentUser();
 
     if (mounted) {
       if (user != null) {
@@ -145,19 +113,14 @@ class _SplashScreenState
       }
 
       // If not logged in, check if user has seen onboarding
-      final hasSeenOnboarding =
-          await OnboardingPrefs.hasSeenOnboarding();
+      final hasSeenOnboarding = await OnboardingPrefs.hasSeenOnboarding();
 
       if (hasSeenOnboarding) {
         // Navigate to login if onboarding was seen
-        context.pushReplacementNamed(
-          Routes.loginScreen,
-        );
+        context.pushReplacementNamed(Routes.loginScreen);
       } else {
         // Navigate to onboarding if first time
-        context.pushReplacementNamed(
-          Routes.onboardingScreen,
-        );
+        context.pushReplacementNamed(Routes.onboardingScreen);
       }
     }
   }
@@ -180,34 +143,23 @@ class _SplashScreenState
             Expanded(
               child: Center(
                 child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Logo container with animation
                     AnimatedBuilder(
                       animation: _logoController,
                       builder: (context, child) {
                         return Opacity(
-                          opacity:
-                              _logoOpacityAnimation
-                                  .value,
+                          opacity: _logoOpacityAnimation.value,
                           child: Transform.scale(
-                            scale:
-                                _logoScaleAnimation
-                                    .value,
+                            scale: _logoScaleAnimation.value,
                             child: Column(
                               children: [
                                 Container(
-                                  padding:
-                                      EdgeInsets.all(
-                                        25.w,
-                                      ),
+                                  padding: EdgeInsets.all(25.w),
                                   child: SvgPicture.asset(
-                                    AppAssets
-                                        .mainLogoSvg,
-                                    fit:
-                                        BoxFit
-                                            .contain,
+                                    AppAssets.mainLogoSvg,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                                 // Container(
@@ -238,11 +190,9 @@ class _SplashScreenState
                       animation: _textController,
                       builder: (context, child) {
                         return SlideTransition(
-                          position:
-                              _textSlideAnimation,
+                          position: _textSlideAnimation,
                           child: FadeTransition(
-                            opacity:
-                                _textOpacityAnimation,
+                            opacity: _textOpacityAnimation,
                             child: Column(
                               children: [
                                 // Text(
@@ -256,61 +206,34 @@ class _SplashScreenState
                                 //   ),
                                 // ),
                                 // SizedBox(height: 12.h),
-                                SizedBox(
-                                  height: 16.h,
-                                ),
+                                SizedBox(height: 16.h),
                                 Text(
-                                  'secure_digital_identity'
-                                      .tr(),
+                                  'secure_digital_identity'.tr(),
                                   style: Theme.of(
-                                        context,
-                                      )
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color:
-                                            AppColors
-                                                .primaryColor,
-                                        letterSpacing:
-                                            0.5,
-                                      ),
-                                  textAlign:
-                                      TextAlign
-                                          .center,
+                                    context,
+                                  ).textTheme.bodyLarge?.copyWith(
+                                    color: AppColors.primaryColor,
+                                    letterSpacing: 0.5,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                SizedBox(
-                                  height: 40.h,
-                                ),
+                                SizedBox(height: 40.h),
 
                                 // Loading indicator
                                 Container(
                                   width: 80.w,
                                   height: 6.h,
                                   decoration: BoxDecoration(
-                                    color:
-                                        Colors
-                                            .grey[200],
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                          3.r,
-                                        ),
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(3.r),
                                   ),
                                   child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                          3.r,
-                                        ),
+                                    borderRadius: BorderRadius.circular(3.r),
                                     child: const LinearProgressIndicator(
-                                      backgroundColor:
-                                          Colors
-                                              .transparent,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<
-                                            Color
-                                          >(
-                                            AppColors
-                                                .primaryColor,
-                                          ),
+                                      backgroundColor: Colors.transparent,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.primaryColor,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -333,35 +256,24 @@ class _SplashScreenState
                 return FadeTransition(
                   opacity: _textOpacityAnimation,
                   child: Container(
-                    margin: EdgeInsets.only(
-                      bottom: 22.h,
-                    ),
+                    margin: EdgeInsets.only(bottom: 22.h),
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: 30.w,
                           height: 30.h,
-                          child: Image.asset(
-                            AppAssets.corbitsTeam,
-                          ),
+                          child: Image.asset(AppAssets.corbitsTeam),
                         ),
                         SizedBox(width: 8.w),
                         Text(
                           'Powered by Corbits',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color:
-                                    AppColors
-                                        .primaryColor,
-                                fontWeight:
-                                    FontWeight
-                                        .w500,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),

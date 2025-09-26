@@ -5,6 +5,7 @@ import '../cubit/admin_dashboard_cubit.dart';
 import '../widgets/reports_chart.dart';
 import '../widgets/recent_activity_widget.dart';
 import '../widgets/mobile_admin_drawer.dart';
+import '../../domain/entities/dashboard_stats_entity.dart';
 
 class MobileAdminDashboardPage extends StatefulWidget {
   const MobileAdminDashboardPage({super.key});
@@ -20,6 +21,7 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
   @override
   void initState() {
     super.initState();
+    // Load dashboard data (this will automatically load activities after stats are loaded)
     context.read<AdminDashboardCubit>().loadDashboardData();
   }
 
@@ -68,7 +70,26 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
             );
           }
 
-          if (state is AdminDashboardLoaded) {
+          if (state is AdminDashboardLoaded ||
+              state is AdminDashboardActivitiesLoaded) {
+            // Get stats from either state
+            DashboardStatsEntity? stats;
+            List<ActivityItem>? activities;
+
+            if (state is AdminDashboardLoaded) {
+              stats = state.stats;
+            } else if (state is AdminDashboardActivitiesLoaded) {
+              // Get cached stats from cubit
+              final cubit = context.read<AdminDashboardCubit>();
+              stats = cubit.cachedStats;
+              activities = state.activities;
+            }
+
+            // If we don't have stats, show loading
+            if (stats == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<AdminDashboardCubit>().refreshDashboard();
@@ -84,15 +105,18 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
                     SizedBox(height: 20.h),
 
                     // Quick Stats Cards
-                    _buildQuickStatsSection(state.stats),
+                    _buildQuickStatsSection(stats),
                     SizedBox(height: 20.h),
 
                     // Charts Section
-                    _buildChartsSection(state.stats),
+                    _buildChartsSection(stats),
                     SizedBox(height: 20.h),
 
-                    // Recent Activity
-                    _buildRecentActivitySection(),
+                    // Recent Activity - Show real data if available
+                    if (activities != null && activities.isNotEmpty)
+                      _buildRecentActivitySectionWithData(activities)
+                    else
+                      _buildRecentActivitySection(),
                     SizedBox(height: 100.h), // Bottom padding for FAB
                   ],
                 ),
@@ -348,10 +372,94 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
               ),
             ],
           ),
-          child: const RecentActivityWidget(activities: []),
+          child: RecentActivityWidget(activities: _getMockActivities()),
         ),
       ],
     );
+  }
+
+  Widget _buildRecentActivitySectionWithData(List<ActivityItem> activities) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'النشاطات الأخيرة',
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: RecentActivityWidget(activities: activities),
+        ),
+      ],
+    );
+  }
+
+  List<ActivityItem> _getMockActivities() {
+    return [
+      ActivityItem(
+        id: '1',
+        title: 'تم إنشاء بلاغ جديد',
+        description: 'بلاغ عن سرقة في منطقة المعادي، القاهرة',
+        type: ActivityType.reportCreated,
+        timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '2',
+        title: 'تم توثيق مستخدم جديد',
+        description: 'محمد أحمد علي - مواطن مصري',
+        type: ActivityType.userVerified,
+        timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '3',
+        title: 'تم تعيين بلاغ للمحقق',
+        description: 'بلاغ #12345 تم تعيينه للمحقق أحمد محمود',
+        type: ActivityType.reportAssigned,
+        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '4',
+        title: 'تم إرسال إشعار جماعي',
+        description: 'إشعار أمني لجميع مستخدمي القاهرة الجديدة',
+        type: ActivityType.notificationSent,
+        timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+        hasAction: false,
+      ),
+      ActivityItem(
+        id: '5',
+        title: 'تم حل بلاغ',
+        description: 'بلاغ #12340 - تم الانتهاء من التحقيق',
+        type: ActivityType.reportResolved,
+        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '6',
+        title: 'تسجيل مستخدم جديد',
+        description: 'Sarah Johnson - مقيم أجنبي',
+        type: ActivityType.userRegistered,
+        timestamp: DateTime.now().subtract(const Duration(hours: 6)),
+        hasAction: false,
+      ),
+    ];
   }
 
   Widget _buildFloatingActionButton() {

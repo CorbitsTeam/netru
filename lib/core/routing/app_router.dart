@@ -19,6 +19,8 @@ import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
 import '../../features/admin/domain/entities/admin_report_entity.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_reports_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_users_cubit.dart';
 import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
@@ -101,27 +103,62 @@ class AppRouter {
       // Admin routes
       case Routes.adminDashboard:
         return _createRoute(
-          BlocProvider<AdminDashboardCubit>(
-            create: (context) => sl<AdminDashboardCubit>(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<AdminDashboardCubit>(
+                create: (context) => sl<AdminDashboardCubit>(),
+              ),
+            ],
             child: const MobileAdminDashboardPage(),
           ),
         );
       case Routes.adminReports:
-        return _createRoute(const AdminReportsPage());
+        return _createRoute(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<AdminReportsCubit>(
+                create: (context) => sl<AdminReportsCubit>(),
+              ),
+            ],
+            child: const AdminReportsPage(),
+          ),
+        );
       case Routes.adminReportDetails:
         final report = settings.arguments as AdminReportEntity?;
         if (report != null) {
-          return _createRoute(AdminReportDetailsPage(report: report));
+          return _createRoute(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider<AdminReportsCubit>(
+                  create: (context) => sl<AdminReportsCubit>(),
+                ),
+              ],
+              child: AdminReportDetailsPage(report: report),
+            ),
+          );
         }
         return null;
       case Routes.adminUsers:
-        return _createRoute(const AdminUsersPage());
+        return _createRoute(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<AdminUsersCubit>(
+                create: (context) => sl<AdminUsersCubit>(),
+              ),
+            ],
+            child: const AdminUsersPage(),
+          ),
+        );
       case Routes.adminNotifications:
         return _createRoute(const AdminNotificationsPage());
       case Routes.adminAuthManager:
         return _createRoute(
-          BlocProvider<AdminAuthManagerCubit>(
-            create: (context) => sl<AdminAuthManagerCubit>(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<AdminAuthManagerCubit>(
+                create: (context) => sl<AdminAuthManagerCubit>(),
+              ),
+            ],
             child: const AdminAuthManagerPage(),
           ),
         );

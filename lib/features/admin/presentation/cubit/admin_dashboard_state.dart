@@ -29,6 +29,15 @@ class AdminDashboardTrendsLoaded extends AdminDashboardState {
   List<Object?> get props => [trends];
 }
 
+class AdminDashboardActivitiesLoaded extends AdminDashboardState {
+  final List<ActivityItem> activities;
+
+  const AdminDashboardActivitiesLoaded(this.activities);
+
+  @override
+  List<Object?> get props => [activities];
+}
+
 class AdminDashboardError extends AdminDashboardState {
   final String message;
 

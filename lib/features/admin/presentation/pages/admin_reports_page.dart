@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/di/injection_container.dart' as di;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/features/admin/presentation/widgets/mobile_admin_drawer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/admin_report_entity.dart';
@@ -33,11 +34,11 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
       create: (_) => di.sl<AdminReportsCubit>()..loadReports(),
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        drawer: const MobileAdminDrawer(selectedRoute: '/admin/reports'),
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           centerTitle: true,
-          automaticallyImplyLeading: false,
           flexibleSpace: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,

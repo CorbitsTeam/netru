@@ -3,6 +3,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/dashboard_stats_entity.dart';
 import '../../domain/repositories/admin_dashboard_repository.dart';
+import '../../presentation/widgets/recent_activity_widget.dart';
 import '../datasources/admin_dashboard_remote_data_source.dart';
 
 class AdminDashboardRepositoryImpl implements AdminDashboardRepository {
@@ -68,6 +69,18 @@ class AdminDashboardRepositoryImpl implements AdminDashboardRepository {
         startDate: startDate,
         endDate: endDate,
       );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ActivityItem>>> getRecentActivities() async {
+    try {
+      final result = await remoteDataSource.getRecentActivities();
       return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

@@ -107,6 +107,8 @@ class UserModel extends UserEntity {
         return UserType.citizen;
       case 'foreigner':
         return UserType.foreigner;
+      case 'admin':
+        return UserType.admin;
       default:
         return UserType.citizen;
     }

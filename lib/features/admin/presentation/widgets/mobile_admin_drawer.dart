@@ -5,7 +5,11 @@ class MobileAdminDrawer extends StatelessWidget {
   final String? selectedRoute;
   final Function(String)? onRouteSelected;
 
-  const MobileAdminDrawer({super.key, this.selectedRoute, this.onRouteSelected});
+  const MobileAdminDrawer({
+    super.key,
+    this.selectedRoute,
+    this.onRouteSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,23 +52,8 @@ class MobileAdminDrawer extends StatelessWidget {
                   route: '/admin/notifications',
                   isSelected: selectedRoute == '/admin/notifications',
                 ),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.security,
-                  title: 'إدارة حسابات المصادقة',
-                  route: '/admin/auth-manager',
-                  isSelected: selectedRoute == '/admin/auth-manager',
-                ),
 
                 const Divider(),
-
-                _buildMenuItem(
-                  context,
-                  icon: Icons.help_outline,
-                  title: 'المساعدة',
-                  route: '/admin/help',
-                  isSelected: selectedRoute == '/admin/help',
-                ),
                 _buildMenuItem(
                   context,
                   icon: Icons.logout,
@@ -198,7 +187,9 @@ class MobileAdminDrawer extends StatelessWidget {
           } else {
             onRouteSelected?.call(route);
             // Navigate to the selected route
-            _navigateToRoute(context, route);
+            if (!isSelected) {
+              _navigateToRoute(context, route);
+            }
           }
         },
       ),
@@ -234,19 +225,39 @@ class MobileAdminDrawer extends StatelessWidget {
   void _navigateToRoute(BuildContext context, String route) {
     switch (route) {
       case '/admin/dashboard':
-        Navigator.pushReplacementNamed(context, '/admin/dashboard');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin/dashboard',
+          (route) => false,
+        );
         break;
       case '/admin/reports':
-        Navigator.pushReplacementNamed(context, '/admin/reports');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin/reports',
+          (route) => false,
+        );
         break;
       case '/admin/users':
-        Navigator.pushReplacementNamed(context, '/admin/users');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin/users',
+          (route) => false,
+        );
         break;
       case '/admin/notifications':
-        Navigator.pushReplacementNamed(context, '/admin/notifications');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin/notifications',
+          (route) => false,
+        );
         break;
       case '/admin/auth-manager':
-        Navigator.pushReplacementNamed(context, '/admin/auth-manager');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin/auth-manager',
+          (route) => false,
+        );
         break;
       default:
         // Show coming soon dialog for unimplemented routes

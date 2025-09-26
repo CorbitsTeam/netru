@@ -105,6 +105,7 @@ import '../../features/admin/domain/repositories/admin_dashboard_repository.dart
 import '../../features/admin/domain/repositories/admin_user_repository.dart';
 import '../../features/admin/domain/repositories/admin_report_repository.dart';
 import '../../features/admin/domain/usecases/get_dashboard_stats.dart';
+import '../../features/admin/domain/usecases/get_recent_activities.dart';
 import '../../features/admin/domain/usecases/manage_auth_accounts.dart';
 import '../../features/admin/domain/usecases/manage_users.dart';
 import '../../features/admin/domain/usecases/manage_reports.dart';
@@ -501,6 +502,7 @@ Future<void> _initAdminDependencies() async {
 
   // Use cases - Dashboard
   sl.registerLazySingleton(() => GetDashboardStats(sl()));
+  sl.registerLazySingleton(() => GetRecentActivities(sl()));
   sl.registerLazySingleton(() => GetReportTrends(sl()));
   sl.registerLazySingleton(() => GetReportsByGovernorate(sl()));
   sl.registerLazySingleton(() => GetReportsByType(sl()));
@@ -540,7 +542,10 @@ Future<void> _initAdminDependencies() async {
   sl.registerLazySingleton(() => SuspendUser(sl()));
 
   // Cubits
-  sl.registerFactory(() => AdminDashboardCubit(getDashboardStats: sl()));
+  sl.registerFactory(
+    () =>
+        AdminDashboardCubit(getDashboardStats: sl(), getRecentActivities: sl()),
+  );
 
   sl.registerFactory(
     () => AdminReportsCubit(

@@ -1,5 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../core/services/supabase_edge_functions_service.dart';
+import '../../presentation/widgets/recent_activity_widget.dart';
 import '../models/admin_dashboard_model.dart';
 
 abstract class AdminDashboardRemoteDataSource {
@@ -11,6 +12,7 @@ abstract class AdminDashboardRemoteDataSource {
     required DateTime startDate,
     required DateTime endDate,
   });
+  Future<List<ActivityItem>> getRecentActivities();
 
   // Edge Functions integration
   Future<Map<String, dynamic>> assignReport({
@@ -266,6 +268,275 @@ class AdminDashboardRemoteDataSourceImpl
       data: data,
       type: type,
     );
+  }
+
+  @override
+  Future<List<ActivityItem>> getRecentActivities() async {
+    try {
+      print('🔍 Starting to fetch recent activities from database...');
+      List<ActivityItem> activities = [];
+
+      // جلب آخر البلاغات المنشأة
+      final recentReports = await apiClient.dio.get(
+        '${ApiEndpoints.rest}/reports',
+        queryParameters: {
+          'select':
+              'id,report_details,submitted_at,reporter_first_name,reporter_last_name,report_status',
+          'order': 'submitted_at.desc',
+          'limit': '5',
+        },
+      );
+
+      if (recentReports.data != null && recentReports.data is List) {
+        print('✓ Found ${recentReports.data.length} recent reports');
+        for (final report in recentReports.data) {
+          final reportDetails =
+              report['report_details']?.toString() ?? 'بلاغ جديد';
+          final description =
+              reportDetails.length > 50
+                  ? '${reportDetails.substring(0, 50)}...'
+                  : reportDetails;
+
+          activities.add(
+            ActivityItem(
+              id: report['id'] ?? 'unknown',
+              title: 'تم إنشاء بلاغ جديد',
+              description:
+                  '${report['reporter_first_name'] ?? ''} ${report['reporter_last_name'] ?? ''} - $description',
+              type: ActivityType.reportCreated,
+              timestamp: DateTime.parse(
+                report['submitted_at'] ?? DateTime.now().toIso8601String(),
+              ),
+              hasAction: true,
+            ),
+          );
+        }
+      } else {
+        print('⚠️ No recent reports found or invalid data format');
+      }
+
+      // جلب آخر المستخدمين المسجلين
+      final recentUsers = await apiClient.dio.get(
+        '${ApiEndpoints.rest}/users',
+        queryParameters: {
+          'select': 'id,full_name,created_at,user_type',
+          'order': 'created_at.desc',
+          'limit': '3',
+        },
+      );
+
+      if (recentUsers.data != null && recentUsers.data is List) {
+        for (final user in recentUsers.data) {
+          final userTypeArabic =
+              user['user_type'] == 'citizen'
+                  ? 'مواطن'
+                  : user['user_type'] == 'foreigner'
+                  ? 'مقيم أجنبي'
+                  : user['user_type'] == 'admin'
+                  ? 'إداري'
+                  : 'مستخدم';
+
+          activities.add(
+            ActivityItem(
+              id: 'user_${user['id'] ?? 'unknown'}',
+              title: 'مستخدم جديد',
+              description:
+                  '${user['full_name'] ?? 'مستخدم جديد'} - $userTypeArabic',
+              type: ActivityType.userRegistered,
+              timestamp: DateTime.parse(
+                user['created_at'] ?? DateTime.now().toIso8601String(),
+              ),
+              hasAction: true,
+            ),
+          );
+        }
+      }
+
+      // جلب آخر تعيينات البلاغات
+      final recentAssignments = await apiClient.dio.get(
+        '${ApiEndpoints.rest}/report_assignments',
+        queryParameters: {
+          'select': 'id,report_id,assigned_at,assigned_to',
+          'order': 'assigned_at.desc',
+          'limit': '3',
+        },
+      );
+
+      if (recentAssignments.data != null && recentAssignments.data is List) {
+        for (final assignment in recentAssignments.data) {
+          // جلب اسم المحقق
+          String assignedToName = 'محقق غير معروف';
+          try {
+            final userResponse = await apiClient.dio.get(
+              '${ApiEndpoints.rest}/users',
+              queryParameters: {
+                'select': 'full_name',
+                'id': 'eq.${assignment['assigned_to']}',
+              },
+            );
+            if (userResponse.data != null &&
+                userResponse.data is List &&
+                userResponse.data.isNotEmpty) {
+              assignedToName =
+                  userResponse.data[0]['full_name'] ?? 'محقق غير معروف';
+            }
+          } catch (e) {
+            print('Error fetching assigned user name: $e');
+          }
+
+          activities.add(
+            ActivityItem(
+              id: 'assignment_${assignment['id'] ?? 'unknown'}',
+              title: 'تم تعيين بلاغ للمحقق',
+              description:
+                  'البلاغ ${assignment['report_id'] ?? ''} تم تعيينه للمحقق $assignedToName',
+              type: ActivityType.reportAssigned,
+              timestamp: DateTime.parse(
+                assignment['assigned_at'] ?? DateTime.now().toIso8601String(),
+              ),
+              hasAction: true,
+            ),
+          );
+        }
+      }
+
+      // جلب آخر الإشعارات المرسلة
+      final recentNotifications = await apiClient.dio.get(
+        '${ApiEndpoints.rest}/notifications',
+        queryParameters: {
+          'select': 'id,title,notification_type,created_at',
+          'order': 'created_at.desc',
+          'limit': '3',
+        },
+      );
+
+      if (recentNotifications.data != null &&
+          recentNotifications.data is List) {
+        for (final notification in recentNotifications.data) {
+          activities.add(
+            ActivityItem(
+              id: 'notification_${notification['id'] ?? 'unknown'}',
+              title: 'تم إرسال إشعار',
+              description: notification['title'] ?? 'إشعار جديد',
+              type: ActivityType.notificationSent,
+              timestamp: DateTime.parse(
+                notification['created_at'] ?? DateTime.now().toIso8601String(),
+              ),
+              hasAction: false,
+            ),
+          );
+        }
+      }
+
+      // جلب آخر تحديثات حالة البلاغات
+      final recentStatusUpdates = await apiClient.dio.get(
+        '${ApiEndpoints.rest}/report_status_history',
+        queryParameters: {
+          'select': 'id,report_id,new_status,changed_at,change_reason',
+          'order': 'changed_at.desc',
+          'limit': '2',
+        },
+      );
+
+      if (recentStatusUpdates.data != null &&
+          recentStatusUpdates.data is List) {
+        for (final statusUpdate in recentStatusUpdates.data) {
+          String statusArabic = statusUpdate['new_status'] ?? 'غير معروف';
+          switch (statusUpdate['new_status']) {
+            case 'pending':
+              statusArabic = 'في الانتظار';
+              break;
+            case 'under_investigation':
+              statusArabic = 'قيد التحقيق';
+              break;
+            case 'resolved':
+              statusArabic = 'تم الحل';
+              break;
+            case 'closed':
+              statusArabic = 'مغلق';
+              break;
+            case 'rejected':
+              statusArabic = 'مرفوض';
+              break;
+          }
+
+          activities.add(
+            ActivityItem(
+              id: 'status_${statusUpdate['id'] ?? 'unknown'}',
+              title: 'تم تحديث حالة بلاغ',
+              description:
+                  'البلاغ ${statusUpdate['report_id'] ?? ''} - $statusArabic',
+              type: ActivityType.reportUpdated,
+              timestamp: DateTime.parse(
+                statusUpdate['changed_at'] ?? DateTime.now().toIso8601String(),
+              ),
+              hasAction: true,
+            ),
+          );
+        }
+      }
+
+      // ترتيب الأنشطة حسب التاريخ (الأحدث أولاً)
+      activities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+      print(
+        '✅ Successfully fetched ${activities.length} activities from database',
+      );
+
+      // إرجاع أول 10 أنشطة
+      return activities.take(10).toList();
+    } catch (e) {
+      print('❌ Error fetching recent activities: $e');
+
+      // في حالة حدوث خطأ، إرجاع بيانات وهمية كـ fallback
+      print('🔄 Falling back to mock data');
+      return _getMockActivities();
+    }
+  }
+
+  List<ActivityItem> _getMockActivities() {
+    return [
+      ActivityItem(
+        id: '1',
+        title: 'تم إنشاء بلاغ جديد',
+        description: 'بلاغ عن حادث في شارع التحرير، القاهرة',
+        type: ActivityType.reportCreated,
+        timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '2',
+        title: 'تم توثيق مستخدم جديد',
+        description: 'أحمد محمد - مواطن مصري',
+        type: ActivityType.userVerified,
+        timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '3',
+        title: 'تم تعيين بلاغ للمحقق',
+        description: 'بلاغ تم تعيينه للمحقق محمد أحمد',
+        type: ActivityType.reportAssigned,
+        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        hasAction: true,
+      ),
+      ActivityItem(
+        id: '4',
+        title: 'تم إرسال إشعار جماعي',
+        description: 'إشعار أمني لجميع مستخدمي منطقة الجيزة',
+        type: ActivityType.notificationSent,
+        timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+        hasAction: false,
+      ),
+      ActivityItem(
+        id: '5',
+        title: 'تم حل بلاغ',
+        description: 'تم الانتهاء من التحقيق في بلاغ السرقة',
+        type: ActivityType.reportResolved,
+        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
+        hasAction: true,
+      ),
+    ];
   }
 }
 

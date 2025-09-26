@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/dashboard_stats_entity.dart';
+import '../../presentation/widgets/recent_activity_widget.dart';
 
 abstract class AdminDashboardRepository {
   Future<Either<Failure, DashboardStatsEntity>> getDashboardStats();
@@ -11,4 +12,5 @@ abstract class AdminDashboardRepository {
     required DateTime startDate,
     required DateTime endDate,
   });
+  Future<Either<Failure, List<ActivityItem>>> getRecentActivities();
 }

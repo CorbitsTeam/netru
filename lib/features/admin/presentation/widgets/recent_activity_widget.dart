@@ -10,33 +10,13 @@ class RecentActivityWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      margin: EdgeInsets.all(8.w),
+      // margin: EdgeInsets.all(8.w),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'النشاط الأخير',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Navigate to full activity log
-                  },
-                  child: Text('عرض الكل', style: TextStyle(fontSize: 14.sp)),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
             if (activities.isEmpty)
               Container(
                 padding: EdgeInsets.all(20.w),
@@ -117,8 +97,6 @@ class RecentActivityWidget extends StatelessWidget {
               ],
             ),
           ),
-          if (activity.hasAction)
-            Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.grey[400]),
         ],
       ),
     );
