@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/app_colors.dart';
 
-class FloatingActionButtonsWidget extends StatefulWidget {
+class FloatingActionButtonsWidget
+    extends StatefulWidget {
   final VoidCallback? onFilterPressed;
   final VoidCallback? onRefreshPressed;
   final VoidCallback? onLocationPressed;
@@ -15,7 +16,8 @@ class FloatingActionButtonsWidget extends StatefulWidget {
   });
 
   @override
-  State<FloatingActionButtonsWidget> createState() =>
+  State<FloatingActionButtonsWidget>
+  createState() =>
       _FloatingActionButtonsWidgetState();
 }
 
@@ -34,19 +36,30 @@ class _FloatingActionButtonsWidgetState
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutBack,
+      ),
     );
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(1.5, 0),
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
     );
 
     // بدء الرسوم المتحركة تلقائياً
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((
+      _,
+    ) {
       _animationController.forward();
     });
   }
@@ -66,31 +79,13 @@ class _FloatingActionButtonsWidgetState
           opacity: _fadeAnimation,
           child: SlideTransition(
             position: _slideAnimation,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // زر الفلتر
-                _buildFloatingButton(
-                  icon: Icons.tune,
-                  heroTag: "filter_btn",
-                  backgroundColor: AppColors.primaryColor,
-                  onPressed: widget.onFilterPressed,
-                  tooltip: 'فلتر النتائج',
-                  delay: 0,
-                ),
-
-                SizedBox(height: 12.h),
-
-                // زر الموقع
-                _buildFloatingButton(
-                  icon: Icons.my_location,
-                  heroTag: "location_btn",
-                  backgroundColor: Colors.green,
-                  onPressed: widget.onLocationPressed,
-                  tooltip: 'موقعي الحالي',
-                  delay: 200,
-                ),
-              ],
+            child: _buildFloatingButton(
+              icon: Icons.my_location,
+              heroTag: "location_btn",
+              backgroundColor: AppColors.primary,
+              onPressed: widget.onLocationPressed,
+              tooltip: 'موقعي الحالي',
+              delay: 200,
             ),
           ),
         );
@@ -107,7 +102,9 @@ class _FloatingActionButtonsWidgetState
     required int delay,
   }) {
     return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 300 + delay),
+      duration: Duration(
+        milliseconds: 300 + delay,
+      ),
       tween: Tween(begin: 0.0, end: 1.0),
       curve: Curves.elasticOut,
       builder: (context, scale, child) {
@@ -120,13 +117,16 @@ class _FloatingActionButtonsWidgetState
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: backgroundColor.withOpacity(0.3),
+                  color: backgroundColor
+                      .withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                   spreadRadius: 2,
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(
+                    0.1,
+                  ),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -137,7 +137,8 @@ class _FloatingActionButtonsWidgetState
               shape: const CircleBorder(),
               elevation: 0,
               child: InkWell(
-                customBorder: const CircleBorder(),
+                customBorder:
+                    const CircleBorder(),
                 onTap: onPressed,
                 child: Container(
                   width: 48.w,
@@ -148,12 +149,17 @@ class _FloatingActionButtonsWidgetState
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        backgroundColor.withOpacity(0.8),
+                        backgroundColor
+                            .withOpacity(0.8),
                         backgroundColor,
                       ],
                     ),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 22.sp),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 22.sp,
+                  ),
                 ),
               ),
             ),

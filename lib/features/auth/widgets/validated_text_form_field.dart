@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 
-class ValidatedTextFormField extends StatefulWidget {
+class ValidatedTextFormField
+    extends StatefulWidget {
   final TextEditingController? controller;
   final String? label;
   final String? hint;
@@ -45,7 +46,8 @@ class ValidatedTextFormField extends StatefulWidget {
     this.maxLength,
     this.inputFormatters,
     this.focusNode,
-    this.textCapitalization = TextCapitalization.none,
+    this.textCapitalization =
+        TextCapitalization.none,
     this.validationType = ValidationType.none,
     this.showValidationIcon = true,
     this.realTimeValidation = true,
@@ -54,10 +56,12 @@ class ValidatedTextFormField extends StatefulWidget {
   });
 
   @override
-  State<ValidatedTextFormField> createState() => _ValidatedTextFormFieldState();
+  State<ValidatedTextFormField> createState() =>
+      _ValidatedTextFormFieldState();
 }
 
-class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
+class _ValidatedTextFormFieldState
+    extends State<ValidatedTextFormField>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -76,8 +80,14 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
     );
 
     _colorAnimation = ColorTween(
@@ -85,19 +95,24 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
       end: AppColors.primary,
     ).animate(_animationController);
 
-    widget.focusNode?.addListener(_handleFocusChange);
+    widget.focusNode?.addListener(
+      _handleFocusChange,
+    );
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    widget.focusNode?.removeListener(_handleFocusChange);
+    widget.focusNode?.removeListener(
+      _handleFocusChange,
+    );
     super.dispose();
   }
 
   void _handleFocusChange() {
     setState(() {
-      _isFocused = widget.focusNode?.hasFocus ?? false;
+      _isFocused =
+          widget.focusNode?.hasFocus ?? false;
     });
 
     if (_isFocused) {
@@ -113,7 +128,9 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
     setState(() {
       _showValidation = value.isNotEmpty;
       if (_showValidation) {
-        _currentError = _getValidationError(value);
+        _currentError = _getValidationError(
+          value,
+        );
         _isValid = _currentError == null;
       } else {
         _currentError = null;
@@ -125,14 +142,18 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
   String? _getValidationError(String value) {
     // Custom validator first
     if (widget.validator != null) {
-      final customError = widget.validator!(value);
+      final customError = widget.validator!(
+        value,
+      );
       if (customError != null) return customError;
     }
 
     // Built-in validation based on type
     switch (widget.validationType) {
       case ValidationType.email:
-        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+        if (!RegExp(
+          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+        ).hasMatch(value)) {
           return 'عنوان البريد الإلكتروني غير صحيح';
         }
         break;
@@ -141,20 +162,29 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
         if (value.length < 8) {
           return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
         }
-        if (!RegExp(r'^(?=.*[a-zA-Z])(?=.*\d)').hasMatch(value)) {
+        if (!RegExp(
+          r'^(?=.*[a-zA-Z])(?=.*\d)',
+        ).hasMatch(value)) {
           return 'يجب أن تحتوي على حروف وأرقام';
         }
         break;
 
       case ValidationType.phone:
-        final cleanPhone = value.replaceAll(RegExp(r'[\s-]'), '');
-        if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(cleanPhone)) {
+        final cleanPhone = value.replaceAll(
+          RegExp(r'[\s-]'),
+          '',
+        );
+        if (!RegExp(
+          r'^\+?[0-9]{10,15}$',
+        ).hasMatch(cleanPhone)) {
           return 'رقم الهاتف غير صحيح';
         }
         break;
 
       case ValidationType.nationalId:
-        if (!RegExp(r'^[0-9]{14}$').hasMatch(value)) {
+        if (!RegExp(
+          r'^[0-9]{14}$',
+        ).hasMatch(value)) {
           return 'الرقم القومي يجب أن يكون 14 رقم';
         }
         break;
@@ -163,7 +193,9 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
         if (value.trim().length < 2) {
           return 'الاسم قصير جداً';
         }
-        if (!RegExp(r'^[\u0600-\u06FF\s]+$').hasMatch(value)) {
+        if (!RegExp(
+          r'^[\u0600-\u06FF\s]+$',
+        ).hasMatch(value)) {
           return 'الاسم يجب أن يكون باللغة العربية فقط';
         }
         break;
@@ -182,25 +214,33 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
   }
 
   Widget? _buildValidationIcon() {
-    if (!widget.showValidationIcon || !_showValidation) return null;
+    if (!widget.showValidationIcon ||
+        !_showValidation)
+      return null;
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
       child: Icon(
-        _isValid ? Icons.check_circle : Icons.error,
-        color: _isValid ? Colors.green : Colors.red,
+        _isValid
+            ? Icons.check_circle
+            : Icons.error,
+        color:
+            _isValid ? Colors.green : Colors.red,
         size: 20.sp,
       ),
       builder:
-          (context, child) =>
-              Transform.scale(scale: _scaleAnimation.value, child: child),
+          (context, child) => Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         // Label
         if (widget.label != null) ...[
@@ -230,8 +270,10 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
                 readOnly: widget.readOnly,
                 maxLines: widget.maxLines,
                 maxLength: widget.maxLength,
-                inputFormatters: widget.inputFormatters,
-                textCapitalization: widget.textCapitalization,
+                inputFormatters:
+                    widget.inputFormatters,
+                textCapitalization:
+                    widget.textCapitalization,
                 onChanged: (value) {
                   _validateInput(value);
                   widget.onChanged?.call(value);
@@ -246,88 +288,154 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
                 decoration: InputDecoration(
                   hintText: widget.hint,
                   hintStyle: TextStyle(
-                    color: AppColors.textSecondary.withOpacity(0.6),
+                    color: AppColors.textSecondary
+                        .withOpacity(0.6),
                     fontFamily: 'Almarai',
                   ),
                   prefixIcon:
                       widget.prefixIcon != null
                           ? Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12.w),
-                            child: widget.prefixIcon,
+                            padding:
+                                EdgeInsets.symmetric(
+                                  horizontal:
+                                      12.w,
+                                ),
+                            child:
+                                widget.prefixIcon,
                           )
                           : null,
-                  suffixIcon: _buildValidationIcon() ?? widget.suffixIcon,
+                  suffixIcon:
+                      _buildValidationIcon() ??
+                      widget.suffixIcon,
                   filled: true,
                   fillColor: Colors.grey[50],
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: const BorderSide(color: AppColors.border, width: 1.5),
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
+                    borderSide: const BorderSide(
+                      color: AppColors.border,
+                      width: 1.5,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
                     borderSide: BorderSide(
                       color:
                           _showValidation
                               ? (_isValid
-                                  ? Colors.green.withOpacity(0.5)
-                                  : Colors.red.withOpacity(0.5))
+                                  ? Colors.green
+                                      .withOpacity(
+                                        0.5,
+                                      )
+                                  : Colors.red
+                                      .withOpacity(
+                                        0.5,
+                                      ))
                               : AppColors.border,
                       width: 1.5,
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(
-                      color: _colorAnimation.value ?? AppColors.primary,
+                  focusedBorder:
+                      OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
+                        borderSide: BorderSide(
+                          color:
+                              _colorAnimation
+                                  .value ??
+                              AppColors.primary,
+                          width: 2,
+                        ),
+                      ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius:
+                        BorderRadius.circular(
+                          12.r,
+                        ),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
                       width: 2,
                     ),
                   ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: const BorderSide(color: Colors.red, width: 2),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: const BorderSide(color: Colors.red, width: 2),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 16.h,
-                  ),
-                  counterText: '', // Hide character counter
+                  focusedErrorBorder:
+                      OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
+                        borderSide:
+                            const BorderSide(
+                              color: Colors.red,
+                              width: 2,
+                            ),
+                      ),
+                  contentPadding:
+                      EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 6.h,
+                      ),
+                  counterText:
+                      '', // Hide character counter
                 ),
-                validator: widget.realTimeValidation ? null : widget.validator,
+                validator:
+                    widget.realTimeValidation
+                        ? null
+                        : widget.validator,
               ),
         ),
 
         // Validation Message
         AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(
+            milliseconds: 300,
+          ),
           height:
               (_currentError != null ||
                       widget.errorText != null ||
-                      (_isValid && widget.successText != null))
+                      (_isValid &&
+                          widget.successText !=
+                              null))
                   ? null
                   : 0,
           child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(
+              milliseconds: 300,
+            ),
             opacity:
                 (_currentError != null ||
-                        widget.errorText != null ||
-                        (_isValid && widget.successText != null))
+                        widget.errorText !=
+                            null ||
+                        (_isValid &&
+                            widget.successText !=
+                                null))
                     ? 1.0
                     : 0.0,
             child: Padding(
-              padding: EdgeInsets.only(top: 6.h, right: 4.w),
+              padding: EdgeInsets.only(
+                top: 6.h,
+                right: 4.w,
+              ),
               child: Row(
                 children: [
                   Icon(
-                    (_currentError != null || widget.errorText != null)
+                    (_currentError != null ||
+                            widget.errorText !=
+                                null)
                         ? Icons.error_outline
-                        : Icons.check_circle_outline,
+                        : Icons
+                            .check_circle_outline,
                     size: 14.sp,
                     color:
-                        (_currentError != null || widget.errorText != null)
+                        (_currentError != null ||
+                                widget.errorText !=
+                                    null)
                             ? Colors.red[600]
                             : Colors.green[600],
                   ),
@@ -341,9 +449,13 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
                       style: TextStyle(
                         fontSize: 12.sp,
                         color:
-                            (_currentError != null || widget.errorText != null)
+                            (_currentError !=
+                                        null ||
+                                    widget.errorText !=
+                                        null)
                                 ? Colors.red[600]
-                                : Colors.green[600],
+                                : Colors
+                                    .green[600],
                         fontFamily: 'Almarai',
                       ),
                     ),
@@ -358,10 +470,19 @@ class _ValidatedTextFormFieldState extends State<ValidatedTextFormField>
   }
 }
 
-enum ValidationType { none, email, password, phone, nationalId, name, required }
+enum ValidationType {
+  none,
+  email,
+  password,
+  phone,
+  nationalId,
+  name,
+  required,
+}
 
 // Password strength widget
-class PasswordStrengthIndicator extends StatelessWidget {
+class PasswordStrengthIndicator
+    extends StatelessWidget {
   final String password;
   final bool show;
 
@@ -371,8 +492,11 @@ class PasswordStrengthIndicator extends StatelessWidget {
     this.show = true,
   });
 
-  PasswordStrength _getPasswordStrength(String password) {
-    if (password.isEmpty) return PasswordStrength.none;
+  PasswordStrength _getPasswordStrength(
+    String password,
+  ) {
+    if (password.isEmpty)
+      return PasswordStrength.none;
 
     int score = 0;
 
@@ -381,10 +505,15 @@ class PasswordStrengthIndicator extends StatelessWidget {
     if (password.length >= 12) score++;
 
     // Character variety
-    if (RegExp(r'[a-z]').hasMatch(password)) score++;
-    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
+    if (RegExp(r'[a-z]').hasMatch(password))
+      score++;
+    if (RegExp(r'[A-Z]').hasMatch(password))
+      score++;
     if (RegExp(r'\d').hasMatch(password)) score++;
-    if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) score++;
+    if (RegExp(
+      r'[!@#$%^&*(),.?":{}|<>]',
+    ).hasMatch(password))
+      score++;
 
     if (score < 2) return PasswordStrength.weak;
     if (score < 4) return PasswordStrength.medium;
@@ -394,15 +523,19 @@ class PasswordStrengthIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!show || password.isEmpty) return const SizedBox.shrink();
+    if (!show || password.isEmpty)
+      return const SizedBox.shrink();
 
-    final strength = _getPasswordStrength(password);
+    final strength = _getPasswordStrength(
+      password,
+    );
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: EdgeInsets.only(top: 8.h),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -430,14 +563,19 @@ class PasswordStrengthIndicator extends StatelessWidget {
             children: List.generate(4, (index) {
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(left: index < 3 ? 4.w : 0),
+                  margin: EdgeInsets.only(
+                    left: index < 3 ? 4.w : 0,
+                  ),
                   height: 4.h,
                   decoration: BoxDecoration(
                     color:
                         index < strength.level
                             ? strength.color
                             : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2.r),
+                    borderRadius:
+                        BorderRadius.circular(
+                          2.r,
+                        ),
                   ),
                 ),
               );
@@ -456,7 +594,11 @@ enum PasswordStrength {
   strong(3, 'قوية', Colors.blue),
   veryStrong(4, 'قوية جداً', Colors.green);
 
-  const PasswordStrength(this.level, this.text, this.color);
+  const PasswordStrength(
+    this.level,
+    this.text,
+    this.color,
+  );
 
   final int level;
   final String text;

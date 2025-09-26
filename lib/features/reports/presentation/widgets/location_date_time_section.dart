@@ -368,7 +368,7 @@ class _LocationDateTimeSectionState
             // Location Button
             Container(
               height: 41.h,
-              width: 130.w,
+              width: 145.w,
               decoration: BoxDecoration(
                 color: const Color(0xFF1E3A8A),
                 borderRadius: BorderRadius.only(
@@ -396,7 +396,7 @@ class _LocationDateTimeSectionState
                               ),
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 14.w,
+                      horizontal: 10.w,
                     ),
                     child:
                         state.isGettingLocation

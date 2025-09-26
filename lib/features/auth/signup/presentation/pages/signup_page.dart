@@ -31,31 +31,40 @@ class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<SignupPage> createState() =>
+      _SignupPageState();
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final PageController _pageController = PageController();
+  final PageController _pageController =
+      PageController();
   int _currentStep = 0;
   bool _isSubmitting = false;
 
   // Step 0: Username (email or phone) and Password
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _usernameController =
+      TextEditingController();
+  final _passwordController =
+      TextEditingController();
+  final _confirmPasswordController =
+      TextEditingController();
 
   late final VoidCallback _usernameListener;
   late final VoidCallback _passwordListener;
-  late final VoidCallback _confirmPasswordListener;
+  late final VoidCallback
+  _confirmPasswordListener;
   final _formKey = GlobalKey<FormState>();
-  bool _isEmailMode = true; // true for email, false for phone
+  bool _isEmailMode =
+      true; // true for email, false for phone
 
   // Step 1: OTP Verification (Email or SMS)
   bool _isVerified = false;
   bool _isCheckingVerification = false;
   String _otpCode = '';
-  final TextEditingController _otpController = TextEditingController();
-  StreamController<ErrorAnimationType>? _otpErrorController;
+  final TextEditingController _otpController =
+      TextEditingController();
+  StreamController<ErrorAnimationType>?
+  _otpErrorController;
   Timer? _resendTimer;
   int _resendCountdown = 0;
 
@@ -88,7 +97,8 @@ class _SignupPageState extends State<SignupPage> {
     super.initState();
 
     // Initialize OTP error controller
-    _otpErrorController = StreamController<ErrorAnimationType>();
+    _otpErrorController =
+        StreamController<ErrorAnimationType>();
 
     // Add listeners to text controllers to update UI when typing
     _usernameListener = () {
@@ -104,9 +114,15 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {});
     };
 
-    _usernameController.addListener(_usernameListener);
-    _passwordController.addListener(_passwordListener);
-    _confirmPasswordController.addListener(_confirmPasswordListener);
+    _usernameController.addListener(
+      _usernameListener,
+    );
+    _passwordController.addListener(
+      _passwordListener,
+    );
+    _confirmPasswordController.addListener(
+      _confirmPasswordListener,
+    );
   }
 
   @override
@@ -117,9 +133,15 @@ class _SignupPageState extends State<SignupPage> {
 
     // Remove listeners safely
     try {
-      _usernameController.removeListener(_usernameListener);
-      _passwordController.removeListener(_passwordListener);
-      _confirmPasswordController.removeListener(_confirmPasswordListener);
+      _usernameController.removeListener(
+        _usernameListener,
+      );
+      _passwordController.removeListener(
+        _passwordListener,
+      );
+      _confirmPasswordController.removeListener(
+        _confirmPasswordListener,
+      );
     } catch (_) {
       // Ignore errors during listener removal
     }
@@ -134,26 +156,39 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  void _handleBlocState(BuildContext context, SignupState state) {
-    if (state is SignupError || state is SignupFailure) {
+  void _handleBlocState(
+    BuildContext context,
+    SignupState state,
+  ) {
+    if (state is SignupError ||
+        state is SignupFailure) {
       final message =
           state is SignupError
               ? state.message
               : (state as SignupFailure).message;
 
       // Use custom snackbar for error messages
-      showModernSnackBar(context, message: message, type: SnackBarType.error);
+      showModernSnackBar(
+        context,
+        message: message,
+        type: SnackBarType.error,
+      );
 
       setState(() {
         _isSubmitting = false;
       });
-    } else if (state is SignupUserExistsWithLoginOption) {
+    } else if (state
+        is SignupUserExistsWithLoginOption) {
       // 🆕 Handle user already exists - show dialog with login option
       setState(() {
         _isSubmitting = false;
       });
 
-      _showUserExistsDialog(context, state.message, state.dataType);
+      _showUserExistsDialog(
+        context,
+        state.message,
+        state.dataType,
+      );
     } else if (state is SignupEmailSent) {
       // 🆕 Handle OTP sent state - transition to next step
       setState(() {
@@ -172,43 +207,56 @@ class _SignupPageState extends State<SignupPage> {
       );
 
       // Transition to OTP verification step only if not coming from user exists error
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          _proceedToNextStep();
-        }
-      });
+      Future.delayed(
+        const Duration(milliseconds: 500),
+        () {
+          if (mounted) {
+            _proceedToNextStep();
+          }
+        },
+      );
     } else if (state is SignupLoading) {
       // Handle loading state
       setState(() {
         _isSubmitting = true;
       });
-    } else if (state is SignupCompleted || state is SignupSuccess) {
+    } else if (state is SignupCompleted ||
+        state is SignupSuccess) {
       setState(() {
         _isSubmitting = false;
       });
 
       showModernSnackBar(
         context,
-        message: 'تم إنشاء الحساب بنجاح! جاري توجيهك لصفحة اختيار اللغة...',
+        message:
+            'تم إنشاء الحساب بنجاح! جاري توجيهك لصفحة اختيار اللغة...',
         type: SnackBarType.success,
       );
 
       // Clear cache and navigate to language selection page
-      Future.delayed(const Duration(seconds: 1), () async {
-        if (!mounted) return;
+      Future.delayed(
+        const Duration(seconds: 1),
+        () async {
+          if (!mounted) return;
 
-        // Clear cache after successful signup
-        await context.read<SignupCubit>().clearCacheAfterSuccessfulSignup();
+          // Clear cache after successful signup
+          await context
+              .read<SignupCubit>()
+              .clearCacheAfterSuccessfulSignup();
 
-        if (!mounted) return;
+          if (!mounted) return;
 
-        // Navigate to language selection page (or main app)
-        // Replace with the actual route for language selection
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          Routes.loginScreen, // TODO: Change to language selection route
-          (route) => false,
-        );
-      });
+          // Navigate to language selection page (or main app)
+          // Replace with the actual route for language selection
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil(
+            Routes
+                .loginScreen, // TODO: Change to language selection route
+            (route) => false,
+          );
+        },
+      );
     } else {
       setState(() {
         _isSubmitting = false;
@@ -221,7 +269,8 @@ class _SignupPageState extends State<SignupPage> {
       SignupUsernamePasswordStep(
         usernameController: _usernameController,
         passwordController: _passwordController,
-        confirmPasswordController: _confirmPasswordController,
+        confirmPasswordController:
+            _confirmPasswordController,
         isEmailMode: _isEmailMode,
         onEmailModeChanged: (isEmail) {
           setState(() {
@@ -234,7 +283,8 @@ class _SignupPageState extends State<SignupPage> {
         isEmailMode: _isEmailMode,
         username: _usernameController.text,
         isVerified: _isVerified,
-        isCheckingVerification: _isCheckingVerification,
+        isCheckingVerification:
+            _isCheckingVerification,
         otpCode: _otpCode,
         otpController: _otpController,
         otpErrorController: _otpErrorController,
@@ -247,7 +297,7 @@ class _SignupPageState extends State<SignupPage> {
         onOTPCompleted: _verifyOTP,
         onResendOTP: _resendOTP,
       ),
-      _buildUserTypeStep(),
+      // _buildUserTypeStep(),
       _buildDocumentStep(),
       _buildDataEntryStep(),
       _buildLocationStep(),
@@ -263,7 +313,10 @@ class _SignupPageState extends State<SignupPage> {
         elevation: 0,
         toolbarHeight: 0,
       ),
-      body: BlocConsumer<SignupCubit, SignupState>(
+      body: BlocConsumer<
+        SignupCubit,
+        SignupState
+      >(
         listener: _handleBlocState,
         builder: (context, state) {
           return CustomScrollView(
@@ -275,7 +328,8 @@ class _SignupPageState extends State<SignupPage> {
                     // Header with logo and title
                     const SignupHeader(
                       title: 'إنشاء حساب جديد',
-                      subtitle: 'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
+                      subtitle:
+                          'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
                       showLogo: false,
                     ),
                     // Progress indicator
@@ -283,7 +337,6 @@ class _SignupPageState extends State<SignupPage> {
                       currentStep: _currentStep,
                       stepTitles: _stepTitles,
                     ),
-                    SizedBox(height: 16.h),
                   ],
                 ),
               ),
@@ -291,7 +344,8 @@ class _SignupPageState extends State<SignupPage> {
               SliverFillRemaining(
                 child: PageView(
                   controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics:
+                      const NeverScrollableScrollPhysics(),
                   children: _buildStepWidgets(),
                 ),
               ),
@@ -299,21 +353,31 @@ class _SignupPageState extends State<SignupPage> {
           );
         },
       ),
-      bottomNavigationBar: BlocBuilder<SignupCubit, SignupState>(
+      bottomNavigationBar: BlocBuilder<
+        SignupCubit,
+        SignupState
+      >(
         builder: (context, state) {
           return SignupNavigationButtons(
-            onPrevious: _currentStep > 0 ? _previousStep : null,
+            onPrevious:
+                _currentStep > 0
+                    ? _previousStep
+                    : null,
             onNext:
                 _canProceedToNext() &&
                         !_isSubmitting &&
                         !_isCheckingVerification
                     ? () {
-                      if (_isSubmitting || _isCheckingVerification) return;
+                      if (_isSubmitting ||
+                          _isCheckingVerification)
+                        return;
                       _nextStep();
                     }
                     : null,
             nextButtonText: _getNextButtonText(),
-            isLoading: _isSubmitting || _isCheckingVerification,
+            isLoading:
+                _isSubmitting ||
+                _isCheckingVerification,
             canProceed: _canProceedToNext(),
             showPreviousButton: _currentStep > 0,
           );
@@ -322,25 +386,26 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _buildUserTypeStep() {
-    return SignupStepContainer(
-      title: 'نوع المستخدم',
-      subtitle: 'اختر نوع المستخدم المناسب لك',
-      child: UserTypeSelectionStep(
-        selectedUserType: _selectedUserType,
-        onUserTypeSelected: (type) {
-          setState(() {
-            _selectedUserType = type;
-          });
-        },
-      ),
-    );
-  }
+  // Widget _buildUserTypeStep() {
+  //   return SignupStepContainer(
+  //     title: 'نوع المستخدم',
+  //     subtitle: 'اختر نوع المستخدم المناسب لك',
+  //     child: UserTypeSelectionStep(
+  //       selectedUserType: _selectedUserType,
+  //       onUserTypeSelected: (type) {
+  //         setState(() {
+  //           _selectedUserType = type;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget _buildDocumentStep() {
     return SignupStepContainer(
       child: DocumentUploadStep(
-        userType: _selectedUserType ?? UserType.citizen,
+        userType:
+            _selectedUserType ?? UserType.citizen,
         selectedDocuments: _selectedDocuments,
         onDocumentsChanged: (documents) {
           setState(() {
@@ -353,23 +418,30 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildDataEntryStep() {
     // Ensure password is in userData
-    final currentPassword = _passwordController.text.trim();
+    final currentPassword =
+        _passwordController.text.trim();
     if (currentPassword.isNotEmpty &&
-        (_userData['password']?.isEmpty ?? true)) {
+        (_userData['password']?.isEmpty ??
+            true)) {
       _userData['password'] = currentPassword;
     }
 
     // Pre-fill email/phone based on registration method
-    if (_isEmailMode && (_userData['email']?.isEmpty ?? true)) {
-      _userData['email'] = _usernameController.text.trim();
+    if (_isEmailMode &&
+        (_userData['email']?.isEmpty ?? true)) {
+      _userData['email'] =
+          _usernameController.text.trim();
     }
-    if (!_isEmailMode && (_userData['phone']?.isEmpty ?? true)) {
-      _userData['phone'] = _usernameController.text.trim();
+    if (!_isEmailMode &&
+        (_userData['phone']?.isEmpty ?? true)) {
+      _userData['phone'] =
+          _usernameController.text.trim();
     }
 
     return SignupStepContainer(
       child: DataEntryStep(
-        userType: _selectedUserType ?? UserType.citizen,
+        userType:
+            _selectedUserType ?? UserType.citizen,
         extractedData: _extractedData,
         currentData: _userData,
         username: _usernameController.text.trim(),
@@ -407,18 +479,23 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildReviewStep() {
     final locationData = {
-      'governorate': _selectedGovernorate?.name ?? '',
+      'governorate':
+          _selectedGovernorate?.name ?? '',
       'city': _selectedCity?.name ?? '',
       'district': '',
     };
 
-    final documentPaths = _selectedDocuments.map((file) => file.path).toList();
+    final documentPaths =
+        _selectedDocuments
+            .map((file) => file.path)
+            .toList();
 
     return SignupStepContainer(
       title: 'مراجعة وإرسال',
       subtitle: 'مراجعة أخيرة لبياناتك',
       child: ReviewSubmitStep(
-        userType: _selectedUserType ?? UserType.citizen,
+        userType:
+            _selectedUserType ?? UserType.citizen,
         userData: _userData,
         locationData: locationData,
         documentPaths: documentPaths,
@@ -428,11 +505,16 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Map<String, String> _mergeUserData(Map<String, dynamic> data) {
-    final currentPassword = _passwordController.text.trim();
+  Map<String, String> _mergeUserData(
+    Map<String, dynamic> data,
+  ) {
+    final currentPassword =
+        _passwordController.text.trim();
 
     // Merge incoming data with existing _userData but preserve the controller password
-    final merged = Map<String, String>.from(_userData);
+    final merged = Map<String, String>.from(
+      _userData,
+    );
 
     // Add/overwrite with new fields from data
     data.forEach((k, v) {
@@ -440,45 +522,66 @@ class _SignupPageState extends State<SignupPage> {
     });
 
     // Ensure password is preserved from controller if available
-    final incomingPassword = data['password']?.toString() ?? '';
-    final existingPassword = _userData['password'] ?? '';
+    final incomingPassword =
+        data['password']?.toString() ?? '';
+    final existingPassword =
+        _userData['password'] ?? '';
     final controllerPassword = currentPassword;
 
     // Choose the best password candidate
     String bestPassword = '';
-    for (final p in [controllerPassword, existingPassword, incomingPassword]) {
-      if (p.isNotEmpty && p.length > bestPassword.length) {
+    for (final p in [
+      controllerPassword,
+      existingPassword,
+      incomingPassword,
+    ]) {
+      if (p.isNotEmpty &&
+          p.length > bestPassword.length) {
         bestPassword = p;
       }
     }
-    if (bestPassword.isNotEmpty) merged['password'] = bestPassword;
+    if (bestPassword.isNotEmpty)
+      merged['password'] = bestPassword;
 
     return merged;
   }
 
   bool _canProceedToNext() {
     // Prevent navigation if currently processing
-    if (_isSubmitting || _isCheckingVerification) return false;
+    if (_isSubmitting || _isCheckingVerification)
+      return false;
 
     switch (_currentStep) {
       case 0: // Username and Password step
         // Allow button to be enabled if basic fields have content
         // Form validation will happen in _nextStep()
-        return _usernameController.text.trim().isNotEmpty &&
-            _passwordController.text.trim().isNotEmpty &&
-            _confirmPasswordController.text.trim().isNotEmpty;
+        return _usernameController.text
+                .trim()
+                .isNotEmpty &&
+            _passwordController.text
+                .trim()
+                .isNotEmpty &&
+            _confirmPasswordController.text
+                .trim()
+                .isNotEmpty;
       case 1: // OTP verification step
         // For step 1, allow if verified OR if OTP code is complete for verification
-        return _isVerified || _otpCode.length == 6;
+        return _isVerified ||
+            _otpCode.length == 6;
       case 2: // User type step
         return _selectedUserType != null;
       case 3: // Document upload step
-        final requiredDocs = _selectedUserType == UserType.citizen ? 2 : 1;
-        return _selectedDocuments.length >= requiredDocs;
+        final requiredDocs =
+            _selectedUserType == UserType.citizen
+                ? 2
+                : 1;
+        return _selectedDocuments.length >=
+            requiredDocs;
       case 4: // Data entry step
         return _isDataValid();
       case 5: // Location step
-        return _selectedGovernorate != null && _selectedCity != null;
+        return _selectedGovernorate != null &&
+            _selectedCity != null;
       case 6: // Review step
         return true; // Review step can always proceed to submit
       default:
@@ -488,7 +591,12 @@ class _SignupPageState extends State<SignupPage> {
 
   bool _isDataValid() {
     // Required fields for all users
-    final requiredFields = ['fullName', 'email', 'phone', 'password'];
+    final requiredFields = [
+      'fullName',
+      'email',
+      'phone',
+      'password',
+    ];
 
     // Document-specific fields
     if (_selectedUserType == UserType.citizen) {
@@ -506,7 +614,9 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     // Check password length with fallback to controller
-    final password = _userData['password'] ?? _passwordController.text.trim();
+    final password =
+        _userData['password'] ??
+        _passwordController.text.trim();
     if (password.length < 6) {
       return false;
     }
@@ -525,15 +635,20 @@ class _SignupPageState extends State<SignupPage> {
     if (phone.isNotEmpty) {
       final phoneValid = RegExp(
         r'^\+?[0-9]{10,15}$',
-      ).hasMatch(phone.replaceAll(RegExp(r'[\s-]'), ''));
+      ).hasMatch(
+        phone.replaceAll(RegExp(r'[\s-]'), ''),
+      );
       if (!phoneValid) return false;
     }
 
     // Validate document-specific fields
     if (_selectedUserType == UserType.citizen) {
-      final nationalId = _userData['nationalId'] ?? '';
+      final nationalId =
+          _userData['nationalId'] ?? '';
       if (nationalId.length != 14 ||
-          !RegExp(r'^\d{14}$').hasMatch(nationalId)) {
+          !RegExp(
+            r'^\d{14}$',
+          ).hasMatch(nationalId)) {
         return false;
       }
     }
@@ -543,11 +658,18 @@ class _SignupPageState extends State<SignupPage> {
 
   String _getNextButtonText() {
     if (_currentStep == 0) {
-      return _isEmailMode ? 'إرسال رمز التحقق' : 'إرسال رمز SMS';
+      return _isEmailMode
+          ? 'إرسال رمز التحقق'
+          : 'إرسال رمز SMS';
     } else if (_currentStep == 1) {
-      return _isVerified ? 'التالي' : 'تأكيد الرمز';
-    } else if (_currentStep == _stepTitles.length - 1) {
-      return _isSubmitting ? 'جاري الإنشاء...' : 'إنشاء الحساب';
+      return _isVerified
+          ? 'التالي'
+          : 'تأكيد الرمز';
+    } else if (_currentStep ==
+        _stepTitles.length - 1) {
+      return _isSubmitting
+          ? 'جاري الإنشاء...'
+          : 'إنشاء الحساب';
     }
     return 'التالي';
   }
@@ -570,7 +692,8 @@ class _SignupPageState extends State<SignupPage> {
       } else {
         await _verifyOTP();
       }
-    } else if (_currentStep < _stepTitles.length - 1) {
+    } else if (_currentStep <
+        _stepTitles.length - 1) {
       _proceedToNextStep();
     } else {
       _submitRegistration();
@@ -600,7 +723,9 @@ class _SignupPageState extends State<SignupPage> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(
+          milliseconds: 300,
+        ),
         curve: Curves.easeInOut,
       );
     }
@@ -613,19 +738,24 @@ class _SignupPageState extends State<SignupPage> {
       _isSubmitting = true;
     });
 
-    final password = _userData['password'] ?? _passwordController.text.trim();
-    final username = _usernameController.text.trim();
+    final password =
+        _userData['password'] ??
+        _passwordController.text.trim();
+    final username =
+        _usernameController.text.trim();
 
     // Prepare registration data
     final registrationData = <String, dynamic>{
       'fullName': _userData['fullName'],
-      'username': username, // Use username from form (email or phone)
+      'username':
+          username, // Use username from form (email or phone)
       'phone': _userData['phone'],
       'userType': _selectedUserType?.name,
       'governorate': _selectedGovernorate?.name,
       'city': _selectedCity?.name,
       'address': _userData['address'],
-      'password': password, // Use password from data entry step
+      'password':
+          password, // Use password from data entry step
     };
 
     // Set email field based on what was entered
@@ -634,21 +764,28 @@ class _SignupPageState extends State<SignupPage> {
     } else {
       registrationData['phone'] = username;
       // Ensure we have email from data entry step
-      registrationData['email'] = _userData['email'];
+      registrationData['email'] =
+          _userData['email'];
     }
 
     // Add document-specific fields
     if (_selectedUserType == UserType.citizen) {
-      registrationData['nationalId'] = _userData['nationalId'];
+      registrationData['nationalId'] =
+          _userData['nationalId'];
     } else {
-      registrationData['passportNumber'] = _userData['passportNumber'];
+      registrationData['passportNumber'] =
+          _userData['passportNumber'];
     }
 
     // Add document file paths
     registrationData['documents'] =
-        _selectedDocuments.map((file) => file.path).toList();
+        _selectedDocuments
+            .map((file) => file.path)
+            .toList();
 
-    context.read<SignupCubit>().registerUserEnhanced(registrationData);
+    context
+        .read<SignupCubit>()
+        .registerUserEnhanced(registrationData);
   }
 
   Future<void> _sendOTP() async {
@@ -669,14 +806,17 @@ class _SignupPageState extends State<SignupPage> {
     });
 
     try {
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
+      final username =
+          _usernameController.text.trim();
+      final password =
+          _passwordController.text.trim();
 
       // Validate input before proceeding
       if (username.isEmpty || password.isEmpty) {
         showModernSnackBar(
           context,
-          message: 'يرجى ملء جميع الحقول المطلوبة',
+          message:
+              'يرجى ملء جميع الحقول المطلوبة',
           type: SnackBarType.error,
         );
         return;
@@ -690,10 +830,14 @@ class _SignupPageState extends State<SignupPage> {
               SizedBox(
                 width: 16.w,
                 height: 16.w,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                child:
+                    const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor:
+                          AlwaysStoppedAnimation<
+                            Color
+                          >(Colors.white),
+                    ),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -710,17 +854,21 @@ class _SignupPageState extends State<SignupPage> {
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(16.w),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(
+              12.r,
+            ),
           ),
         ),
       );
 
       // Use the cubit to send OTP - state transitions will be handled by BlocListener
-      context.read<SignupCubit>().signUpWithUsernameAndPassword(
-        username,
-        password,
-        _isEmailMode,
-      );
+      context
+          .read<SignupCubit>()
+          .signUpWithUsernameAndPassword(
+            username,
+            password,
+            _isEmailMode,
+          );
     } catch (e) {
       setState(() {
         _isSubmitting = false;
@@ -742,30 +890,41 @@ class _SignupPageState extends State<SignupPage> {
   Future<void> _verifyOTP() async {
     if (_otpCode.length != 6) return;
 
-    setState(() => _isCheckingVerification = true);
+    setState(
+      () => _isCheckingVerification = true,
+    );
 
     try {
-      final username = _usernameController.text.trim();
+      final username =
+          _usernameController.text.trim();
       bool isValidOTP = false;
 
       if (_isEmailMode) {
         try {
-          final response = await Supabase.instance.client.auth.verifyOTP(
-            type: OtpType.email,
-            token: _otpCode,
-            email: username,
-          );
+          final response = await Supabase
+              .instance
+              .client
+              .auth
+              .verifyOTP(
+                type: OtpType.email,
+                token: _otpCode,
+                email: username,
+              );
           isValidOTP = response.user != null;
         } catch (e) {
           isValidOTP = false;
         }
       } else {
         try {
-          final response = await Supabase.instance.client.auth.verifyOTP(
-            type: OtpType.sms,
-            token: _otpCode,
-            phone: username,
-          );
+          final response = await Supabase
+              .instance
+              .client
+              .auth
+              .verifyOTP(
+                type: OtpType.sms,
+                token: _otpCode,
+                phone: username,
+              );
           isValidOTP = response.user != null;
         } catch (e) {
           // Fallback for SMS verification
@@ -780,11 +939,17 @@ class _SignupPageState extends State<SignupPage> {
         });
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
@@ -800,19 +965,27 @@ class _SignupPageState extends State<SignupPage> {
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
             ),
           ),
         );
 
         // Auto proceed to next step after a short delay
-        await Future.delayed(const Duration(milliseconds: 1500));
+        await Future.delayed(
+          const Duration(milliseconds: 1500),
+        );
         if (mounted) {
           _proceedToNextStep();
         }
       } else {
-        setState(() => _isCheckingVerification = false);
-        ScaffoldMessenger.of(context).showSnackBar(
+        setState(
+          () => _isCheckingVerification = false,
+        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
           SnackBar(
             content: Text(
               _isEmailMode
@@ -827,7 +1000,9 @@ class _SignupPageState extends State<SignupPage> {
         _clearOTPFields();
       }
     } catch (e) {
-      setState(() => _isCheckingVerification = false);
+      setState(
+        () => _isCheckingVerification = false,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('خطأ في التحقق: $e'),
@@ -847,7 +1022,9 @@ class _SignupPageState extends State<SignupPage> {
       _otpCode = '';
     });
     // Trigger error animation
-    _otpErrorController?.add(ErrorAnimationType.shake);
+    _otpErrorController?.add(
+      ErrorAnimationType.shake,
+    );
   }
 
   // Resend OTP
@@ -859,10 +1036,14 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(
               width: 16.w,
               height: 16.w,
-              child: const CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+              child:
+                  const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<
+                          Color
+                        >(Colors.white),
+                  ),
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -879,7 +1060,9 @@ class _SignupPageState extends State<SignupPage> {
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16.w),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
       ),
     );
@@ -909,10 +1092,18 @@ class _SignupPageState extends State<SignupPage> {
           text: 'تسجيل الدخول',
           onPressed: () {
             Navigator.of(context).pop();
-            Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
+            Navigator.of(
+              context,
+            ).pushReplacementNamed(
+              Routes.loginScreen,
+            );
           },
           isPrimary: true,
-          icon: Icon(Icons.login, size: 16.sp, color: Colors.white),
+          icon: Icon(
+            Icons.login,
+            size: 16.sp,
+            color: Colors.white,
+          ),
         ),
         ModernDialogAction(
           text:
@@ -926,10 +1117,13 @@ class _SignupPageState extends State<SignupPage> {
           onPressed: () {
             Navigator.of(context).pop();
             if (mounted) {
-              context.read<SignupCubit>().clearErrorAndRetry();
+              context
+                  .read<SignupCubit>()
+                  .clearErrorAndRetry();
             }
             // Clear the conflicting field
-            if (field == 'email' || field == 'phone') {
+            if (field == 'email' ||
+                field == 'phone') {
               _usernameController.clear();
             }
             // Reset to initial step if needed
@@ -938,7 +1132,9 @@ class _SignupPageState extends State<SignupPage> {
                 _currentStep = 0;
                 _pageController.animateToPage(
                   0,
-                  duration: const Duration(milliseconds: 300),
+                  duration: const Duration(
+                    milliseconds: 300,
+                  ),
                   curve: Curves.easeInOut,
                 );
               }
@@ -948,7 +1144,8 @@ class _SignupPageState extends State<SignupPage> {
         ),
         ModernDialogAction(
           text: 'إلغاء',
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed:
+              () => Navigator.of(context).pop(),
           icon: Icon(Icons.close, size: 16.sp),
         ),
       ],
@@ -958,14 +1155,17 @@ class _SignupPageState extends State<SignupPage> {
   void _startResendTimer() {
     setState(() => _resendCountdown = 60);
     _resendTimer?.cancel();
-    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_resendCountdown > 0) {
-          _resendCountdown--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
+    _resendTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        setState(() {
+          if (_resendCountdown > 0) {
+            _resendCountdown--;
+          } else {
+            timer.cancel();
+          }
+        });
+      },
+    );
   }
 }

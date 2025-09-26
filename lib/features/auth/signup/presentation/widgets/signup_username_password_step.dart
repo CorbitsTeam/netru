@@ -5,10 +5,12 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../widgets/validated_text_form_field.dart';
 import 'signup_step_container.dart';
 
-class SignupUsernamePasswordStep extends StatefulWidget {
+class SignupUsernamePasswordStep
+    extends StatefulWidget {
   final TextEditingController usernameController;
   final TextEditingController passwordController;
-  final TextEditingController confirmPasswordController;
+  final TextEditingController
+  confirmPasswordController;
   final bool isEmailMode;
   final ValueChanged<bool> onEmailModeChanged;
   final GlobalKey<FormState> formKey;
@@ -24,7 +26,8 @@ class SignupUsernamePasswordStep extends StatefulWidget {
   });
 
   @override
-  State<SignupUsernamePasswordStep> createState() =>
+  State<SignupUsernamePasswordStep>
+  createState() =>
       _SignupUsernamePasswordStepState();
 }
 
@@ -39,15 +42,21 @@ class _SignupUsernamePasswordStepState
     super.initState();
     // Create listener to password controller to update UI when text changes
     _passwordListener = () {
-      setState(() {}); // Rebuild to update password strength indicator
+      setState(
+        () {},
+      ); // Rebuild to update password strength indicator
     };
-    widget.passwordController.addListener(_passwordListener);
+    widget.passwordController.addListener(
+      _passwordListener,
+    );
   }
 
   @override
   void dispose() {
     // Remove listener before disposal
-    widget.passwordController.removeListener(_passwordListener);
+    widget.passwordController.removeListener(
+      _passwordListener,
+    );
     super.dispose();
   }
 
@@ -55,18 +64,25 @@ class _SignupUsernamePasswordStepState
   Widget build(BuildContext context) {
     return SignupStepContainer(
       // title: 'بيانات الدخول الأساسية',
-      subtitle: 'أدخل بريدك الإلكتروني وكلمة مرور قوية',
+      // subtitle: 'أدخل بريدك الإلكتروني وكلمة مرور قوية',
       child: Form(
         key: widget.formKey,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center,
           children: [
             // Username Field (Email or Phone)
             FadeInUp(
-              duration: const Duration(milliseconds: 800),
+              duration: const Duration(
+                milliseconds: 800,
+              ),
               child: ValidatedTextFormField(
-                controller: widget.usernameController,
-                label: widget.isEmailMode ? 'البريد الإلكتروني' : 'رقم الهاتف',
+                controller:
+                    widget.usernameController,
+                label:
+                    widget.isEmailMode
+                        ? 'البريد الإلكتروني'
+                        : 'رقم الهاتف',
                 hint:
                     widget.isEmailMode
                         ? 'أدخل بريدك الإلكتروني'
@@ -80,7 +96,8 @@ class _SignupUsernamePasswordStepState
                 ),
                 keyboardType:
                     widget.isEmailMode
-                        ? TextInputType.emailAddress
+                        ? TextInputType
+                            .emailAddress
                         : TextInputType.phone,
                 validationType:
                     widget.isEmailMode
@@ -95,41 +112,58 @@ class _SignupUsernamePasswordStepState
 
             // Password Field
             FadeInUp(
-              duration: const Duration(milliseconds: 900),
+              duration: const Duration(
+                milliseconds: 900,
+              ),
               child: Column(
                 children: [
                   ValidatedTextFormField(
-                    controller: widget.passwordController,
+                    controller:
+                        widget.passwordController,
                     label: 'كلمة المرور',
-                    hint: 'أدخل كلمة مرور قوية (8 أحرف على الأقل)',
+                    hint:
+                        'أدخل كلمة مرور قوية (8 أحرف على الأقل)',
                     prefixIcon: Icon(
                       Icons.lock_outline,
-                      color: AppColors.textSecondary,
+                      color:
+                          AppColors.textSecondary,
                       size: 20.sp,
                     ),
-                    obscureText: _passwordObscured,
+                    obscureText:
+                        _passwordObscured,
                     suffixIcon: IconButton(
                       onPressed:
                           () => setState(() {
-                            _passwordObscured = !_passwordObscured;
+                            _passwordObscured =
+                                !_passwordObscured;
                           }),
                       icon: Icon(
                         _passwordObscured
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: AppColors.textSecondary,
+                        color:
+                            AppColors
+                                .textSecondary,
                         size: 20.sp,
                       ),
                     ),
-                    validationType: ValidationType.password,
+                    validationType:
+                        ValidationType.password,
                     realTimeValidation: true,
                     showValidationIcon:
                         false, // We'll show strength indicator instead
                   ),
                   // Password strength indicator
                   PasswordStrengthIndicator(
-                    password: widget.passwordController.text,
-                    show: widget.passwordController.text.isNotEmpty,
+                    password:
+                        widget
+                            .passwordController
+                            .text,
+                    show:
+                        widget
+                            .passwordController
+                            .text
+                            .isNotEmpty,
                   ),
                 ],
               ),
@@ -139,9 +173,13 @@ class _SignupUsernamePasswordStepState
 
             // Confirm Password Field
             FadeInUp(
-              duration: const Duration(milliseconds: 1000),
+              duration: const Duration(
+                milliseconds: 1000,
+              ),
               child: ValidatedTextFormField(
-                controller: widget.confirmPasswordController,
+                controller:
+                    widget
+                        .confirmPasswordController,
                 label: 'تأكيد كلمة المرور',
                 hint: 'أعد كتابة كلمة المرور',
                 prefixIcon: Icon(
@@ -149,25 +187,32 @@ class _SignupUsernamePasswordStepState
                   color: AppColors.textSecondary,
                   size: 20.sp,
                 ),
-                obscureText: _confirmPasswordObscured,
+                obscureText:
+                    _confirmPasswordObscured,
                 suffixIcon: IconButton(
                   onPressed:
                       () => setState(() {
-                        _confirmPasswordObscured = !_confirmPasswordObscured;
+                        _confirmPasswordObscured =
+                            !_confirmPasswordObscured;
                       }),
                   icon: Icon(
                     _confirmPasswordObscured
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: AppColors.textSecondary,
+                    color:
+                        AppColors.textSecondary,
                     size: 20.sp,
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
+                  if (value == null ||
+                      value.trim().isEmpty) {
                     return 'تأكيد كلمة المرور مطلوب';
                   }
-                  if (value != widget.passwordController.text) {
+                  if (value !=
+                      widget
+                          .passwordController
+                          .text) {
                     return 'كلمات المرور غير متطابقة';
                   }
                   return null;

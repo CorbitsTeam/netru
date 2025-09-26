@@ -15,7 +15,8 @@ class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key});
 
   // Onboarding slides data - can be easily modified or localized
-  static const List<OnboardingSlideData> _slides = [
+  static const List<OnboardingSlideData>
+  _slides = [
     OnboardingSlideData(
       image: AppAssets.onboarding1,
       title: "بلغ بسهولة وسرعة",
@@ -23,12 +24,17 @@ class OnboardingPage extends StatelessWidget {
           "أرسل بلاغك فورًا بخطوة واحدة، مع تحديد الموقع تلقائيًا وحماية خصوصيتك.",
     ),
     OnboardingSlideData(
-      image: AppAssets.onboarding2, // Using media or custom onboarding image
+      image:
+          AppAssets
+              .onboarding2, // Using media or custom onboarding image
       title: "مساعدك الذكي دومًا معك",
-      subtitle: "سوبيك يوجّهك قانونيا ويقدّم نصائح أمنية فورية.",
+      subtitle:
+          "سوبيك يوجّهك قانونيا ويقدّم نصائح أمنية فورية.",
     ),
     OnboardingSlideData(
-      image: AppAssets.onboarding3, // Using media2 or custom onboarding image
+      image:
+          AppAssets
+              .onboarding3, // Using media2 or custom onboarding image
 
       title: 'اعرف مستوى الأمان حولك',
       subtitle:
@@ -50,11 +56,16 @@ class _OnboardingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<OnboardingCubit, OnboardingState>(
+    return BlocListener<
+      OnboardingCubit,
+      OnboardingState
+    >(
       listener: (context, state) {
         if (state is OnboardingCompleted) {
           // Navigate to login screen
-          context.read<OnboardingCubit>().navigateToLogin(context);
+          context
+              .read<OnboardingCubit>()
+              .navigateToLogin(context);
         }
       },
       child: Scaffold(
@@ -62,7 +73,10 @@ class _OnboardingView extends StatelessWidget {
         body: Column(
           children: [
             // Main content area with PageView
-            Expanded(flex: 6, child: _buildPageView(context)),
+            Expanded(
+              flex: 6,
+              child: _buildPageView(context),
+            ),
 
             // Bottom section with dots and navigation
             _buildBottomSection(context),
@@ -78,9 +92,13 @@ class _OnboardingView extends StatelessWidget {
 
   /// Main PageView with slides
   Widget _buildPageView(BuildContext context) {
-    return BlocBuilder<OnboardingCubit, OnboardingState>(
+    return BlocBuilder<
+      OnboardingCubit,
+      OnboardingState
+    >(
       builder: (context, state) {
-        final cubit = context.read<OnboardingCubit>();
+        final cubit =
+            context.read<OnboardingCubit>();
 
         return PageView.builder(
           controller: cubit.pageController,
@@ -89,10 +107,12 @@ class _OnboardingView extends StatelessWidget {
             FocusScope.of(context).unfocus();
             cubit.onPageChanged(index);
           },
-          itemCount: OnboardingPage._slides.length,
+          itemCount:
+              OnboardingPage._slides.length,
           itemBuilder: (context, index) {
             return OnboardingSlide(
-              slideData: OnboardingPage._slides[index],
+              slideData:
+                  OnboardingPage._slides[index],
               slideIndex: index,
             );
           },
@@ -102,12 +122,20 @@ class _OnboardingView extends StatelessWidget {
   }
 
   /// Bottom section with dots indicator and navigation buttons
-  Widget _buildBottomSection(BuildContext context) {
+  Widget _buildBottomSection(
+    BuildContext context,
+  ) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: BlocBuilder<OnboardingCubit, OnboardingState>(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24.w,
+      ),
+      child: BlocBuilder<
+        OnboardingCubit,
+        OnboardingState
+      >(
         builder: (context, state) {
-          final cubit = context.read<OnboardingCubit>();
+          final cubit =
+              context.read<OnboardingCubit>();
           final currentIndex = cubit.currentIndex;
           final isLastPage = cubit.isLastPage;
 
@@ -115,10 +143,15 @@ class _OnboardingView extends StatelessWidget {
             children: [
               // Dots indicator
               FadeInUp(
-                duration: const Duration(milliseconds: 600),
+                duration: const Duration(
+                  milliseconds: 600,
+                ),
                 child: CustomOnboardingDots(
                   currentIndex: currentIndex,
-                  totalDots: OnboardingPage._slides.length,
+                  totalDots:
+                      OnboardingPage
+                          ._slides
+                          .length,
                   onDotTapped: (index) {
                     HapticFeedback.selectionClick();
                     cubit.goToPage(index);
@@ -134,7 +167,9 @@ class _OnboardingView extends StatelessWidget {
                   // Previous button (only show if not on first page)
                   if (currentIndex > 0)
                     FadeInLeft(
-                      duration: const Duration(milliseconds: 400),
+                      duration: const Duration(
+                        milliseconds: 400,
+                      ),
                       child: _buildNavigationButton(
                         context: context,
                         onPressed: () {
@@ -150,14 +185,19 @@ class _OnboardingView extends StatelessWidget {
 
                   // Next/Start button
                   FadeInRight(
-                    duration: const Duration(milliseconds: 400),
+                    duration: const Duration(
+                      milliseconds: 400,
+                    ),
                     child: _buildNavigationButton(
                       context: context,
                       onPressed: () {
                         HapticFeedback.lightImpact();
                         cubit.nextPage();
                       },
-                      text: isLastPage ? 'ابدأ الآن' : 'التالي',
+                      text:
+                          isLastPage
+                              ? 'ابدأ الآن'
+                              : 'التالي',
                       isSecondary: false,
                     ),
                   ),
@@ -178,35 +218,56 @@ class _OnboardingView extends StatelessWidget {
     required bool isSecondary,
   }) {
     return Container(
-      height: 50.h,
-      constraints: BoxConstraints(minWidth: 120.w),
+      height: 40.h,
+      constraints: BoxConstraints(
+        minWidth: 100.w,
+      ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor:
-              isSecondary ? Colors.transparent : AppColors.primaryColor,
-          foregroundColor: isSecondary ? AppColors.primaryColor : Colors.white,
+              isSecondary
+                  ? Colors.transparent
+                  : AppColors.primaryColor,
+          foregroundColor:
+              isSecondary
+                  ? AppColors.primaryColor
+                  : Colors.white,
           side:
               isSecondary
-                  ? const BorderSide(color: AppColors.primaryColor, width: 1.5)
+                  ? const BorderSide(
+                    color: AppColors.primaryColor,
+                    width: 1.5,
+                  )
                   : null,
           elevation: isSecondary ? 0 : 2,
-          shadowColor: AppColors.primaryColor.withValues(alpha: 0.3),
+          shadowColor: AppColors.primaryColor
+              .withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25.r),
+            borderRadius: BorderRadius.circular(
+              25.r,
+            ),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          padding: EdgeInsets.symmetric(
+            horizontal: 24.w,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               text,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             if (!isSecondary) ...[
               SizedBox(width: 8.w),
-              Icon(Icons.arrow_forward_ios, size: 16.sp),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16.sp,
+              ),
             ],
           ],
         ),

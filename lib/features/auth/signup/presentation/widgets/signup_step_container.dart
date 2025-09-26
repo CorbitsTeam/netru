@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 
-class SignupStepContainer extends StatelessWidget {
+class SignupStepContainer
+    extends StatelessWidget {
   final Widget child;
   final String? title;
   final String? subtitle;
@@ -14,7 +15,9 @@ class SignupStepContainer extends StatelessWidget {
     required this.child,
     this.title,
     this.subtitle,
-    this.animationDuration = const Duration(milliseconds: 600),
+    this.animationDuration = const Duration(
+      milliseconds: 600,
+    ),
     this.animationDelay = 0,
   });
 
@@ -22,16 +25,22 @@ class SignupStepContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return FadeInUp(
       duration: animationDuration,
-      delay: Duration(milliseconds: animationDelay),
+      delay: Duration(
+        milliseconds: animationDelay,
+      ),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(
+            16.r,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(
+                alpha: 0.05,
+              ),
               blurRadius: 10.r,
               offset: const Offset(0, 4),
             ),
@@ -40,24 +49,33 @@ class SignupStepContainer extends StatelessWidget {
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.center,
             children: [
-              if (title != null || subtitle != null) ...[
+              if (title != null ||
+                  subtitle != null) ...[
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       if (title != null) ...[
                         Text(
                           title!,
                           style: TextStyle(
                             fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1F2937),
+                            fontWeight:
+                                FontWeight.bold,
+                            color: const Color(
+                              0xFF1F2937,
+                            ),
                             fontFamily: 'Almarai',
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign:
+                              TextAlign.center,
                         ),
                         SizedBox(height: 8.h),
                       ],
@@ -66,10 +84,13 @@ class SignupStepContainer extends StatelessWidget {
                           subtitle!,
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: const Color(0xFF6B7280),
+                            color: const Color(
+                              0xFF6B7280,
+                            ),
                             fontFamily: 'Almarai',
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign:
+                              TextAlign.center,
                         ),
                         SizedBox(height: 16.h),
                       ],

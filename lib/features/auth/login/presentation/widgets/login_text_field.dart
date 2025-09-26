@@ -23,7 +23,8 @@ class LoginTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -40,7 +41,8 @@ class LoginTextField extends StatelessWidget {
           keyboardType: keyboardType,
           validator: validator,
           textDirection:
-              keyboardType == TextInputType.emailAddress
+              keyboardType ==
+                      TextInputType.emailAddress
                   ? TextDirection.ltr
                   : TextDirection.rtl,
           style: TextStyle(
@@ -55,27 +57,53 @@ class LoginTextField extends StatelessWidget {
               fontSize: 12.sp,
               fontFamily: 'Almarai',
             ),
-            prefixIcon: Icon(icon, color: AppColors.primary, size: 22.sp),
+            prefixIcon: Icon(
+              icon,
+              color: AppColors.primary,
+              size: 22.sp,
+            ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderRadius: BorderRadius.circular(
+                12.r,
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.error,
+              ),
             ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
+            focusedErrorBorder:
+                OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 2,
+                  ),
+                ),
             filled: true,
             fillColor: const Color(0xFFF9FAFB),
             contentPadding: EdgeInsets.symmetric(

@@ -64,27 +64,6 @@ class SupportOptionsDialog
                   () => _makePhoneCall(context),
             ),
 
-            SizedBox(height: 12.h),
-
-            _buildSupportOption(
-              context,
-              icon: Icons.chat_outlined,
-              title: 'الدردشة المباشرة',
-              subtitle: 'متاح على مدار الساعة',
-              onTap: () => _openLiveChat(context),
-            ),
-
-            SizedBox(height: 12.h),
-
-            _buildSupportOption(
-              context,
-              icon: Icons.help_outline,
-              title: 'الأسئلة الشائعة',
-              subtitle:
-                  'إجابات فورية للأسئلة الشائعة',
-              onTap: () => _openFAQ(context),
-            ),
-
             SizedBox(height: 20.h),
 
             // Close button

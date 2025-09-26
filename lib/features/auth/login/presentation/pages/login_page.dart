@@ -19,10 +19,12 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() =>
+      _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoading = false;
   bool _showAdminTab = false;
@@ -30,7 +32,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
   }
 
   @override
@@ -44,7 +49,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+            Icon(
+              Icons.error_outline,
+              color: Colors.white,
+              size: 20.sp,
+            ),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -61,7 +70,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
         margin: EdgeInsets.all(16.w),
         duration: const Duration(seconds: 4),
@@ -73,25 +84,34 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     context.pushNamed(Routes.signupScreen);
   }
 
-  void _navigateBasedOnUserType(UserEntity user) async {
+  void _navigateBasedOnUserType(
+    UserEntity user,
+  ) async {
     // Save user data to SharedPreferences and refresh from database
     try {
       final userHelper = UserDataHelper();
       await userHelper.saveCurrentUser(user);
 
       // Refresh user data from database to get complete information
-      await userHelper.refreshUserDataFromDatabase();
+      await userHelper
+          .refreshUserDataFromDatabase();
     } catch (e) {
-      print('Error saving/refreshing user data: $e');
+      print(
+        'Error saving/refreshing user data: $e',
+      );
     }
 
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:
-        context.pushReplacementNamed(Routes.customBottomBar);
+        context.pushReplacementNamed(
+          Routes.customBottomBar,
+        );
         break;
       case UserType.admin:
-        context.pushReplacementNamed(Routes.adminDashboard);
+        context.pushReplacementNamed(
+          Routes.adminDashboard,
+        );
         break;
     }
   }
@@ -103,12 +123,17 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         // Dispose the old controller properly
         final oldIndex = _tabController.index;
         _tabController.dispose();
-        _tabController = TabController(length: 3, vsync: this);
+        _tabController = TabController(
+          length: 3,
+          vsync: this,
+        );
         // Keep the current tab if it's still valid, otherwise go to admin tab
         if (oldIndex < 2) {
           _tabController.index = oldIndex;
         } else {
-          _tabController.animateTo(2); // Switch to admin tab
+          _tabController.animateTo(
+            2,
+          ); // Switch to admin tab
         }
       });
     }
@@ -138,39 +163,49 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         },
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: 24.w,
+            ),
             child: Column(
               children: [
                 SizedBox(height: 40.h),
-                LoginHeader(onLogoDoubleTap: _onLogoDoubleTap),
-                SizedBox(height: 40.h),
-                LoginTabBar(
-                  tabController: _tabController,
-                  showAdminTab: _showAdminTab,
+                LoginHeader(
+                  onLogoDoubleTap:
+                      _onLogoDoubleTap,
                 ),
+
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height:
+                      MediaQuery.of(
+                        context,
+                      ).size.height *
+                      0.4,
                   child: TabBarView(
                     controller: _tabController,
                     children: [
                       CitizenLoginForm(
                         isLoading: _isLoading,
-                        onSubmit: _handleFormSubmit,
+                        onSubmit:
+                            _handleFormSubmit,
                       ),
                       ForeignerLoginForm(
                         isLoading: _isLoading,
-                        onSubmit: _handleFormSubmit,
+                        onSubmit:
+                            _handleFormSubmit,
                       ),
                       if (_showAdminTab)
                         AdminLoginForm(
                           isLoading: _isLoading,
-                          onSubmit: _handleFormSubmit,
+                          onSubmit:
+                              _handleFormSubmit,
                         ),
                     ],
                   ),
                 ),
-                SizedBox(height: 30.h),
-                LoginBottomSection(onSignupTap: _navigateToSignup),
+                SizedBox(height: 65.h),
+                LoginBottomSection(
+                  onSignupTap: _navigateToSignup,
+                ),
                 SizedBox(height: 30.h),
               ],
             ),

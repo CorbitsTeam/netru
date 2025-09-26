@@ -219,119 +219,6 @@ class _NotificationSettingsWidgetState
               onChanged:
                   _updateNotificationsSetting,
             ),
-
-            if (notificationsEnabled) ...[
-              SizedBox(height: 16.h),
-
-              _buildNotificationTile(
-                icon: Icons.volume_up_outlined,
-                title: 'الصوت',
-                subtitle:
-                    'تشغيل الصوت مع الإشعارات',
-                value: soundEnabled,
-                onChanged: (value) async {
-                  SettingsService().updateSound(
-                    context,
-                    value,
-                  );
-                  await _notificationService
-                      .setSoundEnabled(value);
-                },
-              ),
-
-              SizedBox(height: 16.h),
-
-              _buildNotificationTile(
-                icon: Icons.vibration_outlined,
-                title: 'الاهتزاز',
-                subtitle:
-                    'تفعيل الاهتزاز مع الإشعارات',
-                value: vibrationEnabled,
-                onChanged: (value) async {
-                  SettingsService()
-                      .updateVibration(
-                        context,
-                        value,
-                      );
-                  await _notificationService
-                      .setVibrationEnabled(value);
-                },
-              ),
-
-              SizedBox(height: 24.h),
-
-              Text(
-                'أنواع الإشعارات',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color:
-                      Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.color,
-                ),
-              ),
-
-              SizedBox(height: 16.h),
-
-              _buildNotificationTile(
-                icon: Icons.report_outlined,
-                title: 'إشعارات التقارير',
-                subtitle:
-                    'تحديثات حول التقارير المقدمة',
-                value: _reportsNotifications,
-                onChanged: (value) async {
-                  setState(() {
-                    _reportsNotifications = value;
-                  });
-                  await _notificationService
-                      .setReportsNotificationsEnabled(
-                        value,
-                      );
-                },
-              ),
-
-              SizedBox(height: 16.h),
-
-              _buildNotificationTile(
-                icon: Icons.article_outlined,
-                title: 'إشعارات الأخبار',
-                subtitle:
-                    'آخر الأخبار والتحديثات',
-                value: _newsNotifications,
-                onChanged: (value) async {
-                  setState(() {
-                    _newsNotifications = value;
-                  });
-                  await _notificationService
-                      .setNewsNotificationsEnabled(
-                        value,
-                      );
-                },
-              ),
-
-              SizedBox(height: 16.h),
-
-              _buildNotificationTile(
-                icon: Icons.security_outlined,
-                title: 'التنبيهات الأمنية',
-                subtitle:
-                    'تنبيهات هامة حول الأمان',
-                value: _securityNotifications,
-                onChanged: (value) async {
-                  setState(() {
-                    _securityNotifications =
-                        value;
-                  });
-                  await _notificationService
-                      .setSecurityNotificationsEnabled(
-                        value,
-                      );
-                },
-                isImportant: true,
-              ),
-            ],
           ],
         );
       },
@@ -407,6 +294,9 @@ class _NotificationSettingsWidgetState
           key: switchKey,
           value: value,
           onChanged: onChanged,
+          inactiveThumbColor: Colors.red,
+          inactiveTrackColor: Colors.red
+              .withOpacity(0.3),
           activeColor: AppColors.primaryColor,
           activeTrackColor: AppColors.primaryColor
               .withOpacity(0.3),

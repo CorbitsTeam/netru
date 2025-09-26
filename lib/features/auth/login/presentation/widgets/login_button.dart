@@ -18,16 +18,19 @@ class LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 50.h,
+      height: 45.h,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(
+              12.r,
+            ),
           ),
         ),
         child:
@@ -35,10 +38,11 @@ class LoginButton extends StatelessWidget {
                 ? SizedBox(
                   width: 24.w,
                   height: 24.h,
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
+                  child:
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                 )
                 : Text(
                   text,

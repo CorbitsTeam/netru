@@ -10,7 +10,10 @@ class HeatmapStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HeatmapCubit, HeatmapState>(
+    return BlocBuilder<
+      HeatmapCubit,
+      HeatmapState
+    >(
       builder: (context, state) {
         if (state is HeatmapLoaded) {
           return _buildStatsContent(state);
@@ -22,11 +25,16 @@ class HeatmapStatsWidget extends StatelessWidget {
 
   Widget _buildStatsContent(HeatmapLoaded state) {
     final totalReports = state.reports.length;
-    final topGovernorates = _getTopGovernorates(state.reports, 3);
-    final crimeStats = _analyzeCrimeTypes(state.reports);
+    final topGovernorates = _getTopGovernorates(
+      state.reports,
+      3,
+    );
+    final crimeStats = _analyzeCrimeTypes(
+      state.reports,
+    );
 
     return Container(
-      margin: EdgeInsets.all(16.w),
+      margin: EdgeInsets.all(12.w),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -41,22 +49,16 @@ class HeatmapStatsWidget extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           // العنوان الرئيسي
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  Icons.analytics,
-                  color: AppColors.primaryColor,
-                  size: 24.sp,
-                ),
+              Icon(
+                Icons.analytics,
+                color: AppColors.primaryColor,
+                size: 22.sp,
               ),
               SizedBox(width: 12.w),
               Text(
@@ -87,7 +89,9 @@ class HeatmapStatsWidget extends StatelessWidget {
               Expanded(
                 child: _buildStatCard(
                   title: 'المحافظات المتأثرة',
-                  value: topGovernorates.length.toString(),
+                  value:
+                      topGovernorates.length
+                          .toString(),
                   icon: Icons.location_city,
                   color: Colors.orange,
                 ),
@@ -96,7 +100,9 @@ class HeatmapStatsWidget extends StatelessWidget {
               Expanded(
                 child: _buildStatCard(
                   title: 'أنواع الجرائم',
-                  value: crimeStats.length.toString(),
+                  value:
+                      crimeStats.length
+                          .toString(),
                   icon: Icons.category,
                   color: Colors.green,
                 ),
@@ -120,23 +126,39 @@ class HeatmapStatsWidget extends StatelessWidget {
 
           Column(
             children:
-                topGovernorates.map((governorate) {
+                topGovernorates.map((
+                  governorate,
+                ) {
                   final reports =
                       state.reports
-                          .where((r) => r.governorate == governorate.key)
+                          .where(
+                            (r) =>
+                                r.governorate ==
+                                governorate.key,
+                          )
                           .length;
-                  final percentage = (reports / totalReports * 100).round();
+                  final percentage =
+                      (reports /
+                              totalReports *
+                              100)
+                          .round();
 
                   return Container(
-                    margin: EdgeInsets.only(bottom: 6.h),
+                    margin: EdgeInsets.only(
+                      bottom: 6.h,
+                    ),
                     child: Row(
                       children: [
                         Container(
                           width: 8.w,
                           height: 8.h,
                           decoration: BoxDecoration(
-                            color: _getDangerLevelColor(reports),
-                            shape: BoxShape.circle,
+                            color:
+                                _getDangerLevelColor(
+                                  reports,
+                                ),
+                            shape:
+                                BoxShape.circle,
                           ),
                         ),
                         SizedBox(width: 8.w),
@@ -145,7 +167,9 @@ class HeatmapStatsWidget extends StatelessWidget {
                             governorate.key,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: Colors.grey[700],
+                              color:
+                                  Colors
+                                      .grey[700],
                             ),
                           ),
                         ),
@@ -153,8 +177,12 @@ class HeatmapStatsWidget extends StatelessWidget {
                           '$reports ($percentage%)',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: _getDangerLevelColor(reports),
+                            fontWeight:
+                                FontWeight.w600,
+                            color:
+                                _getDangerLevelColor(
+                                  reports,
+                                ),
                           ),
                         ),
                       ],
@@ -174,11 +202,15 @@ class HeatmapStatsWidget extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      height: 80.h,
+
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+        ),
       ),
       child: Column(
         children: [
@@ -195,7 +227,10 @@ class HeatmapStatsWidget extends StatelessWidget {
           SizedBox(height: 2.h),
           Text(
             title,
-            style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: Colors.grey[600],
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -210,27 +245,34 @@ class HeatmapStatsWidget extends StatelessWidget {
     final Map<String, int> governorateCount = {};
 
     for (final report in reports) {
-      final governorate = report.governorate ?? 'غير محدد';
+      final governorate =
+          report.governorate ?? 'غير محدد';
       if (governorate != 'غير محدد') {
         governorateCount[governorate] =
-            (governorateCount[governorate] ?? 0) + 1;
+            (governorateCount[governorate] ?? 0) +
+            1;
       }
     }
 
     final sortedEntries =
-        governorateCount.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+        governorateCount.entries.toList()..sort(
+          (a, b) => b.value.compareTo(a.value),
+        );
 
     return sortedEntries.take(limit).toList();
   }
 
-  Map<String, int> _analyzeCrimeTypes(List<dynamic> reports) {
+  Map<String, int> _analyzeCrimeTypes(
+    List<dynamic> reports,
+  ) {
     final Map<String, int> crimeTypes = {};
 
     for (final report in reports) {
-      final type = report.reportType ?? 'غير محدد';
+      final type =
+          report.reportType ?? 'غير محدد';
       if (type != 'غير محدد') {
-        crimeTypes[type] = (crimeTypes[type] ?? 0) + 1;
+        crimeTypes[type] =
+            (crimeTypes[type] ?? 0) + 1;
       }
     }
 
@@ -240,7 +282,8 @@ class HeatmapStatsWidget extends StatelessWidget {
   Color _getDangerLevelColor(int reportCount) {
     if (reportCount >= 20) return Colors.red;
     if (reportCount >= 10) return Colors.orange;
-    if (reportCount >= 5) return Colors.yellow[700] ?? Colors.yellow;
+    if (reportCount >= 5)
+      return Colors.yellow[700] ?? Colors.yellow;
     return Colors.green;
   }
 }
