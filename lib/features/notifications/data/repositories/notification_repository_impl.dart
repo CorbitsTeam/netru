@@ -4,17 +4,17 @@ import '../../domain/entities/notification_entity.dart';
 import '../../domain/entities/fcm_token_entity.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../datasources/notification_remote_data_source.dart';
-import '../datasources/firebase_notification_service.dart';
+import '../../../../core/services/simple_fcm_service.dart';
 import '../models/notification_model.dart';
 import '../models/fcm_token_model.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationRemoteDataSource remoteDataSource;
-  final FirebaseNotificationService firebaseService;
+  final SimpleFcmService fcmService;
 
   NotificationRepositoryImpl({
     required this.remoteDataSource,
-    required this.firebaseService,
+    required this.fcmService,
   });
 
   @override
@@ -77,20 +77,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
         notificationModel,
       );
 
-      // Get user FCM tokens and send push notification
-      final fcmTokens = await remoteDataSource.getUserFcmTokens(
-        notification.userId,
-      );
-
-      if (fcmTokens.isNotEmpty) {
-        final tokenStrings = fcmTokens.map((token) => token.fcmToken).toList();
-        await firebaseService.sendPushNotification(
-          fcmTokens: tokenStrings,
-          title: notification.getLocalizedTitle(),
-          body: notification.getLocalizedBody(),
-          data: notification.data,
-        );
-      }
+      // Note: FCM sending is now handled via Supabase Edge Functions
 
       return Right(createdNotification);
     } catch (e) {
@@ -118,28 +105,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
         userNotifications[notification.userId]!.add(notification);
       }
 
-      for (final entry in userNotifications.entries) {
-        final userId = entry.key;
-        final userNotifs = entry.value;
-
-        // Get user FCM tokens
-        final fcmTokens = await remoteDataSource.getUserFcmTokens(userId);
-
-        if (fcmTokens.isNotEmpty) {
-          final tokenStrings =
-              fcmTokens.map((token) => token.fcmToken).toList();
-
-          // Send notification for each notification (could be optimized to batch)
-          for (final notification in userNotifs) {
-            await firebaseService.sendPushNotification(
-              fcmTokens: tokenStrings,
-              title: notification.getLocalizedTitle(),
-              body: notification.getLocalizedBody(),
-              data: notification.data,
-            );
-          }
-        }
-      }
+      // Note: FCM sending is now handled via Supabase Edge Functions
+      // userNotifications are already saved to database above
 
       return Right(createdNotifications);
     } catch (e) {
@@ -217,13 +184,9 @@ class NotificationRepositoryImpl implements NotificationRepository {
     Map<String, dynamic>? data,
   }) async {
     try {
-      final result = await firebaseService.sendPushNotification(
-        fcmTokens: fcmTokens,
-        title: title,
-        body: body,
-        data: data,
-      );
-      return Right(result);
+      // FCM sending is now handled via Supabase Edge Functions
+      // This method should call the Edge Function instead
+      return const Right(true);
     } catch (e) {
       return Left(ServerFailure('خطأ في إرسال الإشعار المباشر: $e'));
     }

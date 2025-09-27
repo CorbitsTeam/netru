@@ -87,7 +87,20 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
       return response as int;
     } catch (e) {
-      throw Exception('خطأ في جلب عدد الإشعارات غير المقروءة: $e');
+      // Fallback to direct query if function doesn't exist
+      try {
+        final response = await supabaseClient
+            .from('notifications')
+            .select()
+            .eq('user_id', userId)
+            .eq('is_read', false);
+
+        return (response as List).length;
+      } catch (fallbackError) {
+        throw Exception(
+          'خطأ في جلب عدد الإشعارات غير المقروءة: $fallbackError',
+        );
+      }
     }
   }
 
@@ -101,7 +114,20 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
       return true;
     } catch (e) {
-      throw Exception('خطأ في تحديث حالة الإشعار: $e');
+      // Fallback to direct update if function doesn't exist
+      try {
+        await supabaseClient
+            .from('notifications')
+            .update({
+              'is_read': true,
+              'read_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', notificationId);
+
+        return true;
+      } catch (fallbackError) {
+        throw Exception('خطأ في تحديث حالة الإشعار: $fallbackError');
+      }
     }
   }
 
@@ -115,7 +141,21 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
       return true;
     } catch (e) {
-      throw Exception('خطأ في تحديث جميع الإشعارات: $e');
+      // Fallback to direct update if function doesn't exist
+      try {
+        await supabaseClient
+            .from('notifications')
+            .update({
+              'is_read': true,
+              'read_at': DateTime.now().toIso8601String(),
+            })
+            .eq('user_id', userId)
+            .eq('is_read', false);
+
+        return true;
+      } catch (fallbackError) {
+        throw Exception('خطأ في تحديث جميع الإشعارات: $fallbackError');
+      }
     }
   }
 

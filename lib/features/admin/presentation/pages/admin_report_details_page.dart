@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,13 +20,21 @@ import '../cubit/admin_reports_cubit.dart';
 import '../../../reports/presentation/services/professional_egyptian_pdf_service.dart';
 import '../../../reports/domain/entities/reports_entity.dart';
 import '../../../reports/presentation/widgets/enhanced_status_tracker.dart';
-import '../../../reports/presentation/widgets/report_media_viewer.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AdminReportDetailsPage extends StatefulWidget {
   final AdminReportEntity report;
+  // Optional: reuse existing AdminReportsCubit from the list page so actions
+  // taken here (status updates / assign / verify) refresh the list without
+  // needing a manual refresh.
+  final AdminReportsCubit? adminReportsCubit;
 
-  const AdminReportDetailsPage({super.key, required this.report});
+  const AdminReportDetailsPage({
+    super.key,
+    required this.report,
+    this.adminReportsCubit,
+  });
 
   @override
   State<AdminReportDetailsPage> createState() => _AdminReportDetailsPageState();
@@ -93,6 +103,20 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // If a cubit was passed from the list page, reuse it via BlocProvider.value
+    // so both pages share the same state and updates will reflect immediately.
+    if (widget.adminReportsCubit != null) {
+      return BlocProvider.value(
+        value: widget.adminReportsCubit!,
+        child: Scaffold(
+          backgroundColor: Colors.grey[50],
+          appBar: _buildAppBar(),
+          body: _buildBody(),
+          floatingActionButton: _buildFloatingActionMenu(),
+        ),
+      );
+    }
+
     return BlocProvider<AdminReportsCubit>(
       create: (_) => di.sl<AdminReportsCubit>(),
       child: Scaffold(
@@ -135,7 +159,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       ),
       actions: [
         Container(
-          margin: EdgeInsets.only(right: 12.w),
+          margin: EdgeInsetsDirectional.only(end: 12.w),
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: _getStatusColor(widget.report.reportStatus).withOpacity(0.1),
@@ -165,111 +189,37 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(10.w),
+          padding: EdgeInsets.all(12.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Report Header Card
-              _buildReportHeaderCard(),
-              SizedBox(height: 10.h),
+              // Main Report Summary Card
+              _buildMainSummaryCard(),
+              SizedBox(height: 16.h),
 
-              // Reporter Information Card
-              _buildReporterInfoCard(),
-              SizedBox(height: 10.h),
+              // Quick Actions Row
+              _buildQuickActionsRow(),
+              SizedBox(height: 16.h),
 
-              // User Profile Loading Indicator
-              if (isLoadingUserProfile) ...[
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-                SizedBox(height: 16.h),
-              ],
+              // Expandable Sections
+              _buildExpandableReporterSection(),
+              SizedBox(height: 12.h),
 
-              // Report Details Card
-              _buildReportDetailsCard(),
-              SizedBox(height: 10.h),
+              _buildExpandableDetailsSection(),
+              SizedBox(height: 12.h),
 
-              // Enhanced Status Tracker
-              _buildAdminStatusTracker(),
-              SizedBox(height: 10.h),
+              if (widget.report.media.isNotEmpty ||
+                  (widget.report.incidentLocationLatitude != null &&
+                      widget.report.incidentLocationLongitude != null))
+                _buildExpandableMediaLocationSection(),
+              SizedBox(height: 12.h),
 
-              // Status Progression Buttons
-              _buildStatusProgressionButtons(),
-              SizedBox(height: 10.h),
+              _buildExpandableStatusSection(),
+              SizedBox(height: 12.h),
 
-              // Location Information Card
-              if (widget.report.incidentLocationLatitude != null &&
-                  widget.report.incidentLocationLongitude != null) ...[
-                _buildLocationCard(),
-                SizedBox(height: 10.h),
-              ],
+              _buildExpandableNotesSection(),
 
-              // Media Cards - عرض الوسائط المرفقة
-              if (widget.report.media.isNotEmpty) ...[
-                // استخدام ReportMediaViewer لكل وسائط
-                ...widget.report.media.map(
-                  (media) => Padding(
-                    padding: EdgeInsets.only(bottom: 16.h),
-                    child: ReportMediaViewer(
-                      mediaUrl: _resolveMediaUrl(media.fileUrl),
-                      mediaType: media.mimeType ?? media.mediaType.name,
-                    ),
-                  ),
-                ),
-              ] else ...[
-                // عرض رسالة عندما لا توجد وسائط
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: Colors.grey[200]!),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.image_not_supported_outlined,
-                        size: 32.sp,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        'لا توجد وسائط مرفقة',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h),
-              ],
-
-              // Admin Notes Card
-              _buildAdminNotesCard(),
-              SizedBox(height: 10.h),
-
-              // Status History Card
-              if (widget.report.statusHistory.isNotEmpty) ...[
-                _buildStatusHistoryCard(),
-                SizedBox(height: 10.h),
-              ],
-
-              // Comments Card
-              if (widget.report.comments.isNotEmpty) ...[
-                _buildCommentsCard(),
-                SizedBox(height: 10.h),
-              ],
-
-              SizedBox(height: 80.h), // Space for floating button
+              SizedBox(height: 100.h), // Space for floating button
             ],
           ),
         ),
@@ -277,10 +227,10 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
     );
   }
 
-  Widget _buildReportHeaderCard() {
+  // New enhanced UI components
+  Widget _buildMainSummaryCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -288,292 +238,2044 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             AppColors.primaryColor.withOpacity(0.8),
           ],
         ),
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryColor.withOpacity(0.3),
             spreadRadius: 0,
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Icon(Icons.assignment, color: Colors.white, size: 28.sp),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Header with reporter info
+          Container(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'رقم البلاغ',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
+                    // Report icon and number
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Icon(
+                        Icons.assignment,
+                        color: Colors.white,
+                        size: 32.sp,
                       ),
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      '#${widget.report.id.substring(0, 8)}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'بلاغ #${widget.report.id.substring(0, 8).toUpperCase()}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            '${widget.report.reporterFirstName} ${widget.report.reporterLastName}',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Status badge
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(
+                          widget.report.reportStatus,
+                        ).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        widget.report.reportStatus.arabicName,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 6.h,
+                SizedBox(height: 20.h),
+
+                // Quick info row
+                Row(
+                  children: [
+                    _buildQuickInfoItem(
+                      Icons.category,
+                      'نوع البلاغ',
+                      widget.report.reportTypeCustom ?? 'غير محدد',
                     ),
-                    decoration: BoxDecoration(
-                      color: _getPriorityColor(widget.report.priorityLevel),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Text(
+                    SizedBox(width: 16.w),
+                    _buildQuickInfoItem(
+                      Icons.priority_high,
+                      'الأولوية',
                       widget.report.priorityLevel.arabicName,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
                     ),
-                  ),
-                  SizedBox(height: 8.h),
-                  if (widget.report.caseNumber != null)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        'رقم القضية: ${widget.report.caseNumber}',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    _buildQuickInfoItem(
+                      Icons.access_time,
+                      'تاريخ الإبلاغ',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(widget.report.submittedAt),
                     ),
-                ],
-              ),
-            ],
+                    SizedBox(width: 16.w),
+                    if (widget.report.caseNumber != null)
+                      _buildQuickInfoItem(
+                        Icons.confirmation_number,
+                        'رقم القضية',
+                        widget.report.caseNumber!,
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 16.h),
+
+          // Report details preview
           Container(
             width: double.infinity,
+            margin: EdgeInsets.symmetric(horizontal: 20.w),
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'نوع البلاغ',
+                  'تفاصيل البلاغ:',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  widget.report.reportTypeName ?? 'غير محدد',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 12.h),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      color: Colors.white.withOpacity(0.9),
-                      size: 16.sp,
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      'تم الإبلاغ: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(widget.report.submittedAt)}',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                if (widget.report.incidentDateTime != null) ...[
-                  SizedBox(height: 8.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.event,
-                        color: Colors.white.withOpacity(0.9),
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        'وقت الحادثة: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(widget.report.incidentDateTime!)}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                SizedBox(height: 8.h),
+                Text(
+                  widget.report.reportDetails.length > 150
+                      ? '${widget.report.reportDetails.substring(0, 150)}...'
+                      : widget.report.reportDetails,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    height: 1.4,
                   ),
-                ],
+                ),
               ],
             ),
           ),
+          SizedBox(height: 20.h),
         ],
       ),
     );
   }
 
-  Widget _buildReporterInfoCard() {
-    // If we have full user profile, show it instead of basic reporter info
-    if (userProfile != null) {
-      return _buildEnhancedUserProfileCard();
-    }
+  Widget _buildQuickInfoItem(IconData icon, String label, String value) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Colors.white.withOpacity(0.8), size: 16.sp),
+                SizedBox(width: 6.w),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              value,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-    // Fallback to basic reporter info from report data
+  Widget _buildQuickActionsRow() {
+    return Row(
+      children: [
+        // Status progression
+        // if (_canProgressStatus())
+        //   Expanded(
+        //     flex: 2,
+        //     child: _buildQuickActionButton(
+        //       icon: Icons.trending_up,
+        //       label: 'تقدم الحالة',
+        //       color: Colors.green,
+        //       onTap: _showProgressDialog,
+        //     ),
+        //   ),
+        if (_canProgressStatus()) SizedBox(width: 12.w),
+
+        // Location button
+        if (widget.report.incidentLocationLatitude != null)
+          Expanded(
+            child: _buildQuickActionButton(
+              icon: Icons.map,
+              label: 'الموقع',
+              color: Colors.blue,
+              onTap: _openInGoogleMaps,
+            ),
+          ),
+
+        SizedBox(width: 12.w),
+
+        // Identity Card button
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.perm_identity,
+            label: 'بطاقة الهوية',
+            color: Colors.orange,
+            onTap: _showIdentityDocumentsForReporter,
+          ),
+        ),
+
+        SizedBox(width: 12.w),
+
+        // PDF button
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.picture_as_pdf,
+            label: 'PDF',
+            color: Colors.red,
+            onTap: _openPDF,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24.sp),
+            SizedBox(height: 6.h),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Expandable Sections
+  Widget _buildExpandableReporterSection() {
+    return _buildExpandableCard(
+      title: 'بيانات المُبلغ',
+      icon: Icons.person,
+      color: Colors.blue,
+      child:
+          isLoadingUserProfile
+              ? Container(
+                height: 100.h,
+                child: const Center(child: CircularProgressIndicator()),
+              )
+              : userProfile != null
+              ? _buildEnhancedUserProfileCardContent()
+              : _buildBasicReporterInfoContent(),
+    );
+  }
+
+  Widget _buildExpandableDetailsSection() {
+    return _buildExpandableCard(
+      title: 'تفاصيل البلاغ',
+      icon: Icons.description,
+      color: AppColors.primaryColor,
+      child: _buildReportDetailsContent(),
+    );
+  }
+
+  Widget _buildExpandableMediaLocationSection() {
+    return _buildExpandableCard(
+      title: 'الوسائط والموقع',
+      icon: Icons.perm_media,
+      color: Colors.purple,
+      child: Column(
+        children: [
+          // Location section
+          if (widget.report.incidentLocationLatitude != null &&
+              widget.report.incidentLocationLongitude != null) ...[
+            _buildLocationContent(),
+            if (widget.report.media.isNotEmpty) SizedBox(height: 16.h),
+          ],
+
+          // Media section
+          if (widget.report.media.isNotEmpty) ...[
+            _buildMediaContent(),
+          ] else if (widget.report.incidentLocationLatitude == null ||
+              widget.report.incidentLocationLongitude == null) ...[
+            Container(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 48.sp,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'لا توجد وسائط أو موقع مرفق',
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandableStatusSection() {
+    return _buildExpandableCard(
+      title: 'حالة ومتابعة البلاغ',
+      icon: Icons.trending_up,
+      color: Colors.green,
+      child: Column(
+        children: [
+          _buildAdminStatusTracker(),
+          SizedBox(height: 16.h),
+          _buildStatusProgressionButtons(),
+          if (widget.report.statusHistory.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            _buildStatusHistoryContent(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandableNotesSection() {
+    return _buildExpandableCard(
+      title: 'الملاحظات والتعليقات',
+      icon: Icons.comment,
+      color: Colors.orange,
+      child: Column(
+        children: [
+          _buildAdminNotesContent(),
+          if (widget.report.comments.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            _buildCommentsContent(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandableCard({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required Widget child,
+  }) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.person,
-                  color: AppColors.primaryColor,
-                  size: 24.sp,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Text(
-                'بيانات مقدم البلاغ (أساسية)',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const Spacer(),
-              if (widget.report.isAnonymous)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Text(
-                    'مجهول',
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                  ),
-                ),
-            ],
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          leading: Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(icon, color: color, size: 20.sp),
           ),
-          SizedBox(height: 20.h),
-          _buildInfoRow(
-            'الاسم الكامل',
-            '${widget.report.reporterFirstName} ${widget.report.reporterLastName}',
-            Icons.person_outline,
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-          SizedBox(height: 16.h),
-          _buildInfoRow(
-            'رقم الهوية الوطنية',
-            widget.report.reporterNationalId,
-            Icons.credit_card,
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoRow('رقم الهاتف', widget.report.reporterPhone, Icons.phone),
-          if (widget.report.assignedTo != null) ...[
-            SizedBox(height: 16.h),
-            Divider(color: Colors.grey[300]),
-            SizedBox(height: 16.h),
-            _buildInfoRow(
-              'مُحال إلى',
-              widget.report.assignedToName ?? 'غير محدد',
-              Icons.assignment_ind,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
+              child: child,
             ),
           ],
+        ),
+      ),
+    );
+  }
 
-          // Warning about limited data
+  // Content methods for expandable sections
+  Widget _buildBasicReporterInfoContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRow(
+          'الاسم الكامل',
+          '${widget.report.reporterFirstName} ${widget.report.reporterLastName}',
+          Icons.person_outline,
+        ),
+        SizedBox(height: 16.h),
+        _buildInfoRow(
+          'رقم الهوية',
+          widget.report.reporterNationalId,
+          Icons.credit_card,
+        ),
+        SizedBox(height: 16.h),
+        _buildInfoRow('رقم الهاتف', widget.report.reporterPhone, Icons.phone),
+        SizedBox(height: 16.h),
+        // Prominent button to show identity documents (ID front/back)
+        Container(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _showIdentityDocumentsForReporter,
+            icon: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(Icons.perm_identity, size: 20.sp),
+            ),
+            label: Text(
+              'عرض صور البطاقة الشخصية',
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              elevation: 4,
+              shadowColor: Colors.orange.withOpacity(0.3),
+            ),
+          ),
+        ),
+        // Inline small previews of identity documents (visible in the reporter section)
+        SizedBox(height: 8.h),
+        _buildInlineIdentityDocs(),
+        if (widget.report.isAnonymous) ...[
           SizedBox(height: 16.h),
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
               color: Colors.orange.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.orange.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.orange, size: 16.sp),
+                Icon(Icons.visibility_off, color: Colors.orange, size: 20.sp),
                 SizedBox(width: 8.w),
-                Expanded(
-                  child: Text(
-                    'لا يمكن تحميل بيانات المستخدم الكاملة. يتم عرض البيانات الأساسية فقط.',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.orange[700],
-                    ),
+                Text(
+                  'بلاغ مجهول الهوية',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange[700],
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  void _showIdentityDocumentsForReporter() {
+    // Collect identity documents from userProfile if available
+    String? frontImageUrl;
+    String? backImageUrl;
+    String docType = 'البطاقة الشخصية';
+
+    if (userProfile != null && userProfile!.identityDocuments.isNotEmpty) {
+      final doc = userProfile!.identityDocuments.first;
+      frontImageUrl = doc.frontImageUrl;
+      backImageUrl = doc.backImageUrl;
+      docType = _getDocumentTypeArabic(doc.docType.toString().split('.').last);
+    }
+
+    // Fallback: try to detect media in report.media that look like ID images
+    if ((frontImageUrl == null && backImageUrl == null) &&
+        widget.report.media.isNotEmpty) {
+      final idKeywords = [
+        'id',
+        'card',
+        'identity',
+        'national',
+        'بطاقة',
+        'هويه',
+        'هوية',
+      ];
+      for (final m in widget.report.media) {
+        final fname = (m.fileName ?? m.fileUrl).toLowerCase();
+        final desc = (m.description ?? '').toLowerCase();
+        if (idKeywords.any((k) => fname.contains(k) || desc.contains(k))) {
+          if (fname.contains('front') ||
+              fname.contains('أمام') ||
+              desc.contains('front') ||
+              desc.contains('أمام')) {
+            frontImageUrl = _resolveMediaUrl(m.fileUrl);
+          } else if (fname.contains('back') ||
+              fname.contains('ظهر') ||
+              desc.contains('back') ||
+              desc.contains('ظهر')) {
+            backImageUrl = _resolveMediaUrl(m.fileUrl);
+          } else {
+            // If no specific side detected, assign to front if empty, otherwise back
+            if (frontImageUrl == null) {
+              frontImageUrl = _resolveMediaUrl(m.fileUrl);
+            } else if (backImageUrl == null) {
+              backImageUrl = _resolveMediaUrl(m.fileUrl);
+            }
+          }
+        }
+      }
+    }
+
+    if (frontImageUrl == null && backImageUrl == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا توجد صور إثبات الهوية متاحة')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.8,
+            maxChildSize: 0.95,
+            minChildSize: 0.5,
+            builder:
+                (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.r),
+                      topRight: Radius.circular(20.r),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 40.w,
+                        height: 4.h,
+                        margin: EdgeInsets.only(top: 12.h, bottom: 8.h),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2.r),
+                        ),
+                      ),
+
+                      // Header
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 16.h,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10.w),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Icon(
+                                Icons.perm_identity,
+                                color: Colors.blue,
+                                size: 24.sp,
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'بيانات هوية المُبلغ',
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Text(
+                                    docType,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: Icon(Icons.close, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Divider(color: Colors.grey[200], height: 1),
+
+                      // Content
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: scrollController,
+                          padding: EdgeInsets.all(20.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Reporter info summary
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(color: Colors.grey[200]!),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'معلومات المُبلغ',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    SizedBox(height: 12.h),
+                                    _buildInfoRowInBottomSheet(
+                                      'الاسم',
+                                      '${widget.report.reporterFirstName} ${widget.report.reporterLastName}',
+                                      Icons.person_outline,
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    _buildInfoRowInBottomSheet(
+                                      'رقم الهوية',
+                                      widget.report.reporterNationalId,
+                                      Icons.credit_card,
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    _buildInfoRowInBottomSheet(
+                                      'رقم الهاتف',
+                                      widget.report.reporterPhone,
+                                      Icons.phone,
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              SizedBox(height: 20.h),
+
+                              // Identity cards section
+                              Text(
+                                'صور البطاقة الشخصية',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+
+                              SizedBox(height: 16.h),
+
+                              // Front and Back cards
+                              if (frontImageUrl != null ||
+                                  backImageUrl != null) ...[
+                                Row(
+                                  children: [
+                                    // Front image
+                                    if (frontImageUrl != null)
+                                      Expanded(
+                                        child: _buildIdCardInBottomSheet(
+                                          imageUrl: frontImageUrl,
+                                          label: 'الوجه الأمامي',
+                                          icon: Icons.badge,
+                                        ),
+                                      ),
+
+                                    if (frontImageUrl != null &&
+                                        backImageUrl != null)
+                                      SizedBox(width: 12.w),
+
+                                    // Back image
+                                    if (backImageUrl != null)
+                                      Expanded(
+                                        child: _buildIdCardInBottomSheet(
+                                          imageUrl: backImageUrl,
+                                          label: 'الوجه الخلفي',
+                                          icon: Icons.badge_outlined,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+
+                                SizedBox(height: 20.h),
+
+                                // Action buttons
+                                Row(
+                                  children: [
+                                    if (frontImageUrl != null)
+                                      Expanded(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: OutlinedButton.icon(
+                                            onPressed:
+                                                () => _viewDocumentImage(
+                                                  frontImageUrl!,
+                                                  'الوجه الأمامي للبطاقة',
+                                                ),
+                                            icon: Icon(
+                                              Icons.zoom_in,
+                                              size: 18.sp,
+                                            ),
+                                            label: const Text('عرض الأمامي'),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: Colors.blue,
+                                              side: const BorderSide(
+                                                color: Colors.blue,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                    if (frontImageUrl != null &&
+                                        backImageUrl != null)
+                                      SizedBox(width: 12.w),
+
+                                    if (backImageUrl != null)
+                                      Expanded(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: OutlinedButton.icon(
+                                            onPressed:
+                                                () => _viewDocumentImage(
+                                                  backImageUrl!,
+                                                  'الوجه الخلفي للبطاقة',
+                                                ),
+                                            icon: Icon(
+                                              Icons.zoom_in,
+                                              size: 18.sp,
+                                            ),
+                                            label: const Text('عرض الخلفي'),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: Colors.blue,
+                                              side: const BorderSide(
+                                                color: Colors.blue,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ] else ...[
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(20.w),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.image_not_supported,
+                                        size: 48.sp,
+                                        color: Colors.grey[400],
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      Text(
+                                        'لا توجد صور بطاقة متاحة',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          ),
+    );
+  }
+
+  Widget _buildInfoRowInBottomSheet(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 16.sp, color: Colors.grey[600]),
+        SizedBox(width: 8.w),
+        Text(
+          '$label: ',
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 13.sp, color: Colors.black87),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIdCardInBottomSheet({
+    required String imageUrl,
+    required String label,
+    required IconData icon,
+  }) {
+    return GestureDetector(
+      onTap: () => _viewDocumentImage(imageUrl, label),
+      child: Container(
+        height: 180.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[300]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.r),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Image
+              Image.network(
+                _resolveMediaUrl(imageUrl),
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value:
+                            loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                        strokeWidth: 2,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                          size: 32.sp,
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'خطأ في تحميل الصورة',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              // Label overlay
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                    horizontal: 12.w,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.7),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: Colors.white, size: 16.sp),
+                      SizedBox(width: 6.w),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Tap indicator
+              Positioned(
+                top: 8.h,
+                right: 8.w,
+                child: Container(
+                  padding: EdgeInsets.all(4.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: Icon(Icons.zoom_in, color: Colors.white, size: 16.sp),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  /// Gather identity document items from user profile or fallback to report media
+  List<Map<String, dynamic>> _gatherIdentityDocs() {
+    final List<Map<String, dynamic>> docs = [];
+
+    if (userProfile != null && userProfile!.identityDocuments.isNotEmpty) {
+      for (final doc in userProfile!.identityDocuments) {
+        final docInfo = {
+          'type': 'profile',
+          'docType': doc.docType.toString().split('.').last,
+          'frontUrl': doc.frontImageUrl,
+          'backUrl': doc.backImageUrl,
+        };
+        docs.add(docInfo);
+      }
+    }
+
+    // Fallback: scan report media for likely id files
+    if (docs.isEmpty && widget.report.media.isNotEmpty) {
+      final idKeywords = [
+        'id',
+        'card',
+        'identity',
+        'national',
+        'بطاقة',
+        'هويه',
+        'هوية',
+      ];
+      String? frontUrl, backUrl;
+      for (final m in widget.report.media) {
+        final fname = (m.fileName ?? m.fileUrl).toLowerCase();
+        final desc = (m.description ?? '').toLowerCase();
+        if (idKeywords.any((k) => fname.contains(k) || desc.contains(k))) {
+          if (fname.contains('front') ||
+              fname.contains('امام') ||
+              desc.contains('امام')) {
+            frontUrl = _resolveMediaUrl(m.fileUrl);
+          } else if (fname.contains('back') ||
+              fname.contains('خلف') ||
+              desc.contains('خلف')) {
+            backUrl = _resolveMediaUrl(m.fileUrl);
+          } else {
+            // If no specific front/back indication, treat as front
+            frontUrl ??= _resolveMediaUrl(m.fileUrl);
+          }
+        }
+      }
+      if (frontUrl != null || backUrl != null) {
+        docs.add({
+          'type': 'media',
+          'docType': 'nationalId',
+          'frontUrl': frontUrl,
+          'backUrl': backUrl,
+        });
+      }
+    }
+
+    return docs;
+  }
+
+  /// Build professional identity card display showing front and back
+  Widget _buildInlineIdentityDocs() {
+    final docs = _gatherIdentityDocs();
+    if (docs.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 12.h),
+        // Header with icon
+        Row(
+          children: [
+            Icon(Icons.credit_card, size: 16.sp, color: Colors.blue),
+            SizedBox(width: 6.w),
+            Text(
+              'إثبات الهوية',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        // Identity cards display
+        ...docs.map((doc) => _buildIdentityCardWidget(doc)),
+      ],
+    );
+  }
+
+  /// Build a single identity document card widget
+  Widget _buildIdentityCardWidget(Map<String, dynamic> doc) {
+    final frontUrl = doc['frontUrl'] as String?;
+    final backUrl = doc['backUrl'] as String?;
+    final docType = doc['docType'] as String? ?? 'nationalId';
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.blue.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Document type header
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                child: Text(
+                  _getDocumentTypeArabic(docType),
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          // Front and back cards
+          Row(
+            children: [
+              // Front card
+              if (frontUrl != null)
+                Expanded(
+                  child: _buildIdCardSide(
+                    imageUrl: frontUrl,
+                    label: 'الوجه الأمامي',
+                    icon: Icons.credit_card,
+                  ),
+                ),
+              if (frontUrl != null && backUrl != null) SizedBox(width: 12.w),
+              // Back card
+              if (backUrl != null)
+                Expanded(
+                  child: _buildIdCardSide(
+                    imageUrl: backUrl,
+                    label: 'الوجه الخلفي',
+                    icon: Icons.flip_to_back,
+                  ),
+                ),
+            ],
+          ),
+          // If no images available
+          if (frontUrl == null && backUrl == null) ...[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.image_not_supported,
+                    size: 24.sp,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'لا توجد صور للهوية',
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Build individual ID card side (front or back)
+  Widget _buildIdCardSide({
+    required String imageUrl,
+    required String label,
+    required IconData icon,
+  }) {
+    return GestureDetector(
+      onTap: () => _viewDocumentImage(imageUrl, label),
+      child: Container(
+        height: 120.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: Colors.grey[300]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.r),
+          child: Stack(
+            children: [
+              // ID card image
+              Positioned.fill(
+                child: Image.network(
+                  _resolveMediaUrl(imageUrl),
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[100],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Colors.blue),
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.red[50],
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.broken_image,
+                              size: 24.sp,
+                              color: Colors.red[300],
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              'خطأ في التحميل',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: Colors.red[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Label overlay
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.8),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, size: 12.sp, color: Colors.white),
+                      SizedBox(width: 4.w),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Get Arabic name for document type
+  String _getDocumentTypeArabic(String docType) {
+    switch (docType) {
+      case 'nationalId':
+        return 'البطاقة الشخصية';
+      case 'passport':
+        return 'جواز السفر';
+      default:
+        return 'وثيقة إثبات هوية';
+    }
+  }
+
+  Widget _buildEnhancedUserProfileCardContent() {
+    if (userProfile == null) return _buildBasicReporterInfoContent();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Profile Image
+        if (userProfile!.profileImage != null) ...[
+          Center(
+            child: Container(
+              width: 80.w,
+              height: 80.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey[300]!, width: 2),
+                image: DecorationImage(
+                  image: NetworkImage(userProfile!.profileImage!),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+        ],
+
+        // Basic Info
+        _buildInfoRow('الاسم الكامل', userProfile!.fullName, Icons.person),
+        SizedBox(height: 12.h),
+        _buildInfoRow('البريد الإلكتروني', userProfile!.email, Icons.email),
+        SizedBox(height: 12.h),
+        _buildInfoRow(
+          'رقم الهاتف',
+          userProfile!.phone ?? 'غير محدد',
+          Icons.phone,
+        ),
+        SizedBox(height: 12.h),
+        _buildInfoRow(
+          'رقم الهوية',
+          userProfile!.nationalId ?? 'غير محدد',
+          Icons.credit_card,
+        ),
+
+        if (userProfile!.governorate != null) ...[
+          SizedBox(height: 12.h),
+          _buildInfoRow(
+            'المحافظة',
+            userProfile!.governorate!,
+            Icons.location_city,
+          ),
+        ],
+
+        // Statistics
+        SizedBox(height: 16.h),
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Row(
+            children: [
+              _buildStatCard(
+                'إجمالي',
+                userProfile!.totalReportsCount.toString(),
+                Colors.blue,
+              ),
+              SizedBox(width: 12.w),
+              _buildStatCard(
+                'معلقة',
+                userProfile!.pendingReportsCount.toString(),
+                Colors.orange,
+              ),
+              SizedBox(width: 12.w),
+              _buildStatCard(
+                'محلولة',
+                userProfile!.resolvedReportsCount.toString(),
+                Colors.green,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReportDetailsContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Text(
+            widget.report.reportDetails,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.black87,
+              height: 1.5,
+            ),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          children: [
+            Icon(Icons.update, color: Colors.grey[600], size: 16.sp),
+            SizedBox(width: 6.w),
+            Text(
+              'آخر تحديث: ${DateFormat('dd/MM/yyyy - HH:mm', 'ar').format(widget.report.updatedAt)}',
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.location_on, color: Colors.green, size: 18.sp),
+            SizedBox(width: 8.w),
+            Text(
+              'موقع الحادثة',
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        if (widget.report.incidentLocationAddress != null) ...[
+          Text(
+            widget.report.incidentLocationAddress!,
+            style: TextStyle(fontSize: 12.sp),
+          ),
+          SizedBox(height: 8.h),
+        ],
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'خط العرض',
+                    style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                  ),
+                  Text(
+                    widget.report.incidentLocationLatitude!.toStringAsFixed(6),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'خط الطول',
+                    style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                  ),
+                  Text(
+                    widget.report.incidentLocationLongitude!.toStringAsFixed(6),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _openInGoogleMaps,
+                icon: Icon(Icons.map, size: 14.sp),
+                label: Text('خرائط جوجل', style: TextStyle(fontSize: 11.sp)),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _copyCoordinates,
+                icon: Icon(Icons.copy, size: 14.sp),
+                label: Text(
+                  'نسخ الإحداثيات',
+                  style: TextStyle(fontSize: 11.sp),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  side: const BorderSide(color: Colors.blue),
+                  foregroundColor: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMediaContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.perm_media, color: Colors.purple, size: 18.sp),
+            SizedBox(width: 8.w),
+            Text(
+              'الوسائط المرفقة',
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Text(
+                '${widget.report.media.length} ملف',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+
+        // Show media grid if there are media files
+        if (widget.report.media.isNotEmpty) ...[
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 1.2,
+            ),
+            itemCount: widget.report.media.length,
+            itemBuilder: (context, index) {
+              final media = widget.report.media[index];
+              return _buildMediaItem(media);
+            },
+          ),
+        ] else ...[
+          // Show "no media" message
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.image_not_supported_outlined,
+                  size: 48.sp,
+                  color: Colors.grey[400],
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  'لا توجد وسائط مرفقة',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'لم يتم إرفاق أي صور أو فيديوهات مع هذا البلاغ',
+                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[500]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStatusHistoryContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'سجل الحالات',
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 12.h),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.report.statusHistory.length,
+          separatorBuilder: (context, index) => SizedBox(height: 8.h),
+          itemBuilder: (context, index) {
+            final history = widget.report.statusHistory[index];
+            return _buildStatusHistoryItem(history);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAdminNotesContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.report.adminNotes != null) ...[
+          Text(
+            'ملاحظات داخلية:',
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.orange,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.orange.withOpacity(0.2)),
+            ),
+            child: Text(
+              widget.report.adminNotes!,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ] else ...[
+          Text(
+            'لا توجد ملاحظات داخلية',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[600],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+
+        SizedBox(height: 16.h),
+
+        if (widget.report.publicNotes != null) ...[
+          Text(
+            'ملاحظات عامة:',
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.green,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.green.withOpacity(0.2)),
+            ),
+            child: Text(
+              widget.report.publicNotes!,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ] else ...[
+          Text(
+            'لا توجد ملاحظات عامة',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[600],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCommentsContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'التعليقات',
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: Colors.teal.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Text(
+                '${widget.report.comments.length} تعليق',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.report.comments.length,
+          separatorBuilder: (context, index) => SizedBox(height: 8.h),
+          itemBuilder: (context, index) {
+            final comment = widget.report.comments[index];
+            return _buildCommentItem(comment);
+          },
+        ),
+      ],
+    );
+  }
+
+  // Helper methods for new UI
+  bool _canProgressStatus() {
+    return widget.report.reportStatus != AdminReportStatus.rejected &&
+        widget.report.reportStatus != AdminReportStatus.resolved &&
+        widget.report.reportStatus != AdminReportStatus.closed;
+  }
+
+  void _showProgressDialog() {
+    final statusOrder = [
+      ReportStatus.received,
+      ReportStatus.underReview,
+      ReportStatus.dataVerification,
+      ReportStatus.actionTaken,
+      ReportStatus.completed,
+    ];
+
+    final currentReportStatus = _convertAdminStatusToReportStatus(
+      widget.report.reportStatus,
+    );
+    final currentIndex = statusOrder.indexOf(currentReportStatus);
+
+    if (currentIndex < statusOrder.length - 1) {
+      final nextStatus = statusOrder[currentIndex + 1];
+      _progressToStatus(nextStatus);
+    }
+  }
+
+  Widget _buildMediaItem(ReportMediaEntity media) {
+    return GestureDetector(
+      onTap: () => _viewMedia(media),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12.r),
+                    topRight: Radius.circular(12.r),
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12.r),
+                    topRight: Radius.circular(12.r),
+                  ),
+                  child:
+                      media.mediaType == MediaType.image
+                          ? Image.network(
+                            _resolveMediaUrl(media.fileUrl),
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.red[50],
+                                child: Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: Colors.red[300],
+                                    size: 32.sp,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                          : Container(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: Icon(
+                                media.mediaType == MediaType.video
+                                    ? Icons.play_circle_outline
+                                    : Icons.insert_drive_file,
+                                size: 32.sp,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12.r),
+                  bottomRight: Radius.circular(12.r),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    media.mediaType.name.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  if (media.fileName != null) ...[
+                    SizedBox(height: 2.h),
+                    Text(
+                      media.fileName!.length > 15
+                          ? '${media.fileName!.substring(0, 15)}...'
+                          : media.fileName!,
+                      style: TextStyle(fontSize: 9.sp, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _viewMedia(ReportMediaEntity media) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog.fullscreen(
+            backgroundColor: Colors.black87,
+            child: Stack(
+              children: [
+                Center(
+                  child: InteractiveViewer(
+                    child:
+                        media.mediaType == MediaType.image
+                            ? Image.network(
+                              _resolveMediaUrl(media.fileUrl),
+                              fit: BoxFit.contain,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.broken_image,
+                                        size: 64.sp,
+                                        color: Colors.white54,
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      Text(
+                                        'خطأ في تحميل الصورة',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )
+                            : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.play_circle_outline,
+                                    size: 64.sp,
+                                    color: Colors.white54,
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    'فيديو - اضغط لفتح في تطبيق خارجي',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16.sp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                  ),
+                ),
+                Positioned(
+                  top: 40.h,
+                  right: 20.w,
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
     );
   }
 
@@ -1632,8 +3334,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                       isPrimary: isNextStep,
                     ),
                   );
-                })
-                ,
+                }),
           ] else ...[
             Container(
               width: double.infinity,
@@ -1912,21 +3613,22 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                   icon: Icon(Icons.map, size: 14.sp),
                   label: Text('خرائط جوجل', style: TextStyle(fontSize: 11.sp)),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 6.h),
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                   ),
                 ),
               ),
               SizedBox(width: 8.w),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: _copyCoordinates,
-                  icon: Icon(Icons.copy, size: 14.sp),
-                  label: Text(
-                    'نسخ الإحداثيات',
-                    style: TextStyle(fontSize: 11.sp),
-                  ),
+                  onPressed: _showLocationOptions,
+                  icon: Icon(Icons.more_horiz, size: 14.sp),
+                  label: Text('خيارات أكثر', style: TextStyle(fontSize: 11.sp)),
                   style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 6.h),
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    side: const BorderSide(color: Colors.blue),
+                    foregroundColor: Colors.blue,
                   ),
                 ),
               ),
@@ -2796,19 +4498,6 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
     }
   }
 
-  Color _getPriorityColor(PriorityLevel priority) {
-    switch (priority) {
-      case PriorityLevel.low:
-        return Colors.green;
-      case PriorityLevel.medium:
-        return Colors.orange;
-      case PriorityLevel.high:
-        return Colors.red;
-      case PriorityLevel.urgent:
-        return Colors.deepPurple;
-    }
-  }
-
   Color _getVerificationStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'verified':
@@ -2938,6 +4627,19 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
     final confirmed = await _showProgressConfirmationDialog(newStatus);
     if (!confirmed) return;
 
+    // Resolve cubit safely: prefer injected cubit, then context provider, then service locator fallback
+    AdminReportsCubit cubit;
+    if (widget.adminReportsCubit != null) {
+      cubit = widget.adminReportsCubit!;
+    } else {
+      try {
+        cubit = context.read<AdminReportsCubit>();
+      } catch (_) {
+        // Fallback to service locator if provider is not available in this context
+        cubit = di.sl<AdminReportsCubit>();
+      }
+    }
+
     try {
       // Show loading
       showDialog(
@@ -2946,15 +4648,15 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
-      // Update status using the cubit
-      await context.read<AdminReportsCubit>().updateReportStatusById(
+      // Update status using the resolved cubit
+      await cubit.updateReportStatusById(
         widget.report.id,
         adminStatus,
         notes: 'تم الانتقال إلى: ${newStatus.arabicName}',
       );
 
       // Hide loading
-      Navigator.pop(context);
+      if (Navigator.canPop(context)) Navigator.pop(context);
 
       // Show success message
       if (mounted) {
@@ -2984,6 +4686,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         Navigator.pop(context);
       }
 
+      log('خطأ في تحديث الحالة: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -2999,6 +4702,18 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
     final confirmed = await _showRejectConfirmationDialog();
     if (!confirmed) return;
 
+    // Resolve cubit safely as above
+    AdminReportsCubit cubit;
+    if (widget.adminReportsCubit != null) {
+      cubit = widget.adminReportsCubit!;
+    } else {
+      try {
+        cubit = context.read<AdminReportsCubit>();
+      } catch (_) {
+        cubit = di.sl<AdminReportsCubit>();
+      }
+    }
+
     try {
       // Show loading
       showDialog(
@@ -3008,13 +4723,13 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       );
 
       // Update status to rejected
-      await context.read<AdminReportsCubit>().rejectReport(
+      await cubit.rejectReport(
         widget.report.id,
         notes: 'تم رفض البلاغ من قبل الإدارة',
       );
 
       // Hide loading
-      Navigator.pop(context);
+      if (Navigator.canPop(context)) Navigator.pop(context);
 
       // Show success message
       if (mounted) {
@@ -3143,130 +4858,234 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         false;
   }
 
-  // Action methods
+  // Enhanced location methods
   void _openInGoogleMaps() async {
+    final lat = widget.report.incidentLocationLatitude;
+    final lng = widget.report.incidentLocationLongitude;
+
+    if (lat == null || lng == null) {
+      _showLocationError('معلومات الموقع غير متوفرة');
+      return;
+    }
+
+    // Basic validation
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      _showLocationError('إحداثيات غير صحيحة');
+      return;
+    }
+
+    final latStr = lat.toStringAsFixed(6);
+    final lngStr = lng.toStringAsFixed(6);
+    final googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latStr,$lngStr';
+
+    try {
+      final uri = Uri.parse(googleMapsUrl);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        _showLocationError('فشل في فتح تطبيق الخرائط');
+      }
+    } catch (e) {
+      _showLocationError('حدث خطأ أثناء فتح الخرائط: $e');
+    }
+  }
+
+  void _showLocationError(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    message.split('\n').first,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (message.contains('\n')) ...[
+              SizedBox(height: 4.h),
+              Text(
+                message.split('\n').skip(1).join('\n'),
+                style: TextStyle(fontSize: 12.sp, color: Colors.white70),
+              ),
+            ],
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        action: SnackBarAction(
+          label: 'نسخ الإحداثيات',
+          textColor: Colors.white,
+          onPressed: _copyCoordinates,
+        ),
+      ),
+    );
+  }
+
+  void _showLocationOptions() {
     if (widget.report.incidentLocationLatitude == null ||
         widget.report.incidentLocationLongitude == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('معلومات الموقع غير متوفرة'),
-            backgroundColor: Colors.orange,
+      _showLocationError('معلومات الموقع غير متوفرة');
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 8.h),
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'خيارات الموقع',
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+
+                      // Google Maps
+                      _buildLocationOption(
+                        icon: Icons.map,
+                        title: 'فتح في خرائط جوجل',
+                        subtitle: 'عرض الموقع في تطبيق الخرائط',
+                        color: Colors.blue,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openInGoogleMaps();
+                        },
+                      ),
+
+                      // Copy coordinates
+                      _buildLocationOption(
+                        icon: Icons.copy,
+                        title: 'نسخ الإحداثيات',
+                        subtitle: 'نسخ خط العرض وخط الطول',
+                        color: Colors.orange,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _copyCoordinates();
+                        },
+                      ),
+
+                      // Share location
+                      _buildLocationOption(
+                        icon: Icons.share_location,
+                        title: 'مشاركة الموقع',
+                        subtitle: 'مشاركة إحداثيات الموقع',
+                        color: Colors.green,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _shareLocation();
+                        },
+                      ),
+
+                      SizedBox(height: 10.h),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        );
-      }
+    );
+  }
+
+  Widget _buildLocationOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: EdgeInsets.all(10.w),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Icon(icon, color: color, size: 22.sp),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+      ),
+      onTap: onTap,
+    );
+  }
+
+  void _shareLocation() async {
+    if (widget.report.incidentLocationLatitude == null ||
+        widget.report.incidentLocationLongitude == null) {
       return;
     }
 
     final lat = widget.report.incidentLocationLatitude!;
     final lng = widget.report.incidentLocationLongitude!;
+    final locationText =
+        'موقع البلاغ #${widget.report.id.substring(0, 8)}\n'
+        'خط العرض: $lat\n'
+        'خط الطول: $lng\n'
+        'رابط الخريطة: https://www.google.com/maps/search/?api=1&query=$lat,$lng';
 
-    // أولاً محاولة فتح تطبيق خرائط جوجل المثبت على الهاتف
-    final googleMapsAppUrl =
-        'comgooglemaps://?center=$lat,$lng&zoom=15&q=$lat,$lng';
-
-    // للأندرويد: geo: protocol أو تطبيق خرائط جوجل
-    final androidGoogleMapsUrl = 'google.navigation:q=$lat,$lng&mode=d';
-
-    // لل iOS: خرائط أبل
-    final appleMapsUrl = 'http://maps.apple.com/?ll=$lat,$lng&q=الموقع&z=15';
-
-    // Web fallback URLs
-    final webUrls = [
-      'https://www.google.com/maps/search/?api=1&query=$lat,$lng&zoom=15',
-      'https://maps.google.com/?q=$lat,$lng&zoom=15',
-      'https://www.google.com/maps/@$lat,$lng,15z',
-    ];
-
-    bool launched = false;
-
-    // محاولة فتح تطبيق خرائط جوجل أولاً
     try {
-      if (await canLaunchUrl(Uri.parse(googleMapsAppUrl))) {
-        await launchUrl(
-          Uri.parse(googleMapsAppUrl),
-          mode: LaunchMode.externalApplication,
-        );
-        launched = true;
-      }
+      await Share.share(locationText, subject: 'موقع البلاغ');
     } catch (e) {
-      // تجاهل الخطأ ومتابعة المحاولات الأخرى
-    }
-
-    // إذا لم ينجح، جرب الأندرويد URL
-    if (!launched) {
-      try {
-        if (await canLaunchUrl(Uri.parse(androidGoogleMapsUrl))) {
-          await launchUrl(
-            Uri.parse(androidGoogleMapsUrl),
-            mode: LaunchMode.externalApplication,
-          );
-          launched = true;
-        }
-      } catch (e) {
-        // تجاهل الخطأ ومتابعة المحاولات الأخرى
-      }
-    }
-
-    // إذا لم ينجح، جرب خرائط أبل (iOS)
-    if (!launched) {
-      try {
-        if (await canLaunchUrl(Uri.parse(appleMapsUrl))) {
-          await launchUrl(
-            Uri.parse(appleMapsUrl),
-            mode: LaunchMode.externalApplication,
-          );
-          launched = true;
-        }
-      } catch (e) {
-        // تجاهل الخطأ ومتابعة المحاولات الأخرى
-      }
-    }
-
-    // إذا لم تنجح التطبيقات، جرب URLs الويب
-    if (!launched) {
-      for (final url in webUrls) {
-        try {
-          if (await canLaunchUrl(Uri.parse(url))) {
-            await launchUrl(
-              Uri.parse(url),
-              mode: LaunchMode.externalApplication,
-            );
-            launched = true;
-            break;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-    }
-
-    if (!launched && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'لا يمكن فتح تطبيق الخرائط. تأكد من وجود تطبيق خرائط جوجل أو أي تطبيق خرائط آخر',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في مشاركة الموقع: $e'),
+            backgroundColor: Colors.red,
           ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8.w),
-              const Text('تم فتح الموقع في تطبيق الخرائط'),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -3278,37 +5097,54 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
 
     final lat = widget.report.incidentLocationLatitude!;
     final lng = widget.report.incidentLocationLongitude!;
-    final coordinates = '$lat, $lng';
+
+    // Create a more comprehensive coordinate text
+    final coordinatesText = '''خط العرض: ${lat.toStringAsFixed(6)}
+خط الطول: ${lng.toStringAsFixed(6)}
+الإحداثيات: ${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}
+رابط خرائط جوجل: https://www.google.com/maps/search/?api=1&query=${lat.toStringAsFixed(6)},${lng.toStringAsFixed(6)}''';
 
     try {
-      await Clipboard.setData(ClipboardData(text: coordinates));
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8.w),
-                const Text('تم نسخ الإحداثيات'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
+      await Clipboard.setData(ClipboardData(text: coordinatesText));
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8.w),
+              const Text('تم نسخ الإحداثيات ورابط الخريطة'),
+            ],
           ),
-        );
-      }
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('فشل في نسخ الإحداثيات: $e'),
-            backgroundColor: Colors.red,
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              SizedBox(width: 8.w),
+              Expanded(child: Text('فشل في نسخ الإحداثيات: $e')),
+            ],
           ),
-        );
-      }
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+        ),
+      );
     }
   }
 }

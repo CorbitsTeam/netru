@@ -20,22 +20,30 @@ class AdminDashboardCubit extends Cubit<AdminDashboardState> {
     required this.getRecentActivities,
   }) : super(AdminDashboardInitial());
 
+  // Use a safe emit to avoid throwing if the cubit has been closed
+  void _safeEmit(AdminDashboardState state) {
+    if (!isClosed) {
+      emit(state);
+    }
+  }
+
   // Getter to access cached stats
   DashboardStatsEntity? get cachedStats => _cachedStats;
 
   Future<void> loadDashboardData() async {
-    emit(AdminDashboardLoading());
+    _safeEmit(AdminDashboardLoading());
 
     final result = await getDashboardStats(const NoParams());
 
-    result.fold((failure) => emit(AdminDashboardError(failure.toString())), (
-      stats,
-    ) {
-      _cachedStats = stats;
-      emit(AdminDashboardLoaded(stats));
-      // Load activities immediately after stats
-      loadRecentActivities();
-    });
+    result.fold(
+      (failure) => _safeEmit(AdminDashboardError(failure.toString())),
+      (stats) {
+        _cachedStats = stats;
+        _safeEmit(AdminDashboardLoaded(stats));
+        // Load activities immediately after stats
+        loadRecentActivities();
+      },
+    );
   }
 
   Future<void> loadRecentActivities() async {
@@ -48,9 +56,9 @@ class AdminDashboardCubit extends Cubit<AdminDashboardState> {
         print('Failed to load recent activities: $failure');
         // Use cached activities if available, otherwise emit stats only
         if (_cachedActivities != null) {
-          emit(AdminDashboardActivitiesLoaded(_cachedActivities!));
+          _safeEmit(AdminDashboardActivitiesLoaded(_cachedActivities!));
         } else if (_cachedStats != null) {
-          emit(AdminDashboardLoaded(_cachedStats!));
+          _safeEmit(AdminDashboardLoaded(_cachedStats!));
         }
       },
       (activities) {
@@ -58,7 +66,7 @@ class AdminDashboardCubit extends Cubit<AdminDashboardState> {
         _cachedActivities = activities;
 
         // Emit activities loaded state
-        emit(AdminDashboardActivitiesLoaded(activities));
+        _safeEmit(AdminDashboardActivitiesLoaded(activities));
       },
     );
   }

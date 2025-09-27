@@ -76,8 +76,7 @@ class ReportFormState extends Equatable {
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,
       selectedDateTime: selectedDateTime ?? this.selectedDateTime,
-      selectedMedia:
-          removeMedia == true ? null : (selectedMedia ?? this.selectedMedia),
+      selectedMedia: removeMedia == true ? null : (selectedMedia ?? this.selectedMedia),
       reportTypes: reportTypes ?? this.reportTypes,
       selectedReportType: selectedReportType ?? this.selectedReportType,
       errorMessage: errorMessage ?? this.errorMessage,

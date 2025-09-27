@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/admin_report_entity.dart';
 import '../../domain/usecases/manage_reports.dart';
+import '../../../../core/services/simple_notification_service.dart';
 import 'admin_reports_state.dart';
 
 class AdminReportsCubit extends Cubit<AdminReportsState> {
@@ -10,6 +11,7 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
   final AssignReport assignReport;
   final VerifyReport verifyReport;
   final AddReportComment addReportComment;
+  final SimpleNotificationService notificationService;
 
   AdminReportsCubit({
     required this.getAllReports,
@@ -18,6 +20,7 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
     required this.assignReport,
     required this.verifyReport,
     required this.addReportComment,
+    required this.notificationService,
   }) : super(AdminReportsInitial());
 
   Future<void> loadReports({
@@ -87,7 +90,14 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
       },
       (updatedReport) {
         emit(AdminReportsActionSuccess('تم تحديث حالة البلاغ بنجاح'));
-        loadReports(); // إعادة تحميل البيانات
+
+        // إرسال إشعار نجاح للمسؤول
+        notificationService.sendSuccessNotification(
+          message: 'تم تحديث البلاغ #${updatedReport.caseNumber} بنجاح',
+        );
+
+        // تحديث البلاغ المحدد في القائمة بدلاً من إعادة تحميل كل البيانات
+        _updateReportInList(updatedReport);
       },
     );
   }
@@ -115,7 +125,14 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
       },
       (success) {
         emit(AdminReportsActionSuccess('تم تعيين المحقق بنجاح'));
-        loadReports(); // إعادة تحميل البيانات
+
+        // إرسال إشعار نجاح للمسؤول
+        notificationService.sendSuccessNotification(
+          message: 'تم تعيين المحقق للبلاغ بنجاح',
+        );
+
+        // تحديث سريع للقائمة - سيتم تحديث البلاغ عندما يتم جلبه مرة أخرى
+        loadReports();
       },
     );
   }
@@ -145,7 +162,7 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
       },
       (success) {
         emit(AdminReportsActionSuccess('تم التحقق من البلاغ بنجاح'));
-        loadReports(); // إعادة تحميل البيانات
+        loadReports(); // إعادة تحميل البيانات للحصول على آخر التحديثات
       },
     );
   }
@@ -285,6 +302,28 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
         state is AdminReportsActionSuccess ||
         state is AdminReportsActionError) {
       loadReports();
+    }
+  }
+
+  /// تحديث بلاغ محدد في القائمة دون إعادة تحميل كامل
+  void _updateReportInList(AdminReportEntity updatedReport) {
+    if (state is AdminReportsLoaded) {
+      final currentState = state as AdminReportsLoaded;
+      final updatedReports =
+          currentState.reports.map((report) {
+            if (report.id == updatedReport.id) {
+              return updatedReport;
+            }
+            return report;
+          }).toList();
+
+      final updatedStatistics = _calculateStatistics(updatedReports);
+      emit(
+        AdminReportsLoaded(
+          reports: updatedReports,
+          statistics: updatedStatistics,
+        ),
+      );
     }
   }
 }

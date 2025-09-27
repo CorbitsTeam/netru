@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
 import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
-import 'package:netru_app/features/notifications/data/datasources/firebase_notification_service.dart';
+import 'package:netru_app/core/services/simple_fcm_service.dart';
 import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
 import 'package:netru_app/features/notifications/domain/repositories/notification_repository.dart';
@@ -90,6 +90,7 @@ import '../services/location_service.dart';
 import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
 import '../services/supabase_edge_functions_service.dart';
+import '../services/simple_notification_service.dart';
 import '../network/api_client.dart';
 
 // Admin Feature
@@ -97,22 +98,27 @@ import '../../features/admin/data/datasources/admin_dashboard_remote_data_source
 import '../../features/admin/data/datasources/admin_auth_manager_data_source.dart';
 import '../../features/admin/data/datasources/admin_user_remote_data_source.dart';
 import '../../features/admin/data/datasources/admin_report_remote_data_source.dart';
+import '../../features/admin/data/datasources/admin_notification_remote_data_source.dart';
 import '../../features/admin/data/repositories/admin_dashboard_repository_impl.dart';
 import '../../features/admin/data/repositories/admin_auth_manager_repository_impl.dart';
 import '../../features/admin/data/repositories/admin_user_repository_impl.dart';
 import '../../features/admin/data/repositories/admin_report_repository_impl.dart';
+import '../../features/admin/data/repositories/admin_notification_repository_impl.dart';
 import '../../features/admin/domain/repositories/admin_dashboard_repository.dart';
 import '../../features/admin/domain/repositories/admin_user_repository.dart';
 import '../../features/admin/domain/repositories/admin_report_repository.dart';
+import '../../features/admin/domain/repositories/admin_notification_repository.dart';
 import '../../features/admin/domain/usecases/get_dashboard_stats.dart';
 import '../../features/admin/domain/usecases/get_recent_activities.dart';
 import '../../features/admin/domain/usecases/manage_auth_accounts.dart';
 import '../../features/admin/domain/usecases/manage_users.dart';
 import '../../features/admin/domain/usecases/manage_reports.dart';
+import '../../features/admin/domain/usecases/manage_notifications.dart';
 import '../../features/admin/presentation/cubit/admin_reports_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_users_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_notifications_cubit.dart';
 
 // ===========================
 // External Dependencies
@@ -402,19 +408,13 @@ Future<void> initNotificationDependencies() async {
         NotificationRemoteDataSourceImpl(supabaseClient: sl<SupabaseClient>()),
   );
 
-  sl.registerLazySingleton<FirebaseNotificationService>(
-    () => FirebaseNotificationServiceImpl(
-      firebaseMessaging: sl<FirebaseMessaging>(),
-      dio: sl<Dio>(),
-      serverKey: '', // Add your Firebase server key here
-    ),
-  );
+  // Note: SimpleFcmService is a singleton, no need to register
 
   // Repository
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(
       remoteDataSource: sl<NotificationRemoteDataSource>(),
-      firebaseService: sl<FirebaseNotificationService>(),
+      fcmService: SimpleFcmService(),
     ),
   );
 
@@ -508,11 +508,16 @@ Future<void> _initAdminDependencies() async {
   sl.registerLazySingleton(() => GetReportsByType(sl()));
   sl.registerLazySingleton(() => GetReportsByStatus(sl()));
 
+  // Simple Notification Service
+  sl.registerLazySingleton<SimpleNotificationService>(
+    () => SimpleNotificationService(),
+  );
+
   // Admin Reports - data source & repository
   sl.registerLazySingleton<AdminReportRemoteDataSource>(
     () => AdminReportRemoteDataSourceImpl(
       supabaseClient: sl<SupabaseClient>(),
-      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+      notificationService: sl<SimpleNotificationService>(),
     ),
   );
 
@@ -527,6 +532,26 @@ Future<void> _initAdminDependencies() async {
   sl.registerLazySingleton(() => AssignReport(sl()));
   sl.registerLazySingleton(() => VerifyReport(sl()));
   sl.registerLazySingleton(() => AddReportComment(sl()));
+
+  // Admin Notifications - data source & repository
+  sl.registerLazySingleton<AdminNotificationRemoteDataSource>(
+    () => AdminNotificationRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AdminNotificationRepository>(
+    () => AdminNotificationRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Admin Notifications - Use cases
+  sl.registerLazySingleton(() => SendBulkNotification(sl()));
+  sl.registerLazySingleton(() => GetAllNotifications(sl()));
+  sl.registerLazySingleton(() => CreateNotification(sl()));
+  sl.registerLazySingleton(() => GetNotificationStats(sl()));
+  sl.registerLazySingleton(() => GetGovernoratesList(sl()));
+  sl.registerLazySingleton(() => GetUserNotifications(sl()));
 
   // Use cases - Auth Manager
   sl.registerLazySingleton(() => GetUsersWithoutAuthAccount(sl()));
@@ -555,6 +580,7 @@ Future<void> _initAdminDependencies() async {
       assignReport: sl(),
       verifyReport: sl(),
       addReportComment: sl(),
+      notificationService: sl(),
     ),
   );
 
@@ -573,6 +599,17 @@ Future<void> _initAdminDependencies() async {
       verifyUser: sl(),
       suspendUser: sl(),
       getUserDetailedProfile: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AdminNotificationsCubit(
+      sl<SendBulkNotification>(),
+      sl<GetAllNotifications>(),
+      sl<CreateNotification>(),
+      sl<GetNotificationStats>(),
+      sl<GetGovernoratesList>(),
+      sl<GetUserNotifications>(),
     ),
   );
 

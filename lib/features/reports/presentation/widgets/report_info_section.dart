@@ -191,6 +191,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
   final TextEditingController _searchController = TextEditingController();
   List<ReportTypeModel> _filteredItems = [];
   bool _isSearching = false;
+  final TextEditingController _displayController = TextEditingController();
 
   @override
   void initState() {
@@ -203,12 +204,30 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
         _isSearching = _searchController.text.isNotEmpty;
       });
     });
+    // Ensure the display controller shows the currently selected report type
+    // when the widget is first created.
+    _displayController.text = widget.selectedReportType?.nameAr ?? '';
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _displayController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant SearchableDropdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If selectedReportType changed externally, update displayed text.
+    if (widget.selectedReportType?.id != oldWidget.selectedReportType?.id) {
+      _displayController.text = widget.selectedReportType?.nameAr ?? '';
+    }
+    // If the list of report types updated and current filtered list is empty,
+    // refresh filtered items to keep search in sync.
+    if (widget.reportTypes != oldWidget.reportTypes && !_isSearching) {
+      _filteredItems = widget.reportTypes;
+    }
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -426,6 +445,10 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                                       ),
                                     ),
                                     onTap: () {
+                                      // Immediately update the displayed text so the
+                                      // selected report type remains visible after
+                                      // the sheet is closed.
+                                      _displayController.text = item.nameAr;
                                       widget.onReportTypeSelected(item);
                                       Navigator.pop(context);
                                     },
@@ -468,10 +491,14 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
 
     return TextFormField(
       readOnly: true,
+      controller: _displayController,
       decoration: InputDecoration(
         labelText: widget.label,
-        hintText: widget.selectedReportType?.nameAr ?? widget.hintText,
-        suffixIcon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryColor),
+        hintText: widget.hintText,
+        suffixIcon: const Icon(
+          Icons.arrow_drop_down,
+          color: AppColors.primaryColor,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey[300]!),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/helpers/database_setup_helper.dart';
 import '../cubit/notification_cubit.dart';
 import '../cubit/notification_state.dart';
 import '../widgets/notification_tile.dart';
@@ -43,6 +44,17 @@ class _NotificationsViewState extends State<NotificationsView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _setupDatabaseIfNeeded();
+  }
+
+  Future<void> _setupDatabaseIfNeeded() async {
+    // Setup database functions and test data if needed
+    try {
+      await DatabaseSetupHelper.completeSetup(widget.userId);
+    } catch (e) {
+      debugPrint('Database setup error: $e');
+      // Continue normally even if setup fails
+    }
   }
 
   void _onScroll() {

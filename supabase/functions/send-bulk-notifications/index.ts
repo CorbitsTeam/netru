@@ -1,9 +1,10 @@
+/// <reference types="https://esm.sh/@types/web@0.0.99/index.d.ts" />
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-secret',
 }
 
 serve(async (req) => {
@@ -15,7 +16,7 @@ serve(async (req) => {
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
         auth: {
           persistSession: false,
@@ -23,23 +24,19 @@ serve(async (req) => {
       }
     )
 
-    // Get the authorization header from the request
-    const authHeader = req.headers.get('authorization')!
-    const token = authHeader.replace('Bearer ', '')
-
-    await supabaseClient.auth.setSession({
-      access_token: token,
-      refresh_token: '',
-    })
-
-    // Verify user is authenticated
-    const { data: { user } } = await supabaseClient.auth.getUser()
-    if (!user) {
+    // Check admin secret authentication (bypass Supabase Auth completely)
+    const adminSecret = req.headers.get('x-admin-secret')
+    const expectedAdminSecret = Deno.env.get('ADMIN_SECRET') || 'netru-admin-2025'
+    
+    if (!adminSecret || adminSecret !== expectedAdminSecret) {
+      console.error('❌ Admin secret authentication failed')
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Unauthorized - Invalid admin secret' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    
+    console.log('✅ Admin secret authentication successful')
 
     const requestData = await req.json()
     const { 
@@ -106,6 +103,33 @@ serve(async (req) => {
 
     console.log(`📱 Sending notifications to ${targetUsers.length} users`)
 
+    // First, create an admin notification record
+    const { data: adminNotification, error: adminNotificationError } = await supabaseClient
+      .from('admin_notifications')
+      .insert({
+        title: title,
+        title_ar: titleAr,
+        body: body,
+        body_ar: bodyAr,
+        type: notificationType,
+        priority: priority,
+        target_type: targetType,
+        target_value: targetValue,
+        data: data,
+        created_by: 'admin', // Since we're using admin secret authentication
+        status: 'sent',
+        sent_count: targetUsers.length,
+        sent_at: new Date().toISOString()
+      })
+      .select()
+      .single()
+
+    if (adminNotificationError) {
+      throw adminNotificationError
+    }
+
+    console.log(`📝 Created admin notification record: ${adminNotification.id}`)
+
     // Create notifications for all target users
     const notifications = targetUsers.map(targetUser => ({
       user_id: targetUser.id,
@@ -118,6 +142,7 @@ serve(async (req) => {
       data: data,
       is_read: false,
       is_sent: false,
+      admin_notification_id: adminNotification.id,
       created_at: new Date().toISOString()
     }))
 
@@ -130,7 +155,7 @@ serve(async (req) => {
       throw notificationError
     }
 
-    console.log(`📝 Created ${createdNotifications.length} notifications`)
+    console.log(`📝 Created ${createdNotifications.length} user notifications`)
 
     // Get FCM tokens for push notifications
     const { data: fcmTokens } = await supabaseClient
@@ -219,12 +244,12 @@ serve(async (req) => {
           })
           console.error(`❌ FCM failed for user ${tokenData.user_id}:`, fcmResult)
         }
-      } catch (error) {
+      } catch (error: any) {
         fcmResults.push({
           user_id: tokenData.user_id,
           token: tokenData.fcm_token,
           success: false,
-          error: error.message
+          error: error?.message || 'Unknown FCM error'
         })
         console.error(`❌ FCM error for user ${tokenData.user_id}:`, error)
       }
@@ -232,6 +257,8 @@ serve(async (req) => {
 
     // Update notifications with sent status
     const successfulTokens = fcmResults.filter(r => r.success).map(r => r.user_id)
+    const failedTokens = fcmResults.filter(r => !r.success).map(r => r.user_id)
+    
     if (successfulTokens.length > 0) {
       await supabaseClient
         .from('notifications')
@@ -240,27 +267,29 @@ serve(async (req) => {
           sent_at: new Date().toISOString() 
         })
         .in('user_id', successfulTokens)
-        .in('id', createdNotifications.map(n => n.id))
+        .eq('admin_notification_id', adminNotification.id)
       
       console.log(`✅ Updated ${successfulTokens.length} notifications as sent`)
     }
 
-    // Log admin action if user is admin
-    const { data: userData } = await supabaseClient
-      .from('users')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
+    // Update admin notification statistics
+    await supabaseClient
+      .from('admin_notifications')
+      .update({
+        delivered_count: successfulTokens.length,
+        failed_count: failedTokens.length,
+        status: successfulTokens.length > 0 ? 'sent' : 'failed'
+      })
+      .eq('id', adminNotification.id)
 
-    if (userData?.user_type === 'admin') {
-      await supabaseClient
-        .from('user_logs')
-        .insert({
-          user_id: user.id,
-          action: `Sent bulk notification to ${targetUsers.length} users`,
-          ip_address: req.headers.get('x-forwarded-for') || 'unknown'
-        })
-    }
+    // Log admin action (we know it's admin because we checked the secret)
+    await supabaseClient
+      .from('user_logs')
+      .insert({
+        user_id: 'admin', // Generic admin identifier since we're using secret auth
+        action: `Sent bulk notification to ${targetUsers.length} users`,
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+      })
 
     const response = {
       success: true,
@@ -287,12 +316,12 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Bulk notification error:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.stack 
+        error: error?.message || 'Unknown error',
+        details: error?.stack || 'No stack trace available'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

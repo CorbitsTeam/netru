@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/di/injection_container.dart';
+import 'package:netru_app/debug_notification_screen.dart';
 import 'package:netru_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:netru_app/features/home/presentation/cubit/home_state.dart';
 import 'package:netru_app/features/home/presentation/widgets/news_carousel_card.dart';
@@ -166,6 +168,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: _buildChatButton(),
                     ),
                   ),
+
+                  // Debug Notification Button (only in debug mode)
+                  if (kDebugMode)
+                    Positioned(
+                      right: 16.w,
+                      top: MediaQuery.of(context).padding.top + 100.h,
+                      child: Material(
+                        color: Colors.red,
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.r),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12.r),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const DebugNotificationScreen(),
+                              ),
+                            );
+                          },
+                          child: SizedBox(
+                            width: 56.w,
+                            height: 56.w,
+                            child: Icon(
+                              Icons.bug_report,
+                              color: Colors.white,
+                              size: 26.sp,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

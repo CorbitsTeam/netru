@@ -6,54 +6,32 @@ import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/utils/user_data_helper.dart';
 import '../../../domain/entities/user_entity.dart';
+import 'package:netru_app/core/di/injection_container.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
 import '../widgets/login_header.dart';
-import '../widgets/login_tab_bar.dart';
+
 import '../widgets/login_bottom_section.dart';
 import '../widgets/citizen_login_form.dart';
-import '../widgets/foreigner_login_form.dart';
+
 import '../widgets/admin_login_form.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() =>
-      _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
+class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
-  bool _showAdminTab = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.white,
-              size: 20.sp,
-            ),
+            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -70,9 +48,7 @@ class _LoginPageState extends State<LoginPage>
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            12.r,
-          ),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         margin: EdgeInsets.all(16.w),
         duration: const Duration(seconds: 4),
@@ -84,59 +60,94 @@ class _LoginPageState extends State<LoginPage>
     context.pushNamed(Routes.signupScreen);
   }
 
-  void _navigateBasedOnUserType(
-    UserEntity user,
-  ) async {
+  void _navigateBasedOnUserType(UserEntity user) async {
     // Save user data to SharedPreferences and refresh from database
     try {
       final userHelper = UserDataHelper();
       await userHelper.saveCurrentUser(user);
 
       // Refresh user data from database to get complete information
-      await userHelper
-          .refreshUserDataFromDatabase();
+      await userHelper.refreshUserDataFromDatabase();
     } catch (e) {
-      print(
-        'Error saving/refreshing user data: $e',
-      );
+      print('Error saving/refreshing user data: $e');
     }
 
     switch (user.userType) {
       case UserType.citizen:
       case UserType.foreigner:
-        context.pushReplacementNamed(
-          Routes.customBottomBar,
-        );
+        context.pushReplacementNamed(Routes.customBottomBar);
         break;
       case UserType.admin:
-        context.pushReplacementNamed(
-          Routes.adminDashboard,
-        );
+        context.pushReplacementNamed(Routes.adminDashboard);
         break;
     }
   }
 
   void _onLogoDoubleTap() {
-    if (!_showAdminTab) {
-      setState(() {
-        _showAdminTab = true;
-        // Dispose the old controller properly
-        final oldIndex = _tabController.index;
-        _tabController.dispose();
-        _tabController = TabController(
-          length: 3,
-          vsync: this,
-        );
-        // Keep the current tab if it's still valid, otherwise go to admin tab
-        if (oldIndex < 2) {
-          _tabController.index = oldIndex;
-        } else {
-          _tabController.animateTo(
-            2,
-          ); // Switch to admin tab
+    _showAdminAccessDialog();
+  }
+
+  void _showAdminAccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        // Try to reuse existing LoginCubit from ancestor; if not found,
+        // fallback to creating one from the DI container so the dialog
+        // remains functional in all navigation scenarios.
+        LoginCubit? existingCubit;
+        try {
+          existingCubit = BlocProvider.of<LoginCubit>(context);
+        } catch (_) {
+          existingCubit = null;
         }
-      });
-    }
+
+        final dialogChild = AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'دخول المطور',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Almarai',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'أدخل رمز المطور للوصول لواجهة الإدارة',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: Colors.grey[600],
+                  fontFamily: 'Almarai',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20.h),
+              AdminLoginForm(
+                isLoading: _isLoading,
+                onSubmit: () => Navigator.of(dialogContext).pop(),
+              ),
+            ],
+          ),
+        );
+
+        if (existingCubit != null) {
+          return BlocProvider.value(value: existingCubit, child: dialogChild);
+        }
+
+        // Fallback: create a temporary LoginCubit from DI container
+        return BlocProvider<LoginCubit>(
+          create: (_) => sl<LoginCubit>(),
+          child: dialogChild,
+        );
+      },
+    );
   }
 
   void _handleFormSubmit() {
@@ -163,49 +174,21 @@ class _LoginPageState extends State<LoginPage>
         },
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 24.w,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Column(
               children: [
                 SizedBox(height: 40.h),
-                LoginHeader(
-                  onLogoDoubleTap:
-                      _onLogoDoubleTap,
-                ),
+                LoginHeader(onLogoDoubleTap: _onLogoDoubleTap),
 
-                SizedBox(
-                  height:
-                      MediaQuery.of(
-                        context,
-                      ).size.height *
-                      0.4,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      CitizenLoginForm(
-                        isLoading: _isLoading,
-                        onSubmit:
-                            _handleFormSubmit,
-                      ),
-                      ForeignerLoginForm(
-                        isLoading: _isLoading,
-                        onSubmit:
-                            _handleFormSubmit,
-                      ),
-                      if (_showAdminTab)
-                        AdminLoginForm(
-                          isLoading: _isLoading,
-                          onSubmit:
-                              _handleFormSubmit,
-                        ),
-                    ],
-                  ),
+                SizedBox(height: 32.h),
+
+                // Citizen login form only
+                CitizenLoginForm(
+                  isLoading: _isLoading,
+                  onSubmit: _handleFormSubmit,
                 ),
                 SizedBox(height: 65.h),
-                LoginBottomSection(
-                  onSignupTap: _navigateToSignup,
-                ),
+                LoginBottomSection(onSignupTap: _navigateToSignup),
                 SizedBox(height: 30.h),
               ],
             ),

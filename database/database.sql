@@ -1,6 +1,26 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.admin_notifications (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  body text NOT NULL,
+  type text NOT NULL DEFAULT 'general'::text CHECK (type = ANY (ARRAY['news'::text, 'report_update'::text, 'report_comment'::text, 'system'::text, 'general'::text])),
+  status text NOT NULL DEFAULT 'draft'::text CHECK (status = ANY (ARRAY['draft'::text, 'scheduled'::text, 'sent'::text, 'failed'::text])),
+  target_users jsonb DEFAULT '[]'::jsonb,
+  target_groups jsonb DEFAULT '[]'::jsonb,
+  data jsonb DEFAULT '{}'::jsonb,
+  created_by uuid NOT NULL,
+  sent_count integer DEFAULT 0,
+  delivered_count integer DEFAULT 0,
+  failed_count integer DEFAULT 0,
+  scheduled_at timestamp without time zone,
+  sent_at timestamp without time zone,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT admin_notifications_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_notifications_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.cities (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   governorate_id bigint,
@@ -171,7 +191,7 @@ CREATE TABLE public.reports (
   report_status text DEFAULT 'pending'::text CHECK (report_status = ANY (ARRAY['pending'::text, 'under_investigation'::text, 'resolved'::text, 'closed'::text, 'rejected'::text, 'received'::text])),
   priority_level text DEFAULT 'medium'::text CHECK (priority_level = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'urgent'::text])),
   assigned_to uuid,
-  case_number text UNIQUE,
+  case_number text DEFAULT nextval('reports_case_number_seq'::regclass) UNIQUE,
   submitted_at timestamp without time zone DEFAULT now(),
   updated_at timestamp without time zone DEFAULT now(),
   resolved_at timestamp without time zone,
@@ -227,5 +247,7 @@ CREATE TABLE public.users (
   verification_status text DEFAULT 'unverified'::text CHECK (verification_status = ANY (ARRAY['unverified'::text, 'pending'::text, 'verified'::text, 'rejected'::text])),
   verified_at timestamp without time zone,
   updated_at timestamp with time zone DEFAULT now(),
+  is_active boolean DEFAULT true,
+  last_login_at timestamp without time zone,
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );

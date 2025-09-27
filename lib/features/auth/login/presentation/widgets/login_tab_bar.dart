@@ -42,7 +42,7 @@ class LoginTabBar extends StatelessWidget {
         ),
         tabs: [
           const Tab(text: 'مواطن مصري'),
-          const Tab(text: 'مقيم أجنبي'),
+          // const Tab(text: 'مقيم أجنبي'),
           if (showAdminTab) const Tab(text: 'مدير'),
         ],
       ),

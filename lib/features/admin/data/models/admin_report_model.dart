@@ -70,11 +70,8 @@ class AdminReportModel extends AdminReportEntity {
       isAnonymous: json['is_anonymous'] ?? false,
       verificationStatus: _parseVerificationStatus(json['verification_status']),
       reportTypeName: json['report_type_name'],
-      media:
-          (json['media'] as List<dynamic>?)
-              ?.map((item) => ReportMediaModel.fromJson(item))
-              .toList() ??
-          [],
+      // Parse media from multiple sources
+      media: _parseMediaFromJson(json),
       comments:
           (json['comments'] as List<dynamic>?)
               ?.map((item) => ReportCommentModel.fromJson(item))
@@ -126,12 +123,57 @@ class AdminReportModel extends AdminReportEntity {
     };
   }
 
+  static List<ReportMediaModel> _parseMediaFromJson(Map<String, dynamic> json) {
+    // First, try nested media array (from select with nested query)
+    if (json['report_media'] != null && json['report_media'] is List) {
+      return (json['report_media'] as List<dynamic>)
+          .map((item) => ReportMediaModel.fromJson(item))
+          .toList();
+    }
+
+    // Second, try direct media array
+    if (json['media'] != null && json['media'] is List) {
+      return (json['media'] as List<dynamic>)
+          .map((item) => ReportMediaModel.fromJson(item))
+          .toList();
+    }
+
+    // Third, try flattened fields from LEFT JOIN
+    final fileUrl = json['file_url'];
+    if (fileUrl != null && fileUrl.isNotEmpty) {
+      try {
+        final mediaMap = <String, dynamic>{
+          'id': json['report_id'] ?? json['id'] ?? 'unknown',
+          'report_id': json['id'] ?? json['report_id'],
+          'media_type': json['media_type'] ?? 'image',
+          'file_url': fileUrl,
+          'file_name': json['file_name'],
+          'file_size': json['file_size'],
+          'mime_type': json['mime_type'],
+          'description': json['description'],
+          'uploaded_at':
+              json['uploaded_at'] ?? DateTime.now().toIso8601String(),
+          'is_evidence': json['is_evidence'] ?? true,
+          'metadata': json['metadata'],
+        };
+
+        return [ReportMediaModel.fromJson(mediaMap)];
+      } catch (e) {
+        print('Error parsing media: $e');
+        return [];
+      }
+    }
+
+    return [];
+  }
+
   static VerificationStatus _parseVerificationStatus(String? status) {
     switch (status) {
       case 'verified':
         return VerificationStatus.verified;
       case 'flagged':
         return VerificationStatus.flagged;
+      case 'unverified':
       default:
         return VerificationStatus.unverified;
     }
@@ -160,10 +202,20 @@ class ReportMediaModel extends ReportMediaEntity {
       mediaType: _parseMediaType(json['media_type']),
       fileUrl: json['file_url'],
       fileName: json['file_name'],
-      fileSize: json['file_size'],
+      fileSize:
+          json['file_size'] is int
+              ? json['file_size']
+              : (json['file_size'] != null
+                  ? int.tryParse('${json['file_size']}')
+                  : null),
       mimeType: json['mime_type'],
       description: json['description'],
-      uploadedAt: DateTime.parse(json['uploaded_at']),
+      // uploaded_at can be null when joining rows or when not provided.
+      uploadedAt:
+          json['uploaded_at'] != null
+              ? DateTime.tryParse(json['uploaded_at'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
       isEvidence: json['is_evidence'] ?? false,
       metadata: json['metadata'],
     );

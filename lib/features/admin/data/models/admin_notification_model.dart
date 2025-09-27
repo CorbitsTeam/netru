@@ -25,20 +25,24 @@ class AdminNotificationModel extends AdminNotificationEntity {
   factory AdminNotificationModel.fromJson(Map<String, dynamic> json) {
     return AdminNotificationModel(
       id: json['id'],
-      userId: json['user_id'],
+      userId:
+          json['user_id'] ??
+          json['created_by'], // Support both admin_notifications and notifications tables
       userName: json['user_name'],
       title: json['title'],
       titleAr: json['title_ar'],
       body: json['body'],
       bodyAr: json['body_ar'],
       notificationType: NotificationTypeExtension.fromString(
-        json['notification_type'],
+        json['notification_type'] ?? json['type'], // Support both field names
       ),
       referenceId: json['reference_id'],
       referenceType: _parseReferenceType(json['reference_type']),
       data: json['data'],
       isRead: json['is_read'] ?? false,
-      isSent: json['is_sent'] ?? false,
+      isSent:
+          json['is_sent'] ??
+          (json['status'] == 'sent'), // Map from admin_notifications status
       priority: NotificationPriorityExtension.fromString(json['priority']),
       fcmMessageId: json['fcm_message_id'],
       createdAt: DateTime.parse(json['created_at']),

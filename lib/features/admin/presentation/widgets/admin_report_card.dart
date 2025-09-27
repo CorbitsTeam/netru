@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/admin_report_entity.dart';
 import '../cubit/admin_reports_cubit.dart';
+import '../pages/admin_report_details_page.dart';
 
 class AdminReportCard extends StatelessWidget {
   final AdminReportEntity report;
@@ -552,8 +553,19 @@ class AdminReportCard extends StatelessWidget {
   }
 
   void _navigateToDetails(BuildContext context) {
-    // Navigate to report details page
-    Navigator.pushNamed(context, '/admin/reports/details', arguments: report);
+    // Navigate to report details page and pass the existing AdminReportsCubit
+    // so the details page reuses it and any status updates refresh the list.
+    final cubit = context.read<AdminReportsCubit>();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => AdminReportDetailsPage(
+              report: report,
+              adminReportsCubit: cubit,
+            ),
+      ),
+    );
   }
 
   void _approveReport(BuildContext context) {

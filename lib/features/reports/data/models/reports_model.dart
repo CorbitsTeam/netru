@@ -24,8 +24,54 @@ class ReportModel extends ReportEntity {
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     print('📄 ReportModel.fromJson Debug:');
-    print('   media_url: ${json['media_url']}');
-    print('   media_type: ${json['media_type']}');
+    print('   raw json keys: ${json.keys.toList()}');
+
+    // Normalize media url/type from different possible response shapes:
+    // 1) top-level 'media_url' / 'media_type'
+    // 2) top-level 'file_url' / 'mime_type'
+    // 3) nested list under 'report_media' -> first entry { file_url, media_type }
+    String? resolvedMediaUrl;
+    String? resolvedMediaType;
+
+    // 1) prefer explicit top-level media_url/media_type
+    if (json.containsKey('media_url') && json['media_url'] != null) {
+      resolvedMediaUrl = json['media_url'] as String?;
+    }
+    if (json.containsKey('media_type') && json['media_type'] != null) {
+      resolvedMediaType = json['media_type'] as String?;
+    }
+
+    // 2) fall back to file_url / mime_type
+    if ((resolvedMediaUrl == null || resolvedMediaUrl.isEmpty) &&
+        json.containsKey('file_url') &&
+        json['file_url'] != null) {
+      resolvedMediaUrl = json['file_url'] as String?;
+    }
+    if ((resolvedMediaType == null || resolvedMediaType.isEmpty) &&
+        json.containsKey('mime_type') &&
+        json['mime_type'] != null) {
+      resolvedMediaType = json['mime_type'] as String?;
+    }
+
+    // 3) nested report_media list
+    if ((resolvedMediaUrl == null || resolvedMediaUrl.isEmpty) &&
+        json.containsKey('report_media') &&
+        json['report_media'] is List &&
+        (json['report_media'] as List).isNotEmpty) {
+      final firstMedia = (json['report_media'] as List).firstWhere(
+        (e) => e != null,
+        orElse: () => null,
+      );
+      if (firstMedia != null && firstMedia is Map<String, dynamic>) {
+        resolvedMediaUrl =
+            (firstMedia['file_url'] ?? firstMedia['media_url']) as String?;
+        resolvedMediaType =
+            (firstMedia['media_type'] ?? firstMedia['mime_type']) as String?;
+      }
+    }
+
+    print('   resolvedMediaUrl: $resolvedMediaUrl');
+    print('   resolvedMediaType: $resolvedMediaType');
 
     return ReportModel(
       id: json['id'] as String,
@@ -42,10 +88,8 @@ class ReportModel extends ReportEntity {
       reportDateTime: DateTime.parse(
         json['incident_datetime'] as String? ?? json['submitted_at'] as String,
       ),
-      mediaUrl:
-          json['media_url']
-              as String?, // This will be handled by join or separate query
-      mediaType: json['media_type'] as String?,
+      mediaUrl: resolvedMediaUrl,
+      mediaType: resolvedMediaType,
       status: mapDatabaseStatusToEnum(json['report_status'] as String),
       submittedBy: json['user_id'] as String?,
       createdAt: DateTime.parse(json['submitted_at'] as String),

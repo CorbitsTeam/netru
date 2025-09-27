@@ -14,13 +14,14 @@ import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_report_details_page.dart';
 import '../../features/admin/presentation/pages/admin_users_page.dart';
-import '../../features/admin/presentation/pages/admin_notifications_page.dart';
+import '../../features/admin/presentation/pages/enhanced_admin_notifications_page.dart';
 import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
 import '../../features/admin/domain/entities/admin_report_entity.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_auth_manager_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_reports_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_users_cubit.dart';
+import '../../features/admin/presentation/cubit/admin_notifications_cubit.dart';
 import 'package:netru_app/features/reports/presentation/pages/create_report_page.dart';
 import 'package:netru_app/features/home/presentation/pages/home_screen.dart';
 import 'package:netru_app/features/home/presentation/widgets/custom_bottom_bar.dart';
@@ -116,8 +117,10 @@ class AppRouter {
         return _createRoute(
           MultiBlocProvider(
             providers: [
+              // Use the shared AdminReportsCubit from the DI container so
+              // the same instance is reused across the admin pages.
               BlocProvider<AdminReportsCubit>(
-                create: (context) => sl<AdminReportsCubit>(),
+                create: (context) => sl.get<AdminReportsCubit>(),
               ),
             ],
             child: const AdminReportsPage(),
@@ -130,7 +133,7 @@ class AppRouter {
             MultiBlocProvider(
               providers: [
                 BlocProvider<AdminReportsCubit>(
-                  create: (context) => sl<AdminReportsCubit>(),
+                  create: (context) => sl.get<AdminReportsCubit>(),
                 ),
               ],
               child: AdminReportDetailsPage(report: report),
@@ -150,7 +153,12 @@ class AppRouter {
           ),
         );
       case Routes.adminNotifications:
-        return _createRoute(const AdminNotificationsPage());
+        return _createRoute(
+          BlocProvider<AdminNotificationsCubit>(
+            create: (context) => sl<AdminNotificationsCubit>(),
+            child: const AdminNotificationsPage(),
+          ),
+        );
       case Routes.adminAuthManager:
         return _createRoute(
           MultiBlocProvider(

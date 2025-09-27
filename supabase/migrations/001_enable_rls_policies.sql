@@ -28,7 +28,7 @@ ALTER TABLE public.governorates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cities ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if user is admin
-CREATE OR REPLACE FUNCTION auth.is_admin()
+CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN (
@@ -40,7 +40,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Helper function to get current user type
-CREATE OR REPLACE FUNCTION auth.get_user_type()
+CREATE OR REPLACE FUNCTION public.get_user_type()
 RETURNS TEXT AS $$
 BEGIN
   RETURN (
@@ -52,7 +52,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Helper function to check if user owns resource
-CREATE OR REPLACE FUNCTION auth.user_owns_resource(resource_user_id UUID)
+CREATE OR REPLACE FUNCTION public.user_owns_resource(resource_user_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN resource_user_id = auth.uid();
