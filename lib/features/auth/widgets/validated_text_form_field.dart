@@ -215,8 +215,9 @@ class _ValidatedTextFormFieldState
 
   Widget? _buildValidationIcon() {
     if (!widget.showValidationIcon ||
-        !_showValidation)
+        !_showValidation) {
       return null;
+    }
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
@@ -495,8 +496,9 @@ class PasswordStrengthIndicator
   PasswordStrength _getPasswordStrength(
     String password,
   ) {
-    if (password.isEmpty)
+    if (password.isEmpty) {
       return PasswordStrength.none;
+    }
 
     int score = 0;
 
@@ -505,15 +507,18 @@ class PasswordStrengthIndicator
     if (password.length >= 12) score++;
 
     // Character variety
-    if (RegExp(r'[a-z]').hasMatch(password))
+    if (RegExp(r'[a-z]').hasMatch(password)) {
       score++;
-    if (RegExp(r'[A-Z]').hasMatch(password))
+    }
+    if (RegExp(r'[A-Z]').hasMatch(password)) {
       score++;
+    }
     if (RegExp(r'\d').hasMatch(password)) score++;
     if (RegExp(
       r'[!@#$%^&*(),.?":{}|<>]',
-    ).hasMatch(password))
+    ).hasMatch(password)) {
       score++;
+    }
 
     if (score < 2) return PasswordStrength.weak;
     if (score < 4) return PasswordStrength.medium;
@@ -523,8 +528,9 @@ class PasswordStrengthIndicator
 
   @override
   Widget build(BuildContext context) {
-    if (!show || password.isEmpty)
+    if (!show || password.isEmpty) {
       return const SizedBox.shrink();
+    }
 
     final strength = _getPasswordStrength(
       password,

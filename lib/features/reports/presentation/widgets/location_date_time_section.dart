@@ -132,57 +132,57 @@ class _LocationDateTimeSectionState
                         color: Colors.blue[700],
                       ),
                     ),
-                    const Spacer(),
-                    if (_currentLatitude !=
-                            null &&
-                        _currentLongitude != null)
-                      InkWell(
-                        onTap:
-                            () =>
-                                _openLocationInMaps(),
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(
-                                horizontal: 8.w,
-                                vertical: 4.h,
-                              ),
-                          decoration: BoxDecoration(
-                            color:
-                                Colors.blue[600],
-                            borderRadius:
-                                BorderRadius.circular(
-                                  4.r,
-                                ),
-                          ),
-                          child: Row(
-                            mainAxisSize:
-                                MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.map,
-                                color:
-                                    Colors.white,
-                                size: 12.sp,
-                              ),
-                              SizedBox(
-                                width: 4.w,
-                              ),
-                              Text(
-                                'عرض في الخريطة',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color:
-                                      Colors
-                                          .white,
-                                  fontWeight:
-                                      FontWeight
-                                          .w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    // const Spacer(),
+                    // if (_currentLatitude !=
+                    //         null &&
+                    //     _currentLongitude != null)
+                    //   InkWell(
+                    //     onTap:
+                    //         () =>
+                    //             _openLocationInMaps(),
+                    //     child: Container(
+                    //       padding:
+                    //           EdgeInsets.symmetric(
+                    //             horizontal: 8.w,
+                    //             vertical: 4.h,
+                    //           ),
+                    //       decoration: BoxDecoration(
+                    //         color:
+                    //             Colors.blue[600],
+                    //         borderRadius:
+                    //             BorderRadius.circular(
+                    //               4.r,
+                    //             ),
+                    //       ),
+                    //       child: Row(
+                    //         mainAxisSize:
+                    //             MainAxisSize.min,
+                    //         children: [
+                    //           Icon(
+                    //             Icons.map,
+                    //             color:
+                    //                 Colors.white,
+                    //             size: 12.sp,
+                    //           ),
+                    //           SizedBox(
+                    //             width: 4.w,
+                    //           ),
+                    //           Text(
+                    //             'عرض في الخريطة',
+                    //             style: TextStyle(
+                    //               fontSize: 10.sp,
+                    //               color:
+                    //                   Colors
+                    //                       .white,
+                    //               fontWeight:
+                    //                   FontWeight
+                    //                       .w500,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 8.h),

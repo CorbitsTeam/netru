@@ -309,7 +309,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
               Tab(text: 'الكل (${state.notifications.length})'),
               Tab(text: 'مجدول (${state.scheduledNotifications.length})'),
               Tab(text: 'مسودات (${state.draftNotifications.length})'),
-              Tab(text: 'الإحصائيات'),
+              const Tab(text: 'الإحصائيات'),
             ],
           ),
         ),

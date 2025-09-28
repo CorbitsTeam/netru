@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:netru_app/core/services/notification_preferences_service.dart';
-import 'package:netru_app/core/services/settings_service.dart';
 import 'package:netru_app/features/settings/presentation/bloc/settings_bloc.dart';
 
 class NotificationSettingsWidget

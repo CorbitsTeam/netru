@@ -540,7 +540,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       color: Colors.blue,
       child:
           isLoadingUserProfile
-              ? Container(
+              ? SizedBox(
                 height: 100.h,
                 child: const Center(child: CircularProgressIndicator()),
               )
@@ -707,7 +707,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
         _buildInfoRow('رقم الهاتف', widget.report.reporterPhone, Icons.phone),
         SizedBox(height: 16.h),
         // Prominent button to show identity documents (ID front/back)
-        Container(
+        SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: _showIdentityDocumentsForReporter,
@@ -809,8 +809,8 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             // If no specific side detected, assign to front if empty, otherwise back
             if (frontImageUrl == null) {
               frontImageUrl = _resolveMediaUrl(m.fileUrl);
-            } else if (backImageUrl == null) {
-              backImageUrl = _resolveMediaUrl(m.fileUrl);
+            } else {
+              backImageUrl ??= _resolveMediaUrl(m.fileUrl);
             }
           }
         }

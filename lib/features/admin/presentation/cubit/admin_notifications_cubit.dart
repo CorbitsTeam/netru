@@ -77,14 +77,14 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
                   .toList();
 
           // Load governorates list
-          final governoratesResult = await _getGovernoratesList(NoParams());
+          final governoratesResult = await _getGovernoratesList(const NoParams());
           final governorates = governoratesResult.fold(
             (l) => <String>[],
             (r) => r,
           );
 
           // Load statistics
-          final statsResult = await _getNotificationStats(NoParams());
+          final statsResult = await _getNotificationStats(const NoParams());
           final stats = statsResult.fold((l) => <String, int>{}, (r) => r);
 
           _safeEmit(
@@ -211,7 +211,7 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
     try {
       _safeEmit(const AdminNotificationsStatsLoading());
 
-      final result = await _getNotificationStats(NoParams());
+      final result = await _getNotificationStats(const NoParams());
 
       result.fold(
         (failure) => _safeEmit(
