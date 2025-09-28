@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/notification_entity.dart';
 
 class NotificationTile extends StatelessWidget {
@@ -19,166 +20,316 @@ class NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
       child: Material(
-        color: notification.isRead ? Colors.white : Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12.r),
-        elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12.r),
-          child: Padding(
-            padding: EdgeInsets.all(16.r),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Notification Icon
-                Container(
-                  width: 40.w,
-                  height: 40.h,
-                  decoration: BoxDecoration(
-                    color: _getIconColor().withOpacity(0.1),
-                    shape: BoxShape.circle,
+        color: _getCardBackgroundColor(),
+        borderRadius: BorderRadius.circular(16.r),
+        elevation: notification.isRead ? 1 : 3,
+        shadowColor: AppColors.shadow,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color:
+                  notification.isRead
+                      ? AppColors.borderLight
+                      : _getTypeAccentColor().withOpacity(0.2),
+              width: 1.5,
+            ),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16.r),
+            splashColor: _getTypeAccentColor().withOpacity(0.1),
+            highlightColor: _getTypeAccentColor().withOpacity(0.05),
+            child: Container(
+              padding: EdgeInsets.all(16.r),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Notification Icon with improved design
+                  Container(
+                    width: 48.w,
+                    height: 48.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _getTypeAccentColor().withOpacity(0.15),
+                          _getTypeAccentColor().withOpacity(0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: _getTypeAccentColor().withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(
+                      _getIcon(),
+                      color: _getTypeAccentColor(),
+                      size: 22.sp,
+                    ),
                   ),
-                  child: Icon(_getIcon(), color: _getIconColor(), size: 20.sp),
-                ),
-                SizedBox(width: 12.w),
+                  SizedBox(width: 14.w),
 
-                // Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        notification.getLocalizedTitle(),
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight:
-                              notification.isRead
-                                  ? FontWeight.w500
-                                  : FontWeight.w600,
-                          color: Colors.black87,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Body
-                      Text(
-                        notification.getLocalizedBody(),
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey[600],
-                          height: 1.4,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 8.h),
-
-                      // Time and actions
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Time
-                          Text(
-                            _getFormattedTime(),
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.grey[500],
-                              fontWeight: FontWeight.w400,
+                  // Content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Type label and priority
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getTypeAccentColor().withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: _getTypeAccentColor().withOpacity(0.3),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Text(
+                                _getTypeLabel(),
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: _getTypeAccentColor(),
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
                             ),
-                          ),
-
-                          // Actions
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Priority indicator
-                              if (notification.priority ==
-                                      NotificationPriority.high ||
-                                  notification.priority ==
-                                      NotificationPriority.urgent)
-                                Container(
-                                  width: 8.w,
-                                  height: 8.h,
-                                  decoration: BoxDecoration(
+                            const Spacer(),
+                            // Priority indicator
+                            if (notification.priority ==
+                                    NotificationPriority.high ||
+                                notification.priority ==
+                                    NotificationPriority.urgent) ...[
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 2.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      notification.priority ==
+                                              NotificationPriority.urgent
+                                          ? AppColors.error.withOpacity(0.1)
+                                          : AppColors.warning.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6.r),
+                                  border: Border.all(
                                     color:
                                         notification.priority ==
                                                 NotificationPriority.urgent
-                                            ? Colors.red
-                                            : Colors.orange,
-                                    shape: BoxShape.circle,
+                                            ? AppColors.error.withOpacity(0.3)
+                                            : AppColors.warning.withOpacity(
+                                              0.3,
+                                            ),
+                                    width: 0.5,
                                   ),
                                 ),
-
-                              if (notification.priority ==
-                                      NotificationPriority.high ||
-                                  notification.priority ==
-                                      NotificationPriority.urgent)
-                                SizedBox(width: 8.w),
-
-                              // Mark as read button
-                              if (!notification.isRead && onMarkAsRead != null)
-                                GestureDetector(
-                                  onTap: onMarkAsRead,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 4.h,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      notification.priority ==
+                                              NotificationPriority.urgent
+                                          ? Icons.priority_high_rounded
+                                          : Icons.flag_rounded,
+                                      size: 10.sp,
+                                      color:
+                                          notification.priority ==
+                                                  NotificationPriority.urgent
+                                              ? AppColors.error
+                                              : AppColors.warning,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade100,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    child: Text(
-                                      'قراءة',
+                                    SizedBox(width: 2.w),
+                                    Text(
+                                      notification.priority ==
+                                              NotificationPriority.urgent
+                                          ? 'عاجل'
+                                          : 'مهم',
                                       style: TextStyle(
-                                        fontSize: 10.sp,
-                                        color: Colors.blue.shade700,
-                                        fontWeight: FontWeight.w500,
+                                        fontSize: 9.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color:
+                                            notification.priority ==
+                                                    NotificationPriority.urgent
+                                                ? AppColors.error
+                                                : AppColors.warning,
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-
-                              if (!notification.isRead && onMarkAsRead != null)
-                                SizedBox(width: 8.w),
-
-                              // Delete button
-                              if (onDelete != null)
-                                GestureDetector(
-                                  onTap: onDelete,
-                                  child: Icon(
-                                    Icons.close,
-                                    color: Colors.grey[400],
-                                    size: 16.sp,
-                                  ),
-                                ),
+                              ),
                             ],
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+
+                        // Title
+                        Text(
+                          notification.getLocalizedTitle(),
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight:
+                                notification.isRead
+                                    ? FontWeight.w600
+                                    : FontWeight.w700,
+                            color:
+                                notification.isRead
+                                    ? AppColors.textSecondary
+                                    : AppColors.textPrimary,
+                            height: 1.4,
+                            letterSpacing: 0.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 6.h),
+
+                        // Body
+                        Text(
+                          notification.getLocalizedBody(),
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color:
+                                notification.isRead
+                                    ? AppColors.textTertiary
+                                    : AppColors.textSecondary,
+                            height: 1.5,
+                            letterSpacing: 0.1,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 12.h),
+
+                        // Time and actions
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Time with improved styling
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceVariant,
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: AppColors.borderLight,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.access_time_rounded,
+                                    size: 12.sp,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    _getFormattedTime(),
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: AppColors.textTertiary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Mark as read button with improved design
+                            if (!notification.isRead && onMarkAsRead != null)
+                              GestureDetector(
+                                onTap: onMarkAsRead,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    vertical: 6.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        AppColors.primary,
+                                        AppColors.primaryLight,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withOpacity(
+                                          0.2,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.check_rounded,
+                                        size: 12.sp,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        'قراءة',
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Unread indicator with improved design
+                  if (!notification.isRead)
+                    Container(
+                      width: 10.w,
+                      height: 10.h,
+                      margin: EdgeInsets.only(top: 6.h, left: 8.w),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _getTypeAccentColor(),
+                            _getTypeAccentColor().withOpacity(0.8),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getTypeAccentColor().withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-
-                // Unread indicator
-                if (!notification.isRead)
-                  Container(
-                    width: 8.w,
-                    height: 8.h,
-                    margin: EdgeInsets.only(top: 4.h, left: 8.w),
-                    decoration: const BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -186,33 +337,59 @@ class NotificationTile extends StatelessWidget {
     );
   }
 
-  IconData _getIcon() {
+  // Get background color based on read status and type
+  Color _getCardBackgroundColor() {
+    if (notification.isRead) {
+      return AppColors.surface;
+    }
+    return _getTypeAccentColor().withOpacity(0.02);
+  }
+
+  // Get type-specific accent color
+  Color _getTypeAccentColor() {
     switch (notification.type) {
       case NotificationType.news:
-        return Icons.article_outlined;
+        return AppColors.success;
       case NotificationType.reportUpdate:
-        return Icons.update;
+        return AppColors.warning;
       case NotificationType.reportComment:
-        return Icons.comment_outlined;
+        return AppColors.info;
       case NotificationType.system:
-        return Icons.settings_outlined;
+        return AppColors.secondary;
       case NotificationType.general:
-        return Icons.notifications_outlined;
+        return AppColors.primary;
     }
   }
 
-  Color _getIconColor() {
+  // Get type label in Arabic
+  String _getTypeLabel() {
     switch (notification.type) {
       case NotificationType.news:
-        return Colors.green;
+        return 'أخبار';
       case NotificationType.reportUpdate:
-        return Colors.orange;
+        return 'تحديث بلاغ';
       case NotificationType.reportComment:
-        return Colors.blue;
+        return 'تعليق';
       case NotificationType.system:
-        return Colors.grey;
+        return 'النظام';
       case NotificationType.general:
-        return Colors.purple;
+        return 'عام';
+    }
+  }
+
+  // Get icon based on notification type
+  IconData _getIcon() {
+    switch (notification.type) {
+      case NotificationType.news:
+        return Icons.newspaper_rounded;
+      case NotificationType.reportUpdate:
+        return Icons.assignment_turned_in_rounded;
+      case NotificationType.reportComment:
+        return Icons.comment_rounded;
+      case NotificationType.system:
+        return Icons.admin_panel_settings_rounded;
+      case NotificationType.general:
+        return Icons.notifications_active_rounded;
     }
   }
 

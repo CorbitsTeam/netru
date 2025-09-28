@@ -42,6 +42,7 @@ class CreateReportUseCase {
       locationName: params.locationName,
       reportDateTime: params.reportDateTime,
       mediaFile: params.mediaFile,
+      mediaFiles: params.mediaFiles,
       submittedBy: params.submittedBy,
     );
   }
@@ -83,6 +84,7 @@ class CreateReportParams {
   final String? locationName;
   final DateTime reportDateTime;
   final File? mediaFile;
+  final List<File>? mediaFiles;
   final String? submittedBy;
 
   CreateReportParams({
@@ -98,6 +100,7 @@ class CreateReportParams {
     this.locationName,
     required this.reportDateTime,
     this.mediaFile,
+    this.mediaFiles,
     this.submittedBy,
   });
 }

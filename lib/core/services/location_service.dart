@@ -48,31 +48,37 @@ class LocationService {
     try {
       final hasPermission = await checkLocationPermission();
       if (!hasPermission) {
+        print('❌ Location permission denied');
         return null;
       }
 
+      print('📍 Getting current GPS location...');
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
         ),
       );
 
-      // فحص إذا كان التطبيق يعمل على محاكي
-      bool isEmulator = await _isRunningOnEmulator();
+      print(
+        '✅ GPS location obtained: ${position.latitude}, ${position.longitude}',
+      );
 
-      if (isEmulator) {
-        // إحداثيات مدينة نصر الحقيقية
-        _currentLocation = const LatLng(30.0626, 31.3219); // مدينة نصر، القاهرة، مصر
-        print('تم اكتشاف المحاكي - استخدام إحداثيات مدينة نصر');
-      } else {
-        _currentLocation = LatLng(position.latitude, position.longitude);
+      // Always use the actual GPS coordinates, even on emulator
+      _currentLocation = LatLng(position.latitude, position.longitude);
+
+      // Check if we got default emulator coordinates and warn the user
+      if (_isDefaultEmulatorLocation(position.latitude, position.longitude)) {
+        print(
+          '⚠️ Warning: This appears to be default emulator location. Consider setting custom location in emulator.',
+        );
       }
 
       return _currentLocation;
     } catch (e) {
-      // في حالة الخطأ، استخدم إحداثيات مدينة نصر كاحتياطي
-      _currentLocation = const LatLng(30.0626, 31.3219);
-      return _currentLocation;
+      print('❌ Failed to get GPS location: $e');
+      // Return null instead of defaulting to Nasr City - let the UI handle this appropriately
+      return null;
     }
   }
 
@@ -234,40 +240,24 @@ class LocationService {
     }
   }
 
-  // فحص إذا كان التطبيق يعمل على محاكي
-  Future<bool> _isRunningOnEmulator() async {
-    try {
-      // فحص أولي للمحاكي
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-        ),
-      );
-
-      // إحداثيات شائعة للمحاكيات
-      double lat = position.latitude;
-      double lng = position.longitude;
-
-      // Google Emulator default location (Google HQ)
-      if ((lat >= 37.4 && lat <= 37.5) && (lng >= -122.1 && lng <= -122.0)) {
-        return true;
-      }
-
-      // iOS Simulator default location (Apple HQ)
-      if ((lat >= 37.3 && lat <= 37.4) && (lng >= -122.1 && lng <= -122.0)) {
-        return true;
-      }
-
-      // إحداثيات أخرى شائعة للمحاكيات
-      if (lat == 0.0 && lng == 0.0) {
-        return true;
-      }
-
-      return false;
-    } catch (e) {
-      // في حالة الخطأ، افترض أنه محاكي
+  // فحص إذا كانت الإحداثيات افتراضية للمحاكي
+  bool _isDefaultEmulatorLocation(double lat, double lng) {
+    // Google Emulator default location (Google HQ)
+    if ((lat >= 37.4 && lat <= 37.5) && (lng >= -122.1 && lng <= -122.0)) {
       return true;
     }
+
+    // iOS Simulator default location (Apple HQ)
+    if ((lat >= 37.3 && lat <= 37.4) && (lng >= -122.1 && lng <= -122.0)) {
+      return true;
+    }
+
+    // إحداثيات أخرى شائعة للمحاكيات
+    if (lat == 0.0 && lng == 0.0) {
+      return true;
+    }
+
+    return false;
   }
 
   // Get location details by coordinates (reverse geocoding)
@@ -276,21 +266,6 @@ class LocationService {
     double longitude,
   ) async {
     try {
-      // فحص خاص لمدينة نصر
-      if (_isNasrCity(latitude, longitude)) {
-        return Right(
-          LocationDetails(
-            latitude: latitude,
-            longitude: longitude,
-            formattedAddress: 'شارع الطيران، مدينة نصر، القاهرة، مصر',
-            street: 'شارع الطيران',
-            city: 'مدينة نصر',
-            state: 'القاهرة',
-            country: 'مصر',
-          ),
-        );
-      }
-
       // استخدام Geocoder للحصول على العنوان الحقيقي
       List<Placemark> placemarks = await placemarkFromCoordinates(
         latitude,
@@ -345,55 +320,38 @@ class LocationService {
         String formattedAddress =
             addressParts.isNotEmpty
                 ? addressParts.join('، ')
-                : 'مدينة نصر، القاهرة، مصر';
+                : '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}';
 
         return Right(
           LocationDetails(
             latitude: latitude,
             longitude: longitude,
             formattedAddress: formattedAddress,
-            street:
-                street.isEmpty || street == 'null' ? 'شارع الطيران' : street,
-            city: city.isEmpty || city == 'null' ? 'مدينة نصر' : city,
-            state: state.isEmpty || state == 'null' ? 'القاهرة' : state,
+            street: street.isEmpty || street == 'null' ? null : street,
+            city: city.isEmpty || city == 'null' ? null : city,
+            state: state.isEmpty || state == 'null' ? null : state,
             country: country.isEmpty || country == 'null' ? 'مصر' : country,
           ),
         );
       } else {
-        // في حالة عدم وجود بيانات، استخدم بيانات مدينة نصر
+        // في حالة عدم وجود بيانات، استخدم الإحداثيات فقط
         return Right(
           LocationDetails(
             latitude: latitude,
             longitude: longitude,
-            formattedAddress: 'مدينة نصر، القاهرة، مصر',
-            street: 'شارع الطيران',
-            city: 'مدينة نصر',
-            state: 'القاهرة',
+            formattedAddress:
+                '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}',
+            street: null,
+            city: null,
+            state: null,
             country: 'مصر',
           ),
         );
       }
     } catch (e) {
-      // في حالة فشل الخدمة، ارجع بيانات مدينة نصر
-      return Right(
-        LocationDetails(
-          latitude: latitude,
-          longitude: longitude,
-          formattedAddress: 'مدينة نصر، القاهرة، مصر',
-          street: 'شارع الطيران',
-          city: 'مدينة نصر',
-          state: 'القاهرة',
-          country: 'مصر',
-        ),
-      );
+      // في حالة فشل الخدمة، ارجع الإحداثيات فقط
+      return Left(ServerFailure('فشل في تحديد العنوان: ${e.toString()}'));
     }
-  }
-
-  // فحص إذا كانت الإحداثيات في مدينة نصر
-  bool _isNasrCity(double latitude, double longitude) {
-    // حدود مدينة نصر التقريبية
-    return (latitude >= 30.05 && latitude <= 30.08) &&
-        (longitude >= 31.30 && longitude <= 31.35);
   }
 }
 

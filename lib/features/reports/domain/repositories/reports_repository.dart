@@ -18,6 +18,7 @@ abstract class ReportsRepository {
     String? locationName,
     required DateTime reportDateTime,
     File? mediaFile,
+    List<File>? mediaFiles,
     String? submittedBy,
   });
   Future<Either<String, ReportEntity>> updateReportStatus(

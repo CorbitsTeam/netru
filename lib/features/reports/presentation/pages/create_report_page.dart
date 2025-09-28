@@ -10,6 +10,7 @@ import '../widgets/location_date_time_section.dart';
 import '../widgets/media_section.dart';
 import '../widgets/personal_info_section.dart';
 import '../widgets/report_info_section.dart';
+import '../widgets/progress_dialog.dart';
 
 class CreateReportPage extends StatelessWidget {
   const CreateReportPage({super.key});
@@ -36,6 +37,7 @@ class ReportFormView extends StatefulWidget {
 
 class _ReportFormViewState extends State<ReportFormView> {
   final _formKey = GlobalKey<FormState>();
+  bool _isProgressDialogShown = false;
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _nationalIdController = TextEditingController();
@@ -79,11 +81,39 @@ class _ReportFormViewState extends State<ReportFormView> {
     return Scaffold(
       body: BlocListener<ReportFormCubit, ReportFormState>(
         listener: (context, state) {
-          if (state.isSubmitted && !state.isLoading) {
-            // Don't reset form immediately - let user see success dialog first
-            _showSuccessDialog(context);
-          } else if (state.errorMessage.isNotEmpty && !state.isLoading) {
-            _showErrorSnackBar(context, state.errorMessage);
+          // Handle progress dialog
+          if (state.isLoading &&
+              state.submissionProgress > 0 &&
+              !_isProgressDialogShown) {
+            _isProgressDialogShown = true;
+            ProgressDialog.show(
+              context,
+              progress: state.submissionProgress,
+              currentStep: state.currentStep,
+              isUploading: state.isUploadingMedia,
+              uploadedFiles: state.uploadedFilesCount,
+              totalFiles: state.totalFilesCount,
+            );
+          } else if (state.isLoading && _isProgressDialogShown) {
+            // Update existing dialog
+            Navigator.pop(context);
+            ProgressDialog.show(
+              context,
+              progress: state.submissionProgress,
+              currentStep: state.currentStep,
+              isUploading: state.isUploadingMedia,
+              uploadedFiles: state.uploadedFilesCount,
+              totalFiles: state.totalFilesCount,
+            );
+          } else if (!state.isLoading && _isProgressDialogShown) {
+            _isProgressDialogShown = false;
+            ProgressDialog.hide(context);
+
+            if (state.isSubmitted) {
+              _showSuccessDialog(context);
+            } else if (state.errorMessage.isNotEmpty) {
+              _showErrorSnackBar(context, state.errorMessage);
+            }
           }
         },
         child: CustomScrollView(
@@ -212,6 +242,7 @@ class _ReportFormViewState extends State<ReportFormView> {
                             );
                           },
                         ),
+
                         SizedBox(height: 20.h),
                       ],
                     ),

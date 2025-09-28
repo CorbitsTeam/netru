@@ -215,6 +215,14 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                     child: CachedNetworkImage(
                       imageUrl: newsList[index].imageUrl!,
                       fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorWidget:
+                          (context, error, stackTrace) =>
+                              _buildErrorCarousel(),
+                      placeholder:
+                          (context, url) =>
+                              _buildEmptyCarousel(),
                     ),
                   ),
                 );

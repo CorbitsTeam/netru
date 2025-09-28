@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dartz/dartz.dart';
 import 'package:uuid/uuid.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
+import '../../../../core/services/enhanced_notification_service.dart';
 import '../../domain/entities/reports_entity.dart';
 import '../../domain/repositories/reports_repository.dart';
 import '../datasources/reports_remote_datasource.dart';
@@ -10,6 +11,8 @@ import '../models/reports_model.dart';
 
 class ReportsRepositoryImpl implements ReportsRepository {
   final ReportsRemoteDataSource remoteDataSource;
+  final EnhancedNotificationService _notificationService =
+      EnhancedNotificationService();
 
   ReportsRepositoryImpl(this.remoteDataSource);
 
@@ -47,6 +50,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
     String? locationName,
     required DateTime reportDateTime,
     File? mediaFile,
+    List<File>? mediaFiles,
     String? submittedBy,
   }) async {
     print('🏭 Repository: Starting createReport...');
@@ -90,6 +94,41 @@ class ReportsRepositoryImpl implements ReportsRepository {
       print('📝 Creating report in database...');
       final createdReport = await remoteDataSource.createReport(reportModel);
       print('✅ Report created with ID: ${createdReport.id}');
+
+      // Send success notification to the user who submitted the report
+      try {
+        print('📧 Sending success notification to user...');
+        await _notificationService.sendReportSubmissionSuccessNotification(
+          reportId: createdReport.id,
+          reportType: reportType,
+          reporterName: '$firstName $lastName',
+          caseNumber: createdReport.id.substring(0, 8).toUpperCase(),
+        );
+        print('✅ User success notification sent successfully');
+      } catch (e) {
+        // Don't fail report creation if notification fails
+        print('⚠️ Failed to send user notification: $e');
+      }
+
+      // Send notification to admin users about the new report
+      try {
+        print('📧 Sending notification to admin users...');
+        await _notificationService.sendNewReportNotificationToAdmins(
+          reportId: createdReport.id,
+          reporterName: '$firstName $lastName',
+          reportType: reportType,
+          reportSummary:
+              reportDetails.length > 100
+                  ? '${reportDetails.substring(0, 100)}...'
+                  : reportDetails,
+          caseNumber: createdReport.id.substring(0, 8).toUpperCase(),
+          nationalId: reporterNationalId,
+        );
+        print('✅ Admin notification sent successfully');
+      } catch (e) {
+        // Don't fail report creation if notification fails
+        print('⚠️ Failed to send admin notification: $e');
+      }
 
       // Upload media if provided and attach to report
       if (mediaFile != null) {
@@ -189,6 +228,61 @@ class ReportsRepositoryImpl implements ReportsRepository {
           }
 
           // For other errors, continue with report creation without media
+        }
+      }
+
+      // Handle multiple media files if provided
+      if (mediaFiles != null && mediaFiles.isNotEmpty) {
+        try {
+          print('📤 Uploading ${mediaFiles.length} additional media files...');
+
+          final baseFileName = 'report_${createdReport.id}';
+          final mediaUrls = await remoteDataSource.uploadMultipleMedia(
+            mediaFiles,
+            baseFileName,
+          );
+
+          if (mediaUrls.isNotEmpty) {
+            print('✅ Uploaded ${mediaUrls.length} media files successfully');
+
+            // Prepare media list for database insertion
+            final mediaList =
+                mediaUrls.map((url) {
+                  final extension = url.split('.').last.toLowerCase();
+                  String mediaType;
+                  if ([
+                    'jpg',
+                    'jpeg',
+                    'png',
+                    'gif',
+                    'bmp',
+                    'webp',
+                  ].contains(extension)) {
+                    mediaType = 'image';
+                  } else if ([
+                    'mp4',
+                    'avi',
+                    'mov',
+                    'wmv',
+                    'flv',
+                  ].contains(extension)) {
+                    mediaType = 'video';
+                  } else {
+                    mediaType = 'document';
+                  }
+                  return {'url': url, 'type': mediaType};
+                }).toList();
+
+            // Attach all media to report
+            await remoteDataSource.attachMultipleMediaToReport(
+              createdReport.id,
+              mediaList,
+            );
+            print('✅ All media files attached to report successfully');
+          }
+        } catch (mediaError) {
+          print('⚠️ Failed to upload multiple media files: $mediaError');
+          // Continue without failing the report creation
         }
       }
 

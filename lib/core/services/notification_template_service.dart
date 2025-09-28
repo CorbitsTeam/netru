@@ -6,7 +6,36 @@ library;
 class NotificationTemplateService {
   static const String _defaultAppName = 'نترو';
 
-  /// Generate notification for report status updates
+  /// Generate notification for new report submitted to admins
+  static Map<String, String> newReportSubmitted({
+    required String reporterName,
+    required String caseNumber,
+    required String reportType,
+    String? reportSummary,
+    String? location,
+    String reportId = 'غير محدد',
+    String appName = _defaultAppName,
+  }) {
+    return {
+      'title': 'بلاغ جديد - #$caseNumber',
+      'body': '''📋 تم استلام بلاغ جديد في النظام
+
+👤 اسم المبلغ: $reporterName
+📂 نوع البلاغ: $reportType
+🆔 رقم القضية: #$caseNumber
+${location != null ? '📍 الموقع: $location' : ''}
+
+${reportSummary != null ? '📄 تفاصيل البلاغ: $reportSummary' : ''}
+
+⏰ الوقت: ${DateTime.now().toString().split('.')[0]}
+
+يرجى مراجعة البلاغ واتخاذ الإجراء المناسب في أسرع وقت ممكن.
+
+$appName - نظام البلاغات''',
+    };
+  }
+
+  /// Generate comprehensive report status update notification
   static Map<String, String> reportStatusUpdate({
     required String status,
     required String reporterName,
@@ -382,6 +411,70 @@ $tipsText
 
 فريق $_defaultAppName''',
       'emoji': '🎉',
+    };
+  }
+
+  /// Generate notification for successful report submission (for user)
+  static Map<String, String> reportSubmissionSuccess({
+    required String reporterName,
+    required String caseNumber,
+    required String reportType,
+    String? expectedProcessingTime,
+  }) {
+    return {
+      'title': '✅ تم تقديم بلاغكم بنجاح',
+      'body': '''السيد/ة $reporterName،
+
+تم استلام وتسجيل بلاغكم بنجاح في النظام!
+
+🆔 رقم القضية: #$caseNumber
+📂 نوع البلاغ: $reportType
+📅 تاريخ التقديم: ${DateTime.now().toString().split(' ')[0]}
+⏰ وقت التقديم: ${DateTime.now().toString().split(' ')[1].substring(0, 5)}
+
+📋 الخطوات التالية:
+• سيتم مراجعة بلاغكم من قبل الفريق المختص
+• ستتلقون إشعاراً عند بدء المراجعة
+• يمكنكم متابعة حالة البلاغ من التطبيق
+
+⏱️ الوقت المتوقع للمراجعة: ${expectedProcessingTime ?? '24-48 ساعة'}
+
+شكراً لثقتكم في خدماتنا!
+
+تطبيق $_defaultAppName''',
+      'emoji': '✅',
+    };
+  }
+
+  /// Generate notification for new report submitted (for admins)
+  static Map<String, String> newReportSubmittedForAdmin({
+    required String reporterName,
+    required String reportType,
+    required String caseNumber,
+    String? reportSummary,
+    String? nationalId,
+  }) {
+    return {
+      'title': '🚨 بلاغ جديد مُعلق - #$caseNumber',
+      'body': '''📋 تم استلام بلاغ جديد ويتطلب المراجعة العاجلة
+
+👤 بيانات المبلغ:
+• الاسم: $reporterName
+${nationalId != null ? '• رقم الهوية: $nationalId' : ''}
+
+📂 تفاصيل البلاغ:
+• نوع البلاغ: $reportType
+• رقم القضية: #$caseNumber
+• وقت التقديم: ${DateTime.now().toString().split(' ')[1].substring(0, 5)}
+
+${reportSummary != null ? '📝 ملخص البلاغ:\n$reportSummary\n' : ''}
+
+⚡ يرجى مراجعة البلاغ وتعيين محقق في أسرع وقت ممكن.
+
+🔗 انقر لفتح تفاصيل البلاغ الكاملة.
+
+نظام الإدارة - $_defaultAppName''',
+      'emoji': '🚨',
     };
   }
 }

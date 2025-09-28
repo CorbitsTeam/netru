@@ -62,7 +62,7 @@ class _SignupPageState extends State<SignupPage> {
   int _resendCountdown = 0;
 
   // Step 2: User Type - Initialize with default citizen type
-  UserType? _selectedUserType = UserType.citizen;
+  final UserType? _selectedUserType = UserType.citizen;
 
   // Step 2: Documents
   List<File> _selectedDocuments = [];

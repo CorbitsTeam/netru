@@ -11,10 +11,18 @@ abstract class ReportsRemoteDataSource {
   Future<ReportModel> updateReport(ReportModel report);
   Future<void> deleteReport(String id);
   Future<String?> uploadMedia(File file, String fileName);
+  Future<List<String>> uploadMultipleMedia(
+    List<File> files,
+    String baseFileName,
+  );
   Future<void> attachMediaToReport(
     String reportId,
     String mediaUrl,
     String mediaType,
+  );
+  Future<void> attachMultipleMediaToReport(
+    String reportId,
+    List<Map<String, String>> mediaList,
   );
 }
 
@@ -34,7 +42,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
         throw Exception('لا يوجد مستخدم مسجل دخول');
       }
 
-
       // Strategy 1: Try multiple search approaches comprehensively
       List<ReportModel> foundReports = [];
 
@@ -51,21 +58,16 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
             .eq('user_id', currentUser.id.toString())
             .order('submitted_at', ascending: false);
 
-
         if (userIdResponse.isNotEmpty) {
           try {
             foundReports.addAll(
               userIdResponse.map((json) => ReportModel.fromJson(json)).toList(),
             );
           } catch (jsonError) {
-            debugPrint(
-              'Error parsing JSON: $jsonError',
-              wrapWidth: 1024,
-            );
+            debugPrint('Error parsing JSON: $jsonError', wrapWidth: 1024);
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
 
       // Strategy 2: Search by reporter_national_id if we have identifier
       final userIdentifier = currentUser.identifier;
@@ -82,7 +84,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               .eq('reporter_national_id', userIdentifier)
               .order('submitted_at', ascending: false);
 
-
           if (nationalIdResponse.isNotEmpty) {
             // Avoid duplicates by checking IDs
             try {
@@ -92,11 +93,9 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                   foundReports.add(report);
                 }
               }
-            } catch (jsonError) {
-            }
+            } catch (jsonError) {}
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       }
 
       // Strategy 3: Alternative search by national_id if available
@@ -123,8 +122,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               }
             }
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       }
 
       // Strategy 4: Emergency fallback - get all reports and filter locally
@@ -137,15 +135,13 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               .eq('user_id', currentUser.id.toString())
               .order('submitted_at', ascending: false);
 
-
           if (simpleResponse.isNotEmpty) {
             try {
               for (final json in simpleResponse) {
                 final report = ReportModel.fromJson(json);
                 foundReports.add(report);
               }
-            } catch (jsonError) {
-            }
+            } catch (jsonError) {}
           } else {
             // If still no results, try the comprehensive fallback
             final allReportsResponse = await supabaseClient
@@ -158,7 +154,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
                 ''')
                 .order('submitted_at', ascending: false)
                 .limit(1000); // Reasonable limit
-
 
             // Filter locally by any matching criteria
             for (final json in allReportsResponse) {
@@ -179,15 +174,13 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
               }
             }
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       }
 
       // Sort by update date (most recent first)
       foundReports.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-      if (foundReports.isNotEmpty) {
-      }
+      if (foundReports.isNotEmpty) {}
 
       return foundReports;
     } catch (e) {
@@ -215,8 +208,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
         final firstMedia = mediaList.first;
         response['media_url'] = firstMedia['file_url'];
         response['media_type'] = firstMedia['media_type'];
-      } else {
-      }
+      } else {}
 
       return ReportModel.fromJson(response);
     } catch (e) {
@@ -274,7 +266,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
   @override
   Future<String?> uploadMedia(File file, String fileName) async {
     try {
-
       // Check if file exists before attempting to read
       if (!await file.exists()) {
         throw Exception('File does not exist at path: ${file.path}');
@@ -295,18 +286,15 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fullFileName = '${fileName}_$timestamp.$extension';
 
-
       // Upload to Supabase Storage
-      final uploadResponse = await supabaseClient.storage
+      await supabaseClient.storage
           .from('reports-media')
           .uploadBinary(fullFileName, bytes);
-
 
       // Get public URL
       final url = supabaseClient.storage
           .from('reports-media')
           .getPublicUrl(fullFileName);
-
 
       // Verify the URL is not empty
       if (url.isEmpty) {
@@ -338,7 +326,6 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
     String mediaType,
   ) async {
     try {
-
       // Validate inputs
       if (reportId.isEmpty) {
         throw Exception('Report ID cannot be empty');
@@ -352,22 +339,15 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
       final fileName = mediaUrl.split('/').last;
 
       // Insert media record
-      final response =
-          await supabaseClient
-              .from('report_media')
-              .insert({
-                'report_id': reportId,
-                'media_type': mediaType,
-                'file_url': mediaUrl,
-                'file_name': fileName,
-                'is_evidence': true,
-                'uploaded_at': DateTime.now().toIso8601String(),
-              })
-              .select()
-              .single();
-
+      await supabaseClient.from('report_media').insert({
+        'report_id': reportId,
+        'media_type': mediaType,
+        'file_url': mediaUrl,
+        'file_name': fileName,
+        'is_evidence': true,
+        'uploaded_at': DateTime.now().toIso8601String(),
+      });
     } catch (e) {
-
       // Provide more specific error messages
       if (e.toString().contains('foreign key')) {
         throw Exception(
@@ -378,6 +358,71 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
       }
 
       throw Exception('Failed to attach media to report: $e');
+    }
+  }
+
+  @override
+  Future<List<String>> uploadMultipleMedia(
+    List<File> files,
+    String baseFileName,
+  ) async {
+    List<String> mediaUrls = [];
+
+    try {
+      debugPrint('📤 Uploading ${files.length} media files...');
+
+      for (int i = 0; i < files.length; i++) {
+        final file = files[i];
+        final fileName = '${baseFileName}_${i + 1}';
+
+        debugPrint('📤 Uploading file ${i + 1}/${files.length}: ${file.path}');
+
+        final mediaUrl = await uploadMedia(file, fileName);
+        if (mediaUrl != null && mediaUrl.isNotEmpty) {
+          mediaUrls.add(mediaUrl);
+          debugPrint('✅ File ${i + 1} uploaded successfully: $mediaUrl');
+        } else {
+          debugPrint('❌ Failed to upload file ${i + 1}');
+        }
+      }
+
+      debugPrint(
+        '✅ Uploaded ${mediaUrls.length}/${files.length} files successfully',
+      );
+      return mediaUrls;
+    } catch (e) {
+      debugPrint('❌ Failed to upload multiple media files: $e');
+      throw Exception('Failed to upload multiple media files: $e');
+    }
+  }
+
+  @override
+  Future<void> attachMultipleMediaToReport(
+    String reportId,
+    List<Map<String, String>> mediaList,
+  ) async {
+    try {
+      debugPrint(
+        '🔗 Attaching ${mediaList.length} media files to report $reportId...',
+      );
+
+      for (int i = 0; i < mediaList.length; i++) {
+        final mediaInfo = mediaList[i];
+        debugPrint('🔗 Attaching media ${i + 1}/${mediaList.length}...');
+
+        await attachMediaToReport(
+          reportId,
+          mediaInfo['url']!,
+          mediaInfo['type']!,
+        );
+
+        debugPrint('✅ Media ${i + 1} attached successfully');
+      }
+
+      debugPrint('✅ All ${mediaList.length} media files attached successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to attach multiple media to report: $e');
+      throw Exception('Failed to attach multiple media to report: $e');
     }
   }
 }

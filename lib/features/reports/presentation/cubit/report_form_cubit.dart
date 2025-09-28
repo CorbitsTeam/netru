@@ -64,6 +64,28 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     emit(state.copyWith(selectedMedia: null, removeMedia: true));
   }
 
+  void addMediaFile(File media) {
+    final currentFiles = List<File>.from(state.selectedMediaFiles);
+    currentFiles.add(media);
+    emit(state.copyWith(selectedMediaFiles: currentFiles));
+  }
+
+  void removeMediaFile(File media) {
+    final currentFiles = List<File>.from(state.selectedMediaFiles);
+    currentFiles.remove(media);
+    emit(state.copyWith(selectedMediaFiles: currentFiles));
+  }
+
+  void clearAllMediaFiles() {
+    emit(state.copyWith(clearAllMedia: true));
+  }
+
+  void addMultipleMediaFiles(List<File> mediaFiles) {
+    final currentFiles = List<File>.from(state.selectedMediaFiles);
+    currentFiles.addAll(mediaFiles);
+    emit(state.copyWith(selectedMediaFiles: currentFiles));
+  }
+
   void submitReport({
     required String firstName,
     required String lastName,
@@ -77,19 +99,66 @@ class ReportFormCubit extends Cubit<ReportFormState> {
     print('📷 Media File: ${state.selectedMedia?.path}');
     print('🗂️ Report Type: ${state.selectedReportType?.nameAr}');
 
-    emit(state.copyWith(isLoading: true, errorMessage: ''));
+    // Reset progress state
+    emit(
+      state.copyWith(
+        isLoading: true,
+        errorMessage: '',
+        submissionProgress: 0.0,
+        currentStep: 'بدء معالجة البلاغ...',
+      ),
+    );
 
     try {
-      // Validate that a report type is selected
+      // Step 1: Validate data (20%)
+      emit(
+        state.copyWith(
+          submissionProgress: 0.1,
+          currentStep: 'التحقق من صحة البيانات...',
+        ),
+      );
+
       if (state.selectedReportType == null) {
-        print('❌ No report type selected');
         emit(
           state.copyWith(
             isLoading: false,
             errorMessage: 'يرجى اختيار نوع البلاغ',
+            submissionProgress: 0.0,
+            currentStep: 'فشل في التحقق من البيانات',
           ),
         );
         return;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      emit(
+        state.copyWith(
+          submissionProgress: 0.2,
+          currentStep: 'تم التحقق من البيانات بنجاح',
+        ),
+      );
+
+      // Step 2: Prepare media files
+      final totalFiles =
+          (state.selectedMedia != null ? 1 : 0) +
+          state.selectedMediaFiles.length;
+      if (totalFiles > 0) {
+        emit(
+          state.copyWith(
+            submissionProgress: 0.3,
+            currentStep: 'إعداد الملفات للرفع...',
+            isUploadingMedia: true,
+            totalFilesCount: totalFiles,
+            uploadedFilesCount: 0,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            submissionProgress: 0.6,
+            currentStep: 'تجهيز البلاغ للإرسال...',
+          ),
+        );
       }
 
       // Get current user ID
@@ -110,7 +179,20 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         locationName: state.locationName,
         reportDateTime: state.selectedDateTime ?? DateTime.now(),
         mediaFile: state.selectedMedia,
+        mediaFiles:
+            state.selectedMediaFiles.isNotEmpty
+                ? state.selectedMediaFiles
+                : null,
         submittedBy: userId, // Link report to current user
+      );
+
+      // Step 3: Submit report (60% - 90%)
+      emit(
+        state.copyWith(
+          submissionProgress: 0.7,
+          currentStep: 'إرسال البلاغ...',
+          isUploadingMedia: false,
+        ),
       );
 
       print('📤 Calling createReportUseCase...');
@@ -140,17 +222,37 @@ class ReportFormCubit extends Cubit<ReportFormState> {
           }
 
           emit(
-            state.copyWith(isLoading: false, errorMessage: userFriendlyError),
+            state.copyWith(
+              isLoading: false,
+              errorMessage: userFriendlyError,
+              submissionProgress: 0.0,
+              currentStep: 'فشل في الإرسال',
+              isUploadingMedia: false,
+            ),
           );
         },
-        (report) {
+        (report) async {
           print('✅ Report submitted successfully! ID: ${report.id}');
-          print('📷 Media URL: ${report.mediaUrl}');
+
+          // Step 4: Sending notifications (90% - 100%)
+          emit(
+            state.copyWith(
+              submissionProgress: 0.9,
+              currentStep: 'إرسال الإشعارات...',
+            ),
+          );
+
+          await Future.delayed(const Duration(milliseconds: 800));
+
+          // Step 5: Complete (100%)
           emit(
             state.copyWith(
               isLoading: false,
               isSubmitted: true,
               submittedReportId: report.id,
+              submissionProgress: 1.0,
+              currentStep: 'تم إرسال البلاغ بنجاح!',
+              isUploadingMedia: false,
             ),
           );
         },
@@ -161,6 +263,24 @@ class ReportFormCubit extends Cubit<ReportFormState> {
         state.copyWith(
           isLoading: false,
           errorMessage: 'حدث خطأ أثناء إرسال البلاغ. يرجى المحاولة مرة أخرى',
+          submissionProgress: 0.0,
+          currentStep: 'فشل في الإرسال',
+          isUploadingMedia: false,
+        ),
+      );
+    }
+  }
+
+  void updateUploadProgress(int uploadedFiles, int totalFiles) {
+    if (totalFiles > 0) {
+      final uploadProgress = uploadedFiles / totalFiles;
+      final overallProgress = 0.3 + (uploadProgress * 0.3); // 30% - 60%
+
+      emit(
+        state.copyWith(
+          submissionProgress: overallProgress,
+          uploadedFilesCount: uploadedFiles,
+          currentStep: 'رفع الملفات... ($uploadedFiles/$totalFiles)',
         ),
       );
     }
