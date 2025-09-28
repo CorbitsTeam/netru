@@ -444,40 +444,49 @@ class _HeatMapWidgetState
 
   // الحصول على أيقونة نوع الجريمة
   IconData _getCrimeTypeIcon(String crimeType) {
-    if (crimeType.contains('سرقة'))
+    if (crimeType.contains('سرقة')) {
       return Icons.security;
-    if (crimeType.contains('اعتداء'))
+    }
+    if (crimeType.contains('اعتداء')) {
       return Icons.warning;
+    }
     if (crimeType.contains('مرور') ||
         crimeType.contains('حادث')) {
       return Icons.directions_car;
     }
-    if (crimeType.contains('مخدرات'))
+    if (crimeType.contains('مخدرات')) {
       return Icons.local_pharmacy;
-    if (crimeType.contains('احتيال'))
+    }
+    if (crimeType.contains('احتيال')) {
       return Icons.monetization_on;
-    if (crimeType.contains('عنف'))
+    }
+    if (crimeType.contains('عنف')) {
       return Icons.home;
+    }
     return Icons.report_problem;
   }
 
   // الحصول على لون نوع الجريمة
   Color _getCrimeTypeColor(String crimeType) {
-    if (crimeType.contains('سرقة'))
+    if (crimeType.contains('سرقة')) {
       return Colors.red;
-    if (crimeType.contains('اعتداء'))
+    }
+    if (crimeType.contains('اعتداء')) {
       return Colors.orange;
+    }
     if (crimeType.contains('مرور') ||
         crimeType.contains('حادث')) {
       return Colors.blue;
     }
-    if (crimeType.contains('مخدرات'))
+    if (crimeType.contains('مخدرات')) {
       return Colors.purple;
+    }
     if (crimeType.contains('احتيال')) {
       return Colors.yellow[700] ?? Colors.yellow;
     }
-    if (crimeType.contains('عنف'))
+    if (crimeType.contains('عنف')) {
       return Colors.pink;
+    }
     return Colors.grey;
   }
 

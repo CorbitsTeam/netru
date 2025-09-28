@@ -5,11 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:netru_app/core/domain/entities/signup_entities.dart';
+
 import 'package:netru_app/features/auth/widgets/data_entry_step.dart';
 import 'package:netru_app/features/auth/widgets/document_upload_step.dart';
 import 'package:netru_app/features/auth/widgets/review_submit_step.dart';
 import 'package:netru_app/features/auth/widgets/simple_location_step.dart';
-import 'package:netru_app/features/auth/widgets/user_type_selection_step.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:netru_app/core/routing/routes.dart';
@@ -31,45 +32,37 @@ class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
   @override
-  State<SignupPage> createState() =>
-      _SignupPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final PageController _pageController =
-      PageController();
+  final PageController _pageController = PageController();
   int _currentStep = 0;
   bool _isSubmitting = false;
+  bool _isDisposed = false; // Track disposal state
 
   // Step 0: Username (email or phone) and Password
-  final _usernameController =
-      TextEditingController();
-  final _passwordController =
-      TextEditingController();
-  final _confirmPasswordController =
-      TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   late final VoidCallback _usernameListener;
   late final VoidCallback _passwordListener;
-  late final VoidCallback
-  _confirmPasswordListener;
+  late final VoidCallback _confirmPasswordListener;
   final _formKey = GlobalKey<FormState>();
-  bool _isEmailMode =
-      true; // true for email, false for phone
+  bool _isEmailMode = true; // true for email, false for phone
 
   // Step 1: OTP Verification (Email or SMS)
   bool _isVerified = false;
   bool _isCheckingVerification = false;
   String _otpCode = '';
-  final TextEditingController _otpController =
-      TextEditingController();
-  StreamController<ErrorAnimationType>?
-  _otpErrorController;
+  final TextEditingController _otpController = TextEditingController();
+  StreamController<ErrorAnimationType>? _otpErrorController;
   Timer? _resendTimer;
   int _resendCountdown = 0;
 
-  // Step 2: User Type
-  UserType? _selectedUserType;
+  // Step 2: User Type - Initialize with default citizen type
+  UserType? _selectedUserType = UserType.citizen;
 
   // Step 2: Documents
   List<File> _selectedDocuments = [];
@@ -85,7 +78,6 @@ class _SignupPageState extends State<SignupPage> {
   final List<String> _stepTitles = [
     'بيانات الدخول الأساسية',
     'تأكيد الهوية (OTP)',
-    'نوع المستخدم',
     'رفع المستندات',
     'البيانات الشخصية',
     'العنوان',
@@ -97,8 +89,7 @@ class _SignupPageState extends State<SignupPage> {
     super.initState();
 
     // Initialize OTP error controller
-    _otpErrorController =
-        StreamController<ErrorAnimationType>();
+    _otpErrorController = StreamController<ErrorAnimationType>();
 
     // Add listeners to text controllers to update UI when typing
     _usernameListener = () {
@@ -114,86 +105,105 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {});
     };
 
-    _usernameController.addListener(
-      _usernameListener,
-    );
-    _passwordController.addListener(
-      _passwordListener,
-    );
-    _confirmPasswordController.addListener(
-      _confirmPasswordListener,
-    );
+    _usernameController.addListener(_usernameListener);
+    _passwordController.addListener(_passwordListener);
+    _confirmPasswordController.addListener(_confirmPasswordListener);
   }
 
   @override
   void dispose() {
+    _isDisposed = true; // Mark as disposed
+    
     // Cancel any running timers first
     _resendTimer?.cancel();
     _otpErrorController?.close();
 
-    // Remove listeners safely
+    // Remove listeners safely before disposing controllers
     try {
-      _usernameController.removeListener(
-        _usernameListener,
-      );
-      _passwordController.removeListener(
-        _passwordListener,
-      );
-      _confirmPasswordController.removeListener(
-        _confirmPasswordListener,
-      );
+      _usernameController.removeListener(_usernameListener);
     } catch (_) {
       // Ignore errors during listener removal
     }
 
-    // Dispose controllers
-    _pageController.dispose();
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _otpController.dispose();
+    try {
+      _passwordController.removeListener(_passwordListener);
+    } catch (_) {
+      // Ignore errors during listener removal
+    }
+
+    try {
+      _confirmPasswordController.removeListener(_confirmPasswordListener);
+    } catch (_) {
+      // Ignore errors during listener removal
+    }
+
+    // Dispose controllers safely
+    try {
+      _pageController.dispose();
+    } catch (_) {
+      // Already disposed
+    }
+
+    try {
+      _usernameController.dispose();
+    } catch (_) {
+      // Already disposed
+    }
+
+    try {
+      _passwordController.dispose();
+    } catch (_) {
+      // Already disposed
+    }
+
+    try {
+      _confirmPasswordController.dispose();
+    } catch (_) {
+      // Already disposed
+    }
+
+    try {
+      _otpController.dispose();
+    } catch (_) {
+      // Already disposed
+    }
 
     super.dispose();
   }
 
-  void _handleBlocState(
-    BuildContext context,
-    SignupState state,
-  ) {
-    if (state is SignupError ||
-        state is SignupFailure) {
+  void _handleBlocState(BuildContext context, SignupState state) {
+    if (_isDisposed) return; // Don't handle state if disposed
+    
+    if (state is SignupError || state is SignupFailure) {
       final message =
           state is SignupError
               ? state.message
               : (state as SignupFailure).message;
 
       // Use custom snackbar for error messages
-      showModernSnackBar(
-        context,
-        message: message,
-        type: SnackBarType.error,
-      );
+      showModernSnackBar(context, message: message, type: SnackBarType.error);
 
-      setState(() {
-        _isSubmitting = false;
-      });
-    } else if (state
-        is SignupUserExistsWithLoginOption) {
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    } else if (state is SignupUserExistsWithLoginOption) {
       // 🆕 Handle user already exists - show dialog with login option
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
 
-      _showUserExistsDialog(
-        context,
-        state.message,
-        state.dataType,
-      );
+      _showUserExistsDialog(context, state.message, state.dataType);
     } else if (state is SignupEmailSent) {
       // 🆕 Handle OTP sent state - transition to next step
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
 
       _startResendTimer();
 
@@ -207,60 +217,64 @@ class _SignupPageState extends State<SignupPage> {
       );
 
       // Transition to OTP verification step only if not coming from user exists error
-      Future.delayed(
-        const Duration(milliseconds: 500),
-        () {
-          if (mounted) {
-            _proceedToNextStep();
-          }
-        },
-      );
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (!_isDisposed && mounted) {
+          _proceedToNextStep();
+        }
+      });
     } else if (state is SignupLoading) {
       // Handle loading state
-      setState(() {
-        _isSubmitting = true;
-      });
-    } else if (state is SignupCompleted ||
-        state is SignupSuccess) {
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = true;
+        });
+      }
+    } else if (state is SignupCompleted || state is SignupSuccess) {
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
 
       showModernSnackBar(
         context,
-        message:
-            'تم إنشاء الحساب بنجاح! جاري توجيهك لصفحة اختيار اللغة...',
+        message: 'تم إنشاء الحساب بنجاح! جاري توجيهك لصفحة اختيار اللغة...',
         type: SnackBarType.success,
       );
 
-      // Clear cache and navigate to language selection page
-      Future.delayed(
-        const Duration(seconds: 1),
-        () async {
-          if (!mounted) return;
+      // Clear cache and navigate to language selection page immediately
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (_isDisposed || !mounted) return;
 
+        try {
           // Clear cache after successful signup
-          await context
-              .read<SignupCubit>()
-              .clearCacheAfterSuccessfulSignup();
+          await context.read<SignupCubit>().clearCacheAfterSuccessfulSignup();
 
-          if (!mounted) return;
+          if (_isDisposed || !mounted) return;
 
           // Navigate to language selection page (or main app)
           // Replace with the actual route for language selection
-          Navigator.of(
-            context,
-          ).pushNamedAndRemoveUntil(
-            Routes
-                .loginScreen, // TODO: Change to language selection route
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            Routes.loginScreen, // TODO: Change to language selection route
             (route) => false,
           );
-        },
-      );
-    } else {
-      setState(() {
-        _isSubmitting = false;
+        } catch (e) {
+          print('❌ Error during post-signup cleanup: $e');
+          // Still navigate even if cleanup fails
+          if (!_isDisposed && mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              Routes.loginScreen,
+              (route) => false,
+            );
+          }
+        }
       });
+    } else {
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 
@@ -269,8 +283,7 @@ class _SignupPageState extends State<SignupPage> {
       SignupUsernamePasswordStep(
         usernameController: _usernameController,
         passwordController: _passwordController,
-        confirmPasswordController:
-            _confirmPasswordController,
+        confirmPasswordController: _confirmPasswordController,
         isEmailMode: _isEmailMode,
         onEmailModeChanged: (isEmail) {
           setState(() {
@@ -283,8 +296,7 @@ class _SignupPageState extends State<SignupPage> {
         isEmailMode: _isEmailMode,
         username: _usernameController.text,
         isVerified: _isVerified,
-        isCheckingVerification:
-            _isCheckingVerification,
+        isCheckingVerification: _isCheckingVerification,
         otpCode: _otpCode,
         otpController: _otpController,
         otpErrorController: _otpErrorController,
@@ -313,10 +325,7 @@ class _SignupPageState extends State<SignupPage> {
         elevation: 0,
         toolbarHeight: 0,
       ),
-      body: BlocConsumer<
-        SignupCubit,
-        SignupState
-      >(
+      body: BlocConsumer<SignupCubit, SignupState>(
         listener: _handleBlocState,
         builder: (context, state) {
           return CustomScrollView(
@@ -328,8 +337,7 @@ class _SignupPageState extends State<SignupPage> {
                     // Header with logo and title
                     const SignupHeader(
                       title: 'إنشاء حساب جديد',
-                      subtitle:
-                          'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
+                      subtitle: 'أنشئ حساباً جديداً للاستفادة من جميع الخدمات',
                       showLogo: false,
                     ),
                     // Progress indicator
@@ -344,8 +352,7 @@ class _SignupPageState extends State<SignupPage> {
               SliverFillRemaining(
                 child: PageView(
                   controller: _pageController,
-                  physics:
-                      const NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   children: _buildStepWidgets(),
                 ),
               ),
@@ -353,32 +360,37 @@ class _SignupPageState extends State<SignupPage> {
           );
         },
       ),
-      bottomNavigationBar: BlocBuilder<
-        SignupCubit,
-        SignupState
-      >(
+      bottomNavigationBar: BlocBuilder<SignupCubit, SignupState>(
         builder: (context, state) {
+          final canProceed = _canProceedToNext();
+          final isProcessing = _isSubmitting || _isCheckingVerification;
+
           return SignupNavigationButtons(
-            onPrevious:
-                _currentStep > 0
-                    ? _previousStep
-                    : null,
+            onPrevious: _currentStep > 0 ? _previousStep : null,
             onNext:
-                _canProceedToNext() &&
-                        !_isSubmitting &&
-                        !_isCheckingVerification
+                canProceed && !isProcessing
                     ? () {
-                      if (_isSubmitting ||
-                          _isCheckingVerification)
-                        return;
+                      if (isProcessing) return;
+                      // Debug current state before proceeding
+                      _debugCurrentState();
                       _nextStep();
                     }
-                    : null,
+                    : () {
+                      // Show debug info when button is disabled
+                      _debugCurrentState();
+                      if (_currentStep == 3) {
+                        final errorMessage = _getValidationError();
+                        if (errorMessage != null) {
+                          // Use post-frame callback to avoid calling during build
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _showValidationError(errorMessage);
+                          });
+                        }
+                      }
+                    },
             nextButtonText: _getNextButtonText(),
-            isLoading:
-                _isSubmitting ||
-                _isCheckingVerification,
-            canProceed: _canProceedToNext(),
+            isLoading: isProcessing,
+            canProceed: canProceed,
             showPreviousButton: _currentStep > 0,
           );
         },
@@ -404,8 +416,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget _buildDocumentStep() {
     return SignupStepContainer(
       child: DocumentUploadStep(
-        userType:
-            _selectedUserType ?? UserType.citizen,
+        userType: _selectedUserType ?? UserType.citizen,
         selectedDocuments: _selectedDocuments,
         onDocumentsChanged: (documents) {
           setState(() {
@@ -418,30 +429,23 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildDataEntryStep() {
     // Ensure password is in userData
-    final currentPassword =
-        _passwordController.text.trim();
+    final currentPassword = _passwordController.text.trim();
     if (currentPassword.isNotEmpty &&
-        (_userData['password']?.isEmpty ??
-            true)) {
+        (_userData['password']?.isEmpty ?? true)) {
       _userData['password'] = currentPassword;
     }
 
     // Pre-fill email/phone based on registration method
-    if (_isEmailMode &&
-        (_userData['email']?.isEmpty ?? true)) {
-      _userData['email'] =
-          _usernameController.text.trim();
+    if (_isEmailMode && (_userData['email']?.isEmpty ?? true)) {
+      _userData['email'] = _usernameController.text.trim();
     }
-    if (!_isEmailMode &&
-        (_userData['phone']?.isEmpty ?? true)) {
-      _userData['phone'] =
-          _usernameController.text.trim();
+    if (!_isEmailMode && (_userData['phone']?.isEmpty ?? true)) {
+      _userData['phone'] = _usernameController.text.trim();
     }
 
     return SignupStepContainer(
       child: DataEntryStep(
-        userType:
-            _selectedUserType ?? UserType.citizen,
+        userType: _selectedUserType ?? UserType.citizen,
         extractedData: _extractedData,
         currentData: _userData,
         username: _usernameController.text.trim(),
@@ -450,6 +454,11 @@ class _SignupPageState extends State<SignupPage> {
         onDataChanged: (data) {
           setState(() {
             _userData = _mergeUserData(data);
+            print('📊 Data updated: $_userData'); // Debug log
+          });
+          // Force rebuild of navigation buttons
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
           });
         },
       ),
@@ -479,23 +488,18 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildReviewStep() {
     final locationData = {
-      'governorate':
-          _selectedGovernorate?.name ?? '',
+      'governorate': _selectedGovernorate?.name ?? '',
       'city': _selectedCity?.name ?? '',
       'district': '',
     };
 
-    final documentPaths =
-        _selectedDocuments
-            .map((file) => file.path)
-            .toList();
+    final documentPaths = _selectedDocuments.map((file) => file.path).toList();
 
     return SignupStepContainer(
       title: 'مراجعة وإرسال',
       subtitle: 'مراجعة أخيرة لبياناتك',
       child: ReviewSubmitStep(
-        userType:
-            _selectedUserType ?? UserType.citizen,
+        userType: _selectedUserType ?? UserType.citizen,
         userData: _userData,
         locationData: locationData,
         documentPaths: documentPaths,
@@ -505,16 +509,11 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Map<String, String> _mergeUserData(
-    Map<String, dynamic> data,
-  ) {
-    final currentPassword =
-        _passwordController.text.trim();
+  Map<String, String> _mergeUserData(Map<String, dynamic> data) {
+    final currentPassword = _passwordController.text.trim();
 
     // Merge incoming data with existing _userData but preserve the controller password
-    final merged = Map<String, String>.from(
-      _userData,
-    );
+    final merged = Map<String, String>.from(_userData);
 
     // Add/overwrite with new fields from data
     data.forEach((k, v) {
@@ -522,67 +521,48 @@ class _SignupPageState extends State<SignupPage> {
     });
 
     // Ensure password is preserved from controller if available
-    final incomingPassword =
-        data['password']?.toString() ?? '';
-    final existingPassword =
-        _userData['password'] ?? '';
+    final incomingPassword = data['password']?.toString() ?? '';
+    final existingPassword = _userData['password'] ?? '';
     final controllerPassword = currentPassword;
 
     // Choose the best password candidate
     String bestPassword = '';
-    for (final p in [
-      controllerPassword,
-      existingPassword,
-      incomingPassword,
-    ]) {
-      if (p.isNotEmpty &&
-          p.length > bestPassword.length) {
+    for (final p in [controllerPassword, existingPassword, incomingPassword]) {
+      if (p.isNotEmpty && p.length > bestPassword.length) {
         bestPassword = p;
       }
     }
-    if (bestPassword.isNotEmpty)
-      merged['password'] = bestPassword;
+    if (bestPassword.isNotEmpty) merged['password'] = bestPassword;
 
     return merged;
   }
 
   bool _canProceedToNext() {
     // Prevent navigation if currently processing
-    if (_isSubmitting || _isCheckingVerification)
-      return false;
+    if (_isSubmitting || _isCheckingVerification) return false;
 
     switch (_currentStep) {
       case 0: // Username and Password step
         // Allow button to be enabled if basic fields have content
         // Form validation will happen in _nextStep()
-        return _usernameController.text
-                .trim()
-                .isNotEmpty &&
-            _passwordController.text
-                .trim()
-                .isNotEmpty &&
-            _confirmPasswordController.text
-                .trim()
-                .isNotEmpty;
+        return _usernameController.text.trim().isNotEmpty &&
+            _passwordController.text.trim().isNotEmpty &&
+            _confirmPasswordController.text.trim().isNotEmpty;
       case 1: // OTP verification step
         // For step 1, allow if verified OR if OTP code is complete for verification
-        return _isVerified ||
-            _otpCode.length == 6;
-      case 2: // User type step
-        return _selectedUserType != null;
-      case 3: // Document upload step
-        final requiredDocs =
-            _selectedUserType == UserType.citizen
-                ? 2
-                : 1;
-        return _selectedDocuments.length >=
-            requiredDocs;
-      case 4: // Data entry step
-        return _isDataValid();
-      case 5: // Location step
-        return _selectedGovernorate != null &&
-            _selectedCity != null;
-      case 6: // Review step
+        return _isVerified || _otpCode.length == 6;
+      case 2: // Document upload step (now step 2, not 3)
+        final requiredDocs = _selectedUserType == UserType.citizen ? 2 : 1;
+        return _selectedDocuments.length >= requiredDocs;
+      case 3: // Data entry step (now step 3, not 4)
+        final canProceed = _isDataValid();
+        print('🔍 Step 3 - Can proceed: $canProceed'); // Debug log
+        return canProceed;
+      case 4: // Location step (now step 4, not 5)
+        final canProceed = _selectedGovernorate != null && _selectedCity != null;
+        print('🔍 Step 4 - Can proceed: $canProceed (Gov: $_selectedGovernorate, City: $_selectedCity)'); // Debug log
+        return canProceed;
+      case 5: // Review step (now step 5, not 6)
         return true; // Review step can always proceed to submit
       default:
         return false;
@@ -590,113 +570,230 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   bool _isDataValid() {
-    // Required fields for all users
-    final requiredFields = [
-      'fullName',
-      'email',
-      'phone',
-      'password',
-    ];
+    try {
+      // Required fields for all users
+      final requiredFields = ['fullName', 'email', 'phone', 'password'];
 
-    // Document-specific fields
-    if (_selectedUserType == UserType.citizen) {
-      requiredFields.add('nationalId');
-    } else {
-      requiredFields.add('passportNumber');
-    }
+      // Document-specific fields
+      if (_selectedUserType == UserType.citizen) {
+        requiredFields.add('nationalId');
+      } else {
+        requiredFields.add('passportNumber');
+      }
 
-    // Check if all required fields have values
-    for (String field in requiredFields) {
-      final value = _userData[field];
-      if (value == null || value.trim().isEmpty) {
+      // Debug: Log current data state
+      print('🔍 Validating data for step $_currentStep');
+      print('📊 Current _userData: $_userData');
+      print('✅ Required fields: $requiredFields');
+
+      // Check if all required fields have values
+      List<String> missingFields = [];
+      for (String field in requiredFields) {
+        final value = _userData[field];
+        if (value == null || value.trim().isEmpty) {
+          missingFields.add(field);
+        }
+      }
+
+      if (missingFields.isNotEmpty) {
+        print('❌ Missing fields: $missingFields');
         return false;
       }
-    }
 
-    // Check password length with fallback to controller
-    final password =
-        _userData['password'] ??
-        _passwordController.text.trim();
-    if (password.length < 6) {
+      // Check password length with fallback to controller
+      final password = _userData['password'] ?? _passwordController.text.trim();
+      if (password.length < 8) {
+        print('❌ Password too short: ${password.length}');
+        return false;
+      }
+
+      // Validate email format
+      final email = _userData['email'] ?? '';
+      if (email.isNotEmpty) {
+        final emailValid = RegExp(
+          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+        ).hasMatch(email);
+        if (!emailValid) {
+          print('❌ Invalid email format: $email');
+          return false;
+        }
+      }
+
+      // Validate phone format
+      final phone = _userData['phone'] ?? '';
+      if (phone.isNotEmpty) {
+        final phoneValid = RegExp(
+          r'^\+?[0-9]{10,15}$',
+        ).hasMatch(phone.replaceAll(RegExp(r'[\s-]'), ''));
+        if (!phoneValid) {
+          print('❌ Invalid phone format: $phone');
+          return false;
+        }
+      }
+
+      // Validate document-specific fields
+      if (_selectedUserType == UserType.citizen) {
+        final nationalId = _userData['nationalId'] ?? '';
+        if (nationalId.length != 14 ||
+            !RegExp(r'^\d{14}$').hasMatch(nationalId)) {
+          print('❌ Invalid national ID: $nationalId');
+          return false;
+        }
+      } else {
+        final passportNumber = _userData['passportNumber'] ?? '';
+        if (passportNumber.length < 6 || passportNumber.length > 12) {
+          print('❌ Invalid passport number: $passportNumber');
+          return false;
+        }
+      }
+
+      print('✅ All validation checks passed');
+      return true;
+    } catch (e) {
+      print('❌ Validation error: $e');
       return false;
     }
+  }
 
-    // Validate email format
-    final email = _userData['email'] ?? '';
-    if (email.isNotEmpty) {
-      final emailValid = RegExp(
-        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-      ).hasMatch(email);
-      if (!emailValid) return false;
-    }
+  /// Get validation error message for current data
+  String? _getValidationError() {
+    try {
+      // Required fields for all users
+      final requiredFields = ['fullName', 'email', 'phone', 'password'];
 
-    // Validate phone format
-    final phone = _userData['phone'] ?? '';
-    if (phone.isNotEmpty) {
-      final phoneValid = RegExp(
-        r'^\+?[0-9]{10,15}$',
-      ).hasMatch(
-        phone.replaceAll(RegExp(r'[\s-]'), ''),
-      );
-      if (!phoneValid) return false;
-    }
-
-    // Validate document-specific fields
-    if (_selectedUserType == UserType.citizen) {
-      final nationalId =
-          _userData['nationalId'] ?? '';
-      if (nationalId.length != 14 ||
-          !RegExp(
-            r'^\d{14}$',
-          ).hasMatch(nationalId)) {
-        return false;
+      // Document-specific fields
+      if (_selectedUserType == UserType.citizen) {
+        requiredFields.add('nationalId');
+      } else {
+        requiredFields.add('passportNumber');
       }
-    }
 
-    return true;
+      // Check if all required fields have values
+      List<String> missingFields = [];
+      for (String field in requiredFields) {
+        final value = _userData[field];
+        if (value == null || value.trim().isEmpty) {
+          missingFields.add(field);
+        }
+      }
+
+      if (missingFields.isNotEmpty) {
+        return 'الحقول المطلوبة مفقودة: ${missingFields.join(", ")}';
+      }
+
+      // Check password length with fallback to controller
+      final password = _userData['password'] ?? _passwordController.text.trim();
+      if (password.length < 8) {
+        return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+      }
+
+      // Validate email format
+      final email = _userData['email'] ?? '';
+      if (email.isNotEmpty) {
+        final emailValid = RegExp(
+          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+        ).hasMatch(email);
+        if (!emailValid) {
+          return 'صيغة البريد الإلكتروني غير صحيحة';
+        }
+      }
+
+      // Validate phone format
+      final phone = _userData['phone'] ?? '';
+      if (phone.isNotEmpty) {
+        final phoneValid = RegExp(
+          r'^\+?[0-9]{10,15}$',
+        ).hasMatch(phone.replaceAll(RegExp(r'[\s-]'), ''));
+        if (!phoneValid) {
+          return 'صيغة رقم الهاتف غير صحيحة';
+        }
+      }
+
+      // Validate document-specific fields
+      if (_selectedUserType == UserType.citizen) {
+        final nationalId = _userData['nationalId'] ?? '';
+        if (nationalId.length != 14 ||
+            !RegExp(r'^\d{14}$').hasMatch(nationalId)) {
+          return 'الرقم القومي يجب أن يكون 14 رقم';
+        }
+      } else {
+        final passportNumber = _userData['passportNumber'] ?? '';
+        if (passportNumber.length < 6 || passportNumber.length > 12) {
+          return 'رقم الجواز يجب أن يكون بين 6-12 حرف أو رقم';
+        }
+      }
+
+      return null; // No validation error
+    } catch (e) {
+      return 'خطأ في التحقق من البيانات';
+    }
   }
 
   String _getNextButtonText() {
     if (_currentStep == 0) {
-      return _isEmailMode
-          ? 'إرسال رمز التحقق'
-          : 'إرسال رمز SMS';
+      return _isEmailMode ? 'إرسال رمز التحقق' : 'إرسال رمز SMS';
     } else if (_currentStep == 1) {
-      return _isVerified
-          ? 'التالي'
-          : 'تأكيد الرمز';
-    } else if (_currentStep ==
-        _stepTitles.length - 1) {
-      return _isSubmitting
-          ? 'جاري الإنشاء...'
-          : 'إنشاء الحساب';
+      return _isVerified ? 'التالي' : 'تأكيد الرمز';
+    } else if (_currentStep == _stepTitles.length - 1) {
+      return _isSubmitting ? 'جاري الإنشاء...' : 'إنشاء الحساب';
     }
     return 'التالي';
   }
 
   void _nextStep() async {
-    // Dismiss keyboard and clear focus
-    FocusScope.of(context).unfocus();
+    try {
+      // Dismiss keyboard and clear focus
+      FocusScope.of(context).unfocus();
 
-    if (_currentStep == 0) {
-      // Username and password step - send OTP
-      // Force form validation first
-      if (_formKey.currentState!.validate()) {
-        _formKey.currentState!.save();
-        await _sendOTP();
-      }
-    } else if (_currentStep == 1) {
-      // OTP verification step - verify OTP
-      if (_isVerified) {
+      print('🚀 _nextStep called for step $_currentStep');
+      print('📊 Can proceed: ${_canProceedToNext()}');
+
+      if (_currentStep == 0) {
+        // Username and password step - send OTP
+        // Force form validation first
+        if (_formKey.currentState!.validate()) {
+          _formKey.currentState!.save();
+          await _sendOTP();
+        }
+      } else if (_currentStep == 1) {
+        // OTP verification step - verify OTP
+        if (_isVerified) {
+          _proceedToNextStep();
+        } else {
+          await _verifyOTP();
+        }
+      } else if (_currentStep == 2) {
+        // Document upload step - just proceed if documents are uploaded
+        _proceedToNextStep();
+      } else if (_currentStep == 3) {
+        // Data entry step - validate data before proceeding
+        print('📝 Validating data entry step...');
+        if (_isDataValid()) {
+          print('✅ Data is valid, proceeding to next step');
+          _proceedToNextStep();
+        } else {
+          print('❌ Data validation failed, staying on current step');
+          final errorMessage = _getValidationError();
+          if (errorMessage != null) {
+            _showValidationError(errorMessage);
+          }
+        }
+      } else if (_currentStep == 4) {
+        // Location step - validate location selection
+        if (_selectedGovernorate != null && _selectedCity != null) {
+          print('✅ Location selected, proceeding to review');
+          _proceedToNextStep();
+        } else {
+          _showValidationError('يرجى اختيار المحافظة والمدينة');
+        }
+      } else if (_currentStep < _stepTitles.length - 1) {
         _proceedToNextStep();
       } else {
-        await _verifyOTP();
+        _submitRegistration();
       }
-    } else if (_currentStep <
-        _stepTitles.length - 1) {
-      _proceedToNextStep();
-    } else {
-      _submitRegistration();
+    } catch (e) {
+      print('❌ Error in _nextStep: $e');
+      _showValidationError('حدث خطأ أثناء الانتقال للخطوة التالية');
     }
   }
 
@@ -704,9 +801,11 @@ class _SignupPageState extends State<SignupPage> {
     // Dismiss keyboard and clear focus first
     FocusScope.of(context).unfocus();
 
-    setState(() {
-      _currentStep++;
-    });
+    if (!_isDisposed && mounted) {
+      setState(() {
+        _currentStep++;
+      });
+    }
 
     // Animate to next page
     _pageController.animateToPage(
@@ -718,14 +817,14 @@ class _SignupPageState extends State<SignupPage> {
 
   void _previousStep() {
     if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _currentStep--;
+        });
+      }
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(
-          milliseconds: 300,
-        ),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -738,24 +837,19 @@ class _SignupPageState extends State<SignupPage> {
       _isSubmitting = true;
     });
 
-    final password =
-        _userData['password'] ??
-        _passwordController.text.trim();
-    final username =
-        _usernameController.text.trim();
+    final password = _userData['password'] ?? _passwordController.text.trim();
+    final username = _usernameController.text.trim();
 
     // Prepare registration data
     final registrationData = <String, dynamic>{
       'fullName': _userData['fullName'],
-      'username':
-          username, // Use username from form (email or phone)
+      'username': username, // Use username from form (email or phone)
       'phone': _userData['phone'],
       'userType': _selectedUserType?.name,
       'governorate': _selectedGovernorate?.name,
       'city': _selectedCity?.name,
       'address': _userData['address'],
-      'password':
-          password, // Use password from data entry step
+      'password': password, // Use password from data entry step
     };
 
     // Set email field based on what was entered
@@ -764,28 +858,21 @@ class _SignupPageState extends State<SignupPage> {
     } else {
       registrationData['phone'] = username;
       // Ensure we have email from data entry step
-      registrationData['email'] =
-          _userData['email'];
+      registrationData['email'] = _userData['email'];
     }
 
     // Add document-specific fields
     if (_selectedUserType == UserType.citizen) {
-      registrationData['nationalId'] =
-          _userData['nationalId'];
+      registrationData['nationalId'] = _userData['nationalId'];
     } else {
-      registrationData['passportNumber'] =
-          _userData['passportNumber'];
+      registrationData['passportNumber'] = _userData['passportNumber'];
     }
 
     // Add document file paths
     registrationData['documents'] =
-        _selectedDocuments
-            .map((file) => file.path)
-            .toList();
+        _selectedDocuments.map((file) => file.path).toList();
 
-    context
-        .read<SignupCubit>()
-        .registerUserEnhanced(registrationData);
+    context.read<SignupCubit>().registerUserEnhanced(registrationData);
   }
 
   Future<void> _sendOTP() async {
@@ -806,17 +893,14 @@ class _SignupPageState extends State<SignupPage> {
     });
 
     try {
-      final username =
-          _usernameController.text.trim();
-      final password =
-          _passwordController.text.trim();
+      final username = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
 
       // Validate input before proceeding
       if (username.isEmpty || password.isEmpty) {
         showModernSnackBar(
           context,
-          message:
-              'يرجى ملء جميع الحقول المطلوبة',
+          message: 'يرجى ملء جميع الحقول المطلوبة',
           type: SnackBarType.error,
         );
         return;
@@ -830,14 +914,10 @@ class _SignupPageState extends State<SignupPage> {
               SizedBox(
                 width: 16.w,
                 height: 16.w,
-                child:
-                    const CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<
-                            Color
-                          >(Colors.white),
-                    ),
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -854,21 +934,17 @@ class _SignupPageState extends State<SignupPage> {
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(16.w),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              12.r,
-            ),
+            borderRadius: BorderRadius.circular(12.r),
           ),
         ),
       );
 
       // Use the cubit to send OTP - state transitions will be handled by BlocListener
-      context
-          .read<SignupCubit>()
-          .signUpWithUsernameAndPassword(
-            username,
-            password,
-            _isEmailMode,
-          );
+      context.read<SignupCubit>().signUpWithUsernameAndPassword(
+        username,
+        password,
+        _isEmailMode,
+      );
     } catch (e) {
       setState(() {
         _isSubmitting = false;
@@ -890,41 +966,41 @@ class _SignupPageState extends State<SignupPage> {
   Future<void> _verifyOTP() async {
     if (_otpCode.length != 6) return;
 
-    setState(
-      () => _isCheckingVerification = true,
-    );
+    // Basic security check - prevent empty or suspicious OTP codes
+    if (_otpCode.trim().isEmpty || _otpCode.contains(RegExp(r'[^0-9]'))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('رمز التحقق غير صحيح'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isCheckingVerification = true);
 
     try {
-      final username =
-          _usernameController.text.trim();
+      final username = _usernameController.text.trim();
       bool isValidOTP = false;
 
       if (_isEmailMode) {
         try {
-          final response = await Supabase
-              .instance
-              .client
-              .auth
-              .verifyOTP(
-                type: OtpType.email,
-                token: _otpCode,
-                email: username,
-              );
+          final response = await Supabase.instance.client.auth.verifyOTP(
+            type: OtpType.email,
+            token: _otpCode,
+            email: username,
+          );
           isValidOTP = response.user != null;
         } catch (e) {
           isValidOTP = false;
         }
       } else {
         try {
-          final response = await Supabase
-              .instance
-              .client
-              .auth
-              .verifyOTP(
-                type: OtpType.sms,
-                token: _otpCode,
-                phone: username,
-              );
+          final response = await Supabase.instance.client.auth.verifyOTP(
+            type: OtpType.sms,
+            token: _otpCode,
+            phone: username,
+          );
           isValidOTP = response.user != null;
         } catch (e) {
           // Fallback for SMS verification
@@ -939,17 +1015,11 @@ class _SignupPageState extends State<SignupPage> {
         });
 
         // Show success message
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                  size: 20.sp,
-                ),
+                Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
@@ -965,27 +1035,19 @@ class _SignupPageState extends State<SignupPage> {
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16.w),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                12.r,
-              ),
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ),
         );
 
         // Auto proceed to next step after a short delay
-        await Future.delayed(
-          const Duration(milliseconds: 1500),
-        );
+        await Future.delayed(const Duration(milliseconds: 1500));
         if (mounted) {
           _proceedToNextStep();
         }
       } else {
-        setState(
-          () => _isCheckingVerification = false,
-        );
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        setState(() => _isCheckingVerification = false);
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               _isEmailMode
@@ -1000,9 +1062,7 @@ class _SignupPageState extends State<SignupPage> {
         _clearOTPFields();
       }
     } catch (e) {
-      setState(
-        () => _isCheckingVerification = false,
-      );
+      setState(() => _isCheckingVerification = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('خطأ في التحقق: $e'),
@@ -1022,9 +1082,7 @@ class _SignupPageState extends State<SignupPage> {
       _otpCode = '';
     });
     // Trigger error animation
-    _otpErrorController?.add(
-      ErrorAnimationType.shake,
-    );
+    _otpErrorController?.add(ErrorAnimationType.shake);
   }
 
   // Resend OTP
@@ -1036,14 +1094,10 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(
               width: 16.w,
               height: 16.w,
-              child:
-                  const CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation<
-                          Color
-                        >(Colors.white),
-                  ),
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -1060,9 +1114,7 @@ class _SignupPageState extends State<SignupPage> {
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16.w),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            12.r,
-          ),
+          borderRadius: BorderRadius.circular(12.r),
         ),
       ),
     );
@@ -1092,18 +1144,10 @@ class _SignupPageState extends State<SignupPage> {
           text: 'تسجيل الدخول',
           onPressed: () {
             Navigator.of(context).pop();
-            Navigator.of(
-              context,
-            ).pushReplacementNamed(
-              Routes.loginScreen,
-            );
+            Navigator.of(context).pushReplacementNamed(Routes.loginScreen);
           },
           isPrimary: true,
-          icon: Icon(
-            Icons.login,
-            size: 16.sp,
-            color: Colors.white,
-          ),
+          icon: Icon(Icons.login, size: 16.sp, color: Colors.white),
         ),
         ModernDialogAction(
           text:
@@ -1117,13 +1161,10 @@ class _SignupPageState extends State<SignupPage> {
           onPressed: () {
             Navigator.of(context).pop();
             if (mounted) {
-              context
-                  .read<SignupCubit>()
-                  .clearErrorAndRetry();
+              context.read<SignupCubit>().clearErrorAndRetry();
             }
             // Clear the conflicting field
-            if (field == 'email' ||
-                field == 'phone') {
+            if (field == 'email' || field == 'phone') {
               _usernameController.clear();
             }
             // Reset to initial step if needed
@@ -1132,9 +1173,7 @@ class _SignupPageState extends State<SignupPage> {
                 _currentStep = 0;
                 _pageController.animateToPage(
                   0,
-                  duration: const Duration(
-                    milliseconds: 300,
-                  ),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
               }
@@ -1144,28 +1183,80 @@ class _SignupPageState extends State<SignupPage> {
         ),
         ModernDialogAction(
           text: 'إلغاء',
-          onPressed:
-              () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.close, size: 16.sp),
         ),
       ],
     );
   } // Start resend countdown timer
 
+  /// Show validation error to user
+  void _showValidationError(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  /// Debug current state for troubleshooting
+  void _debugCurrentState() {
+    print('🔍 === DEBUG CURRENT STATE ===');
+    print('📍 Current Step: $_currentStep');
+    print('📊 User Data: $_userData');
+    print('👤 Selected User Type: $_selectedUserType');
+    print('📄 Selected Documents: ${_selectedDocuments.length}');
+    print('🌍 Selected Governorate: $_selectedGovernorate');
+    print('🏙️ Selected City: $_selectedCity');
+    print('✅ Can Proceed: ${_canProceedToNext()}');
+    print('🔒 Is Verified: $_isVerified');
+    print('⏳ Is Submitting: $_isSubmitting');
+    print('📧 Username Controller: ${_usernameController.text}');
+    print('🔑 Password Controller: ${_passwordController.text}');
+    print('🔄 Is Email Mode: $_isEmailMode');
+    
+    // Check specific step requirements
+    if (_currentStep == 3) {
+      final requiredFields = ['fullName', 'email', 'phone', 'password'];
+      if (_selectedUserType == UserType.citizen) {
+        requiredFields.add('nationalId');
+      } else {
+        requiredFields.add('passportNumber');
+      }
+      
+      print('📋 Required fields for step 3: $requiredFields');
+      for (String field in requiredFields) {
+        final value = _userData[field];
+        print('   $field: "${value ?? ''}" (${value?.isEmpty == true ? 'EMPTY' : 'OK'})');
+      }
+    }
+    print('================================');
+  }
+
   void _startResendTimer() {
-    setState(() => _resendCountdown = 60);
+    if (!_isDisposed && mounted) {
+      setState(() => _resendCountdown = 60);
+    }
     _resendTimer?.cancel();
-    _resendTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        setState(() {
-          if (_resendCountdown > 0) {
-            _resendCountdown--;
-          } else {
-            timer.cancel();
-          }
-        });
-      },
-    );
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_isDisposed || !mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        if (_resendCountdown > 0) {
+          _resendCountdown--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 }

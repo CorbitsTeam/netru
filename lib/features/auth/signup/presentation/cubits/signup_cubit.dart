@@ -2,6 +2,9 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/services/location_service.dart';
+import 'package:netru_app/core/services/rate_limiter_service.dart';
+
+import 'package:netru_app/core/utils/security_utils.dart';
 import 'package:netru_app/core/utils/egyptian_id_parser.dart';
 import 'package:netru_app/features/auth/data/models/user_model.dart';
 import 'package:netru_app/features/auth/domain/entities/user_entity.dart';
@@ -17,7 +20,6 @@ class SignupCubit extends Cubit<SignupState> {
   final SignUpWithDataUseCase _signUpWithDataUseCase;
   final LocationService _locationService;
   final CheckEmailExistsInUsersUseCase _checkEmailExistsInUsersUseCase;
-  final CheckEmailExistsInAuthUseCase _checkEmailExistsInAuthUseCase;
   final CheckPhoneExistsUseCase _checkPhoneExistsUseCase;
   final CheckNationalIdExistsUseCase _checkNationalIdExistsUseCase;
   final CheckPassportExistsUseCase _checkPassportExistsUseCase;
@@ -35,7 +37,6 @@ class SignupCubit extends Cubit<SignupState> {
        _signUpWithDataUseCase = signUpWithDataUseCase,
        _locationService = locationService,
        _checkEmailExistsInUsersUseCase = checkEmailExistsInUsersUseCase,
-       _checkEmailExistsInAuthUseCase = checkEmailExistsInAuthUseCase,
        _checkPhoneExistsUseCase = checkPhoneExistsUseCase,
        _checkNationalIdExistsUseCase = checkNationalIdExistsUseCase,
        _checkPassportExistsUseCase = checkPassportExistsUseCase,
@@ -293,11 +294,11 @@ class SignupCubit extends Cubit<SignupState> {
         return;
       }
 
-      if (password == null || password.length < 6) {
+      if (password == null || password.length < 8) {
         log('❌ فشل: كلمة مرور قصيرة');
         emit(
           const SignupFailure(
-            message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+            message: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
           ),
         );
         return;
@@ -679,9 +680,39 @@ class SignupCubit extends Cubit<SignupState> {
     String password,
     bool isEmailMode,
   ) async {
+    // Check rate limiting first
+    if (!RateLimiterService.canAttemptSignup(username)) {
+      final timeUntilNext = RateLimiterService.getTimeUntilNextAttempt(
+        username,
+      );
+      final waitTime =
+          timeUntilNext != null
+              ? '${timeUntilNext.inMinutes} دقيقة'
+              : 'بعض الوقت';
+      emit(
+        SignupFailure(
+          message:
+              'تم تجاوز الحد الأقصى للمحاولات. يرجى المحاولة بعد $waitTime',
+        ),
+      );
+      return;
+    }
+
+    // Record the attempt
+    RateLimiterService.recordSignupAttempt(username);
+
     emit(SignupLoading());
 
     try {
+      // Sanitize inputs
+      final cleanUsername =
+          isEmailMode
+              ? SecurityUtils.sanitizeEmail(username)
+              : SecurityUtils.sanitizePhoneNumber(username);
+
+      if (cleanUsername != username) {
+        log('⚠️ تم تنظيف المدخلات: $username -> $cleanUsername');
+      }
       log('📧 بدء التسجيل مع: $username (${isEmailMode ? 'إيميل' : 'هاتف'})');
 
       // Validate input format based on mode
@@ -726,37 +757,6 @@ class SignupCubit extends Cubit<SignupState> {
 
         if (emailExistsInUsers) {
           log('❌ البريد الإلكتروني موجود في جدول المستخدمين - توقف العملية');
-          emit(
-            const SignupUserExistsWithLoginOption(
-              message:
-                  'هذا البريد الإلكتروني مستخدم من قبل. هل تريد تسجيل الدخول بحسابك الموجود؟',
-              dataType: 'email',
-            ),
-          );
-          return;
-        }
-
-        // ✅ التحقق من وجود البريد الإلكتروني في نظام المصادقة
-        log('🔍 الخطوة 2: فحص نظام المصادقة...');
-        final emailInAuthResult = await _checkEmailExistsInAuthUseCase.call(
-          username,
-        );
-
-        final emailExistsInAuth = emailInAuthResult.fold(
-          (failure) {
-            log(
-              '⚠️ خطأ في فحص البريد الإلكتروني في نظام المصادقة: ${failure.message}',
-            );
-            return false;
-          },
-          (exists) {
-            log('🔍 نتيجة فحص نظام المصادقة: $exists');
-            return exists;
-          },
-        );
-
-        if (emailExistsInAuth) {
-          log('❌ البريد الإلكتروني موجود في نظام المصادقة - توقف العملية');
           emit(
             const SignupUserExistsWithLoginOption(
               message:
@@ -1019,7 +1019,7 @@ class SignupCubit extends Cubit<SignupState> {
         'email': currentUser.email,
         'password':
             registrationData['password'] as String? ??
-            'defaultpass123', // Use provided password or fallback
+            '', // Password should be provided
         'full_name': fullName.trim(),
         'user_type': userType.name,
         'phone': phone?.trim(),

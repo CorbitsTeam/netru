@@ -1,4 +1,5 @@
 import 'egyptian_id_parser.dart';
+import 'security_utils.dart';
 
 /// Utility class for form validation
 class AuthValidationUtils {
@@ -49,23 +50,10 @@ class AuthValidationUtils {
       return 'كلمة المرور مطلوبة';
     }
 
-    if (value.length < 8) {
-      return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
-    }
-
-    // Check for at least one uppercase letter
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return 'كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل';
-    }
-
-    // Check for at least one lowercase letter
-    if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return 'كلمة المرور يجب أن تحتوي على حرف صغير واحد على الأقل';
-    }
-
-    // Check for at least one digit
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return 'كلمة المرور يجب أن تحتوي على رقم واحد على الأقل';
+    // Check for comprehensive password issues
+    final issues = SecurityUtils.getPasswordIssues(value);
+    if (issues.isNotEmpty) {
+      return issues.first; // Return first issue found
     }
 
     return null;
@@ -77,9 +65,17 @@ class AuthValidationUtils {
       return null; // Email is optional
     }
 
+    // Sanitize input first
+    final cleanEmail = SecurityUtils.sanitizeEmail(value);
+
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) {
+    if (!emailRegex.hasMatch(cleanEmail)) {
       return 'البريد الإلكتروني غير صحيح';
+    }
+
+    // Check for suspicious domains
+    if (SecurityUtils.isSuspiciousEmailDomain(cleanEmail)) {
+      return 'يرجى استخدام بريد إلكتروني صحيح';
     }
 
     return null;
@@ -91,8 +87,9 @@ class AuthValidationUtils {
       return null; // Phone is optional
     }
 
-    // Egyptian mobile number format: 01xxxxxxxxx (11 digits starting with 01)
-    if (!RegExp(r'^01[0-9]{9}$').hasMatch(value)) {
+    // Normalize and validate Egyptian phone
+    final normalizedPhone = SecurityUtils.normalizeEgyptianPhone(value);
+    if (normalizedPhone == null) {
       return 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 01 ويحتوي على 11 رقم)';
     }
 
@@ -105,16 +102,24 @@ class AuthValidationUtils {
       return 'الاسم الكامل مطلوب';
     }
 
-    if (value.length < 2) {
+    // Sanitize input first
+    final cleanName = SecurityUtils.sanitizeName(value);
+
+    if (cleanName.length < 2) {
       return 'الاسم يجب أن يكون حرفين على الأقل';
     }
 
-    if (value.length > 100) {
+    if (cleanName.length > 100) {
       return 'الاسم طويل جداً';
     }
 
     // Allow Arabic and English letters, spaces, and common name characters
-    if (!RegExp(r'^[\u0600-\u06FFa-zA-Z\s\-\.]+$').hasMatch(value)) {
+    if (!RegExp(r'^[\u0600-\u06FFa-zA-Z\s\-\.]+$').hasMatch(cleanName)) {
+      return 'الاسم يحتوي على أحرف غير مسموحة';
+    }
+
+    // Check if input is safe
+    if (!SecurityUtils.isSafeInput(value)) {
       return 'الاسم يحتوي على أحرف غير مسموحة';
     }
 

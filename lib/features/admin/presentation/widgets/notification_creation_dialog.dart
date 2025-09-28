@@ -408,7 +408,7 @@ class _NotificationCreationDialogState
           ),
         ),
         SizedBox(height: 8.h),
-        Container(
+        SizedBox(
           width: double.infinity,
           child: DropdownButtonFormField<T>(
             value: value,

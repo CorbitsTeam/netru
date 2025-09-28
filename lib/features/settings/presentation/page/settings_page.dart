@@ -10,8 +10,6 @@ import 'package:netru_app/core/di/injection_container.dart'
     as di;
 import 'package:netru_app/features/auth/domain/usecases/logout_user.dart';
 import 'package:netru_app/features/settings/presentation/page/edit_profile_page.dart';
-import 'package:netru_app/features/settings/presentation/widgets/theme_section.dart';
-import 'package:netru_app/features/settings/presentation/widgets/language_section.dart';
 import 'package:netru_app/features/settings/presentation/widgets/notification_settings_widget.dart';
 import 'package:netru_app/features/settings/presentation/widgets/support_options_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';

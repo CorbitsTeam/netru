@@ -242,8 +242,8 @@ class SupabaseAuthDataSource implements AuthDataSource {
         throw Exception('عنوان البريد الإلكتروني غير صحيح');
       }
 
-      if (password.length < 6) {
-        throw Exception('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      if (password.length < 8) {
+        throw Exception('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
       }
 
       // التحقق من وجود الإيميل مسبقاً
@@ -526,20 +526,23 @@ class SupabaseAuthDataSource implements AuthDataSource {
     try {
       print('🔍 التحقق من وجود الإيميل في نظام المصادقة: $email');
 
-      // FIXME: التحقق من Auth مُعطّل مؤقتاً لتجنب False Positives
-      // يجب تنفيذ حل أكثر دقة باستخدام Admin APIs أو طريقة موثوقة أخرى
-      print('⚠️ تم تعطيل فحص نظام المصادقة مؤقتاً - العودة بـ false');
-      return false;
-
-      /* محاولة تسجيل دخول مع كلمة مرور خاطئة - لا يعمل بشكل موثوق
-      await supabaseClient.auth.signInWithPassword(
-        email: email,
-        password: 'intentionally_wrong_password_123456789',
-      );
-      
-      // إذا نجح (لن يحدث)، يعني الإيميل موجود
-      return true;
-      */
+      // Try to use password recovery to check if email exists
+      // This is safer than sign-in attempts
+      try {
+        await supabaseClient.auth.resetPasswordForEmail(email);
+        // If no exception is thrown, email likely exists in auth
+        print('✅ الإيميل موجود في نظام المصادقة');
+        return true;
+      } on AuthException catch (authError) {
+        if (authError.message.contains('Email not confirmed') ||
+            authError.message.contains('User not found')) {
+          print('ℹ️ الإيميل غير موجود في نظام المصادقة');
+          return false;
+        }
+        // For other auth errors, assume email might exist
+        print('⚠️ خطأ في التحقق من الإيميل، افتراض وجوده للأمان');
+        return true;
+      }
     } catch (e) {
       print('🔍 خطأ في فحص نظام المصادقة: $e');
       // في حالة الخطأ، نعتبر الإيميل غير موجود للأمان
@@ -701,8 +704,8 @@ class SupabaseAuthDataSource implements AuthDataSource {
       throw Exception('الاسم الكامل مطلوب');
     }
 
-    if (password.length < 6) {
-      throw Exception('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    if (password.length < 8) {
+      throw Exception('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
     }
 
     // التحقق من البيانات الحساسة

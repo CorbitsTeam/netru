@@ -282,8 +282,9 @@ class HeatmapStatsWidget extends StatelessWidget {
   Color _getDangerLevelColor(int reportCount) {
     if (reportCount >= 20) return Colors.red;
     if (reportCount >= 10) return Colors.orange;
-    if (reportCount >= 5)
+    if (reportCount >= 5) {
       return Colors.yellow[700] ?? Colors.yellow;
+    }
     return Colors.green;
   }
 }

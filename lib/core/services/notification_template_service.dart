@@ -1,6 +1,7 @@
 /// Advanced notification templates service for the Netru app
 /// This service provides professional, contextual notification templates
 /// for various app scenarios with proper Arabic localization
+library;
 
 class NotificationTemplateService {
   static const String _defaultAppName = 'نترو';
