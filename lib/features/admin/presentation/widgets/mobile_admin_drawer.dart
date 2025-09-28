@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/extensions/navigation_extensions.dart';
+import 'package:netru_app/core/routing/app_router.dart';
+import 'package:netru_app/core/routing/routes.dart';
+import 'package:netru_app/core/utils/app_shared_preferences.dart';
+import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
+import 'package:netru_app/features/auth/login/presentation/pages/login_page.dart';
 
 class MobileAdminDrawer extends StatelessWidget {
   final String? selectedRoute;
@@ -212,7 +219,8 @@ class MobileAdminDrawer extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                   // Implement logout logic
-                  // context.read<AuthCubit>().logout();
+                  context.pushNamedAndRemoveUntil(Routes.loginScreen);
+                  AppPreferences().removeAllData();
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: const Text('تسجيل الخروج'),

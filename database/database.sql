@@ -1,26 +1,7 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.admin_notifications (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  title text NOT NULL,
-  body text NOT NULL,
-  type text NOT NULL DEFAULT 'general'::text CHECK (type = ANY (ARRAY['news'::text, 'report_update'::text, 'report_comment'::text, 'system'::text, 'general'::text])),
-  status text NOT NULL DEFAULT 'draft'::text CHECK (status = ANY (ARRAY['draft'::text, 'scheduled'::text, 'sent'::text, 'failed'::text])),
-  target_users jsonb DEFAULT '[]'::jsonb,
-  target_groups jsonb DEFAULT '[]'::jsonb,
-  data jsonb DEFAULT '{}'::jsonb,
-  created_by uuid NOT NULL,
-  sent_count integer DEFAULT 0,
-  delivered_count integer DEFAULT 0,
-  failed_count integer DEFAULT 0,
-  scheduled_at timestamp without time zone,
-  sent_at timestamp without time zone,
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now(),
-  CONSTRAINT admin_notifications_pkey PRIMARY KEY (id),
-  CONSTRAINT admin_notifications_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
-);
+
 CREATE TABLE public.cities (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   governorate_id bigint,

@@ -45,6 +45,11 @@ class AppPreferences {
     await _prefs.remove(key);
   }
 
+  /// ✅ **حذف كل البيانات**
+  Future<void> removeAllData() async {
+    await _prefs.clear();
+  }
+
   /// ✅ **حفظ كائن Model (`T`)**
   Future<void> saveModel<T>(
     String key,

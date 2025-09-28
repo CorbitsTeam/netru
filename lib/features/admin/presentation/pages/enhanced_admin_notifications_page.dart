@@ -25,7 +25,10 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    ); // Changed to 2 tabs: Admin & Users
     _scrollController.addListener(_onScroll);
 
     // Load initial data
@@ -299,38 +302,240 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
       children: [
         Container(
           margin: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 2,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: TabBar(
             controller: _tabController,
-            labelColor: const Color(0xFF2E7D32),
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: const Color(0xFF2E7D32),
-            labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+            indicatorColor: Theme.of(context).primaryColor,
+            labelColor: Theme.of(context).primaryColor,
+            unselectedLabelColor: Colors.grey[600],
+            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+            unselectedLabelStyle: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14.sp,
+            ),
             tabs: [
-              Tab(text: 'الكل (${state.notifications.length})'),
-              Tab(text: 'مجدول (${state.scheduledNotifications.length})'),
-              Tab(text: 'مسودات (${state.draftNotifications.length})'),
-              const Tab(text: 'الإحصائيات'),
+              Tab(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.admin_panel_settings, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    const Text('إشعارات الإدارة'),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.people, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    const Text('إشعارات المستخدمين'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
+        SizedBox(height: 16.h),
         Expanded(
           child: TabBarView(
             controller: _tabController,
             children: [
-              _buildNotificationsList(
-                state.notifications,
-                state.selectedNotificationIds,
-              ),
-              _buildNotificationsList(
-                state.scheduledNotifications,
-                state.selectedNotificationIds,
-              ),
-              _buildNotificationsList(
-                state.draftNotifications,
-                state.selectedNotificationIds,
-              ),
-              const NotificationAnalyticsWidget(),
+              _buildAdminNotificationsList(state),
+              _buildUserNotificationsList(state),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // New method for admin notifications
+  Widget _buildAdminNotificationsList(AdminNotificationsLoaded state) {
+    // Filter for admin/system notifications
+    final adminNotifications =
+        state.notifications
+            .where(
+              (n) =>
+                  n.notificationType == NotificationType.system ||
+                  n.notificationType == NotificationType.news ||
+                  (n.data?['admin_created'] == true),
+            )
+            .toList();
+
+    return Column(
+      children: [
+        // Admin notification filters
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: DropdownButton<String>(
+                    value: null,
+                    hint: const Text('فلترة حسب النوع'),
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'all',
+                        child: Text('جميع الإشعارات'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'system',
+                        child: Text('إشعارات النظام'),
+                      ),
+                      DropdownMenuItem(value: 'news', child: Text('الأخبار')),
+                      DropdownMenuItem(value: 'sent', child: Text('المرسلة')),
+                      DropdownMenuItem(
+                        value: 'pending',
+                        child: Text('قيد الانتظار'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      // Handle filter change for admin notifications
+                      if (value != null && value != 'all') {
+                        // Apply filter based on selected type
+                      }
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  '${adminNotifications.length} إشعار',
+                  style: TextStyle(
+                    color: Colors.blue[700],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _buildNotificationsList(
+            adminNotifications,
+            state.selectedNotificationIds,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // New method for user notifications
+  Widget _buildUserNotificationsList(AdminNotificationsLoaded state) {
+    // Filter for user notifications
+    final userNotifications =
+        state.notifications
+            .where(
+              (n) =>
+                  n.notificationType == NotificationType.reportUpdate ||
+                  n.notificationType == NotificationType.reportComment ||
+                  n.notificationType == NotificationType.general ||
+                  (n.data?['admin_created'] != true),
+            )
+            .toList();
+
+    return Column(
+      children: [
+        // User notification filters
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: DropdownButton<String>(
+                    value: null,
+                    hint: const Text('فلترة حسب النوع'),
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'all',
+                        child: Text('جميع الإشعارات'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'report_update',
+                        child: Text('تحديثات البلاغات'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'report_comment',
+                        child: Text('تعليقات البلاغات'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'general',
+                        child: Text('إشعارات عامة'),
+                      ),
+                      DropdownMenuItem(value: 'read', child: Text('المقروءة')),
+                      DropdownMenuItem(
+                        value: 'unread',
+                        child: Text('غير المقروءة'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      // Handle filter change for user notifications
+                      if (value != null && value != 'all') {
+                        // Apply filter based on selected type
+                      }
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  '${userNotifications.length} إشعار',
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _buildNotificationsList(
+            userNotifications,
+            state.selectedNotificationIds,
           ),
         ),
       ],
@@ -388,6 +593,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         );
       },
       child: Container(
+        margin: EdgeInsets.symmetric(vertical: 4.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFFE8F5E8) : Colors.white,
@@ -395,12 +601,12 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
           border:
               isSelected
                   ? Border.all(color: const Color(0xFF2E7D32), width: 2)
-                  : null,
+                  : Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withOpacity(0.08),
               spreadRadius: 1,
-              blurRadius: 4,
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
@@ -410,6 +616,23 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
           children: [
             Row(
               children: [
+                // Notification type icon
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: _getTypeColor(
+                      notification.notificationType,
+                    ).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Icon(
+                    _getNotificationTypeIcon(notification.notificationType),
+                    size: 16.sp,
+                    color: _getTypeColor(notification.notificationType),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Notification type badge
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
@@ -458,7 +681,43 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                   _formatDate(notification.createdAt),
                   style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                 ),
+                SizedBox(width: 16.w),
+                if (notification.userName != null) ...[
+                  Icon(Icons.person, size: 16.sp, color: Colors.grey[500]),
+                  SizedBox(width: 4.w),
+                  Text(
+                    notification.userName!,
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                  ),
+                ],
                 const Spacer(),
+                // Priority indicator
+                if (notification.priority != NotificationPriority.normal) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getPriorityColor(
+                        notification.priority,
+                      ).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4.r),
+                      border: Border.all(
+                        color: _getPriorityColor(notification.priority),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      notification.priority.arabicName,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        color: _getPriorityColor(notification.priority),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
                 IconButton(
                   onPressed: () => _showNotificationActions(notification),
                   icon: const Icon(Icons.more_vert),
@@ -521,6 +780,34 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
         return const Color(0xFFD32F2F);
       case NotificationType.general:
         return const Color(0xFF388E3C);
+    }
+  }
+
+  IconData _getNotificationTypeIcon(NotificationType type) {
+    switch (type) {
+      case NotificationType.news:
+        return Icons.article;
+      case NotificationType.reportUpdate:
+        return Icons.update;
+      case NotificationType.reportComment:
+        return Icons.comment;
+      case NotificationType.system:
+        return Icons.settings;
+      case NotificationType.general:
+        return Icons.notifications;
+    }
+  }
+
+  Color _getPriorityColor(NotificationPriority priority) {
+    switch (priority) {
+      case NotificationPriority.low:
+        return Colors.grey;
+      case NotificationPriority.normal:
+        return Colors.blue;
+      case NotificationPriority.high:
+        return Colors.orange;
+      case NotificationPriority.urgent:
+        return Colors.red;
     }
   }
 

@@ -77,44 +77,71 @@ class AdminNotificationRemoteDataSourceImpl
     DateTime? endDate,
   }) async {
     try {
-      // For now, use notifications table until admin_notifications is created
+      // Get notifications with user information
       var query = Supabase.instance.client.from('notifications').select('''
-            *,
-            users!notifications_user_id_fkey(first_name, last_name)
+            id, user_id, title, title_ar, body, body_ar, 
+            notification_type, reference_id, reference_type, data,
+            is_read, is_sent, priority, fcm_message_id, 
+            created_at, read_at, sent_at,
+            users!user_id (
+              id, name, full_name, email, user_type
+            )
           ''');
 
-      if (type != null) {
+      // Apply filters
+      if (type != null && type.isNotEmpty) {
         query = query.eq('notification_type', type);
       }
+
       if (search != null && search.isNotEmpty) {
         query = query.or('title.ilike.%$search%,body.ilike.%$search%');
       }
+
       if (startDate != null) {
         query = query.gte('created_at', startDate.toIso8601String());
       }
+
       if (endDate != null) {
         query = query.lte('created_at', endDate.toIso8601String());
       }
 
+      // Apply status filter based on is_read and is_sent
+      if (status != null) {
+        switch (status) {
+          case 'read':
+            query = query.eq('is_read', true);
+            break;
+          case 'unread':
+            query = query.eq('is_read', false);
+            break;
+          case 'sent':
+            query = query.eq('is_sent', true);
+            break;
+          case 'pending':
+            query = query.eq('is_sent', false);
+            break;
+        }
+      }
+
       final finalQuery = query
           .order('created_at', ascending: false)
-          .range(
-            ((page ?? 1) - 1) * (limit ?? 20),
-            (page ?? 1) * (limit ?? 20) - 1,
-          );
+          .range((page! - 1) * limit!, page * limit - 1);
 
       final response = await finalQuery;
 
       // Convert notifications to AdminNotificationModel format
       final notifications =
-          response.map<AdminNotificationModel>((json) {
-            // Add user name from joined data
-            final userData = json['users'];
+          (response as List<dynamic>).map((notification) {
+            // Extract user info from the joined data
+            final userData = notification['users'];
             if (userData != null) {
-              json['user_name'] =
-                  '${userData['first_name']} ${userData['last_name']}';
+              notification['user_name'] =
+                  userData['full_name'] ??
+                  userData['name'] ??
+                  userData['email'];
             }
-            return AdminNotificationModel.fromJson(json);
+
+            return AdminNotificationModel.fromJson(notification);
           }).toList();
 
       return notifications;
