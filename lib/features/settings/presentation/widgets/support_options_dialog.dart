@@ -3,16 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SupportOptionsDialog
-    extends StatelessWidget {
+class SupportOptionsDialog extends StatelessWidget {
   const SupportOptionsDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Container(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -32,11 +29,7 @@ class SupportOptionsDialog
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color:
-                        Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.color,
+                    color: Theme.of(context).textTheme.headlineSmall?.color,
                   ),
                 ),
               ],
@@ -49,19 +42,8 @@ class SupportOptionsDialog
               context,
               icon: Icons.email_outlined,
               title: 'البريد الإلكتروني',
-              subtitle: 'corbits.co@gmail.com',
+              subtitle: 'corbitsteam@gmail.com',
               onTap: () => _sendEmail(context),
-            ),
-
-            SizedBox(height: 12.h),
-
-            _buildSupportOption(
-              context,
-              icon: Icons.phone_outlined,
-              title: 'الاتصال المباشر',
-              subtitle: '+201000000012',
-              onTap:
-                  () => _makePhoneCall(context),
             ),
 
             SizedBox(height: 20.h),
@@ -70,24 +52,12 @@ class SupportOptionsDialog
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12.h,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                          8.r,
-                        ),
-                    side: const BorderSide(
-                      color:
-                          AppColors.primaryColor,
-                    ),
+                    borderRadius: BorderRadius.circular(8.r),
+                    side: const BorderSide(color: AppColors.primaryColor),
                   ),
                 ),
                 child: Text(
@@ -118,13 +88,9 @@ class SupportOptionsDialog
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            8.r,
-          ),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: Theme.of(
-              context,
-            ).dividerColor.withOpacity(0.5),
+            color: Theme.of(context).dividerColor.withOpacity(0.5),
           ),
         ),
         child: Row(
@@ -132,33 +98,22 @@ class SupportOptionsDialog
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor
-                    .withOpacity(0.1),
-                borderRadius:
-                    BorderRadius.circular(6.r),
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6.r),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primaryColor,
-                size: 20.sp,
-              ),
+              child: Icon(icon, color: AppColors.primaryColor, size: 20.sp),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color:
-                          Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.color,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -166,11 +121,7 @@ class SupportOptionsDialog
                     subtitle,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color:
-                          Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -178,10 +129,7 @@ class SupportOptionsDialog
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color:
-                  Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.color,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               size: 16.sp,
             ),
           ],
@@ -190,10 +138,8 @@ class SupportOptionsDialog
     );
   }
 
-  Future<void> _sendEmail(
-    BuildContext context,
-  ) async {
-    const email = 'support@netruapp.com';
+  Future<void> _sendEmail(BuildContext context) async {
+    const email = 'corbitsteam@gmail.com';
     const subject = 'طلب دعم فني - تطبيق نترو';
     const body = '''
 مرحباً فريق الدعم،
@@ -227,104 +173,17 @@ class SupportOptionsDialog
     }
   }
 
-  Future<void> _makePhoneCall(
-    BuildContext context,
-  ) async {
-    const phoneNumber = '+966123456789';
-    final Uri phoneUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-
-    try {
-      if (await canLaunchUrl(phoneUri)) {
-        await launchUrl(phoneUri);
-      } else {
-        _showPhoneNotAvailableDialog(
-          context,
-          phoneNumber,
-        );
-      }
-    } catch (e) {
-      _showPhoneNotAvailableDialog(
-        context,
-        phoneNumber,
-      );
-    }
-  }
-
-  Future<void> _openLiveChat(
-    BuildContext context,
-  ) async {
-    // For now, show a message that live chat will be available soon
-    // In the future, this could integrate with customer support platforms
+  void _showFallbackEmailDialog(BuildContext context, String email) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('الدردشة المباشرة'),
-            content: const Text(
-              'خدمة الدردشة المباشرة ستكون متاحة قريباً. في الوقت الحالي، يمكنكم التواصل معنا عبر البريد الإلكتروني أو الهاتف.',
-            ),
-            actions: [
-              TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
-                child: const Text('حسناً'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  Future<void> _openFAQ(
-    BuildContext context,
-  ) async {
-    // This could navigate to an FAQ page or open a web page
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('الأسئلة الشائعة'),
-            content: const Text(
-              'صفحة الأسئلة الشائعة ستكون متاحة قريباً مع إجابات لأكثر الأسئلة شيوعاً.',
-            ),
-            actions: [
-              TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
-                child: const Text('حسناً'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showFallbackEmailDialog(
-    BuildContext context,
-    String email,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(
-              'تعذر فتح البريد الإلكتروني',
-            ),
+            title: const Text('تعذر فتح البريد الإلكتروني'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'يمكنكم إرسال بريد إلكتروني إلى:',
-                ),
+                const Text('يمكنكم إرسال بريد إلكتروني إلى:'),
                 SizedBox(height: 8.h),
                 SelectableText(
                   email,
@@ -337,52 +196,7 @@ class SupportOptionsDialog
             ),
             actions: [
               TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
-                child: const Text('حسناً'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showPhoneNotAvailableDialog(
-    BuildContext context,
-    String phoneNumber,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('تعذر الاتصال'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'يمكنكم الاتصال على الرقم:',
-                ),
-                SizedBox(height: 8.h),
-                SelectableText(
-                  phoneNumber,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed:
-                    () =>
-                        Navigator.of(
-                          context,
-                        ).pop(),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('حسناً'),
               ),
             ],

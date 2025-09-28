@@ -10,7 +10,7 @@ import '../widgets/location_date_time_section.dart';
 import '../widgets/media_section.dart';
 import '../widgets/personal_info_section.dart';
 import '../widgets/report_info_section.dart';
-import '../widgets/progress_dialog.dart';
+import '../widgets/report_submission_progress_widget.dart';
 
 class CreateReportPage extends StatelessWidget {
   const CreateReportPage({super.key});
@@ -86,7 +86,7 @@ class _ReportFormViewState extends State<ReportFormView> {
               state.submissionProgress > 0 &&
               !_isProgressDialogShown) {
             _isProgressDialogShown = true;
-            ProgressDialog.show(
+            ReportSubmissionProgressDialog.show(
               context,
               progress: state.submissionProgress,
               currentStep: state.currentStep,
@@ -97,7 +97,7 @@ class _ReportFormViewState extends State<ReportFormView> {
           } else if (state.isLoading && _isProgressDialogShown) {
             // Update existing dialog
             Navigator.pop(context);
-            ProgressDialog.show(
+            ReportSubmissionProgressDialog.show(
               context,
               progress: state.submissionProgress,
               currentStep: state.currentStep,
@@ -107,7 +107,7 @@ class _ReportFormViewState extends State<ReportFormView> {
             );
           } else if (!state.isLoading && _isProgressDialogShown) {
             _isProgressDialogShown = false;
-            ProgressDialog.hide(context);
+            Navigator.pop(context);
 
             if (state.isSubmitted) {
               _showSuccessDialog(context);

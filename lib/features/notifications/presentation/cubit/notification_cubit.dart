@@ -68,7 +68,11 @@ class NotificationCubit extends Cubit<NotificationState> {
               if (refresh) {
                 _notifications = notifications;
               } else {
-                _notifications.addAll(notifications);
+                // Merge incoming page with existing list and remove duplicates
+                _notifications = _mergeNotifications(
+                  _notifications,
+                  notifications,
+                );
               }
 
               _currentPage++;
@@ -210,20 +214,21 @@ class NotificationCubit extends Cubit<NotificationState> {
     result.fold(
       (failure) => emit(NotificationError(_getFailureMessage(failure))),
       (sentNotification) {
-        // Add to local list if it's for the current user
-        if (_notifications.isNotEmpty &&
-            _notifications.first.userId == sentNotification.userId) {
+        // Insert sent notification at top if not already present
+        if (!_notifications.any((n) => n.id == sentNotification.id)) {
           _notifications.insert(0, sentNotification);
+        }
 
-          if (state is NotificationLoaded) {
-            final currentState = state as NotificationLoaded;
-            emit(
-              currentState.copyWith(
-                notifications: List.from(_notifications),
-                unreadCount: currentState.unreadCount + 1,
-              ),
-            );
-          }
+        if (state is NotificationLoaded) {
+          final currentState = state as NotificationLoaded;
+          final newUnread =
+              currentState.unreadCount + (sentNotification.isRead ? 0 : 1);
+          emit(
+            currentState.copyWith(
+              notifications: List.from(_notifications),
+              unreadCount: newUnread,
+            ),
+          );
         }
       },
     );
@@ -235,14 +240,15 @@ class NotificationCubit extends Cubit<NotificationState> {
         .subscribeToNotifications(userId)
         .listen(
           (notifications) {
-            _notifications = notifications;
-            final unreadCount = notifications.where((n) => !n.isRead).length;
+            // Merge stream notifications with existing list and deduplicate
+            _notifications = _mergeNotifications(_notifications, notifications);
+            final unreadCount = _notifications.where((n) => !n.isRead).length;
 
             emit(
               NotificationLoaded(
                 notifications: List.from(_notifications),
                 unreadCount: unreadCount,
-                hasReachedMax: notifications.length < _pageSize,
+                hasReachedMax: _notifications.length < _pageSize,
               ),
             );
           },
@@ -250,6 +256,26 @@ class NotificationCubit extends Cubit<NotificationState> {
             emit(NotificationError('خطأ في الاتصال المباشر: $error'));
           },
         );
+  }
+
+  // Merge two notification lists while removing duplicates (by id)
+  List<NotificationEntity> _mergeNotifications(
+    List<NotificationEntity> current,
+    List<NotificationEntity> incoming,
+  ) {
+    final map = <String, NotificationEntity>{};
+
+    // Put current first then incoming so incoming replaces duplicates
+    for (final n in current) {
+      map[n.id] = n;
+    }
+    for (final n in incoming) {
+      map[n.id] = n;
+    }
+
+    final merged = map.values.toList();
+    merged.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return merged;
   }
 
   String _getFailureMessage(Failure failure) {

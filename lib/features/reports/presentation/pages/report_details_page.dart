@@ -176,7 +176,7 @@ class ReportDetailsPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Center(
+                        child: const Center(
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
                               AppColors.primaryColor,
@@ -672,7 +672,7 @@ class ReportDetailsPage extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(
+                child: const Text(
                   'موافق',
                   style: TextStyle(
                     color: AppColors.primaryColor,

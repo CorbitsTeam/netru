@@ -154,7 +154,7 @@ class SimpleNotificationService {
         userId: userId,
         title: title,
         body: body,
-        type: 'report_update',
+        type: 'info',
         referenceId: reportId,
         referenceType: 'report',
         additionalData: {
@@ -431,7 +431,7 @@ class SimpleNotificationService {
     required String userId,
     required String title,
     required String body,
-    String type = 'general',
+    String type = 'info',
     Map<String, dynamic>? data,
   }) async {
     try {
@@ -456,7 +456,7 @@ class SimpleNotificationService {
     required List<String> userIds,
     required String title,
     required String body,
-    String type = 'general',
+    String type = 'info',
     Map<String, dynamic>? data,
   }) async {
     try {

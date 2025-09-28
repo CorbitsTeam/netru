@@ -61,7 +61,6 @@ class _CompactMediaSectionState extends State<CompactMediaSection>
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
@@ -105,7 +104,7 @@ class _CompactMediaSectionState extends State<CompactMediaSection>
       onTap: _toggleExpansion,
       borderRadius: BorderRadius.circular(16.r),
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(8.w),
         child: Row(
           children: [
             // Media icon and preview
@@ -129,10 +128,11 @@ class _CompactMediaSectionState extends State<CompactMediaSection>
                       top: 4.h,
                       right: 4.w,
                       child: Container(
-                        padding: EdgeInsets.all(4.w),
+                        padding: EdgeInsets.all(6.w),
                         decoration: BoxDecoration(
                           color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(8.r),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.w),
                         ),
                         child: Text(
                           '$mediaCount',

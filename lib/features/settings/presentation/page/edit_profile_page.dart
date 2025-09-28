@@ -278,6 +278,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
           width: 100.r,
           height: 100.r,
           fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 100.r,
+              height: 100.r,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.03),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.broken_image_outlined,
+                  color: Colors.red[400],
+                  size: 28.r,
+                ),
+              ),
+            );
+          },
         ),
       );
     } else if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {

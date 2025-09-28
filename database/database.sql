@@ -88,7 +88,7 @@ CREATE TABLE public.notifications (
   title_ar text,
   body text NOT NULL,
   body_ar text,
-  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['news'::text, 'report_update'::text, 'report_comment'::text, 'system'::text, 'general'::text])),
+  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['success'::text, 'error'::text, 'info'::text, 'report_success'::text, 'alert'::text])),
   reference_id uuid,
   reference_type text CHECK (reference_type = ANY (ARRAY['news_article'::text, 'report'::text, 'system'::text])),
   data jsonb,

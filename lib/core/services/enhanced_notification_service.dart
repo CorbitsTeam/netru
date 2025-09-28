@@ -53,7 +53,7 @@ class EnhancedNotificationService {
         'user_id': userId,
         'title': template['title']!,
         'body': template['body']!,
-        'notification_type': 'report_submitted',
+        'notification_type': 'report_success',
         'reference_id': reportId,
         'reference_type': 'report',
         'priority': 'normal',
@@ -124,7 +124,7 @@ class EnhancedNotificationService {
           'user_id': adminId,
           'title': template['title']!,
           'body': template['body']!,
-          'notification_type': 'new_report_for_admin',
+          'notification_type': 'alert',
           'reference_id': reportId,
           'reference_type': 'report',
           'priority': 'high',
@@ -208,7 +208,7 @@ class EnhancedNotificationService {
         'user_id': userId,
         'title': template['title']!,
         'body': template['body']!,
-        'notification_type': 'report_status_update',
+        'notification_type': 'info',
         'reference_id': reportId,
         'reference_type': 'report',
         'priority': 'normal',
@@ -231,7 +231,7 @@ class EnhancedNotificationService {
         userId: userId,
         title: template['title']!,
         body: template['body']!,
-        type: 'report_status_update',
+        type: 'info',
         data: notificationData['data'] as Map<String, dynamic>?,
       );
 
@@ -291,7 +291,7 @@ class EnhancedNotificationService {
           _logger.logError(
             '❌ Failed to insert notification after $maxRetries attempts',
           );
-          throw e;
+          rethrow;
         }
 
         // Wait before retry

@@ -54,7 +54,7 @@ class AdminNotificationService {
           'user_id': adminId,
           'title': template['title']!,
           'body': template['body']!,
-          'notification_type': 'report_update',
+          'notification_type': 'alert',
           'reference_id': reportId,
           'reference_type': 'report',
           'priority': 'high',
@@ -114,7 +114,7 @@ class AdminNotificationService {
         'user_id': adminId,
         'title': template['title']!,
         'body': template['body']!,
-        'notification_type': 'report_update',
+        'notification_type': 'alert',
         'reference_id': reportId,
         'reference_type': 'report',
         'priority': 'normal',
@@ -173,7 +173,7 @@ class AdminNotificationService {
       await _supabase.from('notifications').insert(notifications);
     } catch (e) {
       _logger.logError('❌ Failed to insert notifications batch: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -196,7 +196,7 @@ class AdminNotificationService {
       await _supabase.from('notifications').insert(notification);
     } catch (e) {
       _logger.logError('❌ Failed to insert single notification: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -256,7 +256,7 @@ class AdminNotificationService {
         'user_id': userId,
         'title': template['title']!,
         'body': template['body']!,
-        'notification_type': 'report_update',
+        'notification_type': 'info',
         'reference_id': reportId,
         'reference_type': 'report',
         'priority': 'normal',

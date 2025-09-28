@@ -213,7 +213,35 @@ class MediaSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             child:
                 isImage
-                    ? Image.file(mediaFile, fit: BoxFit.cover)
+                    ? Image.file(
+                      mediaFile,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.red.withOpacity(0.05),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.broken_image_outlined,
+                                  size: 28,
+                                  color: Colors.red[400],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'ملف الصورة تالف أو غير مدعوم',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.red[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
                     : Container(
                       color: Colors.grey[100],
                       child: Column(
@@ -357,7 +385,7 @@ class MediaSection extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
@@ -398,6 +426,16 @@ class MediaSection extends StatelessWidget {
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
+                      errorBuilder:
+                          (context, error, stackTrace) => Container(
+                            color: Colors.red.withOpacity(0.03),
+                            child: Center(
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: Colors.red[400],
+                              ),
+                            ),
+                          ),
                     )
                     : Container(
                       color: Colors.grey[100],

@@ -37,7 +37,7 @@ class MultipleMediaViewer extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.all(2.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -523,7 +523,7 @@ class MultipleMediaViewer extends StatelessWidget {
   Widget _buildMediaLoader() {
     return Container(
       color: Colors.grey[100],
-      child: Center(
+      child: const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
         ),
@@ -679,7 +679,7 @@ class _FullScreenMediaGalleryState extends State<_FullScreenMediaGallery> {
         foregroundColor: Colors.white,
         title: Text(
           '${_currentIndex + 1} من ${widget.mediaList.length}',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -752,7 +752,7 @@ class _FullScreenMediaGalleryState extends State<_FullScreenMediaGallery> {
                       SizedBox(height: 8.h),
                       ElevatedButton(
                         onPressed: () => _openExternalPlayer(media['url']!),
-                        child: Text('تشغيل'),
+                        child: const Text('تشغيل'),
                       ),
                     ],
                   ),

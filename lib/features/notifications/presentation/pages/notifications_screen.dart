@@ -122,7 +122,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               child: ListView.builder(
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(vertical: 8.h),
+                padding: EdgeInsets.symmetric(vertical: 22.h),
                 itemCount:
                     state.notifications.length + (state.hasReachedMax ? 0 : 1),
                 itemBuilder: (context, index) {
@@ -137,7 +137,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   final notification = state.notifications[index];
                   return NotificationTile(
                     notification: notification,
-                    onTap: () => _handleNotificationTap(context, notification),
+                    onOpen:
+                        () =>
+                            _showFullNotificationDialog(context, notification),
                     onMarkAsRead:
                         !notification.isRead
                             ? () => context
@@ -215,6 +217,62 @@ class _NotificationsViewState extends State<NotificationsView> {
           break;
       }
     }
+  }
+
+  void _showFullNotificationDialog(BuildContext context, notification) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog(
+            insetPadding: EdgeInsets.symmetric(
+              horizontal: 20.w,
+              vertical: 24.h,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(16.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.getLocalizedTitle(),
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.close, size: 20.sp),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    notification.getLocalizedBody(),
+                    style: TextStyle(fontSize: 15.sp, height: 1.6),
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('اغلاق'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
   }
 
   void _showDeleteDialog(BuildContext context, String notificationId) {

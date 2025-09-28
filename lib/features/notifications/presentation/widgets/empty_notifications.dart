@@ -89,11 +89,11 @@ class EmptyNotifications extends StatelessWidget {
                         color: AppColors.borderLight,
                         width: 1,
                       ),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: AppColors.shadow,
                           blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
