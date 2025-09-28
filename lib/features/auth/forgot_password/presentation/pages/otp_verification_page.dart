@@ -1,3 +1,9 @@
+// NOTE: This page previously threw "A TextEditingController was used after being disposed"
+// and "Looking up a deactivated widget's ancestor is unsafe" errors when async
+// bloc events tried to call setState() or use ScaffoldMessenger after the
+// widget was unmounted. We guard BlocListener callbacks and snack bar helpers
+// with `if (!mounted) return;` to avoid using the `BuildContext` or calling
+// setState after disposal.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,6 +47,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -71,6 +79,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void _showSuccessSnackBar(String message) {
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -199,6 +209,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       ),
       body: BlocListener<ForgotPasswordCubit, ForgotPasswordState>(
         listener: (context, state) {
+          // If the widget was unmounted while waiting for bloc events,
+          // avoid calling setState or using the BuildContext.
+          if (!mounted) return;
+
           if (state is ForgotPasswordLoading) {
             setState(() => _isLoading = true);
           } else {

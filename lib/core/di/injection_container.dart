@@ -275,7 +275,7 @@ Future<void> _initChatbotDependencies() async {
     () => ChatbotRemoteDataSourceImpl(
       dio: sl(),
       groqApiKey:
-          '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', // ⚠️ Replace with your actual key
+          '', // ⚠️ Replace with your actual key
     ),
   );
 
