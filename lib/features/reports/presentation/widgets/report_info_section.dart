@@ -9,7 +9,8 @@ import 'package:netru_app/features/reports/presentation/cubit/report_form_state.
 import 'custom_text_field.dart';
 
 class ReportInfoSection extends StatelessWidget {
-  final TextEditingController reportDetailsController;
+  final TextEditingController
+  reportDetailsController;
 
   /// When provided, the widget becomes read-only and shows [readOnlyReportType]
   /// instead of trying to access the [ReportFormCubit]. This is used by
@@ -27,11 +28,15 @@ class ReportInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         Text(
           'معلومات البلاغ',
-          style: TextStyle(fontSize: 16.sp, color: AppColors.primaryColor),
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: AppColors.primaryColor,
+          ),
         ),
         SizedBox(height: 10.h),
         // Report Type Dropdown with Search.
@@ -58,33 +63,47 @@ class ReportInfoSection extends StatelessWidget {
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius:
+                      BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: AppColors.primaryColor.withOpacity(0.3),
+                    color: AppColors.primaryColor
+                        .withOpacity(0.3),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black
+                          .withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(8.w),
+                          padding: EdgeInsets.all(
+                            8.w,
+                          ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8.r),
+                            color: AppColors
+                                .primaryColor
+                                .withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.circular(
+                                  8.r,
+                                ),
                           ),
                           child: Icon(
-                            Icons.category_outlined,
-                            color: AppColors.primaryColor,
+                            Icons
+                                .category_outlined,
+                            color:
+                                AppColors
+                                    .primaryColor,
                             size: 18.sp,
                           ),
                         ),
@@ -93,8 +112,11 @@ class ReportInfoSection extends StatelessWidget {
                           'نوع البلاغ',
                           style: TextStyle(
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryColor,
+                            fontWeight:
+                                FontWeight.w600,
+                            color:
+                                AppColors
+                                    .primaryColor,
                           ),
                         ),
                       ],
@@ -102,23 +124,35 @@ class ReportInfoSection extends StatelessWidget {
                     SizedBox(height: 12.h),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(12.w),
+                      padding: EdgeInsets.all(
+                        12.w,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(8.r),
+                        color: AppColors
+                            .primaryColor
+                            .withOpacity(0.05),
+                        borderRadius:
+                            BorderRadius.circular(
+                              8.r,
+                            ),
                         border: Border.all(
-                          color: AppColors.primaryColor.withOpacity(0.2),
+                          color: AppColors
+                              .primaryColor
+                              .withOpacity(0.2),
                           width: 1,
                         ),
                       ),
                       child: Text(
-                        readOnlyReportType ?? 'نوع البلاغ غير محدد',
+                        readOnlyReportType ??
+                            'نوع البلاغ غير محدد',
                         style: TextStyle(
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
+                          fontWeight:
+                              FontWeight.w500,
                           color: Colors.black87,
                         ),
-                        textAlign: TextAlign.right,
+                        textAlign:
+                            TextAlign.right,
                       ),
                     ),
                   ],
@@ -126,20 +160,30 @@ class ReportInfoSection extends StatelessWidget {
               );
             }
 
-            return BlocBuilder<ReportFormCubit, ReportFormState>(
+            return BlocBuilder<
+              ReportFormCubit,
+              ReportFormState
+            >(
               builder: (context, state) {
                 return SearchableDropdown(
                   label: 'نوع البلاغ',
                   reportTypes: state.reportTypes,
-                  selectedReportType: state.selectedReportType,
-                  isLoading: state.isLoadingReportTypes,
-                  onReportTypeSelected: (reportType) {
-                    context.read<ReportFormCubit>().setSelectedReportType(
-                      reportType,
-                    );
+                  selectedReportType:
+                      state.selectedReportType,
+                  isLoading:
+                      state.isLoadingReportTypes,
+                  onReportTypeSelected: (
+                    reportType,
+                  ) {
+                    context
+                        .read<ReportFormCubit>()
+                        .setSelectedReportType(
+                          reportType,
+                        );
                   },
                   hintText: 'اختر نوع البلاغ',
-                  searchHint: 'ابحث عن نوع البلاغ',
+                  searchHint:
+                      'ابحث عن نوع البلاغ',
                 );
               },
             );
@@ -150,11 +194,13 @@ class ReportInfoSection extends StatelessWidget {
         // Report Details Field
         CustomTextField(
           controller: reportDetailsController,
-          label: 'تفاصيل البلاغ',
-          hintText: 'اكتب تفاصيل البلاغ هنا... (اختياري)',
+          label: 'تفاصيل البلاغ*',
+          hintText: 'اكتب تفاصيل البلاغ هنا',
           maxLines: 5,
           isRequired: false,
-          validator: ValidationHelper.validateReportDetails,
+          validator:
+              ValidationHelper
+                  .validateReportDetails,
           textAlign: TextAlign.right,
         ),
       ],
@@ -168,7 +214,8 @@ class SearchableDropdown extends StatefulWidget {
   final List<ReportTypeModel> reportTypes;
   final ReportTypeModel? selectedReportType;
   final bool isLoading;
-  final Function(ReportTypeModel) onReportTypeSelected;
+  final Function(ReportTypeModel)
+  onReportTypeSelected;
   final String hintText;
   final String searchHint;
 
@@ -184,14 +231,18 @@ class SearchableDropdown extends StatefulWidget {
   });
 
   @override
-  State<SearchableDropdown> createState() => _SearchableDropdownState();
+  State<SearchableDropdown> createState() =>
+      _SearchableDropdownState();
 }
 
-class _SearchableDropdownState extends State<SearchableDropdown> {
-  final TextEditingController _searchController = TextEditingController();
+class _SearchableDropdownState
+    extends State<SearchableDropdown> {
+  final TextEditingController _searchController =
+      TextEditingController();
   List<ReportTypeModel> _filteredItems = [];
   bool _isSearching = false;
-  final TextEditingController _displayController = TextEditingController();
+  final TextEditingController _displayController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -201,12 +252,14 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
     // Listen to search controller changes
     _searchController.addListener(() {
       setState(() {
-        _isSearching = _searchController.text.isNotEmpty;
+        _isSearching =
+            _searchController.text.isNotEmpty;
       });
     });
     // Ensure the display controller shows the currently selected report type
     // when the widget is first created.
-    _displayController.text = widget.selectedReportType?.nameAr ?? '';
+    _displayController.text =
+        widget.selectedReportType?.nameAr ?? '';
   }
 
   @override
@@ -217,15 +270,21 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
   }
 
   @override
-  void didUpdateWidget(covariant SearchableDropdown oldWidget) {
+  void didUpdateWidget(
+    covariant SearchableDropdown oldWidget,
+  ) {
     super.didUpdateWidget(oldWidget);
     // If selectedReportType changed externally, update displayed text.
-    if (widget.selectedReportType?.id != oldWidget.selectedReportType?.id) {
-      _displayController.text = widget.selectedReportType?.nameAr ?? '';
+    if (widget.selectedReportType?.id !=
+        oldWidget.selectedReportType?.id) {
+      _displayController.text =
+          widget.selectedReportType?.nameAr ?? '';
     }
     // If the list of report types updated and current filtered list is empty,
     // refresh filtered items to keep search in sync.
-    if (widget.reportTypes != oldWidget.reportTypes && !_isSearching) {
+    if (widget.reportTypes !=
+            oldWidget.reportTypes &&
+        !_isSearching) {
       _filteredItems = widget.reportTypes;
     }
   }
@@ -245,18 +304,25 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
             void updateSearch(String query) {
               setModalState(() {
                 if (query.isEmpty) {
-                  _filteredItems = widget.reportTypes;
+                  _filteredItems =
+                      widget.reportTypes;
                 } else {
                   _filteredItems =
                       widget.reportTypes
                           .where(
                             (item) =>
-                                item.nameAr.toLowerCase().contains(
-                                  query.toLowerCase(),
-                                ) ||
-                                item.name.toLowerCase().contains(
-                                  query.toLowerCase(),
-                                ),
+                                item.nameAr
+                                    .toLowerCase()
+                                    .contains(
+                                      query
+                                          .toLowerCase(),
+                                    ) ||
+                                item.name
+                                    .toLowerCase()
+                                    .contains(
+                                      query
+                                          .toLowerCase(),
+                                    ),
                           )
                           .toList();
                 }
@@ -265,7 +331,11 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
             }
 
             return Container(
-              height: MediaQuery.of(context).size.height * 0.8,
+              height:
+                  MediaQuery.of(
+                    context,
+                  ).size.height *
+                  0.8,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -274,7 +344,8 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black
+                        .withOpacity(0.1),
                     blurRadius: 10,
                     spreadRadius: 2,
                   ),
@@ -286,30 +357,48 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                   Container(
                     width: 60.w,
                     height: 5.h,
-                    margin: EdgeInsets.symmetric(vertical: 16.h),
+                    margin: EdgeInsets.symmetric(
+                      vertical: 16.h,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(3.r),
+                      borderRadius:
+                          BorderRadius.circular(
+                            3.r,
+                          ),
                     ),
                   ),
 
                   // Header with title and close button
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .spaceBetween,
                       children: [
                         Text(
                           widget.label,
                           style: TextStyle(
                             fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
+                            fontWeight:
+                                FontWeight.bold,
+                            color:
+                                AppColors
+                                    .primaryColor,
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.close, size: 24.sp),
-                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(
+                            Icons.close,
+                            size: 24.sp,
+                          ),
+                          onPressed:
+                              () => Navigator.pop(
+                                context,
+                              ),
                         ),
                       ],
                     ),
@@ -326,29 +415,46 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius:
+                            BorderRadius.circular(
+                              12.r,
+                            ),
+                        border: Border.all(
+                          color:
+                              Colors.grey[300]!,
+                        ),
                       ),
                       child: TextField(
-                        controller: _searchController,
+                        controller:
+                            _searchController,
                         decoration: InputDecoration(
-                          hintText: widget.searchHint,
+                          hintText:
+                              widget.searchHint,
                           prefixIcon: Icon(
                             Icons.search,
-                            color: Colors.grey[600],
+                            color:
+                                Colors.grey[600],
                           ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 14.h,
-                          ),
+                          border:
+                              InputBorder.none,
+                          contentPadding:
+                              EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 14.h,
+                              ),
                           suffixIcon:
                               _isSearching
                                   ? IconButton(
-                                    icon: Icon(Icons.close, size: 20.sp),
+                                    icon: Icon(
+                                      Icons.close,
+                                      size: 20.sp,
+                                    ),
                                     onPressed: () {
-                                      _searchController.clear();
-                                      updateSearch('');
+                                      _searchController
+                                          .clear();
+                                      updateSearch(
+                                        '',
+                                      );
                                     },
                                   )
                                   : null,
@@ -362,9 +468,12 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
 
                   // Results count
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                    ),
                     child: Align(
-                      alignment: Alignment.centerRight,
+                      alignment:
+                          Alignment.centerRight,
                       child: Text(
                         '${_filteredItems.length} نتيجة',
                         style: TextStyle(
@@ -378,7 +487,10 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                   SizedBox(height: 8.h),
 
                   // Divider
-                  Divider(height: 1, color: Colors.grey[300]),
+                  Divider(
+                    height: 1,
+                    color: Colors.grey[300],
+                  ),
 
                   // List of items with beautiful animation
                   Expanded(
@@ -386,78 +498,140 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
                         _filteredItems.isEmpty
                             ? Center(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .center,
                                 children: [
                                   Icon(
-                                    Icons.search_off,
+                                    Icons
+                                        .search_off,
                                     size: 48.sp,
-                                    color: Colors.grey[400],
+                                    color:
+                                        Colors
+                                            .grey[400],
                                   ),
-                                  SizedBox(height: 16.h),
+                                  SizedBox(
+                                    height: 16.h,
+                                  ),
                                   Text(
                                     'لا توجد نتائج',
                                     style: TextStyle(
-                                      fontSize: 16.sp,
-                                      color: Colors.grey[600],
+                                      fontSize:
+                                          16.sp,
+                                      color:
+                                          Colors
+                                              .grey[600],
                                     ),
                                   ),
-                                  SizedBox(height: 8.h),
+                                  SizedBox(
+                                    height: 8.h,
+                                  ),
                                   Text(
                                     'حاول استخدام كلمات بحث مختلفة',
                                     style: TextStyle(
-                                      fontSize: 12.sp,
-                                      color: Colors.grey[500],
+                                      fontSize:
+                                          12.sp,
+                                      color:
+                                          Colors
+                                              .grey[500],
                                     ),
                                   ),
                                 ],
                               ),
                             )
                             : ListView.builder(
-                              padding: EdgeInsets.only(
-                                left: 16.w,
-                                right: 16.w,
-                                bottom: 16.h,
-                              ),
-                              itemCount: _filteredItems.length,
-                              itemBuilder: (context, index) {
-                                final item = _filteredItems[index];
+                              padding:
+                                  EdgeInsets.only(
+                                    left: 16.w,
+                                    right: 16.w,
+                                    bottom: 16.h,
+                                  ),
+                              itemCount:
+                                  _filteredItems
+                                      .length,
+                              itemBuilder: (
+                                context,
+                                index,
+                              ) {
+                                final item =
+                                    _filteredItems[index];
                                 return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  margin: EdgeInsets.only(bottom: 8.h),
+                                  duration:
+                                      const Duration(
+                                        milliseconds:
+                                            200,
+                                      ),
+                                  margin:
+                                      EdgeInsets.only(
+                                        bottom:
+                                            8.h,
+                                      ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12.r),
+                                    color:
+                                        Colors
+                                            .white,
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                          12.r,
+                                        ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
+                                        color: Colors
+                                            .black
+                                            .withOpacity(
+                                              0.05,
+                                            ),
+                                        blurRadius:
+                                            4,
+                                        offset:
+                                            const Offset(
+                                              0,
+                                              2,
+                                            ),
                                       ),
                                     ],
                                   ),
                                   child: ListTile(
                                     title: Text(
                                       item.nameAr,
-                                      textAlign: TextAlign.right,
+                                      textAlign:
+                                          TextAlign
+                                              .right,
                                       style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w500,
+                                        fontSize:
+                                            16.sp,
+                                        fontWeight:
+                                            FontWeight
+                                                .w500,
                                       ),
                                     ),
                                     onTap: () {
                                       // Immediately update the displayed text so the
                                       // selected report type remains visible after
                                       // the sheet is closed.
-                                      _displayController.text = item.nameAr;
-                                      widget.onReportTypeSelected(item);
-                                      Navigator.pop(context);
+                                      _displayController
+                                              .text =
+                                          item.nameAr;
+                                      widget
+                                          .onReportTypeSelected(
+                                            item,
+                                          );
+                                      Navigator.pop(
+                                        context,
+                                      );
                                     },
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                      vertical: 12.h,
-                                    ),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(
+                                          horizontal:
+                                              16.w,
+                                          vertical:
+                                              12.h,
+                                        ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                            12.r,
+                                          ),
                                     ),
                                   ),
                                 );
@@ -480,11 +654,17 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
         height: 60.h,
         decoration: BoxDecoration(
           color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          border: Border.all(
+            color: Colors.grey[300]!,
+          ),
         ),
         child: const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryColor),
+          child: CircularProgressIndicator(
+            color: AppColors.primaryColor,
+          ),
         ),
       );
     }
@@ -500,20 +680,35 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
           color: AppColors.primaryColor,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          borderSide: BorderSide(
+            color: Colors.grey[300]!,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          borderSide: BorderSide(
+            color: Colors.grey[300]!,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+          borderSide: const BorderSide(
+            color: AppColors.primaryColor,
+          ),
         ),
         filled: true,
         fillColor: Colors.grey[50],
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 16.h,
+        ),
       ),
       validator: (value) {
         if (widget.selectedReportType == null) {
