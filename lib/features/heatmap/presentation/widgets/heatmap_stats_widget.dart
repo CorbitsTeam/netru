@@ -202,8 +202,7 @@ class HeatmapStatsWidget extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      height: 80.h,
-
+      height: 90.h,
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
