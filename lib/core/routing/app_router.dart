@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
-import 'package:netru_app/features/auth/email_verification/presentation/pages/email_verification_page.dart';
-import 'package:netru_app/features/auth/profile_completion/presentation/pages/complete_profile_page.dart';
-import 'package:netru_app/features/auth/signup/presentation/pages/signup_page.dart';
+import '../../features/auth/email_verification/presentation/pages/email_verification_page.dart';
+import '../../features/auth/profile_completion/presentation/pages/complete_profile_page.dart';
+import '../../features/auth/signup/presentation/pages/signup_page.dart';
+import '../../features/auth/forgot_password/presentation/pages/forgot_password_email_page.dart';
+import '../../features/auth/forgot_password/presentation/pages/otp_verification_page.dart';
+import '../../features/auth/forgot_password/presentation/cubit/forgot_password_cubit.dart';
 import 'package:netru_app/features/heatmap/presentation/pages/improved_crime_heat_map_page.dart';
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/auth/login/presentation/cubit/login_cubit.dart';
@@ -67,6 +70,24 @@ class AppRouter {
           BlocProvider<SignupCubit>(
             create: (context) => sl<SignupCubit>(),
             child: const SignupPage(),
+          ),
+        );
+
+      // Forgot Password routes
+      case Routes.forgotPasswordEmail:
+        return _createRoute(
+          BlocProvider<ForgotPasswordCubit>(
+            create: (context) => ForgotPasswordCubit(),
+            child: const ForgotPasswordEmailPage(),
+          ),
+        );
+
+      case Routes.forgotPasswordOtp:
+        final email = settings.arguments as String;
+        return _createRoute(
+          BlocProvider<ForgotPasswordCubit>(
+            create: (context) => ForgotPasswordCubit(),
+            child: OtpVerificationPage(email: email),
           ),
         );
 

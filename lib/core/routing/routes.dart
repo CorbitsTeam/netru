@@ -27,6 +27,10 @@ class Routes {
   // News routes
   static const String allNewsPage = '/allNewsPage';
 
+  // Forgot Password routes
+  static const String forgotPasswordEmail = '/forgotPasswordEmail';
+  static const String forgotPasswordOtp = '/forgotPasswordOtp';
+
   // Admin routes
   static const String adminDashboard = '/admin/dashboard';
   static const String adminReports = '/admin/reports';

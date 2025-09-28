@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
 import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
+import 'package:netru_app/features/auth/forgot_password/presentation/cubit/forgot_password_cubit.dart';
 import 'package:netru_app/core/services/simple_fcm_service.dart';
 import 'package:netru_app/features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'package:netru_app/features/notifications/data/repositories/notification_repository_impl.dart';
@@ -245,6 +246,9 @@ Future<void> _initAuthDependencies() async {
   );
 
   sl.registerFactory(() => LoginCubit(loginUserUseCase: sl()));
+
+  // Forgot Password Cubit
+  sl.registerFactory(() => ForgotPasswordCubit(supabaseClient: sl()));
 
   // Profile Completion Cubit
   sl.registerFactory(

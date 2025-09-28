@@ -17,17 +17,13 @@ class CitizenLoginForm extends StatefulWidget {
   });
 
   @override
-  State<CitizenLoginForm> createState() =>
-      _CitizenLoginFormState();
+  State<CitizenLoginForm> createState() => _CitizenLoginFormState();
 }
 
-class _CitizenLoginFormState
-    extends State<CitizenLoginForm> {
+class _CitizenLoginFormState extends State<CitizenLoginForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nationalIdController =
-      TextEditingController();
-  final _passwordController =
-      TextEditingController();
+  final _nationalIdController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -38,11 +34,9 @@ class _CitizenLoginFormState
   }
 
   void _handleSubmit() {
-    if (_formKey.currentState?.validate() ??
-        false) {
+    if (_formKey.currentState?.validate() ?? false) {
       context.read<LoginCubit>().loginUser(
-        identifier:
-            _nationalIdController.text.trim(),
+        identifier: _nationalIdController.text.trim(),
         password: _passwordController.text,
         userType: UserType.citizen,
       );
@@ -60,13 +54,9 @@ class _CitizenLoginFormState
             controller: _nationalIdController,
             label: 'الرقم القومي',
             hint: 'أدخل الرقم القومي (14 رقم)',
-            prefixIcon: Icon(
-              Icons.person_outline,
-              size: 20.sp,
-            ),
+            prefixIcon: Icon(Icons.person_outline, size: 20.sp),
             keyboardType: TextInputType.number,
-            validationType:
-                ValidationType.nationalId,
+            validationType: ValidationType.nationalId,
             realTimeValidation: true,
             showValidationIcon: true,
           ),
@@ -75,35 +65,43 @@ class _CitizenLoginFormState
             controller: _passwordController,
             label: 'كلمة المرور',
             hint: 'أدخل كلمة المرور',
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              size: 20.sp,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, size: 20.sp),
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
               onPressed:
-                  () => setState(
-                    () =>
-                        _obscurePassword =
-                            !_obscurePassword,
-                  ),
+                  () => setState(() => _obscurePassword = !_obscurePassword),
               icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_off
-                    : Icons.visibility,
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 size: 20.sp,
               ),
             ),
-            validationType:
-                ValidationType.required,
+            validationType: ValidationType.required,
             realTimeValidation: true,
             showValidationIcon: true,
           ),
-          SizedBox(height: 20.h),
-          LoginButton(
-            onPressed: _handleSubmit,
-            isLoading: widget.isLoading,
+          SizedBox(height: 16.h),
+
+          // Forgot Password Link
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/forgotPasswordEmail');
+              },
+              child: Text(
+                'نسيت كلمة المرور؟',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: const Color(0xFF002768), // Primary color
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Almarai',
+                ),
+              ),
+            ),
           ),
+
+          SizedBox(height: 12.h),
+          LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),
         ],
       ),
     );

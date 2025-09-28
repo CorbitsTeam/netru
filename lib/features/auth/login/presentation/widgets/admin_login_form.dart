@@ -84,7 +84,28 @@ class _AdminLoginFormState extends State<AdminLoginForm> {
                   () => setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
-          SizedBox(height: 40.h),
+          SizedBox(height: 16.h),
+
+          // Forgot Password Link
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/forgotPasswordEmail');
+              },
+              child: Text(
+                'نسيت كلمة المرور؟',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: const Color(0xFF002768), // Primary color
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Almarai',
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 12.h),
           LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),
         ],
       ),
