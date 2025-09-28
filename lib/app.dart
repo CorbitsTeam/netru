@@ -7,6 +7,7 @@ import 'core/routing/app_router.dart';
 import 'core/constants/app_constants.dart';
 import 'core/cubit/theme/theme_cubit.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/deep_link_service.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 
 class MyApp extends StatelessWidget {
@@ -37,8 +38,13 @@ class MyApp extends StatelessWidget {
               themeMode = themeState.themeMode;
             }
 
+            // Global navigator key for deep link handling
+            final GlobalKey<NavigatorState> navigatorKey =
+                GlobalKey<NavigatorState>();
+
             return MaterialApp(
               key: const ValueKey('main_material_app'),
+              navigatorKey: navigatorKey,
               debugShowCheckedModeBanner: false,
               title: AppConstants.appName,
               theme: AppTheme.lightTheme,
@@ -49,6 +55,13 @@ class MyApp extends StatelessWidget {
               localizationsDelegates: context.localizationDelegates,
               onGenerateRoute: appRouter.generateRoute,
               initialRoute: '/',
+              builder: (context, child) {
+                // Initialize deep link service when app starts
+                if (navigatorKey.currentState != null) {
+                  DeepLinkService().init(navigatorKey.currentState!);
+                }
+                return child!;
+              },
             );
           },
         );

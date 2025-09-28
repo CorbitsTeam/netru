@@ -5,6 +5,7 @@ class Routes {
   static const String submissionOfaReportPage = '/submissionOfaReportPage';
   static const String loginScreen = '/loginScreen';
   static const String signupScreen = '/signupScreen';
+  static const String forgotPasswordScreen = '/forgotPasswordScreen';
   static const String homeScreen = '/homeScreen';
   static const String homePage = '/homeScreen'; // Alias for compatibility
   static const String customBottomBar = '/customBottomBar';

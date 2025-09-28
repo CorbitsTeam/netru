@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netru_app/core/routing/routes.dart';
+import 'package:netru_app/core/theme/app_colors.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../widgets/validated_text_form_field.dart';
 import '../cubit/login_cubit.dart';
@@ -79,7 +81,28 @@ class _CitizenLoginFormState extends State<CitizenLoginForm> {
             realTimeValidation: true,
             showValidationIcon: true,
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 16.h),
+
+          // Forgot Password Link
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, Routes.forgotPasswordScreen);
+              },
+              child: Text(
+                'نسيت كلمة المرور؟',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Almarai',
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+
           LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),
         ],
       ),

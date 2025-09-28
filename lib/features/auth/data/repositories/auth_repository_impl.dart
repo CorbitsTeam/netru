@@ -74,6 +74,54 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   // ========================
+  // Password Reset Methods
+  // ========================
+
+  @override
+  Future<Either<Failure, bool>> sendPasswordResetToken(String email) async {
+    try {
+      final result = await authDataSource.sendPasswordResetToken(email);
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> verifyPasswordResetToken(
+    String email,
+    String token,
+  ) async {
+    try {
+      final result = await authDataSource.verifyPasswordResetToken(
+        email,
+        token,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> resetPasswordWithToken(
+    String email,
+    String token,
+    String newPassword,
+  ) async {
+    try {
+      final result = await authDataSource.resetPasswordWithToken(
+        email,
+        token,
+        newPassword,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ========================
   // Registration Methods
   // ========================
 

@@ -149,7 +149,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   showAdminTab: _showAdminTab,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.42,
                   child: TabBarView(
                     controller: _tabController,
                     children: [

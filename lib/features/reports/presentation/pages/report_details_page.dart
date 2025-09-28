@@ -731,22 +731,22 @@ class ReportDetailsPage extends StatelessWidget {
   }
 
   // Helper methods
-  Color _getStatusColor(ReportStatus status) {
-    switch (status) {
-      case ReportStatus.received:
-        return AppColors.primaryColor;
-      case ReportStatus.underReview:
-        return Colors.orange;
-      case ReportStatus.dataVerification:
-        return Colors.amber[700]!;
-      case ReportStatus.actionTaken:
-        return Colors.blue;
-      case ReportStatus.completed:
-        return Colors.green;
-      case ReportStatus.rejected:
-        return Colors.red;
-    }
-  }
+  // Color _getStatusColor(ReportStatus status) {
+  //   switch (status) {
+  //     case ReportStatus.received:
+  //       return AppColors.primaryColor;
+  //     case ReportStatus.underReview:
+  //       return Colors.orange;
+  //     case ReportStatus.dataVerification:
+  //       return Colors.amber[700]!;
+  //     case ReportStatus.actionTaken:
+  //       return Colors.blue;
+  //     case ReportStatus.completed:
+  //       return Colors.green;
+  //     case ReportStatus.rejected:
+  //       return Colors.red;
+  //   }
+  // }
 
   IconData _getReportTypeIcon() {
     final type = report!.reportType.toLowerCase();

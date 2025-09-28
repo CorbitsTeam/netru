@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../../core/routing/routes.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../cubit/login_cubit.dart';
 import '../../../widgets/validated_text_form_field.dart';
@@ -84,7 +86,29 @@ class _AdminLoginFormState extends State<AdminLoginForm> {
                   () => setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
-          SizedBox(height: 40.h),
+          SizedBox(height: 16.h),
+
+          // Forgot Password Link
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, Routes.forgotPasswordScreen);
+              },
+              child: Text(
+                'نسيت كلمة المرور؟',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Almarai',
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 24.h),
           LoginButton(onPressed: _handleSubmit, isLoading: widget.isLoading),
         ],
       ),

@@ -8,6 +8,8 @@ import 'package:netru_app/features/heatmap/presentation/pages/improved_crime_hea
 import 'package:netru_app/features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/auth/login/presentation/cubit/login_cubit.dart';
 import '../../features/auth/login/presentation/pages/login_page.dart';
+import '../../features/auth/forgot_password/presentation/cubit/forgot_password_cubit.dart';
+import '../../features/auth/forgot_password/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/signup/presentation/cubits/signup_cubit.dart';
 import '../di/injection_container.dart';
 import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart';
@@ -64,6 +66,13 @@ class AppRouter {
           BlocProvider<SignupCubit>(
             create: (context) => sl<SignupCubit>(),
             child: const SignupPage(),
+          ),
+        );
+      case Routes.forgotPasswordScreen:
+        return _createRoute(
+          BlocProvider<ForgotPasswordCubit>(
+            create: (context) => sl<ForgotPasswordCubit>(),
+            child: const ForgotPasswordPage(),
           ),
         );
 

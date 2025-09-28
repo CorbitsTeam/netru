@@ -24,6 +24,20 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> logout();
 
   // ========================
+  // Password Reset Methods
+  // ========================
+  Future<Either<Failure, bool>> sendPasswordResetToken(String email);
+  Future<Either<Failure, bool>> verifyPasswordResetToken(
+    String email,
+    String token,
+  );
+  Future<Either<Failure, bool>> resetPasswordWithToken(
+    String email,
+    String token,
+    String newPassword,
+  );
+
+  // ========================
   // Registration Methods
   // ========================
   Future<Either<Failure, UserEntity>> registerUser({

@@ -32,7 +32,12 @@ import '../../features/auth/domain/usecases/get_user_by_id.dart';
 import '../../features/auth/domain/usecases/signup_with_data.dart';
 import '../../features/auth/domain/usecases/update_user_profile.dart';
 import '../../features/auth/domain/usecases/upload_profile_image.dart';
+
+import '../../features/auth/domain/usecases/send_password_reset_passcode.dart';
+import '../../features/auth/domain/usecases/verify_password_reset_passcode.dart';
+import '../../features/auth/domain/usecases/reset_password_with_passcode.dart';
 import '../../features/auth/profile_completion/presentation/cubit/profile_completion_cubit.dart';
+import '../../features/auth/forgot_password/presentation/cubit/forgot_password_cubit.dart';
 
 import '../../features/chatbot/data/datasources/chatbot_local_data_source.dart';
 // ===========================
@@ -216,6 +221,9 @@ Future<void> _initAuthDependencies() async {
   sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
   sl.registerLazySingleton(() => UploadProfileImageUseCase(sl()));
   sl.registerLazySingleton(() => SignUpWithDataUseCase(sl()));
+  sl.registerLazySingleton(() => SendPasswordResetTokenUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyPasswordResetTokenUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordWithTokenUseCase(sl()));
 
   // Profile Completion Use Cases
   sl.registerLazySingleton(() => CompleteProfileUseCase(sl(), sl()));
@@ -250,6 +258,15 @@ Future<void> _initAuthDependencies() async {
       checkNationalIdExistsUseCase: sl(),
       checkPassportExistsUseCase: sl(),
       checkEmailExistsInUsersUseCase: sl(),
+    ),
+  );
+
+  // Forgot Password Cubit
+  sl.registerFactory(
+    () => ForgotPasswordCubit(
+      sendTokenUseCase: sl(),
+      verifyTokenUseCase: sl(),
+      resetPasswordUseCase: sl(),
     ),
   );
 
