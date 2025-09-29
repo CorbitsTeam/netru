@@ -7,6 +7,10 @@ import 'package:latlong2/latlong.dart';
 import '../cubit/heatmap_cubit.dart';
 import '../cubit/heatmap_state.dart';
 import '../../../../core/services/location_service.dart';
+import '../../domain/entities/heatmap_entity.dart';
+import 'report_marker_widget.dart';
+import 'clustered_report_marker_widget.dart';
+import '../helpers/report_marker_helper.dart';
 
 class HeatMapWidget extends StatefulWidget {
   const HeatMapWidget({super.key});
@@ -178,30 +182,11 @@ class _HeatMapWidgetState
     // طبقة الدوائر الحرارية المحسنة
     List<CircleMarker> heatCircles = [];
     List<Marker> reportMarkers = [];
-    List<Marker> governorateMarkers = [];
-
-    // تجميع التقارير حسب المحافظة
-    Map<String, List<dynamic>>
-    governorateReports = {};
+    List<Marker> singleReportMarkers = [];
 
     // تجميع التقارير في مجموعات بناءً على القرب الجغرافي
     List<ReportCluster> clusters =
         _clusterNearbyReports(reports);
-
-    for (final report in reports) {
-      // تجميع حسب المحافظة
-      final governorate =
-          report.governorate ?? 'غير محدد';
-      governorateReports
-          .putIfAbsent(governorate, () => [])
-          .add(report);
-    }
-
-    // إضافة علامات للمحافظات
-    _addGovernorateMarkers(
-      governorateMarkers,
-      governorateReports,
-    );
 
     // إنشاء الدوائر الحرارية والعلامات المحسنة باستخدام المجموعات
     for (final cluster in clusters) {
@@ -213,82 +198,107 @@ class _HeatMapWidgetState
       final crimeTypeStats = _analyzeCrimeTypes(
         reportsInCluster,
       );
-      final dominantCrimeType =
-          crimeTypeStats.entries
-              .reduce(
-                (a, b) =>
-                    a.value > b.value ? a : b,
-              )
-              .key;
+
+      // احصل على أعلى أولوية في المجموعة
+      final highestPriority = _getHighestPriority(reportsInCluster);
+      final priorityColor = ReportMarkerHelper.getPriorityColor(highestPriority);
 
       // دائرة شفافة بسيطة
       final baseRadius = _calculateClusterRadius(
         intensity,
       );
-      final mainColor = _getClusterColor(
-        intensity,
+
+      // ===== تحسين مظهر الدوائر الحرارية =====
+
+      // الطبقة الخارجية - دائرة كبيرة جداً شفافة للتأثير
+      if (intensity >= 5) {
+        heatCircles.add(
+          CircleMarker(
+            point: location,
+            radius: baseRadius * 2.2,
+            color: priorityColor.withValues(alpha: 0.02),
+            borderStrokeWidth: 0,
+          ),
+        );
+      }
+
+      // الطبقة الوسطى - دائرة متوسطة
+      heatCircles.add(
+        CircleMarker(
+          point: location,
+          radius: baseRadius * 1.4,
+          color: priorityColor.withValues(alpha: 0.04),
+          borderColor: priorityColor.withValues(alpha: 0.08),
+          borderStrokeWidth: 1,
+        ),
       );
 
-      // دائرة شفافة نظيفة
+      // الطبقة الداخلية - دائرة أساسية مع حدود واضحة
       heatCircles.add(
         CircleMarker(
           point: location,
           radius: baseRadius,
-          color: mainColor.withOpacity(0.1),
-          borderColor: mainColor.withOpacity(0.4),
-          borderStrokeWidth: 1.5,
+          color: priorityColor.withValues(alpha: 0.08),
+          borderColor: priorityColor.withValues(alpha: 0.25),
+          borderStrokeWidth: 2,
         ),
       );
 
-      // علامة شفافة بسيطة وواضحة
-      reportMarkers.add(
-        Marker(
-          point: location,
-          width: _getMarkerSize(intensity),
-          height: _getMarkerSize(intensity),
-          child: GestureDetector(
-            onTap:
-                () => _showEnhancedAreaDetails(
-                  reportsInCluster,
-                  crimeTypeStats,
-                ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(
-                  0.9,
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: mainColor,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black
-                        .withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+      // دائرة إضافية للتقارير عالية الأولوية
+      if (highestPriority == 'urgent') {
+        heatCircles.add(
+          CircleMarker(
+            point: location,
+            radius: baseRadius * 0.6,
+            color: priorityColor.withValues(alpha: 0.15),
+            borderColor: priorityColor.withValues(alpha: 0.35),
+            borderStrokeWidth: 1.5,
+          ),
+        );
+      }
+
+      // Use appropriate marker based on cluster size
+      if (intensity == 1) {
+        // Single report - use individual marker
+        final report = reportsInCluster.first;
+        singleReportMarkers.add(
+          Marker(
+            point: location,
+            width: 40.w,
+            height: 40.h,
+            child: ReportMarkerWidget(
+              report: report,
+              onTap: () => _showEnhancedAreaDetails(
+                reportsInCluster,
+                crimeTypeStats,
               ),
-              child: Center(
-                child: Text(
-                  intensity.toString(),
-                  style: TextStyle(
-                    color: mainColor,
-                    fontSize: _getFontSize(
-                      intensity,
-                    ),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              showPulseAnimation: ReportMarkerHelper.shouldShowPulse(
+                report.priority,
               ),
             ),
           ),
-        ),
-      );
+        );
+      } else {
+        // Multiple reports - use cluster marker
+        // Cast to proper type for ClusteredReportMarkerWidget
+        final List<ReportLocationEntity> typedReports =
+            reportsInCluster.cast<ReportLocationEntity>();
 
-      // لا حاجة للنقاط الصغيرة - سنعرض العدد الإجمالي في العلامة الرئيسية
+        reportMarkers.add(
+          Marker(
+            point: location,
+            width: _getMarkerSize(intensity),
+            height: _getMarkerSize(intensity),
+            child: ClusteredReportMarkerWidget(
+              reports: typedReports,
+              onTap: () => _showEnhancedAreaDetails(
+                reportsInCluster,
+                crimeTypeStats,
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     // إضافة الطبقات بترتيب مناسب
@@ -297,14 +307,14 @@ class _HeatMapWidgetState
         CircleLayer(circles: heatCircles),
       );
     }
-    if (governorateMarkers.isNotEmpty) {
-      layers.add(
-        MarkerLayer(markers: governorateMarkers),
-      );
-    }
     if (reportMarkers.isNotEmpty) {
       layers.add(
         MarkerLayer(markers: reportMarkers),
+      );
+    }
+    if (singleReportMarkers.isNotEmpty) {
+      layers.add(
+        MarkerLayer(markers: singleReportMarkers),
       );
     }
 
@@ -373,432 +383,6 @@ class _HeatMapWidgetState
     return Colors.grey;
   }
 
-  // إضافة علامات المحافظات بناءً على البيانات الفعلية من قاعدة البيانات
-  void _addGovernorateMarkers(
-    List<Marker> governorateMarkers,
-    Map<String, List<dynamic>> governorateReports,
-  ) {
-    for (final entry
-        in governorateReports.entries) {
-      final governorate = entry.key;
-      final reports = entry.value;
-
-      if (governorate == 'غير محدد' ||
-          reports.isEmpty) {
-        continue;
-      }
-
-      // حساب المتوسط الجغرافي للتقارير في المحافظة من البيانات الفعلية
-      double avgLat = 0.0;
-      double avgLng = 0.0;
-      int validReports = 0;
-
-      for (final report in reports) {
-        if (report.location != null) {
-          avgLat += report.location.latitude;
-          avgLng += report.location.longitude;
-          validReports++;
-        }
-      }
-
-      if (validReports == 0) continue;
-
-      final location = LatLng(
-        avgLat / validReports,
-        avgLng / validReports,
-      );
-
-      final reportCount = reports.length;
-      final crimeLevel = _getCrimeLevel(
-        reportCount,
-      );
-
-      governorateMarkers.add(
-        Marker(
-          point: location,
-          width: 60.w,
-          height: 80.h,
-          child: GestureDetector(
-            onTap:
-                () => _showGovernorateDetails(
-                  governorate,
-                  reports,
-                ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // سهم متحرك للمحافظات الأكثر خطورة
-                if (crimeLevel == 'high')
-                  TweenAnimationBuilder<double>(
-                    duration: const Duration(
-                      seconds: 1,
-                    ),
-                    tween: Tween(
-                      begin: 0.0,
-                      end: 1.0,
-                    ),
-                    builder: (
-                      context,
-                      value,
-                      child,
-                    ) {
-                      return Transform.translate(
-                        offset: Offset(
-                          0,
-                          -5 *
-                              math.sin(
-                                value *
-                                    2 *
-                                    math.pi,
-                              ),
-                        ),
-                        child: Icon(
-                          Icons.keyboard_arrow_up,
-                          color: Colors.red
-                              .withOpacity(
-                                0.7 + 0.3 * value,
-                              ),
-                          size: 24.sp,
-                        ),
-                      );
-                    },
-                  ),
-
-                // العلامة الرئيسية
-                Container(
-                  width: 50.w,
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                    color: _getCrimeLevelColor(
-                      crimeLevel,
-                    ),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 3,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            _getCrimeLevelColor(
-                              crimeLevel,
-                            ).withOpacity(0.4),
-                        blurRadius: 12,
-                        spreadRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _getCrimeLevelIcon(
-                          crimeLevel,
-                        ),
-                        color: Colors.white,
-                        size: 18.sp,
-                      ),
-                      Text(
-                        reportCount.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  String _getCrimeLevel(int reportCount) {
-    if (reportCount >= 20) return 'high';
-    if (reportCount >= 10) return 'medium';
-    if (reportCount >= 5) return 'low';
-    return 'safe';
-  }
-
-  Color _getCrimeLevelColor(String level) {
-    switch (level) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      case 'low':
-        return Colors.yellow[700] ??
-            Colors.yellow;
-      case 'safe':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getCrimeLevelIcon(String level) {
-    switch (level) {
-      case 'high':
-        return Icons.dangerous;
-      case 'medium':
-        return Icons.warning;
-      case 'low':
-        return Icons.info;
-      case 'safe':
-        return Icons.check_circle;
-      default:
-        return Icons.help;
-    }
-  }
-
-  void _showGovernorateDetails(
-    String governorate,
-    List<dynamic> reports,
-  ) {
-    final crimeStats = _analyzeCrimeTypes(
-      reports,
-    );
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24.r),
-        ),
-      ),
-      builder:
-          (context) => Container(
-            height:
-                MediaQuery.of(
-                  context,
-                ).size.height *
-                0.7,
-            padding: EdgeInsets.all(24.w),
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                // مقبض السحب
-                Center(
-                  child: Container(
-                    width: 40.w,
-                    height: 4.h,
-                    margin: EdgeInsets.only(
-                      bottom: 20.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius:
-                          BorderRadius.circular(
-                            2.r,
-                          ),
-                    ),
-                  ),
-                ),
-
-                // عنوان المحافظة
-                Text(
-                  'إحصائيات $governorate',
-                  style: TextStyle(
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-
-                SizedBox(height: 16.h),
-
-                // إجمالي البلاغات
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.blue
-                        .withOpacity(0.1),
-                    borderRadius:
-                        BorderRadius.circular(
-                          12.r,
-                        ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.report,
-                        color: Colors.blue,
-                        size: 32.sp,
-                      ),
-                      SizedBox(width: 12.w),
-                      Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-                        children: [
-                          Text(
-                            'إجمالي البلاغات',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color:
-                                  Colors
-                                      .grey[600],
-                            ),
-                          ),
-                          Text(
-                            '${reports.length}',
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight:
-                                  FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 16.h),
-
-                // إحصائيات أنواع الجرائم
-                Text(
-                  'توزيع أنواع الجرائم',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-
-                SizedBox(height: 12.h),
-
-                Expanded(
-                  child: ListView.builder(
-                    itemCount:
-                        crimeStats.entries.length,
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
-                      final entry = crimeStats
-                          .entries
-                          .elementAt(index);
-                      final percentage =
-                          (entry.value /
-                                  reports.length *
-                                  100)
-                              .round();
-
-                      return Container(
-                        margin: EdgeInsets.only(
-                          bottom: 8.h,
-                        ),
-                        padding: EdgeInsets.all(
-                          12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius:
-                              BorderRadius.circular(
-                                8.r,
-                              ),
-                          border: Border.all(
-                            color:
-                                Colors.grey[200]!,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _getCrimeTypeIcon(
-                                entry.key,
-                              ),
-                              color:
-                                  _getCrimeTypeColor(
-                                    entry.key,
-                                  ),
-                              size: 24.sp,
-                            ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
-                                children: [
-                                  Text(
-                                    entry.key,
-                                    style: TextStyle(
-                                      fontSize:
-                                          14.sp,
-                                      fontWeight:
-                                          FontWeight
-                                              .w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${entry.value} بلاغ ($percentage%)',
-                                    style: TextStyle(
-                                      fontSize:
-                                          12.sp,
-                                      color:
-                                          Colors
-                                              .grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding:
-                                  EdgeInsets.symmetric(
-                                    horizontal:
-                                        8.w,
-                                    vertical: 4.h,
-                                  ),
-                              decoration: BoxDecoration(
-                                color:
-                                    _getCrimeTypeColor(
-                                      entry.key,
-                                    ).withOpacity(
-                                      0.2,
-                                    ),
-                                borderRadius:
-                                    BorderRadius.circular(
-                                      12.r,
-                                    ),
-                              ),
-                              child: Text(
-                                entry.value
-                                    .toString(),
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
-                                  color:
-                                      _getCrimeTypeColor(
-                                        entry.key,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-    );
-  }
-
   List<Widget> _buildHeatmapLayers(
     List<dynamic> reports,
   ) {
@@ -821,8 +405,8 @@ class _HeatMapWidgetState
               return Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blue.withOpacity(
-                    0.3,
+                  color: Colors.blue.withValues(
+                    alpha: 0.3,
                   ),
                   border: Border.all(
                     color: Colors.blue,
@@ -840,12 +424,6 @@ class _HeatMapWidgetState
         ),
       ],
     );
-  }
-
-  double _calculateRadius(int reportCount) {
-    if (reportCount >= 10) return 50.0;
-    if (reportCount >= 5) return 35.0;
-    return 25.0;
   }
 
   Color _getCrimeColor(int reportCount) {
@@ -868,52 +446,13 @@ class _HeatMapWidgetState
     return 25.0;
   }
 
-  /// الحصول على لون المجموعة
-  Color _getClusterColor(int reportCount) {
-    if (reportCount >= 20) {
-      return const Color(
-        0xFFD32F2F,
-      ).withValues(alpha: 0.7); // أحمر داكن
-    }
-    if (reportCount >= 10) {
-      return const Color(
-        0xFFE65100,
-      ).withValues(alpha: 0.7); // برتقالي داكن
-    }
-    if (reportCount >= 5) {
-      return const Color(
-        0xFFFF9800,
-      ).withValues(alpha: 0.7); // برتقالي
-    }
-    if (reportCount >= 3) {
-      return const Color(
-        0xFFFFC107,
-      ).withValues(alpha: 0.7); // أصفر
-    }
-    return const Color(
-      0xFF4CAF50,
-    ).withValues(alpha: 0.7); // أخضر
-  }
 
   /// حساب حجم العلامة
   double _getMarkerSize(int reportCount) {
-    if (reportCount >= 20) return 50.w;
-    if (reportCount >= 10) return 45.w;
-    if (reportCount >= 5) return 40.w;
-    return 20.w;
-  }
-
-  /// حساب حجم الخط
-  double _getFontSize(int reportCount) {
-    if (reportCount >= 100) return 10.sp;
-    if (reportCount >= 20) return 12.sp;
-    if (reportCount >= 10) return 14.sp;
-    return 10.sp;
-  }
-
-  /// حساب حجم الأيقونة
-  double _getIconSize(int reportCount) {
-    return 20.sp;
+    if (reportCount >= 20) return 60.w;
+    if (reportCount >= 10) return 52.w;
+    if (reportCount >= 5) return 46.w;
+    return 40.w;
   }
 
   void _handleMapTap(
@@ -1028,7 +567,7 @@ class _HeatMapWidgetState
                       decoration: BoxDecoration(
                         color: _getCrimeColor(
                           totalReports,
-                        ).withOpacity(0.1),
+                        ).withValues(alpha: 0.1),
                         borderRadius:
                             BorderRadius.circular(
                               12.r,
@@ -1086,10 +625,10 @@ class _HeatMapWidgetState
                       colors: [
                         _getCrimeColor(
                           totalReports,
-                        ).withOpacity(0.1),
+                        ).withValues(alpha: 0.1),
                         _getCrimeColor(
                           totalReports,
-                        ).withOpacity(0.05),
+                        ).withValues(alpha: 0.05),
                       ],
                     ),
                     borderRadius:
@@ -1099,7 +638,7 @@ class _HeatMapWidgetState
                     border: Border.all(
                       color: _getCrimeColor(
                         totalReports,
-                      ).withOpacity(0.3),
+                      ).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -1188,8 +727,8 @@ class _HeatMapWidgetState
                                 color:
                                     _getCrimeTypeColor(
                                       crimeType,
-                                    ).withOpacity(
-                                      0.2,
+                                    ).withValues(
+                                      alpha: 0.2,
                                     ),
                                 borderRadius:
                                     BorderRadius.circular(
@@ -1315,12 +854,18 @@ class _HeatMapWidgetState
     );
   }
 
+  /// Get highest priority from a list of reports
+  String _getHighestPriority(List<dynamic> reports) {
+    if (reports.any((r) => r.priority == 'urgent')) return 'urgent';
+    if (reports.any((r) => r.priority == 'high')) return 'high';
+    if (reports.any((r) => r.priority == 'medium')) return 'medium';
+    return 'low';
+  }
+
   /// تجميع التقارير المتقاربة جغرافياً في مجموعات
   List<ReportCluster> _clusterNearbyReports(
     List<dynamic> reports,
   ) {
-    const double clusterRadius =
-        0.005; // حوالي 500 متر
     List<ReportCluster> clusters = [];
     List<bool> processed = List.filled(
       reports.length,

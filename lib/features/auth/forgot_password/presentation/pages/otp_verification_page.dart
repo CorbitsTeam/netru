@@ -17,18 +17,28 @@ import '../cubit/forgot_password_state.dart';
 class OtpVerificationPage extends StatefulWidget {
   final String email;
 
-  const OtpVerificationPage({super.key, required this.email});
+  const OtpVerificationPage({
+    super.key,
+    required this.email,
+  });
 
   @override
-  State<OtpVerificationPage> createState() => _OtpVerificationPageState();
+  State<OtpVerificationPage> createState() =>
+      _OtpVerificationPageState();
 }
 
-class _OtpVerificationPageState extends State<OtpVerificationPage> {
-  final TextEditingController _otpController = TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
+class _OtpVerificationPageState
+    extends State<OtpVerificationPage> {
+  final TextEditingController _otpController =
       TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController
+  _newPasswordController =
+      TextEditingController();
+  final TextEditingController
+  _confirmPasswordController =
+      TextEditingController();
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>();
 
   bool _isLoading = false;
   bool _isOtpVerified = false;
@@ -53,7 +63,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+            Icon(
+              Icons.error_outline,
+              color: Colors.white,
+              size: 20.sp,
+            ),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -70,7 +84,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
         margin: EdgeInsets.all(16.w),
         duration: const Duration(seconds: 4),
@@ -85,7 +101,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+            Icon(
+              Icons.check_circle,
+              color: Colors.white,
+              size: 20.sp,
+            ),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -102,7 +122,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
         ),
         margin: EdgeInsets.all(16.w),
         duration: const Duration(seconds: 3),
@@ -124,7 +146,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
     if (_otpController.text.trim().length != 6) {
       setState(() {
-        _otpError = 'رمز التحقق يجب أن يكون 6 أرقام';
+        _otpError =
+            'رمز التحقق يجب أن يكون 6 أرقام';
       });
       return;
     }
@@ -142,43 +165,57 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     });
 
     // Validate password
-    if (_newPasswordController.text.trim().isEmpty) {
+    if (_newPasswordController.text
+        .trim()
+        .isEmpty) {
       setState(() {
-        _passwordError = 'يرجى إدخال كلمة المرور الجديدة';
+        _passwordError =
+            'يرجى إدخال كلمة المرور الجديدة';
       });
       return;
     }
 
     if (_newPasswordController.text.length < 6) {
       setState(() {
-        _passwordError = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+        _passwordError =
+            'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
       });
       return;
     }
 
     // Validate confirm password
-    if (_confirmPasswordController.text.trim().isEmpty) {
+    if (_confirmPasswordController.text
+        .trim()
+        .isEmpty) {
       setState(() {
-        _confirmPasswordError = 'يرجى تأكيد كلمة المرور';
+        _confirmPasswordError =
+            'يرجى تأكيد كلمة المرور';
       });
       return;
     }
 
-    if (_newPasswordController.text != _confirmPasswordController.text) {
+    if (_newPasswordController.text !=
+        _confirmPasswordController.text) {
       setState(() {
-        _confirmPasswordError = 'كلمات المرور غير متطابقة';
+        _confirmPasswordError =
+            'كلمات المرور غير متطابقة';
       });
       return;
     }
 
-    context.read<ForgotPasswordCubit>().updatePassword(
-      email: widget.email,
-      newPassword: _newPasswordController.text.trim(),
-    );
+    context
+        .read<ForgotPasswordCubit>()
+        .updatePassword(
+          email: widget.email,
+          newPassword:
+              _newPasswordController.text.trim(),
+        );
   }
 
   void _resendOtp() {
-    context.read<ForgotPasswordCubit>().sendOtp(widget.email);
+    context.read<ForgotPasswordCubit>().sendOtp(
+      widget.email,
+    );
   }
 
   @override
@@ -194,7 +231,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             color: AppColors.textPrimary,
             size: 20.sp,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed:
+              () => Navigator.of(context).pop(),
         ),
         title: Text(
           'تحقق من الرمز',
@@ -207,7 +245,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         ),
         centerTitle: true,
       ),
-      body: BlocListener<ForgotPasswordCubit, ForgotPasswordState>(
+      body: BlocListener<
+        ForgotPasswordCubit,
+        ForgotPasswordState
+      >(
         listener: (context, state) {
           // If the widget was unmounted while waiting for bloc events,
           // avoid calling setState or using the BuildContext.
@@ -221,23 +262,30 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
           if (state is ForgotPasswordOtpSent) {
             _showSuccessSnackBar(state.message);
-          } else if (state is ForgotPasswordOtpVerified) {
+          } else if (state
+              is ForgotPasswordOtpVerified) {
             _showSuccessSnackBar(state.message);
             setState(() {
               _isOtpVerified = true;
             });
-          } else if (state is ForgotPasswordSuccess) {
+          } else if (state
+              is ForgotPasswordSuccess) {
             _showSuccessSnackBar(state.message);
             // Navigate back to login after successful password reset
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          } else if (state is ForgotPasswordFailure) {
+            Navigator.of(
+              context,
+            ).popUntil((route) => route.isFirst);
+          } else if (state
+              is ForgotPasswordFailure) {
             _showErrorSnackBar(state.error);
-          } else if (state is ForgotPasswordValidationError) {
+          } else if (state
+              is ForgotPasswordValidationError) {
             if (state.fieldName == 'otp') {
               setState(() {
                 _otpError = state.error;
               });
-            } else if (state.fieldName == 'password') {
+            } else if (state.fieldName ==
+                'password') {
               setState(() {
                 _passwordError = state.error;
               });
@@ -246,11 +294,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         },
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: 24.w,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 40.h),
 
@@ -262,16 +313,31 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       decoration: BoxDecoration(
                         color:
                             _isOtpVerified
-                                ? AppColors.success.withOpacity(0.1)
-                                : AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(40.r),
+                                ? AppColors
+                                    .success
+                                    .withOpacity(
+                                      0.1,
+                                    )
+                                : AppColors
+                                    .primary
+                                    .withOpacity(
+                                      0.1,
+                                    ),
+                        borderRadius:
+                            BorderRadius.circular(
+                              40.r,
+                            ),
                       ),
                       child: Icon(
-                        _isOtpVerified ? Icons.lock_open : Icons.security,
+                        _isOtpVerified
+                            ? Icons.lock_open
+                            : Icons.security,
                         color:
                             _isOtpVerified
-                                ? AppColors.success
-                                : AppColors.primary,
+                                ? AppColors
+                                    .success
+                                : AppColors
+                                    .primary,
                         size: 40.sp,
                       ),
                     ),
@@ -280,31 +346,52 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   SizedBox(height: 32.h),
 
                   // Title
-                  Text(
-                    _isOtpVerified ? 'كلمة المرور الجديدة' : 'رمز التحقق',
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                      fontFamily: 'Almarai',
-                    ),
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isOtpVerified
+                            ? 'كلمة المرور الجديدة'
+                            : 'رمز التحقق',
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight:
+                              FontWeight.bold,
+                          color:
+                              AppColors
+                                  .textPrimary,
+                          fontFamily: 'Almarai',
+                        ),
+                        textAlign:
+                            TextAlign.center,
+                      ),
+                    ],
                   ),
 
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 10.h),
 
                   // Description
-                  Text(
-                    _isOtpVerified
-                        ? 'أدخل كلمة المرور الجديدة لحسابك'
-                        : 'أدخل الرمز المرسل إلى ${widget.email}',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.textSecondary,
-                      fontFamily: 'Almarai',
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isOtpVerified
+                            ? 'أدخل كلمة المرور الجديدة لحسابك'
+                            : 'أدخل الرمز المرسل إلى ${widget.email}',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color:
+                              AppColors
+                                  .textSecondary,
+                          fontFamily: 'Almarai',
+                          height: 1.5,
+                        ),
+                        textAlign:
+                            TextAlign.center,
+                      ),
+                    ],
                   ),
 
                   SizedBox(height: 40.h),
@@ -312,31 +399,49 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   if (!_isOtpVerified) ...[
                     // OTP Input
                     Directionality(
-                      textDirection: TextDirection.ltr,
+                      textDirection:
+                          TextDirection.ltr,
                       child: PinCodeTextField(
                         appContext: context,
                         length: 6,
-                        controller: _otpController,
-                        keyboardType: TextInputType.number,
+                        controller:
+                            _otpController,
+                        keyboardType:
+                            TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter
+                              .digitsOnly,
                         ],
                         textStyle: TextStyle(
                           fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          fontWeight:
+                              FontWeight.bold,
+                          color:
+                              AppColors
+                                  .textPrimary,
                         ),
                         pinTheme: PinTheme(
-                          shape: PinCodeFieldShape.box,
-                          borderRadius: BorderRadius.circular(12.r),
+                          shape:
+                              PinCodeFieldShape
+                                  .box,
+                          borderRadius:
+                              BorderRadius.circular(
+                                12.r,
+                              ),
                           fieldHeight: 50.h,
                           fieldWidth: 45.w,
-                          activeFillColor: Colors.white,
-                          inactiveFillColor: Colors.white,
-                          selectedFillColor: Colors.white,
-                          activeColor: AppColors.primary,
-                          inactiveColor: AppColors.border,
-                          selectedColor: AppColors.primary,
+                          activeFillColor:
+                              Colors.white,
+                          inactiveFillColor:
+                              Colors.white,
+                          selectedFillColor:
+                              Colors.white,
+                          activeColor:
+                              AppColors.primary,
+                          inactiveColor:
+                              AppColors.border,
+                          selectedColor:
+                              AppColors.primary,
                           borderWidth: 2,
                         ),
                         enableActiveFill: true,
@@ -360,7 +465,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           color: AppColors.error,
                           fontFamily: 'Almarai',
                         ),
-                        textAlign: TextAlign.center,
+                        textAlign:
+                            TextAlign.center,
                       ),
                     ],
 
@@ -371,15 +477,24 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       width: double.infinity,
                       height: 50.h,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _verifyOtp,
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : _verifyOtp,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              AppColors.primary,
+                          foregroundColor:
+                              Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                            borderRadius:
+                                BorderRadius.circular(
+                                  12.r,
+                                ),
                           ),
-                          disabledBackgroundColor: AppColors.disabled,
+                          disabledBackgroundColor:
+                              AppColors.disabled,
                         ),
                         child:
                             _isLoading
@@ -387,18 +502,27 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   width: 20.w,
                                   height: 20.w,
                                   child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
+                                    strokeWidth:
+                                        2,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<
+                                          Color
+                                        >(
+                                          Colors
+                                              .white,
+                                        ),
                                   ),
                                 )
                                 : Text(
                                   'تحقق من الرمز',
                                   style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'Almarai',
+                                    fontSize:
+                                        16.sp,
+                                    fontWeight:
+                                        FontWeight
+                                            .w600,
+                                    fontFamily:
+                                        'Almarai',
                                   ),
                                 ),
                       ),
@@ -409,14 +533,19 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     // Resend OTP Link
                     Center(
                       child: TextButton(
-                        onPressed: _isLoading ? null : _resendOtp,
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : _resendOtp,
                         child: Text(
                           'إعادة إرسال الرمز',
                           style: TextStyle(
                             fontSize: 16.sp,
-                            color: AppColors.primary,
+                            color:
+                                AppColors.primary,
                             fontFamily: 'Almarai',
-                            fontWeight: FontWeight.w500,
+                            fontWeight:
+                                FontWeight.w500,
                           ),
                         ),
                       ),
@@ -424,10 +553,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   ] else ...[
                     // Password Fields
                     CustomTextField(
-                      label: 'كلمة المرور الجديدة',
-                      hint: 'أدخل كلمة المرور الجديدة',
-                      controller: _newPasswordController,
-                      obscureText: _obscurePassword,
+                      label:
+                          'كلمة المرور الجديدة',
+                      hint:
+                          'أدخل كلمة المرور الجديدة',
+                      controller:
+                          _newPasswordController,
+                      obscureText:
+                          _obscurePassword,
                       prefixIcon: Icon(
                         Icons.lock_outline,
                         color: AppColors.primary,
@@ -436,28 +569,36 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                              ? Icons.visibility_off
+                              ? Icons
+                                  .visibility_off
                               : Icons.visibility,
-                          color: AppColors.textSecondary,
+                          color:
+                              AppColors
+                                  .textSecondary,
                           size: 20.sp,
                         ),
                         onPressed: () {
                           setState(() {
-                            _obscurePassword = !_obscurePassword;
+                            _obscurePassword =
+                                !_obscurePassword;
                           });
                         },
                       ),
                       errorText: _passwordError,
-                      textInputAction: TextInputAction.next,
+                      textInputAction:
+                          TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
 
                     CustomTextField(
                       label: 'تأكيد كلمة المرور',
-                      hint: 'أعد إدخال كلمة المرور',
-                      controller: _confirmPasswordController,
-                      obscureText: _obscureConfirmPassword,
+                      hint:
+                          'أعد إدخال كلمة المرور',
+                      controller:
+                          _confirmPasswordController,
+                      obscureText:
+                          _obscureConfirmPassword,
                       prefixIcon: Icon(
                         Icons.lock_outline,
                         color: AppColors.primary,
@@ -466,20 +607,28 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureConfirmPassword
-                              ? Icons.visibility_off
+                              ? Icons
+                                  .visibility_off
                               : Icons.visibility,
-                          color: AppColors.textSecondary,
+                          color:
+                              AppColors
+                                  .textSecondary,
                           size: 20.sp,
                         ),
                         onPressed: () {
                           setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                            _obscureConfirmPassword =
+                                !_obscureConfirmPassword;
                           });
                         },
                       ),
-                      errorText: _confirmPasswordError,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _updatePassword(),
+                      errorText:
+                          _confirmPasswordError,
+                      textInputAction:
+                          TextInputAction.done,
+                      onFieldSubmitted:
+                          (_) =>
+                              _updatePassword(),
                     ),
 
                     SizedBox(height: 40.h),
@@ -489,15 +638,24 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       width: double.infinity,
                       height: 50.h,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _updatePassword,
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : _updatePassword,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.success,
-                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              AppColors.success,
+                          foregroundColor:
+                              Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                            borderRadius:
+                                BorderRadius.circular(
+                                  12.r,
+                                ),
                           ),
-                          disabledBackgroundColor: AppColors.disabled,
+                          disabledBackgroundColor:
+                              AppColors.disabled,
                         ),
                         child:
                             _isLoading
@@ -505,18 +663,27 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   width: 20.w,
                                   height: 20.w,
                                   child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
+                                    strokeWidth:
+                                        2,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<
+                                          Color
+                                        >(
+                                          Colors
+                                              .white,
+                                        ),
                                   ),
                                 )
                                 : Text(
                                   'تحديث كلمة المرور',
                                   style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'Almarai',
+                                    fontSize:
+                                        16.sp,
+                                    fontWeight:
+                                        FontWeight
+                                            .w600,
+                                    fontFamily:
+                                        'Almarai',
                                   ),
                                 ),
                       ),
