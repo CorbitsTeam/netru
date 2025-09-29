@@ -1,11 +1,11 @@
 <div align="center">
   <img src="assets/screens-app/mainLogo.svg" alt="Netru Logo" width="200"/>
 
-# Netru - نترو
+# Netru
 
-### تطبيق الأمان والخدمات الذكية للمواطنين المصريين
+### Smart Security and Services App for Egyptian Citizens
 
-تطبيق متكامل يوفر خدمات الأمان والحماية مع مساعد ذكي قانوني، خرائط الجريمة التفاعلية، ونظام التبليغ الإلكتروني للمواطنين المصريين البالغين (18 سنة فأكثر).
+A comprehensive application providing security and protection services with an AI legal assistant, interactive crime maps, and electronic reporting system for Egyptian citizens aged 18 and above.
 
 ![Flutter Version](https://img.shields.io/badge/Flutter-3.7.2-02569B?logo=flutter)
 ![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS-green)
@@ -33,69 +33,69 @@
 
 ## 🎯 About
 
-**Netru** هو تطبيق Flutter متطور مصمم خصيصاً للمواطنين المصريين، يهدف إلى توفير منصة شاملة للأمان والخدمات الذكية. يتضمن التطبيق مجموعة متنوعة من الميزات المتقدمة مثل المساعد الذكي القانوني، خرائط الجريمة التفاعلية، ونظام التبليغ الإلكتروني.
+**Netru** is an advanced Flutter application designed specifically for Egyptian citizens, aiming to provide a comprehensive platform for security and smart services. The app includes various advanced features such as an AI legal assistant, interactive crime maps, and an electronic reporting system.
 
-### 🇪🇬 للمواطنين المصريين
+### 🇪🇬 For Egyptian Citizens
 
-التطبيق مُحسّن خصيصاً للبيئة المصرية ويستهدف المواطنين البالغين (18 سنة فأكثر) مع دعم كامل للغة العربية والقوانين المصرية.
+The app is optimized specifically for the Egyptian environment and targets adult citizens (18+ years) with full support for Arabic language and Egyptian laws.
 
 ---
 
 ## ✨ Features
 
-### 🤖 المساعد الذكي القانوني
+### 🤖 AI Legal Assistant
 
-- **سوبيك**: مساعد ذكي متخصص في القوانين المصرية
-- دعم المحادثات المتعددة مع حفظ تاريخ الجلسات
-- إجابات فورية على الاستفسارات القانونية
-- واجهة محادثة سهلة ومتطورة
+- **Sobek**: AI assistant specialized in Egyptian laws
+- Support for multiple conversations with session history
+- Instant answers to legal inquiries
+- Easy and advanced conversation interface
 
-### 🗺️ خرائط الجريمة التفاعلية
+### 🗺️ Interactive Crime Maps
 
-- **Heat Map متطورة** لعرض بيانات الجريمة في الوقت الفعلي
-- تحديد المناطق الآمنة والخطرة
-- إحصائيات تفصيلية حسب المنطقة والنوع
-- تكامل مع خدمات الموقع GPS
+- **Advanced Heat Map** for real-time crime data display
+- Identification of safe and dangerous areas
+- Detailed statistics by area and type
+- Integration with GPS location services
 
-### 📝 نظام التبليغ الإلكتروني
+### 📝 Electronic Reporting System
 
-- إنشاء التقارير الإلكترونية بسهولة
-- دعم رفع المستندات والصور
-- تتبع حالة التقارير في الوقت الفعلي
-- إنتاج ملفات PDF احترافية
+- Easy creation of electronic reports
+- Support for document and image uploads
+- Real-time report status tracking
+- Professional PDF generation
 
-### 🔐 نظام المصادقة المتطور
+### 🔐 Advanced Authentication System
 
-- تسجيل دخول آمن مع Supabase
-- استخراج بيانات الهوية المصرية تلقائياً
-- حماية البيانات الشخصية
+- Secure login with Supabase
+- Automatic Egyptian ID data extraction
+- Personal data protection
 
-### 📱 واجهة مستخدم متطورة
+### 📱 Advanced User Interface
 
-- دعم الوضع المظلم والفاتح
-- واجهة responsive مع Screen Util
-- خطوط عربية أنيقة (Almarai، Tajawal)
-- رسوم متحركة سلسة مع Flutter Animate
+- Dark and light mode support
+- Responsive interface with Screen Util
+- Elegant Arabic fonts (Almarai, Tajawal)
+- Smooth animations with Flutter Animate
 
-### 🔔 نظام الإشعارات الذكي
+### 🔔 Smart Notification System
 
-- إشعارات Firebase Cloud Messaging
-- إشعارات محلية مخصصة
-- تنبيهات أمنية في الوقت الفعلي
+- Firebase Cloud Messaging notifications
+- Custom local notifications
+- Real-time security alerts
 
-### 👨‍💼 لوحة تحكم إدارية
+### 👨‍💼 Administrative Dashboard
 
-- إدارة المستخدمين والتقارير
-- إحصائيات شاملة
-- نظام إشعارات المدراء
+- User and report management
+- Comprehensive statistics
+- Manager notification system
 
-### 📊 ميزات إضافية
+### 📊 Additional Features
 
-- **إدارة القضايا**: متابعة القضايا القانونية
-- **الأخبار والتحديثات**: آخر الأخبار الأمنية
-- **الخرائط التفاعلية**: Flutter Map مع خدمات الموقع
-- **ضغط الصور**: تحسين أداء التطبيق
-- **المسح الضوئي للوثائق**: استخراج البيانات من المستندات
+- **Case Management**: Legal case tracking
+- **News & Updates**: Latest security news
+- **Interactive Maps**: Flutter Map with location services
+- **Image Compression**: App performance optimization
+- **Document Scanning**: Data extraction from documents
 
 ---
 
@@ -104,34 +104,34 @@
 ### 🔐 Authentication Screens
 
 <div align="center">
-  <img src="assets/screens-app/auth-one.png" alt="تسجيل دخول" width="250"/>
-  <img src="assets/screens-app/auth-two.png" alt="إنشاء حساب" width="250"/>
+  <img src="assets/screens-app/auth-one.png" alt="Login" width="250"/>
+  <img src="assets/screens-app/auth-two.png" alt="Sign Up" width="250"/>
 </div>
 
 ### 🏠 Home & Main Features
 
 <div align="center">
-  <img src="assets/screens-app/home.png" alt="الشاشة الرئيسية" width="250"/>
-  <img src="assets/screens-app/settings.png" alt="الإعدادات" width="250"/>
+  <img src="assets/screens-app/home.png" alt="Home Screen" width="250"/>
+  <img src="assets/screens-app/settings.png" alt="Settings" width="250"/>
 </div>
 
 ### 🤖 AI Chatbot & Legal Assistant
 
 <div align="center">
-  <img src="assets/screens-app/ai-chat-bot.png" alt="المساعد الذكي" width="250"/>
+  <img src="assets/screens-app/ai-chat-bot.png" alt="AI Assistant" width="250"/>
 </div>
 
 ### 🗺️ Crime Heat Map
 
 <div align="center">
-  <img src="assets/screens-app/crime-heatmap.png" alt="خريطة الجريمة" width="250"/>
+  <img src="assets/screens-app/crime-heatmap.png" alt="Crime Map" width="250"/>
 </div>
 
 ### 📝 Reports System
 
 <div align="center">
-  <img src="assets/screens-app/create-report.png" alt="إنشاء تقرير" width="250"/>
-  <img src="assets/screens-app/report.png" alt="عرض التقرير" width="250"/>
+  <img src="assets/screens-app/create-report.png" alt="Create Report" width="250"/>
+  <img src="assets/screens-app/report.png" alt="View Report" width="250"/>
 </div>
 
 ---
@@ -234,12 +234,12 @@ lib/
 
 ### 🏗️ Architecture Pattern
 
-يستخدم المشروع **Clean Architecture** مع **BLoC Pattern** للحصول على:
+The project uses **Clean Architecture** with **BLoC Pattern** for:
 
-- فصل واضح بين الطبقات
-- سهولة الاختبار والصيانة
-- قابلية إعادة الاستخدام
-- إدارة حالة متقدمة
+- Clear separation between layers
+- Easy testing and maintenance
+- Reusability
+- Advanced state management
 
 ---
 
@@ -247,62 +247,62 @@ lib/
 
 ### Prerequisites
 
-- **Flutter SDK** (3.7.2 أو أحدث)
+- **Flutter SDK** (3.7.2 or newer)
 - **Dart SDK**
 - **Android Studio** / **Xcode**
 - **Git**
-- حساب **Firebase** (للإشعارات)
-- حساب **Supabase** (للقاعدة البيانات)
+- **Firebase** account (for notifications)
+- **Supabase** account (for database)
 
 ### 🔧 Firebase Setup
 
-1. إنشاء مشروع Firebase جديد
-2. تفعيل Firebase Authentication
-3. تفعيل Firebase Cloud Messaging
-4. تحميل ملفات التكوين:
+1. Create a new Firebase project
+2. Enable Firebase Authentication
+3. Enable Firebase Cloud Messaging
+4. Download configuration files:
    - `android/app/google-services.json`
    - `ios/Runner/GoogleService-Info.plist`
 
 ### 🔧 Supabase Setup
 
-1. إنشاء مشروع Supabase جديد
-2. الحصول على Project URL و Anon Key
-3. إعداد قاعدة البيانات والجداول المطلوبة
+1. Create a new Supabase project
+2. Get Project URL and Anon Key
+3. Set up required database and tables
 
 ---
 
 ## 💻 Installation
 
-### 1. Clone المستودع
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/CorbitsTeam/netru_app.git
 cd netru_app
 ```
 
-### 2. تثبيت التبعيات
+### 2. Install dependencies
 
 ```bash
 flutter pub get
 ```
 
-### 3. إعداد ملفات التكوين
+### 3. Set up configuration files
 
 ```bash
-# تكوين Firebase
+# Firebase configuration
 flutter packages pub run build_runner build
 
-# إنشاء أيقونة التطبيق
+# Generate app icon
 flutter packages pub run flutter_launcher_icons:main
 ```
 
-### 4. تشغيل التطبيق
+### 4. Run the app
 
 ```bash
-# للأندرويد
+# For Android
 flutter run
 
-# للـ iOS
+# For iOS
 flutter run
 ```
 
@@ -310,75 +310,75 @@ flutter run
 
 ## 🎮 Usage
 
-### 🔐 بدء الاستخدام
+### 🔐 Getting Started
 
-1. **التسجيل**: إنشاء حساب جديد أو تسجيل دخول
-2. **إعداد البيانات**: إضافة بيانات الهوية المصرية
-3. **الاستكشاف**: تصفح الميزات المختلفة
+1. **Registration**: Create a new account or login
+2. **Data Setup**: Add Egyptian ID data
+3. **Explore**: Browse different features
 
-### 🤖 استخدام المساعد الذكي
+### 🤖 Using the AI Assistant
 
-- انتقل إلى صفحة "المساعد الذكي"
-- ابدأ محادثة جديدة
-- اسأل عن القوانين المصرية أو استفسارات عامة
+- Navigate to "AI Assistant" page
+- Start a new conversation
+- Ask about Egyptian laws or general inquiries
 
-### 🗺️ استخدام خريطة الجريمة
+### 🗺️ Using the Crime Map
 
-- السماح بالوصول للموقع
-- عرض الإحصائيات حسب المنطقة
-- تصفح البيانات التفاعلية
+- Allow location access
+- View statistics by area
+- Browse interactive data
 
-### 📝 إنشاء تقرير
+### 📝 Creating a Report
 
-- الانتقال إلى صفحة "إنشاء تقرير"
-- ملء البيانات المطلوبة
-- رفع المستندات (اختياري)
-- إرسال التقرير
+- Navigate to "Create Report" page
+- Fill in required data
+- Upload documents (optional)
+- Submit report
 
 ---
 
 ## 🤝 Contributing
 
-نرحب بالمساهمات من المطورين! للمساهمة:
+We welcome contributions from developers! To contribute:
 
-### 1. Fork المشروع
+### 1. Fork the project
 
 ```bash
 git fork https://github.com/CorbitsTeam/netru_app.git
 ```
 
-### 2. إنشاء branch جديد
+### 2. Create a new branch
 
 ```bash
 git checkout -b feature/new-feature
 ```
 
-### 3. Commit التغييرات
+### 3. Commit changes
 
 ```bash
 git commit -m "Add some feature"
 ```
 
-### 4. Push للـ branch
+### 4. Push to branch
 
 ```bash
 git push origin feature/new-feature
 ```
 
-### 5. إنشاء Pull Request
+### 5. Create Pull Request
 
 ### 📋 Guidelines
 
-- اتباع Clean Architecture
-- كتابة tests للمكونات الجديدة
-- استخدام التعليقات باللغة العربية
-- اتباع Flutter/Dart style guide
+- Follow Clean Architecture
+- Write tests for new components
+- Use comments in Arabic/English
+- Follow Flutter/Dart style guide
 
 ---
 
 ## 📄 License
 
-هذا المشروع مرخص تحت رخصة MIT - راجع ملف [LICENSE](LICENSE) للتفاصيل.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ```
 MIT License
@@ -408,27 +408,15 @@ SOFTWARE.
 
 ## 📞 Contact & Support
 
-- **البريد الإلكتروني**: corbitsteam@gmail.com
-- **Documentation**: [التوثيق الكامل](https://netru-eg.blogspot.com/)
+- **Email**: corbitsteam@gmail.com
+- **Documentation**: [Full Documentation](https://netru-eg.blogspot.com/)
 
 ---
 
-## 🙏 Acknowledgments
-
-شكر خاص لـ:
-
-- **Flutter Team** لإطار العمل الرائع
-- **Supabase** لخدمات Backend المتميزة
-- **Firebase** لخدمات الإشعارات
-- **جميع المطورين** الذين ساهموا في المكتبات المستخدمة
-- **المجتمع المصري** لدعم مشاريع التكنولوجيا المحلية
-
----
 
 <div align="center">
-  <p>صنع بـ ❤️ في مصر للمواطنين المصريين</p>
   <p>Made with ❤️ in Egypt for Egyptian Citizens</p>
 
-**Netru - نترو | أمانك معنا**
+**Netru | Your Safety is Our Priority**
 
 </div>
