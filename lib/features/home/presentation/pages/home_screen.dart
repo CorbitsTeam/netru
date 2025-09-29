@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _buttonX = 16.w; // Left side with some padding
         _buttonY =
             size.height -
-            170.h; // 50.h from bottom navigation (56.h nav height + 50.h spacing)
+            200.h; // 50.h from bottom navigation (56.h nav height + 50.h spacing)
       });
     });
   }
@@ -69,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             child: Scaffold(
+              appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white),
               body: Stack(
                 children: [
                   SafeArea(
@@ -166,7 +167,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: _buildChatButton(),
                     ),
                   ),
-
                 ],
               ),
             ),

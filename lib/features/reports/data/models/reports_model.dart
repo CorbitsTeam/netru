@@ -139,6 +139,19 @@ class ReportModel extends ReportEntity {
 
   static ReportStatus mapDatabaseStatusToEnum(String status) {
     switch (status) {
+      case 'received':
+        return ReportStatus.received;
+      case 'under_review':
+        return ReportStatus.underReview;
+      case 'data_verification':
+        return ReportStatus.dataVerification;
+      case 'action_taken':
+        return ReportStatus.actionTaken;
+      case 'completed':
+        return ReportStatus.completed;
+      case 'rejected':
+        return ReportStatus.rejected;
+      // Legacy support for old status values
       case 'pending':
         return ReportStatus.received;
       case 'under_investigation':
@@ -147,8 +160,6 @@ class ReportModel extends ReportEntity {
         return ReportStatus.completed;
       case 'closed':
         return ReportStatus.completed;
-      case 'rejected':
-        return ReportStatus.rejected;
       default:
         return ReportStatus.received;
     }
@@ -157,15 +168,15 @@ class ReportModel extends ReportEntity {
   static String mapEnumToDatabaseStatus(ReportStatus status) {
     switch (status) {
       case ReportStatus.received:
-        return 'pending';
+        return 'received';
       case ReportStatus.underReview:
-        return 'under_investigation';
+        return 'under_review';
       case ReportStatus.dataVerification:
-        return 'under_investigation';
+        return 'data_verification';
       case ReportStatus.actionTaken:
-        return 'under_investigation';
+        return 'action_taken';
       case ReportStatus.completed:
-        return 'resolved';
+        return 'completed';
       case ReportStatus.rejected:
         return 'rejected';
     }

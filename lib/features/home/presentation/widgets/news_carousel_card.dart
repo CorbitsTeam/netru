@@ -4,6 +4,8 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:netru_app/core/constants/app_assets.dart';
 import 'package:netru_app/features/news/presentation/cubit/news_cubit.dart';
 import 'package:netru_app/features/news/presentation/cubit/news_state.dart';
 import 'package:netru_app/features/news/presentation/pages/newsdetails_page.dart';
@@ -143,20 +145,13 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
       height: 180.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Colors.red.withOpacity(0.1),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: Colors.white,
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
       ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
-            SizedBox(height: 8.h),
-            Text(
-              'خطأ في تحميل الأخبار',
-              style: TextStyle(fontSize: 14.sp, color: Colors.red[700]),
-            ),
-          ],
+          children: [SvgPicture.asset(AppAssets.mainLogoSvg)],
         ),
       ),
     );
@@ -218,11 +213,8 @@ class _NewsCarouselCardState extends State<NewsCarouselCard>
                       width: double.infinity,
                       height: double.infinity,
                       errorWidget:
-                          (context, error, stackTrace) =>
-                              _buildErrorCarousel(),
-                      placeholder:
-                          (context, url) =>
-                              _buildEmptyCarousel(),
+                          (context, error, stackTrace) => _buildErrorCarousel(),
+                      placeholder: (context, url) => _buildEmptyCarousel(),
                     ),
                   ),
                 );

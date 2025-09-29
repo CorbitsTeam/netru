@@ -154,7 +154,7 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: 40.h),
 

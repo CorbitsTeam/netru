@@ -30,16 +30,16 @@ class SignupNavigationButtons extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
-          if (showPreviousButton && onPrevious != null)
-            Expanded(
-              child: AnimatedButton(
-                text: previousButtonText,
-                onPressed: isLoading ? null : onPrevious,
-                backgroundColor: Colors.grey[300],
-                textColor: AppColors.textPrimary,
-                height: 38.h,
-              ),
-            ),
+          // if (showPreviousButton && onPrevious != null)
+          //   Expanded(
+          //     child: AnimatedButton(
+          //       text: previousButtonText,
+          //       onPressed: isLoading ? null : onPrevious,
+          //       backgroundColor: Colors.grey[300],
+          //       textColor: AppColors.textPrimary,
+          //       height: 38.h,
+          //     ),
+          //   ),
           if (showPreviousButton && onPrevious != null) SizedBox(width: 16.w),
           Expanded(
             flex: showPreviousButton ? 2 : 1,
