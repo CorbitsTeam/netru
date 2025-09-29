@@ -130,7 +130,7 @@ The app is optimized specifically for the Egyptian environment and targets adult
 ### 📝 Reports System
 
 <div align="center">
-  <img src="assets/screens-app/create-report.png" alt="Create Report" width="600"/>
+  <img src="assets/screens-app/create-report.png" alt="Create Report" width="400"/>
   <img src="assets/screens-app/report.png" alt="View Report" width="600"/>
 </div>
 
