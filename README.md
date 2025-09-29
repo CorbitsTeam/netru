@@ -104,7 +104,7 @@ The app is optimized specifically for the Egyptian environment and targets adult
 ### 🔐 Authentication Screens
 
 <div align="center">
-  <img src="assets/screens-app/auth-one.png" alt="Login" width="250" height="200"/>
+  <img src="assets/screens-app/auth-one.png" alt="Login" width="400"/>
   <img src="assets/screens-app/auth-two.png" alt="Sign Up" width="250"/>
 </div>
 
