@@ -5,62 +5,123 @@ import '../../../../core/theme/app_text_styles.dart';
 import 'typing_animation_widget.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
-class ChatMessageBubble extends StatelessWidget {
+class ChatMessageBubble extends StatefulWidget {
   final ChatMessageEntity message;
   final VoidCallback? onTap;
 
   const ChatMessageBubble({super.key, required this.message, this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    final isUser = message.type == MessageType.user;
-    final isError = message.type == MessageType.error;
-    final isLoading = message.isLoading;
+  State<ChatMessageBubble> createState() => _ChatMessageBubbleState();
+}
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 16.w),
-        child: Row(
-          mainAxisAlignment:
-              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!isUser) _buildAssistantAvatar(),
-            if (!isUser) SizedBox(width: 8.w),
-            Flexible(
+class _ChatMessageBubbleState extends State<ChatMessageBubble>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
+
+    final isUser = widget.message.type == MessageType.user;
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(isUser ? 0.3 : -0.3, 0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    // Start animation
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isUser = widget.message.type == MessageType.user;
+    final isError = widget.message.type == MessageType.error;
+    final isLoading = widget.message.isLoading;
+
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: GestureDetector(
+              onTap: widget.onTap,
               child: Container(
-                constraints: BoxConstraints(maxWidth: 280.w),
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: _getBubbleColor(isUser, isError),
-                  borderRadius: _getBubbleBorderRadius(isUser),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      offset: Offset(0, 2.h),
-                      blurRadius: 4.r,
-                    ),
-                  ],
-                ),
-                child: Column(
+                margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment:
+                      isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (isLoading)
-                      _buildTypingIndicator()
-                    else
-                      _buildMessageContent(isUser, isError),
-                    SizedBox(height: 4.h),
-                    _buildMessageTime(isUser),
+                    if (!isUser) _buildAssistantAvatar(),
+                    if (!isUser) SizedBox(width: 8.w),
+                    Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 280.w),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getBubbleColor(isUser, isError),
+                          borderRadius: _getBubbleBorderRadius(isUser),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadow,
+                              offset: Offset(0, 2.h),
+                              blurRadius: 6.r,
+                            ),
+                            if (!isUser && widget.message.isStreaming)
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                offset: Offset(0, 0),
+                                blurRadius: 8.r,
+                              ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isLoading)
+                              _buildTypingIndicator()
+                            else
+                              _buildMessageContent(isUser, isError),
+                            SizedBox(height: 4.h),
+                            _buildMessageTime(isUser),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (isUser) SizedBox(width: 8.w),
+                    if (isUser) _buildUserAvatar(),
                   ],
                 ),
               ),
             ),
-            if (isUser) SizedBox(width: 8.w),
-            if (isUser) _buildUserAvatar(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -90,16 +151,19 @@ class ChatMessageBubble extends StatelessWidget {
 
   Widget _buildMessageContent(bool isUser, bool isError) {
     // For assistant messages with streaming enabled
-    if (!isUser && message.isStreaming) {
+    if (!isUser && widget.message.isStreaming) {
       return TypingAnimationWithSummary(
-        text: message.content,
-        summary: message.summary,
+        text: widget.message.content,
+        summary: widget.message.summary,
         textStyle: AppTextStyles.bodyMedium.copyWith(
           color: isError ? AppColors.error : AppColors.textPrimary,
         ),
-        typingSpeed: const Duration(milliseconds: 20),
+        typingSpeed: const Duration(milliseconds: 15),
         autoStart: true,
         showCursor: true,
+        enableWaveEffect: true,
+        isStreaming: true,
+        progress: widget.message.streamingProgress,
       );
     }
 
@@ -108,7 +172,7 @@ class ChatMessageBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SelectableText(
-          message.content,
+          widget.message.content,
           style: AppTextStyles.bodyMedium.copyWith(
             color:
                 isUser
@@ -119,45 +183,66 @@ class ChatMessageBubble extends StatelessWidget {
           ),
         ),
         if (!isUser &&
-            message.summary != null &&
-            message.summary!.isNotEmpty) ...[
+            widget.message.summary != null &&
+            widget.message.summary!.isNotEmpty) ...[
           SizedBox(height: 12.h),
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: AppColors.primaryLight.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryLight.withValues(alpha: 0.15),
+                  AppColors.primaryLight.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: AppColors.primaryLight.withValues(alpha: 0.3),
+                color: AppColors.primaryLight.withValues(alpha: 0.4),
                 width: 1.w,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  blurRadius: 8.r,
+                  offset: Offset(0, 2.h),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.summarize_outlined,
-                      size: 16.sp,
-                      color: AppColors.primary,
+                    Container(
+                      padding: EdgeInsets.all(6.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome,
+                        size: 16.sp,
+                        color: AppColors.primary,
+                      ),
                     ),
-                    SizedBox(width: 6.w),
+                    SizedBox(width: 8.w),
                     Text(
-                      'الملخص',
-                      style: AppTextStyles.labelMedium.copyWith(
+                      'الملخص الذكي',
+                      style: AppTextStyles.labelLarge.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 6.h),
-                Text(
-                  message.summary!,
-                  style: AppTextStyles.bodySmall.copyWith(
+                SizedBox(height: 12.h),
+                SelectableText(
+                  widget.message.summary!,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textPrimary,
-                    height: 1.4,
+                    height: 1.5,
                   ),
                 ),
               ],
@@ -169,12 +254,34 @@ class ChatMessageBubble extends StatelessWidget {
   }
 
   Widget _buildTypingIndicator() {
-    return const TypingIndicator(size: 8.0, color: AppColors.secondary);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const TypingIndicator(
+              size: 6.0,
+              color: AppColors.primary,
+              dotCount: 3,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              'جارٍ الكتابة...',
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.primary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.h),
+      ],
+    );
   }
 
   Widget _buildMessageTime(bool isUser) {
     return Text(
-      _formatTime(message.timestamp),
+      _formatTime(widget.message.timestamp),
       style: AppTextStyles.labelSmall.copyWith(
         color: isUser ? Colors.white70 : AppColors.textSecondary,
       ),
