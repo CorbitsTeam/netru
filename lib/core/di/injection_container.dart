@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:netru_app/core/services/admin_notifications_service.dart';
 import 'package:netru_app/features/auth/login/presentation/cubit/login_cubit.dart';
 import 'package:netru_app/features/auth/signup/presentation/cubits/signup_cubit.dart';
 import 'package:netru_app/features/auth/forgot_password/presentation/cubit/forgot_password_cubit.dart';
@@ -542,12 +543,14 @@ Future<void> _initAdminDependencies() async {
   sl.registerLazySingleton(() => AssignReport(sl()));
   sl.registerLazySingleton(() => VerifyReport(sl()));
   sl.registerLazySingleton(() => AddReportComment(sl()));
+  sl.registerLazySingleton(() => AdminNotificationsService());
 
   // Admin Notifications - data source & repository
   sl.registerLazySingleton<AdminNotificationRemoteDataSource>(
     () => AdminNotificationRemoteDataSourceImpl(
       apiClient: sl<ApiClient>(),
       edgeFunctionsService: sl<SupabaseEdgeFunctionsService>(),
+      adminNotificationsService: sl<AdminNotificationsService>(),
     ),
   );
 
