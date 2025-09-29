@@ -104,15 +104,15 @@ The app is optimized specifically for the Egyptian environment and targets adult
 ### 🔐 Authentication Screens
 
 <div align="center">
-  <img src="assets/screens-app/auth-one.png" alt="Login" width="600"/>
-  <img src="assets/screens-app/auth-two.png" alt="Sign Up" width="600"/>
+  <img src="assets/screens-app/auth-one.png" alt="Login" width="700"/>
+  <img src="assets/screens-app/auth-two.png" alt="Sign Up" width="700"/>
 </div>
 
 ### 🏠 Home & Main Features
 
 <div align="center">
-  <img src="assets/screens-app/home.png" alt="Home Screen" width="250"/>
-  <img src="assets/screens-app/settings.png" alt="Settings" width="250"/>
+  <img src="assets/screens-app/home.png" alt="Home Screen" width="700"/>
+  <img src="assets/screens-app/settings.png" alt="Settings" width="700"/>
 </div>
 
 ### 🤖 AI Chatbot & Legal Assistant
