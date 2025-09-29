@@ -124,14 +124,14 @@ The app is optimized specifically for the Egyptian environment and targets adult
 ### 🗺️ Crime Heat Map
 
 <div align="center">
-  <img src="assets/screens-app/crime-heatmap.png" alt="Crime Map" width="200"/>
+  <img src="assets/screens-app/crime-heatmap.png" alt="Crime Map" width="600"/>
 </div>
 
 ### 📝 Reports System
 
 <div align="center">
-  <img src="assets/screens-app/create-report.png" alt="Create Report" width="200"/>
-  <img src="assets/screens-app/report.png" alt="View Report" width="650"/>
+  <img src="assets/screens-app/create-report.png" alt="Create Report" width="600"/>
+  <img src="assets/screens-app/report.png" alt="View Report" width="600"/>
 </div>
 
 ---
