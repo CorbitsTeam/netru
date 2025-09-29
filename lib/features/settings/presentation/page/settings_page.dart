@@ -262,14 +262,6 @@ class _SettingsPageState
                   );
                 },
               ),
-              _buildDivider(),
-              _buildActionTile(
-                icon: Icons.star_outline,
-                title: 'تقييم التطبيق',
-                subtitle: 'قيم تجربتك معنا',
-                onTap: _rateApp,
-              ),
-              _buildDivider(),
               _buildActionTile(
                 icon: Icons.share_outlined,
                 title: 'مشاركة التطبيق',
@@ -277,7 +269,6 @@ class _SettingsPageState
                     'شارك التطبيق مع الآخرين',
                 onTap: _shareApp,
               ),
-              _buildDivider(),
               _buildActionTile(
                 icon: Icons.info_outline,
                 title: 'حول التطبيق',

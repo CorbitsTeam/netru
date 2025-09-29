@@ -85,7 +85,7 @@ class HeatmapStatsWidget extends StatelessWidget {
                   color: Colors.blue,
                 ),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: 5.w),
               Expanded(
                 child: _buildStatCard(
                   title: 'المحافظات المتأثرة',
@@ -96,7 +96,7 @@ class HeatmapStatsWidget extends StatelessWidget {
                   color: Colors.orange,
                 ),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: 5.w),
               Expanded(
                 child: _buildStatCard(
                   title: 'أنواع الجرائم',
@@ -203,7 +203,7 @@ class HeatmapStatsWidget extends StatelessWidget {
   }) {
     return Container(
       height: 90.h,
-      padding: EdgeInsets.all(4.w),
+      padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),

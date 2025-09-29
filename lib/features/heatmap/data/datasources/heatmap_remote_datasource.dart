@@ -145,15 +145,16 @@ class HeatmapRemoteDataSourceImpl implements HeatmapRemoteDataSource {
           }
         }
 
-        return governorateCounts.entries
-            .map(
-              (entry) => GovernorateStatsModel(
-                governorateName: entry.key,
-                reportCount: entry.value,
-                centerLocation: _getGovernorateCenter(entry.key),
-              ),
-            )
-            .toList();
+        final List<GovernorateStatsModel> stats = [];
+        for (final entry in governorateCounts.entries) {
+          final center = await _calculateGovernorateCenter(entry.key);
+          stats.add(GovernorateStatsModel(
+            governorateName: entry.key,
+            reportCount: entry.value,
+            centerLocation: center,
+          ));
+        }
+        return stats;
       }
 
       return (response as List<dynamic>)
@@ -311,43 +312,57 @@ class HeatmapRemoteDataSourceImpl implements HeatmapRemoteDataSource {
     }
   }
 
-  // مراكز المحافظات المصرية الرئيسية
-  static const Map<String, Map<String, double>> _governorateCenters = {
-    'القاهرة': {'lat': 30.0444, 'lng': 31.2357},
-    'الجيزة': {'lat': 30.0131, 'lng': 31.2089},
-    'الإسكندرية': {'lat': 31.2001, 'lng': 29.9187},
-    'الدقهلية': {'lat': 31.0409, 'lng': 31.3785},
-    'البحر الأحمر': {'lat': 26.0667, 'lng': 33.8116},
-    'البحيرة': {'lat': 30.8481, 'lng': 30.3436},
-    'الفيوم': {'lat': 29.3084, 'lng': 30.8428},
-    'الغربية': {'lat': 30.7618, 'lng': 31.0335},
-    'الإسماعيلية': {'lat': 30.5965, 'lng': 32.2715},
-    'المنوفية': {'lat': 30.5972, 'lng': 31.0041},
-    'المنيا': {'lat': 28.0871, 'lng': 30.7618},
-    'القليوبية': {'lat': 30.1792, 'lng': 31.2421},
-    'الوادي الجديد': {'lat': 25.4519, 'lng': 30.5467},
-    'شمال سيناء': {'lat': 30.2824, 'lng': 33.6176},
-    'جنوب سيناء': {'lat': 28.4693, 'lng': 33.9715},
-    'بورسعيد': {'lat': 31.2653, 'lng': 32.3019},
-    'دمياط': {'lat': 31.8133, 'lng': 31.8844},
-    'الشرقية': {'lat': 30.5965, 'lng': 31.5041},
-    'كفر الشيخ': {'lat': 31.1107, 'lng': 30.9388},
-    'مطروح': {'lat': 31.3543, 'lng': 27.2373},
-    'أسوان': {'lat': 24.0889, 'lng': 32.8998},
-    'أسيوط': {'lat': 27.1783, 'lng': 31.1859},
-    'بني سويف': {'lat': 29.0661, 'lng': 31.0994},
-    'سوهاج': {'lat': 26.5569, 'lng': 31.6948},
-    'قنا': {'lat': 26.1551, 'lng': 32.7160},
-    'الأقصر': {'lat': 25.6872, 'lng': 32.6396},
-    'السويس': {'lat': 29.9668, 'lng': 32.5498},
-  };
+  /// حساب مركز المحافظة من البيانات الفعلية المخزنة في قاعدة البيانات
+  Future<LatLng> _calculateGovernorateCenter(String governorateName) async {
+    try {
+      print('🎯 Calculating center for governorate: $governorateName');
 
-  LatLng _getGovernorateCenter(String governorateName) {
-    final center = _governorateCenters[governorateName];
-    if (center != null) {
-      return LatLng(center['lat']!, center['lng']!);
+      final response = await _supabase
+          .from('reports')
+          .select('incident_location_latitude, incident_location_longitude')
+          .eq('users.governorate', governorateName)
+          .not('incident_location_latitude', 'is', null)
+          .not('incident_location_longitude', 'is', null)
+          .limit(100); // نأخذ عينة من 100 تقرير لحساب المتوسط
+
+      if (response.isEmpty) {
+        print('⚠️ No data found for $governorateName, using default center');
+        return _getDefaultCenter();
+      }
+
+      double totalLat = 0.0;
+      double totalLng = 0.0;
+      int validCount = 0;
+
+      for (final report in response) {
+        final lat = report['incident_location_latitude'] as double?;
+        final lng = report['incident_location_longitude'] as double?;
+
+        if (lat != null && lng != null) {
+          totalLat += lat;
+          totalLng += lng;
+          validCount++;
+        }
+      }
+
+      if (validCount == 0) {
+        print('⚠️ No valid coordinates found for $governorateName');
+        return _getDefaultCenter();
+      }
+
+      final centerLat = totalLat / validCount;
+      final centerLng = totalLng / validCount;
+
+      print('✅ Calculated center for $governorateName: ($centerLat, $centerLng)');
+      return LatLng(centerLat, centerLng);
+    } catch (e) {
+      print('❌ Error calculating center for $governorateName: $e');
+      return _getDefaultCenter();
     }
-    // الافتراضي: وسط القاهرة
-    return const LatLng(30.0444, 31.2357);
+  }
+
+  /// المركز الافتراضي (وسط مصر تقريباً)
+  LatLng _getDefaultCenter() {
+    return const LatLng(26.8206, 30.8025); // وسط مصر جغرافياً
   }
 }

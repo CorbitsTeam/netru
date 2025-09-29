@@ -183,7 +183,10 @@ class _HeatMapWidgetState
     // تجميع التقارير حسب المحافظة
     Map<String, List<dynamic>>
     governorateReports = {};
-    Map<String, List<dynamic>> areaReports = {};
+
+    // تجميع التقارير في مجموعات بناءً على القرب الجغرافي
+    List<ReportCluster> clusters =
+        _clusterNearbyReports(reports);
 
     for (final report in reports) {
       // تجميع حسب المحافظة
@@ -191,13 +194,6 @@ class _HeatMapWidgetState
           report.governorate ?? 'غير محدد';
       governorateReports
           .putIfAbsent(governorate, () => [])
-          .add(report);
-
-      // تجميع حسب المنطقة المحددة
-      final key =
-          '${report.location.latitude.toStringAsFixed(3)},${report.location.longitude.toStringAsFixed(3)}';
-      areaReports
-          .putIfAbsent(key, () => [])
           .add(report);
     }
 
@@ -207,16 +203,15 @@ class _HeatMapWidgetState
       governorateReports,
     );
 
-    // إنشاء الدوائر الحرارية والعلامات المحسنة
-    for (final entry in areaReports.entries) {
-      final reportsInArea = entry.value;
-      final location =
-          reportsInArea.first.location;
-      final intensity = reportsInArea.length;
+    // إنشاء الدوائر الحرارية والعلامات المحسنة باستخدام المجموعات
+    for (final cluster in clusters) {
+      final location = cluster.centerLocation;
+      final intensity = cluster.reportCount;
+      final reportsInCluster = cluster.reports;
 
-      // تحليل أنواع الجرائم في المنطقة
+      // تحليل أنواع الجرائم في المجموعة
       final crimeTypeStats = _analyzeCrimeTypes(
-        reportsInArea,
+        reportsInCluster,
       );
       final dominantCrimeType =
           crimeTypeStats.entries
@@ -226,186 +221,74 @@ class _HeatMapWidgetState
               )
               .key;
 
-      // دوائر حرارية متدرجة احترافية
-      final baseRadius = _calculateRadius(
+      // دائرة شفافة بسيطة
+      final baseRadius = _calculateClusterRadius(
         intensity,
       );
-      final mainColor = _getCrimeColor(intensity);
+      final mainColor = _getClusterColor(
+        intensity,
+      );
 
-      // دوائر خارجية متدرجة للتأثير الحراري
-      for (int i = 4; i >= 1; i--) {
-        final radiusMultiplier = i * 0.7;
-        final opacityLevel = 0.15 / i;
+      // دائرة شفافة نظيفة
+      heatCircles.add(
+        CircleMarker(
+          point: location,
+          radius: baseRadius,
+          color: mainColor.withOpacity(0.1),
+          borderColor: mainColor.withOpacity(0.4),
+          borderStrokeWidth: 1.5,
+        ),
+      );
 
-        heatCircles.add(
-          CircleMarker(
-            point: location,
-            radius:
-                baseRadius *
-                (radiusMultiplier + 0.3),
-            color: mainColor.withOpacity(
-              opacityLevel,
-            ),
-            borderColor: mainColor.withOpacity(
-              opacityLevel * 2,
-            ),
-            borderStrokeWidth: i == 1 ? 2.0 : 1.0,
-          ),
-        );
-      }
-
-      // علامة رئيسية للمنطقة مع تصميم محسن
+      // علامة شفافة بسيطة وواضحة
       reportMarkers.add(
         Marker(
           point: location,
-          width: 60.w,
-          height: 80.h,
+          width: _getMarkerSize(intensity),
+          height: _getMarkerSize(intensity),
           child: GestureDetector(
             onTap:
                 () => _showEnhancedAreaDetails(
-                  reportsInArea,
+                  reportsInCluster,
                   crimeTypeStats,
                 ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // العلامة الرئيسية
-                Container(
-                  width: 50.w,
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                    color: mainColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 3,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: mainColor
-                            .withOpacity(0.4),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                        offset: const Offset(
-                          0,
-                          4,
-                        ),
-                      ),
-                      BoxShadow(
-                        color: Colors.black
-                            .withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(
-                          0,
-                          2,
-                        ),
-                      ),
-                    ],
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(
+                  0.9,
+                ),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: mainColor,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black
+                        .withOpacity(0.1),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
-                  child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _getCrimeTypeIcon(
-                          dominantCrimeType,
-                        ),
-                        color: Colors.white,
-                        size: 18.sp,
-                      ),
-                      Text(
-                        intensity.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  intensity.toString(),
+                  style: TextStyle(
+                    color: mainColor,
+                    fontSize: _getFontSize(
+                      intensity,
+                    ),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-
-                // شارة عدد الأنواع المختلفة
-                if (crimeTypeStats.length > 1)
-                  Positioned(
-                    top: -5.h,
-                    right: -5.w,
-                    child: Container(
-                      width: 20.w,
-                      height: 20.h,
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '+${crimeTypeStats.length - 1}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.sp,
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
         ),
       );
 
-      // نقاط صغيرة للتقارير الفردية حول العلامة الرئيسية
-      for (
-        int i = 0;
-        i < reportsInArea.length && i < 8;
-        i++
-      ) {
-        final angle =
-            (i * 45.0) *
-            (3.14159 / 180); // تحويل إلى راديان
-        final offsetLat =
-            location.latitude +
-            (0.001 * math.cos(angle));
-        final offsetLng =
-            location.longitude +
-            (0.001 * math.sin(angle));
-
-        reportMarkers.add(
-          Marker(
-            point: LatLng(offsetLat, offsetLng),
-            width: 12.w,
-            height: 12.h,
-            child: Container(
-              decoration: BoxDecoration(
-                color: _getCrimeTypeColor(
-                  reportsInArea[i].reportType,
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: _getCrimeTypeColor(
-                      reportsInArea[i].reportType,
-                    ).withOpacity(0.6),
-                    blurRadius: 4,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }
+      // لا حاجة للنقاط الصغيرة - سنعرض العدد الإجمالي في العلامة الرئيسية
     }
 
     // إضافة الطبقات بترتيب مناسب
@@ -490,68 +373,41 @@ class _HeatMapWidgetState
     return Colors.grey;
   }
 
-  // إضافة علامات المحافظات
+  // إضافة علامات المحافظات بناءً على البيانات الفعلية من قاعدة البيانات
   void _addGovernorateMarkers(
     List<Marker> governorateMarkers,
     Map<String, List<dynamic>> governorateReports,
   ) {
-    // مواقع المحافظات المصرية الرئيسية
-    final Map<String, LatLng>
-    governorateLocations = {
-      'القاهرة': const LatLng(30.0444, 31.2357),
-      'الجيزة': const LatLng(30.0131, 31.2089),
-      'الإسكندرية': const LatLng(
-        31.2001,
-        29.9187,
-      ),
-      'الغربية': const LatLng(30.7618, 31.0335),
-      'المنوفية': const LatLng(30.5972, 30.9876),
-      'القليوبية': const LatLng(30.1792, 31.2045),
-      'كفر الشيخ': const LatLng(31.1107, 30.9388),
-      'الدقهلية': const LatLng(31.0409, 31.3785),
-      'دمياط': const LatLng(31.4165, 31.8133),
-      'الشرقية': const LatLng(30.7327, 31.7195),
-      'المنيا': const LatLng(28.0871, 30.7618),
-      'بني سويف': const LatLng(29.0661, 31.0994),
-      'الفيوم': const LatLng(29.2985, 30.8418),
-      'أسيوط': const LatLng(27.1809, 31.1837),
-      'سوهاج': const LatLng(26.5569, 31.6948),
-      'قنا': const LatLng(26.1551, 32.7160),
-      'الأقصر': const LatLng(25.6872, 32.6396),
-      'أسوان': const LatLng(24.0889, 32.8998),
-      'البحر الأحمر': const LatLng(
-        26.1062,
-        33.8116,
-      ),
-      'الوادي الجديد': const LatLng(
-        25.4500,
-        30.5500,
-      ),
-      'مطروح': const LatLng(31.3543, 27.2373),
-      'شمال سيناء': const LatLng(
-        31.1313,
-        33.8116,
-      ),
-      'جنوب سيناء': const LatLng(
-        28.9717,
-        33.6175,
-      ),
-    };
-
     for (final entry
         in governorateReports.entries) {
       final governorate = entry.key;
       final reports = entry.value;
 
       if (governorate == 'غير محدد' ||
-          !governorateLocations.containsKey(
-            governorate,
-          )) {
+          reports.isEmpty) {
         continue;
       }
 
-      final location =
-          governorateLocations[governorate]!;
+      // حساب المتوسط الجغرافي للتقارير في المحافظة من البيانات الفعلية
+      double avgLat = 0.0;
+      double avgLng = 0.0;
+      int validReports = 0;
+
+      for (final report in reports) {
+        if (report.location != null) {
+          avgLat += report.location.latitude;
+          avgLng += report.location.longitude;
+          validReports++;
+        }
+      }
+
+      if (validReports == 0) continue;
+
+      final location = LatLng(
+        avgLat / validReports,
+        avgLng / validReports,
+      );
+
       final reportCount = reports.length;
       final crimeLevel = _getCrimeLevel(
         reportCount,
@@ -993,9 +849,65 @@ class _HeatMapWidgetState
   }
 
   Color _getCrimeColor(int reportCount) {
-    if (reportCount >= 10) return Colors.red;
-    if (reportCount >= 5) return Colors.orange;
-    return Colors.green;
+    if (reportCount >= 10)
+      return Colors.red.withValues(alpha: 0.7);
+    if (reportCount >= 5)
+      return Colors.orange.withValues(alpha: 0.7);
+    return Colors.green.withValues(alpha: 0.7);
+  }
+
+  /// حساب نصف قطر الدائرة للمجموعة
+  double _calculateClusterRadius(
+    int reportCount,
+  ) {
+    if (reportCount >= 20) return 70.0;
+    if (reportCount >= 10) return 55.0;
+    if (reportCount >= 5) return 40.0;
+    return 25.0;
+  }
+
+  /// الحصول على لون المجموعة
+  Color _getClusterColor(int reportCount) {
+    if (reportCount >= 20)
+      return const Color(
+        0xFFD32F2F,
+      ).withValues(alpha: 0.7); // أحمر داكن
+    if (reportCount >= 10)
+      return const Color(
+        0xFFE65100,
+      ).withValues(alpha: 0.7); // برتقالي داكن
+    if (reportCount >= 5)
+      return const Color(
+        0xFFFF9800,
+      ).withValues(alpha: 0.7); // برتقالي
+    if (reportCount >= 3)
+      return const Color(
+        0xFFFFC107,
+      ).withValues(alpha: 0.7); // أصفر
+    return const Color(
+      0xFF4CAF50,
+    ).withValues(alpha: 0.7); // أخضر
+  }
+
+  /// حساب حجم العلامة
+  double _getMarkerSize(int reportCount) {
+    if (reportCount >= 20) return 50.w;
+    if (reportCount >= 10) return 45.w;
+    if (reportCount >= 5) return 40.w;
+    return 20.w;
+  }
+
+  /// حساب حجم الخط
+  double _getFontSize(int reportCount) {
+    if (reportCount >= 100) return 10.sp;
+    if (reportCount >= 20) return 12.sp;
+    if (reportCount >= 10) return 14.sp;
+    return 10.sp;
+  }
+
+  /// حساب حجم الأيقونة
+  double _getIconSize(int reportCount) {
+    return 20.sp;
   }
 
   void _handleMapTap(
@@ -1396,4 +1308,81 @@ class _HeatMapWidgetState
           ),
     );
   }
+
+  /// تجميع التقارير المتقاربة جغرافياً في مجموعات
+  List<ReportCluster> _clusterNearbyReports(
+    List<dynamic> reports,
+  ) {
+    const double clusterRadius =
+        0.005; // حوالي 500 متر
+    List<ReportCluster> clusters = [];
+    List<bool> processed = List.filled(
+      reports.length,
+      false,
+    );
+
+    for (int i = 0; i < reports.length; i++) {
+      if (processed[i]) continue;
+
+      final mainReport = reports[i];
+      List<dynamic> clusterReports = [mainReport];
+      processed[i] = true;
+
+      // البحث عن التقارير القريبة
+      for (
+        int j = i + 1;
+        j < reports.length;
+        j++
+      ) {
+        if (processed[j]) continue;
+
+        final otherReport = reports[j];
+        final distance = _calculateDistance(
+          mainReport.location.latitude,
+          mainReport.location.longitude,
+          otherReport.location.latitude,
+          otherReport.location.longitude,
+        );
+
+        // إذا كانت المسافة أقل من نصف كيلومتر، أضفها للمجموعة
+        if (distance <= 500) {
+          clusterReports.add(otherReport);
+          processed[j] = true;
+        }
+      }
+
+      // حساب المركز الجغرافي للمجموعة
+      double avgLat = 0;
+      double avgLng = 0;
+      for (final report in clusterReports) {
+        avgLat += report.location.latitude;
+        avgLng += report.location.longitude;
+      }
+      avgLat /= clusterReports.length;
+      avgLng /= clusterReports.length;
+
+      clusters.add(
+        ReportCluster(
+          centerLocation: LatLng(avgLat, avgLng),
+          reports: clusterReports,
+          reportCount: clusterReports.length,
+        ),
+      );
+    }
+
+    return clusters;
+  }
+}
+
+/// فئة لتمثيل مجموعة من التقارير المتقاربة جغرافياً
+class ReportCluster {
+  final LatLng centerLocation;
+  final List<dynamic> reports;
+  final int reportCount;
+
+  ReportCluster({
+    required this.centerLocation,
+    required this.reports,
+    required this.reportCount,
+  });
 }
