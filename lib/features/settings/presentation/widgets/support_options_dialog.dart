@@ -148,13 +148,19 @@ class SupportOptionsDialog extends StatelessWidget {
 [يرجى وصف مشكلتك أو استفسارك هنا]
 
 معلومات إضافية:
-- نظام التشغيل: 
+- نظام التشغيل:
 - إصدار التطبيق: 1.0.0
 - رقم المستخدم: [إذا كان متاحاً]
 
 شكراً لكم.
     ''';
 
+    // Gmail app URL scheme with proper format
+    final Uri gmailUri = Uri.parse(
+      'https://mail.google.com/mail/?view=cm&to=$email&subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+    );
+
+    // Standard mailto fallback
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: email,
@@ -163,44 +169,20 @@ class SupportOptionsDialog extends StatelessWidget {
     );
 
     try {
-      if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri);
-      } else {
-        _showFallbackEmailDialog(context, email);
-      }
+      // Try Gmail web first with external application mode
+      await launchUrl(gmailUri, mode: LaunchMode.externalApplication);
     } catch (e) {
-      _showFallbackEmailDialog(context, email);
+      try {
+        // Fallback to standard email client
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+      } catch (e2) {
+        // Last resort: try platform default
+        try {
+          await launchUrl(emailUri);
+        } catch (e3) {
+          // Silent fail
+        }
+      }
     }
-  }
-
-  void _showFallbackEmailDialog(BuildContext context, String email) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('تعذر فتح البريد الإلكتروني'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('يمكنكم إرسال بريد إلكتروني إلى:'),
-                SizedBox(height: 8.h),
-                SelectableText(
-                  email,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('حسناً'),
-              ),
-            ],
-          ),
-    );
   }
 }
