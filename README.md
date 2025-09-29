@@ -111,26 +111,26 @@ The app is optimized specifically for the Egyptian environment and targets adult
 ### 🏠 Home & Main Features
 
 <div align="center">
-  <img src="assets/screens-app/home.png" alt="Home Screen" width="700"/>
+  <img src="assets/screens-app/home.png" alt="Home Screen" width="750"/>
   <img src="assets/screens-app/settings.png" alt="Settings" width="700"/>
 </div>
 
 ### 🤖 AI Chatbot & Legal Assistant
 
 <div align="center">
-  <img src="assets/screens-app/ai-chat-bot.png" alt="AI Assistant" width="250"/>
+  <img src="assets/screens-app/ai-chat-bot.png" alt="AI Assistant" width="200"/>
 </div>
 
 ### 🗺️ Crime Heat Map
 
 <div align="center">
-  <img src="assets/screens-app/crime-heatmap.png" alt="Crime Map" width="250"/>
+  <img src="assets/screens-app/crime-heatmap.png" alt="Crime Map" width="700"/>
 </div>
 
 ### 📝 Reports System
 
 <div align="center">
-  <img src="assets/screens-app/create-report.png" alt="Create Report" width="250"/>
+  <img src="assets/screens-app/create-report.png" alt="Create Report" width="700"/>
   <img src="assets/screens-app/report.png" alt="View Report" width="250"/>
 </div>
 
