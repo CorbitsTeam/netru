@@ -412,13 +412,21 @@ class AdminReportCard extends StatelessWidget {
         SizedBox(width: 8.w),
 
         // Quick action buttons
-        if (report.reportStatus == AdminReportStatus.pending) ...[
+        if (report.reportStatus == AdminReportStatus.received) ...[
           _buildQuickActionButton(
             context,
-            icon: Icons.check,
-            color: Colors.green,
-            onTap: () => _approveReport(context),
-            tooltip: 'موافقة',
+            icon: Icons.play_arrow,
+            color: Colors.orange,
+            onTap: () => _startReview(context),
+            tooltip: 'بدء المراجعة',
+          ),
+        ] else if (report.reportStatus == AdminReportStatus.underReview) ...[
+          _buildQuickActionButton(
+            context,
+            icon: Icons.fact_check,
+            color: Colors.purple,
+            onTap: () => _startDataVerification(context),
+            tooltip: 'التحقق من البيانات',
           ),
           SizedBox(width: 8.w),
           _buildQuickActionButton(
@@ -429,13 +437,13 @@ class AdminReportCard extends StatelessWidget {
             tooltip: 'رفض',
           ),
         ] else if (report.reportStatus ==
-            AdminReportStatus.underInvestigation) ...[
+            AdminReportStatus.dataVerification) ...[
           _buildQuickActionButton(
             context,
-            icon: Icons.done_all,
-            color: Colors.green,
-            onTap: () => _resolveReport(context),
-            tooltip: 'حل',
+            icon: Icons.engineering,
+            color: Colors.indigo,
+            onTap: () => _takeAction(context),
+            tooltip: 'اتخاذ الإجراء',
           ),
           SizedBox(width: 8.w),
           _buildQuickActionButton(
@@ -445,13 +453,13 @@ class AdminReportCard extends StatelessWidget {
             onTap: () => _assignReport(context),
             tooltip: 'تعيين',
           ),
-        ] else if (report.reportStatus == AdminReportStatus.received) ...[
+        ] else if (report.reportStatus == AdminReportStatus.actionTaken) ...[
           _buildQuickActionButton(
             context,
-            icon: Icons.play_arrow,
-            color: Colors.orange,
-            onTap: () => _startInvestigation(context),
-            tooltip: 'بدء التحقيق',
+            icon: Icons.check_circle,
+            color: Colors.green,
+            onTap: () => _completeReport(context),
+            tooltip: 'إكمال البلاغ',
           ),
         ],
       ],
@@ -487,13 +495,13 @@ class AdminReportCard extends StatelessWidget {
     switch (report.reportStatus) {
       case AdminReportStatus.received:
         return 0.15;
-      case AdminReportStatus.pending:
-        return 0.3;
-      case AdminReportStatus.underInvestigation:
-        return 0.6;
-      case AdminReportStatus.resolved:
-        return 1.0;
-      case AdminReportStatus.closed:
+      case AdminReportStatus.underReview:
+        return 0.35;
+      case AdminReportStatus.dataVerification:
+        return 0.55;
+      case AdminReportStatus.actionTaken:
+        return 0.75;
+      case AdminReportStatus.completed:
         return 1.0;
       case AdminReportStatus.rejected:
         return 0.1;
@@ -504,14 +512,14 @@ class AdminReportCard extends StatelessWidget {
     switch (status) {
       case AdminReportStatus.received:
         return AppColors.primaryColor;
-      case AdminReportStatus.pending:
+      case AdminReportStatus.underReview:
         return Colors.orange;
-      case AdminReportStatus.underInvestigation:
+      case AdminReportStatus.dataVerification:
         return Colors.purple;
-      case AdminReportStatus.resolved:
+      case AdminReportStatus.actionTaken:
+        return Colors.indigo;
+      case AdminReportStatus.completed:
         return Colors.green;
-      case AdminReportStatus.closed:
-        return Colors.grey;
       case AdminReportStatus.rejected:
         return Colors.red;
     }
@@ -573,10 +581,35 @@ class AdminReportCard extends StatelessWidget {
     }
   }
 
-  void _approveReport(BuildContext context) {
-    context.read<AdminReportsCubit>().approveReport(
+  void _startReview(BuildContext context) {
+    context.read<AdminReportsCubit>().updateReportStatusById(
       report.id,
-      notes: 'تمت الموافقة على البلاغ من قبل الإدارة',
+      AdminReportStatus.underReview,
+      notes: 'تم بدء مراجعة البلاغ',
+    );
+  }
+
+  void _startDataVerification(BuildContext context) {
+    context.read<AdminReportsCubit>().updateReportStatusById(
+      report.id,
+      AdminReportStatus.dataVerification,
+      notes: 'تم بدء التحقق من البيانات',
+    );
+  }
+
+  void _takeAction(BuildContext context) {
+    context.read<AdminReportsCubit>().updateReportStatusById(
+      report.id,
+      AdminReportStatus.actionTaken,
+      notes: 'تم اتخاذ الإجراء المناسب',
+    );
+  }
+
+  void _completeReport(BuildContext context) {
+    context.read<AdminReportsCubit>().updateReportStatusById(
+      report.id,
+      AdminReportStatus.completed,
+      notes: 'تم إكمال البلاغ بنجاح',
     );
   }
 
@@ -584,23 +617,8 @@ class AdminReportCard extends StatelessWidget {
     _showRejectDialog(context);
   }
 
-  void _resolveReport(BuildContext context) {
-    context.read<AdminReportsCubit>().approveReport(
-      report.id,
-      notes: 'تم حل البلاغ بنجاح',
-    );
-  }
-
   void _assignReport(BuildContext context) {
     _showAssignDialog(context);
-  }
-
-  void _startInvestigation(BuildContext context) {
-    context.read<AdminReportsCubit>().updateReportStatusById(
-      report.id,
-      AdminReportStatus.underInvestigation,
-      notes: 'تم بدء التحقيق في البلاغ',
-    );
   }
 
   void _showRejectDialog(BuildContext context) {

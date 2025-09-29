@@ -79,33 +79,49 @@ class AdminDashboardRemoteDataSourceImpl
       final pendingVerifications = verificationsResponse.data?.length ?? 0;
       final newsByStatus = _processNewsByStatus(newsResponse.data ?? []);
 
+      // Extract values from processed data
+      final totalUsers = usersByType.values.fold(
+        0,
+        (sum, count) => sum + count,
+      );
+      final citizenUsers = usersByType['citizen'] ?? 0;
+      final foreignerUsers = usersByType['foreigner'] ?? 0;
+      final adminUsers = usersByType['admin'] ?? 0;
+      final totalNewsArticles = newsByStatus.values.fold(
+        0,
+        (sum, count) => sum + count,
+      );
+      final publishedNewsArticles = newsByStatus['published'] ?? 0;
+
       // Get geographical and type distributions
-      final reportsByGovernorate = await getReportsByGovernorate();
-      final reportsByType = await getReportsByType();
+      final governorateStats = await getReportsByGovernorate();
+      final typeStats = await getReportsByType();
 
       // Get recent trends (last 30 days)
-      final reportTrends = await getReportTrends(
+      final trends = await getReportTrends(
         startDate: DateTime.now().subtract(const Duration(days: 30)),
         endDate: DateTime.now(),
       );
 
       return DashboardStatsModel(
         totalReports: totalReports,
-        pendingReports: reportsByStatus['pending'] ?? 0,
-        underInvestigationReports: reportsByStatus['under_investigation'] ?? 0,
-        resolvedReports: reportsByStatus['resolved'] ?? 0,
+        receivedReports: reportsByStatus['received'] ?? 0,
+        underReviewReports: reportsByStatus['under_review'] ?? 0,
+        dataVerificationReports: reportsByStatus['data_verification'] ?? 0,
+        actionTakenReports: reportsByStatus['action_taken'] ?? 0,
+        completedReports: reportsByStatus['completed'] ?? 0,
         rejectedReports: reportsByStatus['rejected'] ?? 0,
-        totalUsers: usersResponse.data?.length ?? 0,
-        citizenUsers: usersByType['citizen'] ?? 0,
-        foreignerUsers: usersByType['foreigner'] ?? 0,
-        adminUsers: usersByType['admin'] ?? 0,
+        totalUsers: totalUsers,
+        citizenUsers: citizenUsers,
+        foreignerUsers: foreignerUsers,
+        adminUsers: adminUsers,
         pendingVerifications: pendingVerifications,
-        totalNewsArticles: newsResponse.data?.length ?? 0,
-        publishedNewsArticles: newsByStatus['published'] ?? 0,
-        reportsByGovernorate: reportsByGovernorate,
-        reportsByType: reportsByType,
-        reportsByStatus: reportsByStatus.map((k, v) => MapEntry(k, v)),
-        reportTrends: reportTrends,
+        totalNewsArticles: totalNewsArticles,
+        publishedNewsArticles: publishedNewsArticles,
+        reportsByGovernorate: governorateStats,
+        reportsByType: typeStats,
+        reportsByStatus: reportsByStatus,
+        reportTrends: trends,
       );
     } catch (e) {
       throw Exception('Failed to fetch dashboard stats: $e');

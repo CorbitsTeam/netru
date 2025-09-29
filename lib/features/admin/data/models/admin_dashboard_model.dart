@@ -3,9 +3,11 @@ import '../../domain/entities/dashboard_stats_entity.dart';
 class DashboardStatsModel extends DashboardStatsEntity {
   const DashboardStatsModel({
     required super.totalReports,
-    required super.pendingReports,
-    required super.underInvestigationReports,
-    required super.resolvedReports,
+    required super.receivedReports,
+    required super.underReviewReports,
+    required super.dataVerificationReports,
+    required super.actionTakenReports,
+    required super.completedReports,
     required super.rejectedReports,
     required super.totalUsers,
     required super.citizenUsers,
@@ -23,9 +25,11 @@ class DashboardStatsModel extends DashboardStatsEntity {
   factory DashboardStatsModel.fromJson(Map<String, dynamic> json) {
     return DashboardStatsModel(
       totalReports: json['total_reports'] ?? 0,
-      pendingReports: json['pending_reports'] ?? 0,
-      underInvestigationReports: json['under_investigation_reports'] ?? 0,
-      resolvedReports: json['resolved_reports'] ?? 0,
+      receivedReports: json['received_reports'] ?? 0,
+      underReviewReports: json['under_review_reports'] ?? 0,
+      dataVerificationReports: json['data_verification_reports'] ?? 0,
+      actionTakenReports: json['action_taken_reports'] ?? 0,
+      completedReports: json['completed_reports'] ?? 0,
       rejectedReports: json['rejected_reports'] ?? 0,
       totalUsers: json['total_users'] ?? 0,
       citizenUsers: json['citizen_users'] ?? 0,
@@ -50,9 +54,11 @@ class DashboardStatsModel extends DashboardStatsEntity {
   Map<String, dynamic> toJson() {
     return {
       'total_reports': totalReports,
-      'pending_reports': pendingReports,
-      'under_investigation_reports': underInvestigationReports,
-      'resolved_reports': resolvedReports,
+      'received_reports': receivedReports,
+      'under_review_reports': underReviewReports,
+      'data_verification_reports': dataVerificationReports,
+      'action_taken_reports': actionTakenReports,
+      'completed_reports': completedReports,
       'rejected_reports': rejectedReports,
       'total_users': totalUsers,
       'citizen_users': citizenUsers,

@@ -76,9 +76,9 @@ class ReportsChart extends StatelessWidget {
 
     return [
       PieChartSectionData(
-        value: stats.pendingReports.toDouble(),
-        color: Colors.orange,
-        title: '${((stats.pendingReports / total) * 100).toStringAsFixed(1)}%',
+        value: stats.receivedReports.toDouble(),
+        color: Colors.blue,
+        title: '${((stats.receivedReports / total) * 100).toStringAsFixed(1)}%',
         radius: 50.r,
         titleStyle: TextStyle(
           fontSize: 12.sp,
@@ -87,10 +87,22 @@ class ReportsChart extends StatelessWidget {
         ),
       ),
       PieChartSectionData(
-        value: stats.underInvestigationReports.toDouble(),
+        value: stats.underReviewReports.toDouble(),
+        color: Colors.orange,
+        title:
+            '${((stats.underReviewReports / total) * 100).toStringAsFixed(1)}%',
+        radius: 50.r,
+        titleStyle: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      PieChartSectionData(
+        value: stats.dataVerificationReports.toDouble(),
         color: Colors.purple,
         title:
-            '${((stats.underInvestigationReports / total) * 100).toStringAsFixed(1)}%',
+            '${((stats.dataVerificationReports / total) * 100).toStringAsFixed(1)}%',
         radius: 50.r,
         titleStyle: TextStyle(
           fontSize: 12.sp,
@@ -99,9 +111,33 @@ class ReportsChart extends StatelessWidget {
         ),
       ),
       PieChartSectionData(
-        value: stats.resolvedReports.toDouble(),
+        value: stats.actionTakenReports.toDouble(),
+        color: Colors.teal,
+        title:
+            '${((stats.actionTakenReports / total) * 100).toStringAsFixed(1)}%',
+        radius: 50.r,
+        titleStyle: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      PieChartSectionData(
+        value: stats.completedReports.toDouble(),
         color: Colors.green,
-        title: '${((stats.resolvedReports / total) * 100).toStringAsFixed(1)}%',
+        title:
+            '${((stats.completedReports / total) * 100).toStringAsFixed(1)}%',
+        radius: 50.r,
+        titleStyle: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      PieChartSectionData(
+        value: stats.rejectedReports.toDouble(),
+        color: Colors.red,
+        title: '${((stats.rejectedReports / total) * 100).toStringAsFixed(1)}%',
         radius: 50.r,
         titleStyle: TextStyle(
           fontSize: 12.sp,
@@ -114,15 +150,21 @@ class ReportsChart extends StatelessWidget {
 
   List<Widget> _buildLegendItems(BuildContext context) {
     return [
-      _buildLegendItem('في الانتظار', Colors.orange, stats.pendingReports),
+      _buildLegendItem('مستلمة', Colors.blue, stats.receivedReports),
+      SizedBox(height: 8.h),
+      _buildLegendItem('قيد المراجعة', Colors.orange, stats.underReviewReports),
       SizedBox(height: 8.h),
       _buildLegendItem(
-        'قيد التحقيق',
+        'تحقق من البيانات',
         Colors.purple,
-        stats.underInvestigationReports,
+        stats.dataVerificationReports,
       ),
       SizedBox(height: 8.h),
-      _buildLegendItem('محلولة', Colors.green, stats.resolvedReports),
+      _buildLegendItem('تم اتخاذ إجراء', Colors.teal, stats.actionTakenReports),
+      SizedBox(height: 8.h),
+      _buildLegendItem('مكتملة', Colors.green, stats.completedReports),
+      SizedBox(height: 8.h),
+      _buildLegendItem('مرفوضة', Colors.red, stats.rejectedReports),
     ];
   }
 

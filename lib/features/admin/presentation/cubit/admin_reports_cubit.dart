@@ -170,7 +170,7 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
   Future<void> approveReport(String reportId, {String? notes}) async {
     await updateReportStatusById(
       reportId,
-      AdminReportStatus.resolved,
+      AdminReportStatus.completed,
       notes: notes,
     );
   }
@@ -216,31 +216,31 @@ class AdminReportsCubit extends Cubit<AdminReportsState> {
   Map<String, int> _calculateStatistics(List<AdminReportEntity> reports) {
     return {
       'total': reports.length,
-      'pending':
+      'received':
           reports
-              .where((r) => r.reportStatus == AdminReportStatus.pending)
+              .where((r) => r.reportStatus == AdminReportStatus.received)
               .length,
-      'underInvestigation':
+      'underReview':
+          reports
+              .where((r) => r.reportStatus == AdminReportStatus.underReview)
+              .length,
+      'dataVerification':
           reports
               .where(
-                (r) => r.reportStatus == AdminReportStatus.underInvestigation,
+                (r) => r.reportStatus == AdminReportStatus.dataVerification,
               )
               .length,
-      'resolved':
+      'actionTaken':
           reports
-              .where((r) => r.reportStatus == AdminReportStatus.resolved)
+              .where((r) => r.reportStatus == AdminReportStatus.actionTaken)
+              .length,
+      'completed':
+          reports
+              .where((r) => r.reportStatus == AdminReportStatus.completed)
               .length,
       'rejected':
           reports
               .where((r) => r.reportStatus == AdminReportStatus.rejected)
-              .length,
-      'closed':
-          reports
-              .where((r) => r.reportStatus == AdminReportStatus.closed)
-              .length,
-      'received':
-          reports
-              .where((r) => r.reportStatus == AdminReportStatus.received)
               .length,
       'highPriority':
           reports

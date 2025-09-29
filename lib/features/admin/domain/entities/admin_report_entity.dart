@@ -288,12 +288,12 @@ class ReportStatusHistoryEntity extends Equatable {
 }
 
 enum AdminReportStatus {
-  pending,
-  underInvestigation,
-  resolved,
-  closed,
-  rejected,
   received,
+  underReview,
+  dataVerification,
+  actionTaken,
+  completed,
+  rejected,
 }
 
 enum PriorityLevel { low, medium, high, urgent }
@@ -305,54 +305,54 @@ enum VerificationStatus { unverified, verified, flagged }
 extension AdminReportStatusExtension on AdminReportStatus {
   String get value {
     switch (this) {
-      case AdminReportStatus.pending:
-        return 'pending';
-      case AdminReportStatus.underInvestigation:
-        return 'under_investigation';
-      case AdminReportStatus.resolved:
-        return 'resolved';
-      case AdminReportStatus.closed:
-        return 'closed';
-      case AdminReportStatus.rejected:
-        return 'rejected';
       case AdminReportStatus.received:
         return 'received';
+      case AdminReportStatus.underReview:
+        return 'under_review';
+      case AdminReportStatus.dataVerification:
+        return 'data_verification';
+      case AdminReportStatus.actionTaken:
+        return 'action_taken';
+      case AdminReportStatus.completed:
+        return 'completed';
+      case AdminReportStatus.rejected:
+        return 'rejected';
     }
   }
 
   String get arabicName {
     switch (this) {
-      case AdminReportStatus.pending:
-        return 'في الانتظار';
-      case AdminReportStatus.underInvestigation:
-        return 'قيد التحقيق';
-      case AdminReportStatus.resolved:
-        return 'تم الحل';
-      case AdminReportStatus.closed:
-        return 'مغلق';
-      case AdminReportStatus.rejected:
-        return 'مرفوض';
       case AdminReportStatus.received:
         return 'تم الاستلام';
+      case AdminReportStatus.underReview:
+        return 'قيد المراجعة';
+      case AdminReportStatus.dataVerification:
+        return 'التحقق من البيانات';
+      case AdminReportStatus.actionTaken:
+        return 'اتخاذ الإجراء';
+      case AdminReportStatus.completed:
+        return 'مكتمل';
+      case AdminReportStatus.rejected:
+        return 'مرفوض';
     }
   }
 
   static AdminReportStatus fromString(String value) {
     switch (value) {
-      case 'pending':
-        return AdminReportStatus.pending;
-      case 'under_investigation':
-        return AdminReportStatus.underInvestigation;
-      case 'resolved':
-        return AdminReportStatus.resolved;
-      case 'closed':
-        return AdminReportStatus.closed;
-      case 'rejected':
-        return AdminReportStatus.rejected;
       case 'received':
         return AdminReportStatus.received;
+      case 'under_review':
+        return AdminReportStatus.underReview;
+      case 'data_verification':
+        return AdminReportStatus.dataVerification;
+      case 'action_taken':
+        return AdminReportStatus.actionTaken;
+      case 'completed':
+        return AdminReportStatus.completed;
+      case 'rejected':
+        return AdminReportStatus.rejected;
       default:
-        return AdminReportStatus.pending;
+        return AdminReportStatus.received;
     }
   }
 }

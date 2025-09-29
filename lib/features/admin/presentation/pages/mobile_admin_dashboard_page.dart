@@ -234,10 +234,34 @@ class _MobileAdminDashboardPageState extends State<MobileAdminDashboardPage> {
           color: Colors.blue,
         ),
         _buildStatCard(
-          title: 'البلاغات المعلقة',
-          value: stats?.pendingReports?.toString() ?? '0',
-          icon: Icons.pending,
+          title: 'مستلمة',
+          value: stats?.receivedReports?.toString() ?? '0',
+          icon: Icons.inbox,
+          color: Colors.blue,
+        ),
+        _buildStatCard(
+          title: 'قيد المراجعة',
+          value: stats?.underReviewReports?.toString() ?? '0',
+          icon: Icons.search,
           color: Colors.orange,
+        ),
+        _buildStatCard(
+          title: 'تحقق من البيانات',
+          value: stats?.dataVerificationReports?.toString() ?? '0',
+          icon: Icons.verified,
+          color: Colors.purple,
+        ),
+        _buildStatCard(
+          title: 'تم اتخاذ إجراء',
+          value: stats?.actionTakenReports?.toString() ?? '0',
+          icon: Icons.done_all,
+          color: Colors.teal,
+        ),
+        _buildStatCard(
+          title: 'مكتملة',
+          value: stats?.completedReports?.toString() ?? '0',
+          icon: Icons.check_circle,
+          color: Colors.green,
         ),
         _buildStatCard(
           title: 'إجمالي المستخدمين',

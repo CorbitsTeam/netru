@@ -75,21 +75,20 @@ class ComprehensiveAdminActions extends StatelessWidget {
           SizedBox(height: 12.h),
           Row(
             children: [
-              if (report.reportStatus == AdminReportStatus.pending) ...[
+              if (report.reportStatus == AdminReportStatus.received) ...[
                 _buildQuickActionButton(
                   context,
-                  'بدء التحقيق',
+                  'بدء المراجعة',
                   Icons.search,
                   Colors.blue,
                   () => _startInvestigation(context),
                 ),
                 SizedBox(width: 8.w),
               ],
-              if (report.reportStatus ==
-                  AdminReportStatus.underInvestigation) ...[
+              if (report.reportStatus == AdminReportStatus.actionTaken) ...[
                 _buildQuickActionButton(
                   context,
-                  'حل البلاغ',
+                  'إكمال البلاغ',
                   Icons.check_circle,
                   Colors.green,
                   () => _resolveReport(context),
@@ -271,24 +270,24 @@ class ComprehensiveAdminActions extends StatelessWidget {
   void _startInvestigation(BuildContext context) {
     context.read<AdminReportsCubit>().updateReportStatusById(
       report.id,
-      AdminReportStatus.underInvestigation,
-      notes: 'تم بدء التحقيق في البلاغ',
+      AdminReportStatus.underReview,
+      notes: 'تم بدء مراجعة البلاغ',
     );
-    _showSuccessMessage(context, 'تم بدء التحقيق بنجاح');
+    _showSuccessMessage(context, 'تم بدء المراجعة بنجاح');
   }
 
   void _resolveReport(BuildContext context) {
     _showNotesDialog(
       context,
-      title: 'حل البلاغ',
-      hintText: 'اكتب ملاحظات الحل...',
+      title: 'إكمال البلاغ',
+      hintText: 'اكتب ملاحظات الإكمال...',
       onSubmit: (notes) {
         context.read<AdminReportsCubit>().updateReportStatusById(
           report.id,
-          AdminReportStatus.resolved,
+          AdminReportStatus.completed,
           notes: notes,
         );
-        _showSuccessMessage(context, 'تم حل البلاغ بنجاح');
+        _showSuccessMessage(context, 'تم إكمال البلاغ بنجاح');
       },
     );
   }
@@ -535,18 +534,18 @@ class ComprehensiveAdminActions extends StatelessWidget {
   /// تحويل حالة الإدارة إلى حالة التقرير
   ReportStatus _convertAdminStatusToReportStatus(AdminReportStatus status) {
     switch (status) {
-      case AdminReportStatus.pending:
+      case AdminReportStatus.received:
         return ReportStatus.received;
-      case AdminReportStatus.underInvestigation:
+      case AdminReportStatus.underReview:
         return ReportStatus.underReview;
-      case AdminReportStatus.resolved:
-        return ReportStatus.completed;
-      case AdminReportStatus.closed:
+      case AdminReportStatus.dataVerification:
+        return ReportStatus.dataVerification;
+      case AdminReportStatus.actionTaken:
+        return ReportStatus.actionTaken;
+      case AdminReportStatus.completed:
         return ReportStatus.completed;
       case AdminReportStatus.rejected:
         return ReportStatus.rejected;
-      case AdminReportStatus.received:
-        return ReportStatus.received;
     }
   }
 

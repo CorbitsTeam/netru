@@ -20,6 +20,8 @@ import '../cubit/admin_reports_cubit.dart';
 import '../../../reports/presentation/services/professional_egyptian_pdf_service.dart';
 import '../../../reports/domain/entities/reports_entity.dart';
 import '../../../reports/presentation/widgets/enhanced_status_tracker.dart';
+import '../widgets/video_player_widget.dart';
+import '../widgets/video_thumbnail_widget.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -2054,8 +2056,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
   // Helper methods for new UI
   bool _canProgressStatus() {
     return widget.report.reportStatus != AdminReportStatus.rejected &&
-        widget.report.reportStatus != AdminReportStatus.resolved &&
-        widget.report.reportStatus != AdminReportStatus.closed;
+        widget.report.reportStatus != AdminReportStatus.completed;
   }
 
   void _showProgressDialog() {
@@ -2130,13 +2131,16 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                               );
                             },
                           )
+                          : media.mediaType == MediaType.video
+                          ? VideoThumbnailWidget(
+                            videoUrl: _resolveMediaUrl(media.fileUrl),
+                            onTap: () => _viewMedia(media),
+                          )
                           : Container(
                             color: Colors.grey[300],
                             child: Center(
                               child: Icon(
-                                media.mediaType == MediaType.video
-                                    ? Icons.play_circle_outline
-                                    : Icons.insert_drive_file,
+                                Icons.insert_drive_file,
                                 size: 32.sp,
                                 color: Colors.grey[600],
                               ),
@@ -2185,6 +2189,22 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
   }
 
   void _viewMedia(ReportMediaEntity media) {
+    if (media.mediaType == MediaType.video) {
+      // فتح الفيديو في صفحة كاملة
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => FullScreenVideoPlayer(
+                videoUrl: _resolveMediaUrl(media.fileUrl),
+                title: media.fileName ?? 'فيديو البلاغ',
+              ),
+        ),
+      );
+      return;
+    }
+
+    // للصور - عرض في حوار ملء الشاشة
     showDialog(
       context: context,
       builder:
@@ -2237,13 +2257,13 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.play_circle_outline,
+                                    Icons.insert_drive_file,
                                     size: 64.sp,
                                     color: Colors.white54,
                                   ),
                                   SizedBox(height: 16.h),
                                   Text(
-                                    'فيديو - اضغط لفتح في تطبيق خارجي',
+                                    'ملف غير مدعوم',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16.sp,
@@ -3823,18 +3843,18 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
   /// تحويل حالة الإدارة إلى حالة التقرير
   ReportStatus _convertAdminStatusToReportStatus(AdminReportStatus status) {
     switch (status) {
-      case AdminReportStatus.pending:
+      case AdminReportStatus.received:
         return ReportStatus.received;
-      case AdminReportStatus.underInvestigation:
+      case AdminReportStatus.underReview:
         return ReportStatus.underReview;
-      case AdminReportStatus.resolved:
-        return ReportStatus.completed;
-      case AdminReportStatus.closed:
+      case AdminReportStatus.dataVerification:
+        return ReportStatus.dataVerification;
+      case AdminReportStatus.actionTaken:
+        return ReportStatus.actionTaken;
+      case AdminReportStatus.completed:
         return ReportStatus.completed;
       case AdminReportStatus.rejected:
         return ReportStatus.rejected;
-      case AdminReportStatus.received:
-        return ReportStatus.received;
     }
   }
 
@@ -4483,14 +4503,14 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
     switch (status) {
       case AdminReportStatus.received:
         return Colors.blue;
-      case AdminReportStatus.pending:
+      case AdminReportStatus.underReview:
         return Colors.orange;
-      case AdminReportStatus.underInvestigation:
+      case AdminReportStatus.dataVerification:
         return Colors.purple;
-      case AdminReportStatus.resolved:
+      case AdminReportStatus.actionTaken:
+        return Colors.indigo;
+      case AdminReportStatus.completed:
         return Colors.green;
-      case AdminReportStatus.closed:
-        return Colors.grey;
       case AdminReportStatus.rejected:
         return Colors.red;
     }
@@ -4605,13 +4625,13 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       case ReportStatus.received:
         return AdminReportStatus.received;
       case ReportStatus.underReview:
-        return AdminReportStatus.underInvestigation;
+        return AdminReportStatus.underReview;
       case ReportStatus.dataVerification:
-        return AdminReportStatus.underInvestigation;
+        return AdminReportStatus.dataVerification;
       case ReportStatus.actionTaken:
-        return AdminReportStatus.underInvestigation;
+        return AdminReportStatus.actionTaken;
       case ReportStatus.completed:
-        return AdminReportStatus.resolved;
+        return AdminReportStatus.completed;
       case ReportStatus.rejected:
         return AdminReportStatus.rejected;
     }

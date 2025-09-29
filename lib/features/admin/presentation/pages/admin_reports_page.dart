@@ -76,13 +76,30 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    onPressed: () => _showFiltersDialog(),
-                    icon: Icon(
-                      Icons.filter_list,
-                      color: AppColors.primaryColor,
-                      size: 24.sp,
-                    ),
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () => _showFiltersDialog(),
+                        icon: Icon(
+                          Icons.filter_list,
+                          color: AppColors.primaryColor,
+                          size: 24.sp,
+                        ),
+                      ),
+                      if (_hasActiveFilters())
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            width: 8.w,
+                            height: 8.h,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () {
@@ -143,52 +160,112 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
   }
 
   void _showFiltersDialog() {
+    // إنشاء متغيرات محلية للحوار
+    AdminReportStatus? tempSelectedStatus = _selectedStatus;
+    String? tempSelectedGovernorate = _selectedGovernorate;
+    String? tempSearchQuery = _searchQuery;
+
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('تصفية البلاغات'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<AdminReportStatus>(
-                  value: _selectedStatus,
-                  decoration: const InputDecoration(labelText: 'حالة البلاغ'),
-                  items:
-                      AdminReportStatus.values.map((status) {
-                        return DropdownMenuItem(
-                          value: status,
-                          child: Text(status.arabicName),
-                        );
-                      }).toList(),
-                  onChanged: (value) => setState(() => _selectedStatus = value),
-                ),
-                SizedBox(height: 16.h),
-                TextFormField(
-                  onChanged: (value) => _searchQuery = value,
-                  decoration: const InputDecoration(
-                    labelText: 'البحث',
-                    hintText: 'ابحث في البلاغات...',
+          (context) => StatefulBuilder(
+            builder:
+                (context, setDialogState) => AlertDialog(
+                  title: const Text('تصفية البلاغات'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<AdminReportStatus>(
+                        value: tempSelectedStatus,
+                        decoration: const InputDecoration(
+                          labelText: 'حالة البلاغ',
+                        ),
+                        items:
+                            AdminReportStatus.values.map((status) {
+                              return DropdownMenuItem(
+                                value: status,
+                                child: Text(status.arabicName),
+                              );
+                            }).toList(),
+                        onChanged:
+                            (value) => setDialogState(
+                              () => tempSelectedStatus = value,
+                            ),
+                      ),
+                      SizedBox(height: 16.h),
+                      DropdownButtonFormField<String>(
+                        value: tempSelectedGovernorate,
+                        decoration: const InputDecoration(
+                          labelText: 'المحافظة',
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: null,
+                            child: Text('جميع المحافظات'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'القاهرة',
+                            child: Text('القاهرة'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'الجيزة',
+                            child: Text('الجيزة'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'الإسكندرية',
+                            child: Text('الإسكندرية'),
+                          ),
+                          // أضف باقي المحافظات حسب الحاجة
+                        ],
+                        onChanged:
+                            (value) => setDialogState(
+                              () => tempSelectedGovernorate = value,
+                            ),
+                      ),
+                      SizedBox(height: 16.h),
+                      TextFormField(
+                        initialValue: tempSearchQuery,
+                        onChanged: (value) => tempSearchQuery = value,
+                        decoration: const InputDecoration(
+                          labelText: 'البحث',
+                          hintText: 'ابحث في البلاغات...',
+                        ),
+                      ),
+                    ],
                   ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        // تطبيق التغييرات
+                        setState(() {
+                          _selectedStatus = tempSelectedStatus;
+                          _selectedGovernorate = tempSelectedGovernorate;
+                          _searchQuery = tempSearchQuery;
+                        });
+                        Navigator.pop(context);
+                        _applyFilters();
+                      },
+                      child: const Text('تطبيق'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // مسح الفلاتر
+                        setState(() {
+                          _selectedStatus = null;
+                          _selectedGovernorate = null;
+                          _searchQuery = null;
+                        });
+                        Navigator.pop(context);
+                        _clearFilters();
+                      },
+                      child: const Text('مسح'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('إلغاء'),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _applyFilters();
-                },
-                child: const Text('تطبيق'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _clearFilters();
-                },
-                child: const Text('مسح'),
-              ),
-            ],
           ),
     );
   }
@@ -208,6 +285,12 @@ class _AdminReportsPageState extends State<AdminReportsPage> {
       _searchQuery = null;
     });
     context.read<AdminReportsCubit>().loadReports();
+  }
+
+  bool _hasActiveFilters() {
+    return _selectedStatus != null ||
+        (_selectedGovernorate != null && _selectedGovernorate!.isNotEmpty) ||
+        (_searchQuery != null && _searchQuery!.isNotEmpty);
   }
 }
 
@@ -519,20 +602,36 @@ class AdminReportsListView extends StatelessWidget {
           Row(
             children: [
               _buildStatCard(
-                'في الانتظار',
-                statistics['pending'] ?? 0,
+                'مستلمة',
+                statistics['received'] ?? 0,
+                Colors.blue,
+              ),
+              SizedBox(width: 8.w),
+              _buildStatCard(
+                'قيد المراجعة',
+                statistics['underReview'] ?? 0,
                 Colors.orange,
               ),
               SizedBox(width: 8.w),
               _buildStatCard(
-                'قيد التحقيق',
-                statistics['underInvestigation'] ?? 0,
+                'التحقق من البيانات',
+                statistics['dataVerification'] ?? 0,
                 Colors.purple,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              _buildStatCard(
+                'اتخاذ الإجراء',
+                statistics['actionTaken'] ?? 0,
+                Colors.indigo,
               ),
               SizedBox(width: 8.w),
               _buildStatCard(
-                'محلولة',
-                statistics['resolved'] ?? 0,
+                'مكتملة',
+                statistics['completed'] ?? 0,
                 Colors.green,
               ),
               SizedBox(width: 8.w),

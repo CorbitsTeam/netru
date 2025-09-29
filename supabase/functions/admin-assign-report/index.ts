@@ -87,15 +87,15 @@ serve(async (req) => {
       throw updateError
     }
 
-    // Add status history entry
+    // Add status history entry - Update to use new status values
     const { error: historyError } = await supabaseClient
       .from('report_status_history')
       .insert({
         report_id: reportId,
         previous_status: null,
-        new_status: 'assigned',
+        new_status: 'under_review', // Updated to match new AdminReportStatus
         changed_by: user.id,
-        change_reason: 'Report assigned to investigator',
+        change_reason: 'Report assigned to investigator for review',
         notes: assignmentNotes
       })
 

@@ -2,9 +2,11 @@ import 'package:equatable/equatable.dart';
 
 class DashboardStatsEntity extends Equatable {
   final int totalReports;
-  final int pendingReports;
-  final int underInvestigationReports;
-  final int resolvedReports;
+  final int receivedReports;
+  final int underReviewReports;
+  final int dataVerificationReports;
+  final int actionTakenReports;
+  final int completedReports;
   final int rejectedReports;
   final int totalUsers;
   final int citizenUsers;
@@ -20,9 +22,11 @@ class DashboardStatsEntity extends Equatable {
 
   const DashboardStatsEntity({
     required this.totalReports,
-    required this.pendingReports,
-    required this.underInvestigationReports,
-    required this.resolvedReports,
+    required this.receivedReports,
+    required this.underReviewReports,
+    required this.dataVerificationReports,
+    required this.actionTakenReports,
+    required this.completedReports,
     required this.rejectedReports,
     required this.totalUsers,
     required this.citizenUsers,
@@ -40,9 +44,11 @@ class DashboardStatsEntity extends Equatable {
   @override
   List<Object?> get props => [
     totalReports,
-    pendingReports,
-    underInvestigationReports,
-    resolvedReports,
+    receivedReports,
+    underReviewReports,
+    dataVerificationReports,
+    actionTakenReports,
+    completedReports,
     rejectedReports,
     totalUsers,
     citizenUsers,
