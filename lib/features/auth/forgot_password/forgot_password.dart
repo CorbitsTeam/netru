@@ -30,6 +30,7 @@
 /// How to access:
 /// - From login screen: Click "نسيت كلمة المرور؟" link
 /// - Or navigate directly using Navigator.pushNamed(context, '/forgotPasswordEmail')
+library;
 
 export 'presentation/cubit/forgot_password_cubit.dart';
 export 'presentation/cubit/forgot_password_state.dart';

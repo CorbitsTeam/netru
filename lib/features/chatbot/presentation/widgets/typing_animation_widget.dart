@@ -281,7 +281,7 @@ class _TypingAnimationWidgetState extends State<TypingAnimationWidget>
                 child: LinearProgressIndicator(
                   value: _progressAnimation.value,
                   backgroundColor: AppColors.border,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                   minHeight: 2.h,
                 ),
               );

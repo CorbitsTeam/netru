@@ -92,6 +92,7 @@ import '../services/logger_service.dart';
 import '../services/report_types_service.dart';
 import '../services/supabase_edge_functions_service.dart';
 import '../services/simple_notification_service.dart';
+import '../services/report_notification_service.dart';
 import '../network/api_client.dart';
 
 // Admin Feature
@@ -274,8 +275,7 @@ Future<void> _initChatbotDependencies() async {
   sl.registerLazySingleton<ChatbotRemoteDataSource>(
     () => ChatbotRemoteDataSourceImpl(
       dio: sl(),
-      groqApiKey:
-          '', // ⚠️ Replace with your actual key
+      groqApiKey: '', // ⚠️ Replace with your actual key
     ),
   );
 
@@ -517,11 +517,17 @@ Future<void> _initAdminDependencies() async {
     () => SimpleNotificationService(),
   );
 
+  // Report Notification Service
+  sl.registerLazySingleton<ReportNotificationService>(
+    () => ReportNotificationService(),
+  );
+
   // Admin Reports - data source & repository
   sl.registerLazySingleton<AdminReportRemoteDataSource>(
     () => AdminReportRemoteDataSourceImpl(
       supabaseClient: sl<SupabaseClient>(),
       notificationService: sl<SimpleNotificationService>(),
+      reportNotificationService: sl<ReportNotificationService>(),
     ),
   );
 

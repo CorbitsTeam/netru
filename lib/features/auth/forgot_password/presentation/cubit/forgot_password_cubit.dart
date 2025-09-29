@@ -57,7 +57,7 @@ class ForgotPasswordCubit extends Cubit<ForgotPasswordState> {
     } catch (e) {
       log('❌ خطأ غير متوقع في إرسال OTP: $e');
       emit(
-        ForgotPasswordFailure(
+        const ForgotPasswordFailure(
           error: 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
         ),
       );
@@ -116,7 +116,7 @@ class ForgotPasswordCubit extends Cubit<ForgotPasswordState> {
     } catch (e) {
       log('❌ خطأ غير متوقع في التحقق من OTP: $e');
       emit(
-        ForgotPasswordFailure(
+        const ForgotPasswordFailure(
           error: 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
         ),
       );
@@ -179,7 +179,7 @@ class ForgotPasswordCubit extends Cubit<ForgotPasswordState> {
     } catch (e) {
       log('❌ خطأ غير متوقع في تحديث كلمة المرور: $e');
       emit(
-        ForgotPasswordFailure(
+        const ForgotPasswordFailure(
           error: 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
         ),
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/simple_notification_service.dart';
+import '../../../../core/services/report_notification_service.dart';
 import '../models/admin_report_model.dart';
 
 abstract class AdminReportRemoteDataSource {
@@ -50,10 +51,12 @@ abstract class AdminReportRemoteDataSource {
 class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
   final SupabaseClient supabaseClient;
   final SimpleNotificationService notificationService;
+  final ReportNotificationService reportNotificationService;
 
   AdminReportRemoteDataSourceImpl({
     required this.supabaseClient,
     required this.notificationService,
+    required this.reportNotificationService,
   });
 
   @override
@@ -171,11 +174,9 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
       if (currentReport.userId != null) {
         await _sendStatusUpdateNotification(
           reportId: reportId,
-          userId: currentReport.userId!,
           status: status,
-          reporterName:
-              '${currentReport.reporterFirstName} ${currentReport.reporterLastName}',
-          caseNumber: currentReport.caseNumber,
+          caseNumber: currentReport.caseNumber ?? reportId.substring(0, 8),
+          adminNotes: notes,
         );
       }
 
@@ -216,11 +217,9 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
       if (currentReport.userId != null) {
         await _sendStatusUpdateNotification(
           reportId: reportId,
-          userId: currentReport.userId!,
           status: 'under_investigation',
-          reporterName:
-              '${currentReport.reporterFirstName} ${currentReport.reporterLastName}',
-          caseNumber: currentReport.caseNumber,
+          caseNumber: currentReport.caseNumber ?? reportId.substring(0, 8),
+          adminNotes: 'تم تعيين محقق للبلاغ',
         );
       }
 
@@ -331,35 +330,37 @@ class AdminReportRemoteDataSourceImpl implements AdminReportRemoteDataSource {
     }
   }
 
-  /// Send automatic notification when report status changes - SIMPLIFIED
+  /// Send automatic notification when report status changes using new ReportNotificationService
   Future<void> _sendStatusUpdateNotification({
     required String reportId,
-    required String userId,
     required String status,
-    required String reporterName,
-    String? caseNumber,
+    required String caseNumber,
+    String? adminNotes,
   }) async {
     try {
       debugPrint('📱 إرسال إشعار تحديث الحالة للبلاغ: $reportId');
 
-      // استخدام الخدمة البسيطة الجديدة لإرسال الإشعار لصاحب البلاغ
-      await notificationService.sendReportStatusNotification(
+      // استخدام ReportNotificationService الجديد لإرسال الإشعار
+      await reportNotificationService.sendReportStatusNotification(
         reportId: reportId,
-        reportStatus: status,
-        reportOwnerName: reporterName,
+        newStatus: status,
         caseNumber: caseNumber,
+        adminNotes: adminNotes,
       );
 
       debugPrint('✅ تم إرسال إشعار تحديث الحالة بنجاح');
     } catch (e) {
       debugPrint('❌ خطأ في إرسال إشعار تحديث الحالة: $e');
 
-      // إشعار محلي بسيط كـ fallback أخير
-      await notificationService.showLocalNotification(
-        title: '🔔 تحديث البلاغ',
-        body:
-            'تم تحديث حالة بلاغكم رقم #${caseNumber ?? reportId.substring(0, 8)} إلى $status',
-      );
+      // fallback إلى الخدمة البسيطة إذا فشل الإرسال
+      try {
+        await notificationService.showLocalNotification(
+          title: '🔔 تحديث البلاغ',
+          body: 'تم تحديث حالة بلاغكم رقم #$caseNumber إلى $status',
+        );
+      } catch (fallbackError) {
+        debugPrint('❌ فشل حتى في الإشعار المحلي: $fallbackError');
+      }
     }
   }
 }

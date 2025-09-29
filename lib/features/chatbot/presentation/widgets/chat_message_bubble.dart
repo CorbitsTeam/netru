@@ -95,7 +95,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                             if (!isUser && widget.message.isStreaming)
                               BoxShadow(
                                 color: AppColors.primary.withValues(alpha: 0.1),
-                                offset: Offset(0, 0),
+                                offset: const Offset(0, 0),
                                 blurRadius: 8.r,
                               ),
                           ],

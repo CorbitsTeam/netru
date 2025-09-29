@@ -849,10 +849,12 @@ class _HeatMapWidgetState
   }
 
   Color _getCrimeColor(int reportCount) {
-    if (reportCount >= 10)
+    if (reportCount >= 10) {
       return Colors.red.withValues(alpha: 0.7);
-    if (reportCount >= 5)
+    }
+    if (reportCount >= 5) {
       return Colors.orange.withValues(alpha: 0.7);
+    }
     return Colors.green.withValues(alpha: 0.7);
   }
 
@@ -868,22 +870,26 @@ class _HeatMapWidgetState
 
   /// الحصول على لون المجموعة
   Color _getClusterColor(int reportCount) {
-    if (reportCount >= 20)
+    if (reportCount >= 20) {
       return const Color(
         0xFFD32F2F,
       ).withValues(alpha: 0.7); // أحمر داكن
-    if (reportCount >= 10)
+    }
+    if (reportCount >= 10) {
       return const Color(
         0xFFE65100,
       ).withValues(alpha: 0.7); // برتقالي داكن
-    if (reportCount >= 5)
+    }
+    if (reportCount >= 5) {
       return const Color(
         0xFFFF9800,
       ).withValues(alpha: 0.7); // برتقالي
-    if (reportCount >= 3)
+    }
+    if (reportCount >= 3) {
       return const Color(
         0xFFFFC107,
       ).withValues(alpha: 0.7); // أصفر
+    }
     return const Color(
       0xFF4CAF50,
     ).withValues(alpha: 0.7); // أخضر

@@ -3839,16 +3839,14 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
   }
 
   void _refreshData() async {
-    // Refresh all data
-    await _loadUserProfile();
+    // إذا كان لدينا cubit من الصفحة الرئيسية، نعمل له ريفريش
+    if (widget.adminReportsCubit != null) {
+      widget.adminReportsCubit!.loadReports();
+    }
 
+    // العودة للصفحة الرئيسية مع ريفريش
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم تحديث البيانات بنجاح'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      Navigator.of(context).pop(true); // إرسال true للإشارة أن هناك تحديث
     }
   }
 
@@ -4658,7 +4656,7 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
       // Hide loading
       if (Navigator.canPop(context)) Navigator.pop(context);
 
-      // Show success message
+      // Show success message and return to main page
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -4666,7 +4664,22 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
               children: [
                 const Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 8.w),
-                Text('تم الانتقال إلى: ${newStatus.arabicName}'),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('تم الانتقال إلى: ${newStatus.arabicName}'),
+                      Text(
+                        'سيتم إشعار مقدم البلاغ تلقائياً',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             backgroundColor: Colors.green,
@@ -4674,11 +4687,12 @@ class _AdminReportDetailsPageState extends State<AdminReportDetailsPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.r),
             ),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
 
-      // Refresh data
+      // Refresh data and return to main page
       _refreshData();
     } catch (e) {
       // Hide loading if still showing

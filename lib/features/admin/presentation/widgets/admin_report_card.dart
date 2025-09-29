@@ -552,11 +552,11 @@ class AdminReportCard extends StatelessWidget {
     }
   }
 
-  void _navigateToDetails(BuildContext context) {
+  void _navigateToDetails(BuildContext context) async {
     // Navigate to report details page and pass the existing AdminReportsCubit
     // so the details page reuses it and any status updates refresh the list.
     final cubit = context.read<AdminReportsCubit>();
-    Navigator.push(
+    final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder:
@@ -566,6 +566,11 @@ class AdminReportCard extends StatelessWidget {
             ),
       ),
     );
+
+    // إذا تم إرجاع true، يعني حدث تحديث وتحتاج صفحة القائمة للريفريش
+    if (result == true) {
+      cubit.loadReports();
+    }
   }
 
   void _approveReport(BuildContext context) {

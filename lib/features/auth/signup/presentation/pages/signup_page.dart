@@ -199,8 +199,9 @@ class _SignupPageState extends State<SignupPage> {
     BuildContext context,
     SignupState state,
   ) {
-    if (_isDisposed)
+    if (_isDisposed) {
       return; // Don't handle state if disposed
+    }
 
     if (state is SignupError ||
         state is SignupFailure) {
@@ -636,16 +637,18 @@ class _SignupPageState extends State<SignupPage> {
         bestPassword = p;
       }
     }
-    if (bestPassword.isNotEmpty)
+    if (bestPassword.isNotEmpty) {
       merged['password'] = bestPassword;
+    }
 
     return merged;
   }
 
   bool _canProceedToNext() {
     // Prevent navigation if currently processing
-    if (_isSubmitting || _isCheckingVerification)
+    if (_isSubmitting || _isCheckingVerification) {
       return false;
+    }
 
     switch (_currentStep) {
       case 0: // Username and Password step
@@ -1036,7 +1039,7 @@ class _SignupPageState extends State<SignupPage> {
       'username':
           username, // Use username from form (email or phone)
       'phone': _userData['phone'],
-      'userType': _selectedUserType?.name,
+      'userType': _selectedUserType.name,
       'governorate': _selectedGovernorate?.name,
       'city': _selectedCity?.name,
       'address': _userData['address'],
