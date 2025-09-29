@@ -1,609 +1,434 @@
-# نترو - تطبيق الأمن والحماية المجتمعي
+<div align="center">
+  <img src="assets/screens-app/mainLogo.svg" alt="Netru Logo" width="200"/>
+
+# Netru - نترو
+
+### تطبيق الأمان والخدمات الذكية للمواطنين المصريين
+
+تطبيق متكامل يوفر خدمات الأمان والحماية مع مساعد ذكي قانوني، خرائط الجريمة التفاعلية، ونظام التبليغ الإلكتروني للمواطنين المصريين البالغين (18 سنة فأكثر).
+
+![Flutter Version](https://img.shields.io/badge/Flutter-3.7.2-02569B?logo=flutter)
+![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS-green)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Language](https://img.shields.io/badge/Language-Arabic%20|%20English-orange)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [About](#about)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Technologies](#technologies)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## 🎯 About
+
+**Netru** هو تطبيق Flutter متطور مصمم خصيصاً للمواطنين المصريين، يهدف إلى توفير منصة شاملة للأمان والخدمات الذكية. يتضمن التطبيق مجموعة متنوعة من الميزات المتقدمة مثل المساعد الذكي القانوني، خرائط الجريمة التفاعلية، ونظام التبليغ الإلكتروني.
+
+### 🇪🇬 للمواطنين المصريين
+
+التطبيق مُحسّن خصيصاً للبيئة المصرية ويستهدف المواطنين البالغين (18 سنة فأكثر) مع دعم كامل للغة العربية والقوانين المصرية.
+
+---
+
+## ✨ Features
+
+### 🤖 المساعد الذكي القانوني
+
+- **سوبيك**: مساعد ذكي متخصص في القوانين المصرية
+- دعم المحادثات المتعددة مع حفظ تاريخ الجلسات
+- إجابات فورية على الاستفسارات القانونية
+- واجهة محادثة سهلة ومتطورة
+
+### 🗺️ خرائط الجريمة التفاعلية
+
+- **Heat Map متطورة** لعرض بيانات الجريمة في الوقت الفعلي
+- تحديد المناطق الآمنة والخطرة
+- إحصائيات تفصيلية حسب المنطقة والنوع
+- تكامل مع خدمات الموقع GPS
+
+### 📝 نظام التبليغ الإلكتروني
+
+- إنشاء التقارير الإلكترونية بسهولة
+- دعم رفع المستندات والصور
+- تتبع حالة التقارير في الوقت الفعلي
+- إنتاج ملفات PDF احترافية
+
+### 🔐 نظام المصادقة المتطور
+
+- تسجيل دخول آمن مع Supabase
+- استخراج بيانات الهوية المصرية تلقائياً
+- حماية البيانات الشخصية
+
+### 📱 واجهة مستخدم متطورة
+
+- دعم الوضع المظلم والفاتح
+- واجهة responsive مع Screen Util
+- خطوط عربية أنيقة (Almarai، Tajawal)
+- رسوم متحركة سلسة مع Flutter Animate
+
+### 🔔 نظام الإشعارات الذكي
+
+- إشعارات Firebase Cloud Messaging
+- إشعارات محلية مخصصة
+- تنبيهات أمنية في الوقت الفعلي
+
+### 👨‍💼 لوحة تحكم إدارية
+
+- إدارة المستخدمين والتقارير
+- إحصائيات شاملة
+- نظام إشعارات المدراء
+
+### 📊 ميزات إضافية
+
+- **إدارة القضايا**: متابعة القضايا القانونية
+- **الأخبار والتحديثات**: آخر الأخبار الأمنية
+- **الخرائط التفاعلية**: Flutter Map مع خدمات الموقع
+- **ضغط الصور**: تحسين أداء التطبيق
+- **المسح الضوئي للوثائق**: استخراج البيانات من المستندات
+
+---
+
+## 📱 Screenshots
+
+### 🔐 Authentication Screens
 
 <div align="center">
-  <img src="assets/images/mainLogo.png" alt="نترو Logo" width="200"/>
-  
-  **من أجل أمن وأمان مصر**
-  
-  [![Flutter](https://img.shields.io/badge/Flutter-3.35.1-blue.svg)](https://flutter.dev/)
-  [![Platform](https://img.shields.io/b# NetRu App - Clean Architecture Flutter Application
+  <img src="assets/screens-app/auth-one.png" alt="تسجيل دخول" width="250"/>
+  <img src="assets/screens-app/auth-two.png" alt="إنشاء حساب" width="250"/>
+</div>
 
-A comprehensive Flutter application built with Clean Architecture principles, featuring BLoC/Cubit state management, Supabase integration, advanced permission handling, and notification system.
+### 🏠 Home & Main Features
 
-## 🏗️ Architecture Overview
+<div align="center">
+  <img src="assets/screens-app/home.png" alt="الشاشة الرئيسية" width="250"/>
+  <img src="assets/screens-app/settings.png" alt="الإعدادات" width="250"/>
+</div>
 
-This project follows **Clean Architecture** principles with clear separation of concerns:
+### 🤖 AI Chatbot & Legal Assistant
 
-### 📁 Project Structure
+<div align="center">
+  <img src="assets/screens-app/ai-chat-bot.png" alt="المساعد الذكي" width="250"/>
+</div>
+
+### 🗺️ Crime Heat Map
+
+<div align="center">
+  <img src="assets/screens-app/crime-heatmap.png" alt="خريطة الجريمة" width="250"/>
+</div>
+
+### 📝 Reports System
+
+<div align="center">
+  <img src="assets/screens-app/create-report.png" alt="إنشاء تقرير" width="250"/>
+  <img src="assets/screens-app/report.png" alt="عرض التقرير" width="250"/>
+</div>
+
+---
+
+## 🛠️ Technologies
+
+### Core
+
+- **Flutter** 3.7.2
+- **Dart** SDK
+- **Clean Architecture** Pattern
+
+### State Management
+
+- **Flutter Bloc** 8.1.4 (BLoC Pattern)
+- **Equatable** 2.0.7 (Value Equality)
+
+### Backend & Database
+
+- **Supabase Flutter** 2.8.1 (Backend as a Service)
+- **Firebase Core** 3.13.0
+- **Firebase Messaging** 15.2.5 (Push Notifications)
+
+### Key Packages
+
+| Package                         | Version | Purpose                           |
+| ------------------------------- | ------- | --------------------------------- |
+| **flutter_bloc**                | ^8.1.4  | State Management (BLoC Pattern)   |
+| **supabase_flutter**            | ^2.8.1  | Backend Database & Authentication |
+| **dio**                         | ^5.9.0  | HTTP Client for API Calls         |
+| **cached_network_image**        | ^3.4.1  | Image Caching & Loading           |
+| **flutter_screenutil**          | ^5.9.3  | Responsive UI Design              |
+| **google_fonts**                | ^6.3.0  | Typography & Font Loading         |
+| **google_sign_in**              | ^6.2.1  | Google Authentication             |
+| **flutter_map**                 | ^8.2.1  | Interactive Maps                  |
+| **geolocator**                  | ^14.0.2 | GPS Location Services             |
+| **geocoding**                   | ^3.0.0  | Address ↔️ Coordinates             |
+| **image_picker**                | ^1.2.0  | Camera & Gallery Access           |
+| **cunning_document_scanner**    | ^1.3.1  | Document Scanning                 |
+| **flutter_local_notifications** | ^19.1.0 | Local Push Notifications          |
+| **shared_preferences**          | ^2.5.3  | Local Data Persistence            |
+| **lottie**                      | ^3.3.1  | Vector Animations                 |
+| **flutter_animate**             | ^4.5.2  | UI Animations                     |
+| **pin_code_fields**             | ^8.0.1  | OTP Input Fields                  |
+| **country_picker**              | ^2.0.24 | Country Code Selection            |
+| **pdf**                         | ^3.10.1 | PDF Generation                    |
+| **fl_chart**                    | ^0.64.0 | Charts & Data Visualization       |
+| **get_it**                      | ^8.2.0  | Dependency Injection              |
+| **dartz**                       | ^0.10.1 | Functional Programming            |
+| **logger**                      | ^2.4.0  | Advanced Logging                  |
+
+### Development Tools
+
+- **flutter_lints** ^3.0.0 (Code Analysis)
+- **build_runner** ^2.4.10 (Code Generation)
+- **bloc_test** ^9.1.5 (BLoC Testing)
+
+---
+
+## 📁 Project Structure
 
 ```
 lib/
-├── core/                          # Core functionality
-│   ├── constants/                 # App constants
-│   ├── data/                      # Data layer implementation
-│   │   ├── datasources/          # External data sources
-│   │   ├── models/               # Data models (DTOs)
-│   │   └── repositories/         # Repository implementations
-│   ├── domain/                    # Business logic layer
-│   │   ├── entities/             # Business entities
-│   │   ├── repositories/         # Repository contracts
-│   │   └── usecases/             # Business use cases
-│   ├── cubit/                     # State management
-│   │   ├── permission/           # Permission management
-│   │   ├── theme/                # Theme management
-│   │   └── locale/               # Localization
-│   ├── di/                        # Dependency injection
-│   ├── errors/                    # Error handling
-│   ├── services/                  # Core services
-│   ├── utils/                     # Utilities
-│   └── widgets/                   # Reusable widgets
-├── features/                      # Feature modules
-│   ├── home/                     # Home feature
-│   ├── splash/                   # Splash screen
-│   └── reports/                  # Reports feature
-├── app.dart                      # App widget
-└── main.dart                     # Entry point
+├── 📁 core/                    # Core functionality
+│   ├── 📁 constants/          # App constants
+│   ├── 📁 cubit/             # Global state management
+│   │   ├── locale/           # Localization cubit
+│   │   └── theme/            # Theme cubit
+│   ├── 📁 di/                # Dependency injection
+│   ├── 📁 domain/            # Core domain entities
+│   ├── 📁 errors/            # Error handling
+│   ├── 📁 extensions/        # Dart extensions
+│   ├── 📁 helper/            # Helper utilities
+│   ├── 📁 network/           # Network handling
+│   ├── 📁 routing/           # App routing
+│   ├── 📁 services/          # Core services
+│   ├── 📁 theme/             # App theming
+│   ├── 📁 utils/             # Utilities & helpers
+│   └── 📁 widgets/           # Reusable widgets
+├── 📁 features/               # Feature modules
+│   ├── 📁 admin/             # Admin dashboard
+│   ├── 📁 auth/              # Authentication
+│   ├── 📁 cases/             # Legal cases
+│   ├── 📁 chatbot/           # AI Legal Assistant
+│   ├── 📁 heatmap/           # Crime heat maps
+│   ├── 📁 home/              # Home screen
+│   ├── 📁 news/              # News & updates
+│   ├── 📁 notifications/     # Notifications
+│   ├── 📁 onboarding/        # App introduction
+│   ├── 📁 profile/           # User profile
+│   ├── 📁 reports/           # Electronic reporting
+│   ├── 📁 settings/          # App settings
+│   └── 📁 splash/            # Splash screen
+├── 📁 shared/                 # Shared components
+├── app.dart                   # App configuration
+├── app_bloc_observer.dart     # BLoC observer
+├── firebase_options.dart      # Firebase config
+└── main.dart                 # App entry point
 ```
 
-## 🔧 Clean Architecture Layers
+### 🏗️ Architecture Pattern
 
-### 1. **Domain Layer** (Business Logic)
-- **Entities**: Core business objects (`User`, `Permission`, `NotificationPayload`)
-- **Repositories**: Abstract contracts for data operations
-- **Use Cases**: Business rules and application logic
+يستخدم المشروع **Clean Architecture** مع **BLoC Pattern** للحصول على:
 
-### 2. **Data Layer** (External Concerns)
-- **Data Sources**: External APIs, local storage, etc.
-- **Models**: Data Transfer Objects (DTOs)
-- **Repository Implementations**: Concrete repository implementations
+- فصل واضح بين الطبقات
+- سهولة الاختبار والصيانة
+- قابلية إعادة الاستخدام
+- إدارة حالة متقدمة
 
-### 3. **Presentation Layer** (UI)
-- **Cubits/Blocs**: State management using BLoC pattern
-- **Widgets**: UI components and screens
-
-## ⚡ Features Implemented
-
-### 🔐 Permission Management System
-
-Complete permission handling with Clean Architecture:
-
-```dart
-// Domain entities
-PermissionType.location
-PermissionType.camera
-PermissionType.storage
-PermissionType.notification
-
-// Use cases
-CheckPermissionUseCase
-RequestPermissionUseCase
-RequestMultiplePermissionsUseCase
-OpenAppSettingsUseCase
-
-// Cubit states
-PermissionInitial
-PermissionLoading
-PermissionGranted(permission)
-PermissionDenied(permission)
-PermissionError(message)
-```
-
-#### Usage Example:
-```dart
-// Request essential permissions
-await permissionCubit.requestEssentialPermissions();
-
-// Request specific permission
-await permissionCubit.requestCameraPermission();
-
-// Check permission status
-await permissionCubit.checkPermission(PermissionType.location);
-```
-
-### 📦 Supabase Integration (Ready for Implementation)
-
-Complete setup for Supabase services:
-
-#### Authentication:
-- Email/password authentication
-- Social logins (Google, Apple)
-- Session management
-- Password reset
-
-#### Database:
-- CRUD operations with PostgreSQL
-- Real-time subscriptions
-- Type-safe queries
-
-#### Storage:
-- File upload/download
-- Image and video handling
-- Secure URL generation
-
-### 🔔 Push Notifications (Firebase + Supabase Ready)
-
-Comprehensive notification system:
-- Local notifications
-- Push notifications via FCM
-- Background message handling
-- Notification scheduling
-
-### 📊 Logging System
-
-Centralized logging with multiple levels:
-
-```dart
-final logger = LoggerService();
-
-// Different log levels
-logger.logInfo('Information message');
-logger.logError('Error occurred', error, stackTrace);
-logger.logWarning('Warning message');
-
-// Specific event logging
-logger.logApiRequest('GET', '/users', data);
-logger.logPermissionGranted('Camera');
-logger.logAuthEvent('Sign in successful');
-```
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK (3.7.2+)
-- Dart SDK
-- Android Studio / VS Code
-- Firebase account (for notifications)
-- Supabase account (for backend services)
 
-### Installation
+- **Flutter SDK** (3.7.2 أو أحدث)
+- **Dart SDK**
+- **Android Studio** / **Xcode**
+- **Git**
+- حساب **Firebase** (للإشعارات)
+- حساب **Supabase** (للقاعدة البيانات)
 
-1. **Clone the repository:**
-```bash
-git clone [repository-url]
-cd netru_app
-```
+### 🔧 Firebase Setup
 
-2. **Install dependencies:**
-```bash
-flutter pub get
-```
+1. إنشاء مشروع Firebase جديد
+2. تفعيل Firebase Authentication
+3. تفعيل Firebase Cloud Messaging
+4. تحميل ملفات التكوين:
+   - `android/app/google-services.json`
+   - `ios/Runner/GoogleService-Info.plist`
 
-3. **Configure Firebase:**
-   - Add `google-services.json` (Android)
-   - Add `GoogleService-Info.plist` (iOS)
+### 🔧 Supabase Setup
 
-4. **Configure Supabase:**
-   - Update Supabase URL and keys in the service locator
-   - Set up database tables
-   - Configure storage buckets
-
-5. **Run the app:**
-```bash
-flutter run
-```
-
-## 🛠️ Dependency Injection
-
-Using GetIt for clean dependency injection:
-
-```dart
-// Service registration
-sl.registerLazySingleton<LoggerService>(() => LoggerService()..init());
-sl.registerLazySingleton<PermissionRepository>(() => PermissionRepositoryImpl(dataSource: sl()));
-
-// Use case registration
-sl.registerLazySingleton(() => RequestPermissionUseCase(sl()));
-
-// Cubit registration
-sl.registerFactory(() => PermissionCubit(
-  checkPermissionUseCase: sl(),
-  requestPermissionUseCase: sl(),
-  // ... other dependencies
-));
-```
-
-## 📝 State Management with BLoC/Cubit
-
-Clean state management following BLoC patterns:
-
-### Permission Cubit Example:
-```dart
-class PermissionCubit extends Cubit<PermissionState> {
-  final RequestPermissionUseCase _requestPermissionUseCase;
-  
-  PermissionCubit({required RequestPermissionUseCase requestPermissionUseCase})
-    : _requestPermissionUseCase = requestPermissionUseCase,
-      super(PermissionInitial());
-
-  Future<void> requestPermission(PermissionType type) async {
-    emit(PermissionLoading());
-    
-    final result = await _requestPermissionUseCase(type);
-    result.fold(
-      (failure) => emit(PermissionError(failure.message)),
-      (permission) => permission.isGranted 
-        ? emit(PermissionGranted(permission))
-        : emit(PermissionDenied(permission)),
-    );
-  }
-}
-```
-
-## 🔧 Configuration
-
-### 1. Supabase Configuration
-
-Update in `lib/core/di/service_locator.dart`:
-```dart
-await Supabase.initialize(
-  url: 'YOUR_SUPABASE_URL',
-  anonKey: 'YOUR_SUPABASE_ANON_KEY',
-);
-```
-
-### 2. Firebase Configuration
-
-Add Firebase configuration files and initialize in main.dart:
-```dart
-await Firebase.initializeApp();
-```
-
-### 3. Permissions (Android)
-
-Add to `android/app/src/main/AndroidManifest.xml`:
-```xml
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-```
-
-### 4. Permissions (iOS)
-
-Add to `ios/Runner/Info.plist`:
-```xml
-<key>NSCameraUsageDescription</key>
-<string>This app needs camera access for photo capture</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>This app needs location access for location-based features</string>
-```
-
-## 🧪 Testing
-
-The project is set up for comprehensive testing:
-
-- **Unit Tests**: Business logic and use cases
-- **Widget Tests**: UI components
-- **Integration Tests**: End-to-end functionality
-
-Run tests:
-```bash
-flutter test
-```
-
-## 📈 Performance Considerations
-
-- **Lazy Loading**: Dependencies are registered as lazy singletons
-- **Memory Management**: Proper disposal of streams and controllers
-- **Efficient State Management**: Minimal rebuilds with BLoC
-- **Background Processing**: Non-blocking permission requests
-
-## 🔄 Future Enhancements
-
-### Ready for Implementation:
-1. **Complete Supabase Integration**: Database operations, storage, real-time
-2. **Push Notifications**: Firebase messaging integration
-3. **Offline Support**: Local caching and sync
-4. **Social Authentication**: Google, Apple, Facebook logins
-5. **Advanced Analytics**: User behavior tracking
-6. **Biometric Authentication**: Fingerprint and face recognition
-
-## 🤝 Contributing
-
-1. Follow Clean Architecture principles
-2. Write comprehensive tests
-3. Document your code
-4. Use conventional commits
-5. Ensure code quality with linting
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Ayman** - Flutter Expert specializing in Clean Architecture and enterprise-level mobile applications.
+1. إنشاء مشروع Supabase جديد
+2. الحصول على Project URL و Anon Key
+3. إعداد قاعدة البيانات والجداول المطلوبة
 
 ---
 
-**Note**: This application demonstrates professional Flutter development practices with Clean Architecture, comprehensive error handling, logging, and production-ready patterns. The architecture is designed to be scalable, maintainable, and testable.e/Platform-iOS%20%7C%20Android-lightgrey.svg)](https://flutter.dev/)
-  [![License](https://img.shields.io/badge/License-Private-red.svg)](#)
-</div>
+## 💻 Installation
 
-## نظرة عامة
-
-تطبيق **نترو** هو تطبيق أمني متطور يهدف إلى تعزيز الأمن المجتمعي من خلال ربط المواطنين بوزارة الداخلية المصرية. يوفر التطبيق منصة سهلة وآمنة للإبلاغ عن الحوادث الأمنية، متابعة القضايا الأمنية، وتلقي التنبيهات المهمة.
-
-## الميزات الرئيسية
-
-### 🚨 نظام الإبلاغات المتقدم
-
-- إرسال بلاغات فورية للجهات الأمنية
-- تتبع حالة البلاغات المرسلة
-- نظام تصنيف متنوع للحوادث
-
-### 🗺️ خريطة الجرائم التفاعلية
-
-- عرض الأنشطة الإجرامية على الخريطة
-- مناطق الخطر والتحذيرات الأمنية
-- إحصائيات مفصلة حسب المنطقة
-
-### 📊 إحصائيات وتحليلات
-
-- إحصائيات الجرائم والحوادث
-- معدلات الأمان في المناطق المختلفة
-- تقارير دورية عن الوضع الأمني
-
-### 🔔 نظام التنبيهات الذكي
-
-- تنبيهات فورية للحوادث القريبة
-- إشعارات حالة البلاغات
-- تحذيرات أمنية مهمة
-
-### 👤 إدارة الحساب الشخصي
-
-- ملف شخصي آمن
-- سجل البلاغات السابقة
-- إعدادات الخصوصية والأمان
-
-## لقطات الشاشة
-
-### الشاشة الرئيسية
-
-<img src="assets/screens-app/home.jpg" alt="الشاشة الرئيسية" width="300"/>
-
-تعرض الشاشة الرئيسية أهم الأخبار الأمنية وإحصائيات سريعة حول الوضع الأمني.
-
-### نظام التنبيهات
-
-<img src="assets/screens-app/alerts.jpg" alt="التنبيهات" width="300"/>
-
-نظام تنبيهات شامل يشمل:
-
-- تنبيهات المناطق عالية الخطورة
-- حل البلاغات المرسلة
-- تنبيهات أمنية قريبة من الموقع
-
-### جهود الأجهزة الأمنية
-
-<img src="assets/screens-app/details.jpg" alt="جهود الأجهزة الأمنية" width="300"/>
-
-متابعة عمليات الأجهزة الأمنية ونتائجها في محافظة شمال سيناء.
-
-### خريطة الجرائم
-
-<img src="assets/screens-app/heat-map.jpg" alt="خريطة الجرائم" width="300"/>
-
-خريطة تفاعلية تعرض:
-
-- النشاط الأخير للنقاط الساخنة
-- مناطق الجرائم المختلفة بألوان متدرجة
-- إحصائيات الحوادث حسب الموقع
-
-### مساعد الذكي الاصطناعي
-
-<img src="assets/screens-app/ai-assistant.jpg" alt="الشاشة الرئيسية المحسنة" width="300"/>
-
-
-### شاشة تسجيل الدخول
-
-<img src="assets/screens-app/login.jpg" alt="تسجيل الدخول" width="300"/>
-
-نظام تسجيل دخول آمن يتضمن:
-
-- الرقم القومي
-- الرقم السري مع خيار إظهار/إخفاء
-- خيار "تذكرني"
-
-### إعدادات الحساب
-
-<img src="assets/screens-app/profile.jpg" alt="الإعدادات" width="300"/>
-
-لوحة إعدادات شاملة تتضمن:
-
-- معلومات الحساب الشخصي
-- تفاصيل شخصية
-- تغيير كلمة المرور
-- تفعيل/إلغاء التحقق
-- خيارات اللغة (العربية/English)
-
-### تفاصيل البلاغ
-
-<img src="assets/screens-app/report-details.jpg" alt="تفاصيل البلاغ" width="300"/>
-
-صفحة مفصلة لتقديم البلاغات تشمل:
-
-- معلومات المبلغ الشخصية
-- معلومات البلاغ التفصيلية
-- إرفاق الوسائط (صور/فيديو)
-- الإجراءات المتاحة
-
-### تقديم بلاغ
-
-<img src="assets/screens-app/report-form.jpg" alt="تقديم بلاغ" width="300"/>
-
-نموذج شامل لتقديم البلاغات يتضمن:
-
-- معلومات شخصية
-- نوع البلاغ (قائمة منسدلة متنوعة)
-- تفاصيل البلاغ
-- الموقع الجغرافي
-- إرفاق الملفات
-
-### حالة البلاغات
-
-<img src="assets/screens-app/report-stutas.jpg" alt="حالة البلاغات" width="300"/>
-
-متابعة شاملة لجميع البلاغات المرسلة مع حالات مختلفة:
-
-- قيد المراجعة (رمادي)
-- قيد التحقيق للوحدات المعنية (برتقالي)
-- تم الحل (أخضر)
-- مغلق نهائياً (أحمر)
-
-### إنشاء حساب جديد
-
-<img src="assets/screens-app/sign-up.jpg" alt="إنشاء حساب" width="300"/>
-
-صفحة تسجيل مستخدم جديد تتطلب:
-
-- الاسم الأول والأخير
-- الرقم القومي
-- رقم المصنع
-- رقم الهاتف
-- الرقم السري وتأكيده
-
-### شاشة البداية
-
-<img src="assets/screens-app/splash.jpg" alt="شاشة البداية" width="300"/>
-
-شاشة ترحيب تعرض شعار "نترو" مع الشعار الوطني "من أجل أمن وأمان مصر".
-
-## المتطلبات التقنية
-
-### Flutter SDK
-
-```
-Flutter 3.35.1
-```
-
-### المنصات المدعومة
-
-- 📱 iOS 11.0+
-- 🤖 Android API 21+
-
-### الأذونات المطلوبة
-
-#### Android
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-```
-
-#### iOS
-
-```xml
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>يحتاج التطبيق للوصول لموقعك لتحديد موقع البلاغ</string>
-<key>NSCameraUsageDescription</key>
-<string>يحتاج التطبيق للكاميرا لتصوير الحوادث</string>
-```
-
-## التثبيت والتشغيل
-
-### المتطلبات الأساسية
-
-تأكد من تثبيت:
-
-- [Flutter SDK](https://flutter.dev/docs/get-started/install)
-- [Android Studio](https://developer.android.com/studio) أو [VS Code](https://code.visualstudio.com/)
-- [Xcode](https://developer.apple.com/xcode/) (للتطوير على iOS)
-
-### خطوات التشغيل
-
-1. **استنساخ المشروع**
+### 1. Clone المستودع
 
 ```bash
-git clone [repository-url]
-cd netro_app
+git clone https://github.com/CorbitsTeam/netru_app.git
+cd netru_app
 ```
 
-2. **تثبيت التبعيات**
+### 2. تثبيت التبعيات
 
 ```bash
 flutter pub get
 ```
 
-3. **تشغيل أكواد البناء**
+### 3. إعداد ملفات التكوين
 
 ```bash
+# تكوين Firebase
 flutter packages pub run build_runner build
+
+# إنشاء أيقونة التطبيق
+flutter packages pub run flutter_launcher_icons:main
 ```
 
-4. **تشغيل التطبيق**
+### 4. تشغيل التطبيق
 
 ```bash
+# للأندرويد
+flutter run
+
+# للـ iOS
 flutter run
 ```
 
-### بناء التطبيق للإنتاج
+---
 
-#### Android (APK)
+## 🎮 Usage
+
+### 🔐 بدء الاستخدام
+
+1. **التسجيل**: إنشاء حساب جديد أو تسجيل دخول
+2. **إعداد البيانات**: إضافة بيانات الهوية المصرية
+3. **الاستكشاف**: تصفح الميزات المختلفة
+
+### 🤖 استخدام المساعد الذكي
+
+- انتقل إلى صفحة "المساعد الذكي"
+- ابدأ محادثة جديدة
+- اسأل عن القوانين المصرية أو استفسارات عامة
+
+### 🗺️ استخدام خريطة الجريمة
+
+- السماح بالوصول للموقع
+- عرض الإحصائيات حسب المنطقة
+- تصفح البيانات التفاعلية
+
+### 📝 إنشاء تقرير
+
+- الانتقال إلى صفحة "إنشاء تقرير"
+- ملء البيانات المطلوبة
+- رفع المستندات (اختياري)
+- إرسال التقرير
+
+---
+
+## 🤝 Contributing
+
+نرحب بالمساهمات من المطورين! للمساهمة:
+
+### 1. Fork المشروع
 
 ```bash
-flutter build apk --release
+git fork https://github.com/CorbitsTeam/netru_app.git
 ```
 
-#### Android (App Bundle)
+### 2. إنشاء branch جديد
 
 ```bash
-flutter build appbundle --release
+git checkout -b feature/new-feature
 ```
 
-#### iOS
+### 3. Commit التغييرات
 
 ```bash
-flutter build ios --release
+git commit -m "Add some feature"
 ```
 
-## التبعيات الرئيسية
+### 4. Push للـ branch
 
-| Package                | الإصدار | الوصف                       |
-| ---------------------- | ------- | --------------------------- |
-| `flutter_bloc`         | latest  | إدارة الحالة                |
-| `dio`                  | ^5.9.0  | HTTP Client                 |
-| `geolocator`           | ^14.0.2 | خدمات الموقع                |
-| `flutter_map`          | ^8.2.1  | عرض الخرائط                 |
-| `cached_network_image` | ^3.4.1  | تحميل وحفظ الصور            |
-| `shared_preferences`   | ^2.5.3  | التخزين المحلي              |
-| `permission_handler`   | ^12.0.1 | إدارة الأذونات              |
-| `easy_localization`    | ^3.0.8  | الترجمة والدعم متعدد اللغات |
-| `flutter_screenutil`   | ^5.9.3  | التصميم المتجاوب            |
-| `google_fonts`         | ^6.3.0  | الخطوط المخصصة              |
-| `lottie`               | ^3.3.1  | الرسوم المتحركة             |
-| `animate_do`           | ^4.2.0  | تأثيرات الحركة              |
+```bash
+git push origin feature/new-feature
+```
 
-## الأمان والخصوصية
+### 5. إنشاء Pull Request
 
-- 🔐 تشفير شامل لجميع البيانات المرسلة
-- 🛡️ التحقق الثنائي من الهوية
-- 📱 حماية البيانات الشخصية وفقاً لقوانين حماية البيانات
-- 🔒 تخزين آمن للمعلومات الحساسة
+### 📋 Guidelines
 
-## الدعم والمساعدة
+- اتباع Clean Architecture
+- كتابة tests للمكونات الجديدة
+- استخدام التعليقات باللغة العربية
+- اتباع Flutter/Dart style guide
 
-للحصول على المساعدة أو الإبلاغ عن المشاكل:
+---
 
-- 📧 البريد الإلكتروني: support@netro-app.gov.eg
-- 📞 الخط الساخن: 19696
-- 🌐 الموقع الرسمي: [www.netro-app.gov.eg]
+## 📄 License
 
-## ملاحظات مهمة
+هذا المشروع مرخص تحت رخصة MIT - راجع ملف [LICENSE](LICENSE) للتفاصيل.
 
-- هذا التطبيق مخصص للاستخدام داخل جمهورية مصر العربية فقط
-- يجب التحقق من صحة البيانات المدخلة قبل الإرسال
-- في حالة الطوارئ، يُنصح بالاتصال المباشر بالأرقام المخصصة للطوارئ
+```
+MIT License
+
+Copyright (c) 2024 Netru App
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 📞 Contact & Support
+
+- **البريد الإلكتروني**: corbitsteam@gmail.com
+- **Documentation**: [التوثيق الكامل](https://netru-eg.blogspot.com/)
+
+---
+
+## 🙏 Acknowledgments
+
+شكر خاص لـ:
+
+- **Flutter Team** لإطار العمل الرائع
+- **Supabase** لخدمات Backend المتميزة
+- **Firebase** لخدمات الإشعارات
+- **جميع المطورين** الذين ساهموا في المكتبات المستخدمة
+- **المجتمع المصري** لدعم مشاريع التكنولوجيا المحلية
 
 ---
 
 <div align="center">
-  
-**تم التطوير بواسطة فريق كوربتس**
+  <p>صنع بـ ❤️ في مصر للمواطنين المصريين</p>
+  <p>Made with ❤️ in Egypt for Egyptian Citizens</p>
 
-_من أجل أمن وأمان مصر_ 🇪🇬
+**Netru - نترو | أمانك معنا**
 
 </div>
