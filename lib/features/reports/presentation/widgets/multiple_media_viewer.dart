@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netru_app/core/theme/app_colors.dart';
 import 'package:share_plus/share_plus.dart';
+import 'video_player_widget.dart';
 
 class MultipleMediaViewer extends StatelessWidget {
   final List<Map<String, String>>
@@ -183,7 +184,11 @@ class MultipleMediaViewer extends StatelessWidget {
                       (context, error, stackTrace) => _buildMediaError(),
                 )
               else
-                _buildVideoThumbnail(media['url']!),
+                VideoPlayerWidget(
+                  videoUrl: media['url']!,
+                  autoPlay: false,
+                  showControls: true,
+                ),
 
               // Media type indicator
               Positioned(
@@ -237,7 +242,10 @@ class MultipleMediaViewer extends StatelessWidget {
                       (context, error, stackTrace) => _buildMediaError(),
                 )
               else
-                _buildVideoThumbnail(media['url']!),
+                VideoThumbnailWidget(
+                  videoUrl: media['url']!,
+                  onTap: () => _openFullScreenViewer(context, index),
+                ),
 
               // Media type indicator
               Positioned(
@@ -358,42 +366,6 @@ class MultipleMediaViewer extends StatelessWidget {
               ),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVideoThumbnail(String videoUrl) {
-    return Container(
-      color: Colors.black,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Video placeholder or actual thumbnail
-          Container(
-            color: Colors.grey[800],
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.play_circle_fill,
-                    size: 48.sp,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'فيديو',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -734,27 +706,13 @@ class _FullScreenMediaGalleryState extends State<_FullScreenMediaGallery> {
                   ),
                 );
               } else {
-                // Video placeholder - would need video player package
+                // Video player for full screen
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.play_circle_fill,
-                        size: 80.sp,
-                        color: Colors.white,
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        'فيديو',
-                        style: TextStyle(color: Colors.white, fontSize: 18.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      ElevatedButton(
-                        onPressed: () => _openExternalPlayer(media['url']!),
-                        child: const Text('تشغيل'),
-                      ),
-                    ],
+                  child: VideoPlayerWidget(
+                    videoUrl: media['url']!,
+                    autoPlay: false,
+                    showControls: true,
+                    isFullScreen: true,
                   ),
                 );
               }
@@ -798,10 +756,5 @@ class _FullScreenMediaGalleryState extends State<_FullScreenMediaGallery> {
     } catch (e) {
       debugPrint('Error sharing media: $e');
     }
-  }
-
-  void _openExternalPlayer(String videoUrl) async {
-    // Would implement video player or external app opening
-    debugPrint('Opening video: $videoUrl');
   }
 }

@@ -65,7 +65,7 @@ dependencies:
   open_file: ^3.5.10
   fl_chart: ^0.64.0
   video_player: ^2.10.0
-  chewie: null
+  chewie: ^1.8.5
 dev_dependencies:
   bloc_test: ^9.1.5
   build_runner: ^2.4.10

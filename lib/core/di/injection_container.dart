@@ -617,7 +617,6 @@ Future<void> _initAdminDependencies() async {
 
   sl.registerFactory(
     () => AdminNotificationsCubit(
-      sl<SendBulkNotification>(),
       sl<GetAllNotifications>(),
       sl<CreateNotification>(),
       sl<GetNotificationStats>(),

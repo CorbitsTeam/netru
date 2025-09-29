@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netru_app/core/utils/user_data_helper.dart';
+import 'package:netru_app/features/admin/presentation/pages/simple_admin_notifications_page.dart';
 import '../../features/auth/email_verification/presentation/pages/email_verification_page.dart';
 import '../../features/auth/profile_completion/presentation/pages/complete_profile_page.dart';
 import '../../features/auth/signup/presentation/pages/signup_page.dart';
@@ -17,7 +18,6 @@ import '../../features/admin/presentation/pages/mobile_admin_dashboard_page.dart
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_report_details_page.dart';
 import '../../features/admin/presentation/pages/admin_users_page.dart';
-import '../../features/admin/presentation/pages/enhanced_admin_notifications_page.dart';
 import '../../features/admin/presentation/pages/admin_auth_manager_page.dart';
 import '../../features/admin/domain/entities/admin_report_entity.dart';
 import '../../features/admin/presentation/cubit/admin_dashboard_cubit.dart';
@@ -177,7 +177,7 @@ class AppRouter {
         return _createRoute(
           BlocProvider<AdminNotificationsCubit>(
             create: (context) => sl<AdminNotificationsCubit>(),
-            child: const AdminNotificationsPage(),
+            child: const SimpleAdminNotificationsPage(),
           ),
         );
       case Routes.adminAuthManager:

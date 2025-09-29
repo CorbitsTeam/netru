@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 // 'dartz' not required directly in this file; remove unused import
 
 import '../../domain/entities/admin_notification_entity.dart';
@@ -11,7 +12,6 @@ import '../../../../core/usecases/usecase.dart';
 part 'admin_notifications_state.dart';
 
 class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
-  final SendBulkNotification _sendBulkNotification;
   final GetAllNotifications _getAllNotifications;
   final CreateNotification _createNotification;
   final GetNotificationStats _getNotificationStats;
@@ -23,7 +23,6 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
   StreamSubscription? _statisticsSubscription;
 
   AdminNotificationsCubit(
-    this._sendBulkNotification,
     this._getAllNotifications,
     this._createNotification,
     this._getNotificationStats,
@@ -36,7 +35,137 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
     if (!isClosed) emit(state);
   }
 
-  /// Load all notifications with optional filters
+  /// Load all notifications from database with real-time updates
+  Future<void> loadNotificationsFromDatabase({
+    int page = 1,
+    int limit = 50,
+    bool refresh = false,
+  }) async {
+    try {
+      if (refresh || state is! AdminNotificationsLoaded) {
+        _safeEmit(const AdminNotificationsLoading());
+      }
+
+      // Get notifications directly from Supabase
+      final response = await Supabase.instance.client
+          .from('notifications')
+          .select('''
+            id, user_id, title, body, notification_type, 
+            is_sent, is_read, priority, created_at, read_at, sent_at,
+            users!notifications_user_id_fkey(full_name)
+          ''')
+          .order('created_at', ascending: false)
+          .range((page - 1) * limit, page * limit - 1);
+
+      final notifications =
+          response
+              .map(
+                (item) => AdminNotificationEntity(
+                  id: item['id'],
+                  userId: item['user_id'],
+                  userName:
+                      item['users'] != null
+                          ? item['users']['full_name'] ?? 'مستخدم غير معروف'
+                          : 'مستخدم غير معروف',
+                  title: item['title'],
+                  body: item['body'],
+                  notificationType: _parseNotificationType(
+                    item['notification_type'],
+                  ),
+                  isRead: item['is_read'] ?? false,
+                  isSent: item['is_sent'] ?? false,
+                  priority: _parsePriority(item['priority']),
+                  createdAt: DateTime.parse(item['created_at']),
+                  readAt:
+                      item['read_at'] != null
+                          ? DateTime.parse(item['read_at'])
+                          : null,
+                  sentAt:
+                      item['sent_at'] != null
+                          ? DateTime.parse(item['sent_at'])
+                          : null,
+                ),
+              )
+              .toList();
+
+      // Get statistics
+      final statsResponse = await Supabase.instance.client
+          .from('notifications')
+          .select('notification_type, is_sent, is_read');
+
+      final stats = _calculateStatistics(statsResponse);
+
+      _safeEmit(
+        AdminNotificationsLoaded(
+          notifications: notifications,
+          scheduledNotifications: const [],
+          draftNotifications: const [],
+          statistics: stats,
+          governorates: const [],
+          currentPage: page,
+          hasMoreData: response.length == limit,
+          lastUpdateTime: DateTime.now(),
+        ),
+      );
+    } catch (e) {
+      _safeEmit(AdminNotificationsError(message: 'خطأ في تحميل الإشعارات: $e'));
+    }
+  }
+
+  NotificationType _parseNotificationType(String? type) {
+    switch (type) {
+      case 'news':
+        return NotificationType.news;
+      case 'report_update':
+        return NotificationType.reportUpdate;
+      case 'report_comment':
+        return NotificationType.reportComment;
+      case 'system':
+        return NotificationType.system;
+      default:
+        return NotificationType.general;
+    }
+  }
+
+  NotificationPriority _parsePriority(String? priority) {
+    switch (priority) {
+      case 'low':
+        return NotificationPriority.low;
+      case 'high':
+        return NotificationPriority.high;
+      case 'urgent':
+        return NotificationPriority.urgent;
+      default:
+        return NotificationPriority.normal;
+    }
+  }
+
+  Map<String, int> _calculateStatistics(List<dynamic> data) {
+    final stats = <String, int>{
+      'total': data.length,
+      'sent': 0,
+      'pending': 0,
+      'read': 0,
+      'unread': 0,
+    };
+
+    for (final item in data) {
+      if (item['is_sent'] == true) {
+        stats['sent'] = (stats['sent'] ?? 0) + 1;
+      } else {
+        stats['pending'] = (stats['pending'] ?? 0) + 1;
+      }
+
+      if (item['is_read'] == true) {
+        stats['read'] = (stats['read'] ?? 0) + 1;
+      } else {
+        stats['unread'] = (stats['unread'] ?? 0) + 1;
+      }
+    }
+
+    return stats;
+  }
+
   Future<void> loadNotifications({
     int page = 1,
     int limit = 20,
@@ -77,7 +206,9 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
                   .toList();
 
           // Load governorates list
-          final governoratesResult = await _getGovernoratesList(const NoParams());
+          final governoratesResult = await _getGovernoratesList(
+            const NoParams(),
+          );
           final governorates = governoratesResult.fold(
             (l) => <String>[],
             (r) => r,
@@ -107,48 +238,57 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
     }
   }
 
-  /// Send bulk notification to multiple recipients
+  /// Send bulk notification to multiple recipients using Edge Functions
+  Future<void> sendBulkNotificationToAll(BulkNotificationData data) async {
+    try {
+      _safeEmit(
+        const AdminNotificationsSending(
+          message: 'جاري إرسال الإشعار لجميع المستخدمين...',
+        ),
+      );
+
+      // Use Supabase Edge Function for bulk notifications
+      final response = await Supabase.instance.client.functions.invoke(
+        'admin-notifications',
+        queryParameters: {'action': 'send_bulk'},
+        body: {
+          'title': data.title,
+          'body': data.body,
+          'notification_type': data.type.value,
+          'target_type': 'all',
+          'target_value': null,
+          'priority': data.priority.value,
+          if (data.data != null) 'data': data.data,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        final sentCount = response.data['sent_count'] ?? 0;
+        _safeEmit(
+          AdminNotificationsSent(
+            message: 'تم إرسال الإشعار بنجاح',
+            recipientCount: sentCount,
+          ),
+        );
+
+        // Refresh notifications list
+        await loadNotificationsFromDatabase(refresh: true);
+      } else {
+        throw Exception(response.data['error'] ?? 'فشل في إرسال الإشعار');
+      }
+    } catch (e) {
+      _safeEmit(AdminNotificationsError(message: 'خطأ في إرسال الإشعار: $e'));
+    }
+  }
+
   Future<void> sendBulkNotification(BulkNotificationData data) async {
     try {
       _safeEmit(
         const AdminNotificationsSending(message: 'جاري إرسال الإشعارات...'),
       );
 
-      final request = BulkNotificationRequest(
-        title: data.title,
-        titleAr: data.titleAr,
-        body: data.body,
-        bodyAr: data.bodyAr,
-        targetType: data.targetType,
-        targetValue: data.targetValue,
-        notificationType: data.type,
-        priority: data.priority,
-        data: data.data,
-      );
-
-      final result = await _sendBulkNotification(
-        SendBulkNotificationParams(request: request),
-      );
-
-      result.fold(
-        (failure) => _safeEmit(
-          AdminNotificationsError(message: _mapFailureToMessage(failure)),
-        ),
-        (success) {
-          final recipientCount = _calculateRecipientCount(
-            data.targetType,
-            data.targetValue,
-          );
-          _safeEmit(
-            AdminNotificationsSent(
-              message: 'تم إرسال الإشعار بنجاح',
-              recipientCount: recipientCount,
-            ),
-          );
-          // Reload notifications to reflect changes
-          loadNotifications(refresh: true);
-        },
-      );
+      // Use the new Edge Function approach
+      await sendBulkNotificationToAll(data);
     } catch (e) {
       _safeEmit(AdminNotificationsError(message: 'فشل في إرسال الإشعار: $e'));
     }
@@ -411,18 +551,6 @@ class AdminNotificationsCubit extends Cubit<AdminNotificationsState> {
     }
 
     return 'حدث خطأ غير متوقع.';
-  }
-
-  int _calculateRecipientCount(TargetType targetType, dynamic targetValue) {
-    if (targetType == TargetType.all) return 10000;
-    if (targetType == TargetType.governorate) return 1500;
-    if (targetType == TargetType.userType) return 500;
-    if (targetType == TargetType.specificUsers) {
-      if (targetValue is List) return targetValue.length;
-      return 1;
-    }
-
-    return 0;
   }
 
   List<DailyNotificationStat> _parseDailyStats(List<dynamic> rawStats) {

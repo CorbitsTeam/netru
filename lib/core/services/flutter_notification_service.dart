@@ -193,7 +193,7 @@ class FlutterNotificationService {
         "apns": {
           "headers": {
             "apns-expiration":
-                "${DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000}",
+                "${DateTime.now().add(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000}",
           },
           "payload": {
             "aps": {
