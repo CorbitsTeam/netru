@@ -410,7 +410,7 @@ SOFTWARE.
 ## 📞 Contact & Support
 
 - **Email**: corbitsteam@gmail.com
-- **Documentation**: ([](https://drive.google.com/drive/folders/1B3ul-PqXqwANFxhNcszpCy8l3SRpm_n4?usp=sharing))
+- **Documentation**: ([full documentation](https://drive.google.com/drive/folders/1B3ul-PqXqwANFxhNcszpCy8l3SRpm_n4?usp=sharing))
 
 ---
 
